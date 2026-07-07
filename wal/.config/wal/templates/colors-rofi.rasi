@@ -1,0 +1,25 @@
+* {{
+    background:     {background};
+    foreground:     {foreground};
+    background-alt: {color8};
+    selected:       {color4};
+    active:         {color4};
+    urgent:         {color1};
+    color0:         {color0};
+    color1:         {color1};
+    color2:         {color2};
+    color3:         {color3};
+    color4:         {color4};
+    color5:         {color5};
+    color6:         {color6};
+    color7:         {color7};
+    color8:         {color8};
+    /* Variantes glass (alpha) · dinámicas con el wallpaper */
+    glass-bg:       rgba({background.rgb}, 0.55);
+    glass-bg-soft:  rgba({background.rgb}, 0.40);
+    glass-border:   rgba({foreground.rgb}, 0.10);
+    fg-soft:        rgba({foreground.rgb}, 0.55);
+    accent-soft:    rgba({color4.rgb}, 0.20);
+    accent-border:  rgba({color4.rgb}, 0.70);
+    urgent-soft:    rgba({color1.rgb}, 0.18);
+}}

@@ -1,0 +1,379 @@
+@import '../../.cache/wal/colors-waybar.css';
+
+/* ═══════════════════════════════════════════════════════════════
+   SWAYNC · PANEL DE NOTIFICACIONES — Dynamic-Island aesthetic
+   Vidrio ahumado · acento color4 · sombras tonificadas · fluidez
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── RESETEO ANTI-GTK ── */
+* {
+    font-family: "SF Pro Display", "Inter", "JetBrainsMono Nerd Font Propo", "Google Sans";
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+window, row, button, box, image, label, progress, trough {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+.blank-window { background: transparent; }
+.floating-notifications { background: transparent; }
+
+/* GTK4 aplica opacidad 50% a los labels por defecto — lo neutralizamos */
+.text-box label { filter: none; }
+
+/* ═══════════════════════════════════════════════════════════════
+   PANEL PRINCIPAL — Cristal ahumado
+   ═══════════════════════════════════════════════════════════════ */
+.control-center {
+    background-color: alpha(@background, 0.42);
+    border-radius: 18px;
+    border: 1px solid alpha(@foreground, 0.10);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.40),
+                inset 0 1px 0 0 alpha(@foreground, 0.06);
+    margin: 10px;
+    padding: 14px 10px;
+    min-width: 300px;
+    max-width: 300px;
+}
+
+/* Placeholder cuando no hay notificaciones */
+.control-center .control-center-list-placeholder {
+    color: alpha(@foreground, 0.40);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   REPRODUCTOR MPRIS — Tarjeta minimalista
+   ═══════════════════════════════════════════════════════════════ */
+.widget-mpris {
+    background-color: alpha(@foreground, 0.04);
+    border-radius: 14px;
+    border: 1px solid alpha(@foreground, 0.06);
+    padding: 10px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22),
+                inset 0 1px 0 0 alpha(@foreground, 0.05);
+}
+
+picture.mpris-background { opacity: 0; }
+
+.widget-mpris-album-art {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.40);
+    margin-right: 12px;
+}
+
+.widget-mpris-title {
+    color: @foreground;
+    font-weight: 800;
+    font-size: 1.05rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    margin-bottom: 2px;
+}
+
+.widget-mpris-subtitle {
+    color: alpha(@foreground, 0.65);
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.widget-mpris button {
+    color: alpha(@foreground, 0.55);
+    border-radius: 99px;
+    padding: 6px 8px;
+    background: alpha(@foreground, 0.04);
+}
+
+.widget-mpris button:hover {
+    background-color: @color4;
+    color: @background;
+    box-shadow: 0 2px 8px alpha(@color4, 0.35);
+    transform: scale(1.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CABECERA — Título + DND
+   ═══════════════════════════════════════════════════════════════ */
+.widget-title {
+    color: @foreground;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 2px 6px 8px 6px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.widget-title button {
+    background-color: alpha(@foreground, 0.08);
+    color: alpha(@foreground, 0.85);
+    border-radius: 99px;
+    padding: 5px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.widget-title button:hover {
+    background-color: @color1;
+    color: @background;
+    box-shadow: 0 2px 8px alpha(@color1, 0.35);
+}
+
+.widget-dnd {
+    margin: 0 6px 12px 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: alpha(@foreground, 0.85);
+}
+
+.widget-dnd switch {
+    background: alpha(@foreground, 0.10);
+    border-radius: 99px;
+    padding: 2px;
+    border: 1px solid alpha(@foreground, 0.08);
+}
+
+.widget-dnd switch:checked {
+    background: @color4;
+    border-color: alpha(@color4, 0.5);
+    box-shadow: 0 0 0 1px alpha(@color4, 0.30),
+                0 2px 8px alpha(@color4, 0.30);
+}
+
+.widget-dnd switch slider {
+    background: @foreground;
+    border-radius: 99px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TARJETAS DE NOTIFICACIÓN — Vidrio + rail de acento por urgencia
+   El rail izquierdo señala la urgencia sin agregar widgets:
+     · normal  → color4  (acento del sistema, sutil)
+     · baja    → color8  (apagado, discreto)
+     · crítica → rojo de alerta + glow cálido
+   ═══════════════════════════════════════════════════════════════ */
+.notification-row {
+    background: none;
+    outline: none;
+}
+
+.notification-row .notification-background {
+    padding: 4px;
+}
+
+/* Tarjeta base (urgencia normal) */
+.notification-row .notification-background .notification {
+    background-color: alpha(@background, 0.42);
+    border: 1px solid alpha(@foreground, 0.08);
+    border-left: 2px solid alpha(@color4, 0.32);
+    border-radius: 14px;
+    padding: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28),
+                inset 0 1px 0 0 alpha(@foreground, 0.05);
+}
+
+/* Baja prioridad — rail apagado */
+.notification-row .notification-background .notification.low {
+    border-left-color: alpha(@color8, 0.45);
+}
+
+/* Crítica — rail rojo más grueso + glow cálido (rompe paleta a propósito) */
+.notification-row .notification-background .notification.critical {
+    border: 1px solid rgba(224, 106, 106, 0.28);
+    border-left: 3px solid #E06A6A;
+    box-shadow: 0 3px 14px rgba(224, 106, 106, 0.16),
+                inset 0 1px 0 0 alpha(@foreground, 0.06);
+}
+
+/* Acción por defecto (área clickeable de la tarjeta) */
+.notification-row .notification-background .notification .notification-default-action {
+    padding: 4px;
+    border-radius: 12px;
+    background: transparent;
+}
+
+.notification-row .notification-background .notification .notification-default-action:hover {
+    background-color: alpha(@foreground, 0.05);
+}
+
+.notification-content { background: transparent; padding: 0; }
+
+/* Imagen principal (icono / thumbnail) */
+.image {
+    border-radius: 10px;
+    margin: 4px 8px 4px 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* Icono de la app (solo visible cuando hay imagen principal) */
+.app-icon {
+    -gtk-icon-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    margin: 4px;
+}
+
+.text-box { padding: 2px 4px; }
+
+/* Título */
+.summary {
+    color: @foreground;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1px;
+}
+
+/* Marca de tiempo (antes sin estilo) */
+.time {
+    color: alpha(@foreground, 0.42);
+    font-size: 0.72rem;
+    font-weight: 500;
+    margin-right: 24px;
+}
+
+/* Cuerpo */
+.body {
+    color: alpha(@foreground, 0.78);
+    font-weight: 400;
+    font-size: 0.85rem;
+}
+
+/* Imagen extra (body-image) */
+.body-image {
+    border-radius: 10px;
+    margin-top: 6px;
+}
+
+/* Barra de progreso */
+.notification-content progressbar {
+    margin-top: 6px;
+}
+
+.notification-content progressbar trough {
+    background-color: alpha(@foreground, 0.08);
+    border-radius: 99px;
+    min-height: 4px;
+    border: none;
+    box-shadow: none;
+}
+
+.notification-content progressbar progress {
+    background-color: @color4;
+    border-radius: 99px;
+    min-height: 4px;
+    margin: 0;
+    box-shadow: 0 0 6px alpha(@color4, 0.40);
+}
+
+/* Respuesta inline */
+.inline-reply { margin-top: 6px; }
+
+.inline-reply-entry {
+    background-color: alpha(@foreground, 0.06);
+    color: @foreground;
+    caret-color: @color4;
+    border: 1px solid alpha(@foreground, 0.10);
+    border-radius: 99px;
+    padding: 6px 12px;
+}
+
+.inline-reply-entry:focus {
+    border-color: alpha(@color4, 0.50);
+    box-shadow: 0 0 0 1px alpha(@color4, 0.30);
+}
+
+.inline-reply-button {
+    margin-left: 6px;
+    background-color: alpha(@color4, 0.15);
+    color: @color4;
+    border: none;
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-weight: 700;
+}
+
+.inline-reply-button:hover {
+    background-color: @color4;
+    color: @background;
+}
+
+.inline-reply-button:disabled {
+    background-color: alpha(@foreground, 0.04);
+    color: alpha(@foreground, 0.40);
+}
+
+/* Acciones alternativas (botones inferiores) */
+.notification-alt-actions {
+    padding: 4px;
+    background: transparent;
+}
+
+.notification-action > button {
+    border-radius: 10px;
+    color: alpha(@foreground, 0.85);
+    background-color: alpha(@foreground, 0.05);
+    padding: 6px 10px;
+    font-weight: 600;
+}
+
+.notification-action > button:hover {
+    background-color: alpha(@color4, 0.18);
+    color: @foreground;
+}
+
+/* Botón de cerrar */
+.close-button {
+    color: alpha(@foreground, 0.45);
+    background-color: alpha(@foreground, 0.04);
+    border-radius: 99px;
+    min-width: 22px;
+    min-height: 22px;
+    padding: 3px;
+    margin: 2px;
+}
+
+.close-button:hover {
+    background-color: @color1;
+    color: @background;
+    box-shadow: 0 2px 8px alpha(@color1, 0.35);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NOTIFICACIONES AGRUPADAS
+   ═══════════════════════════════════════════════════════════════ */
+.notification-group .notification-group-headers {
+    color: alpha(@foreground, 0.80);
+    padding: 2px 6px;
+}
+
+.notification-group .notification-group-header {
+    font-weight: 700;
+}
+
+.notification-group .notification-group-icon {
+    color: @color4;
+}
+
+.notification-group.collapsed.not-expanded {
+    opacity: 0.50;
+}
+
+.notification-group .notification-group-close-button .close-button {
+    margin: 2px 6px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NOTIFICACIONES FLOTANTES (popups)
+   Mismo lenguaje que el panel; sólo más opacas para flotar sobre
+   contenido arbitrario. Heredan rail de urgencia y (en críticas) glow.
+   ═══════════════════════════════════════════════════════════════ */
+.floating-notifications .notification-row .notification-background {
+    padding: 4px;
+    margin: 8px 12px;
+}
+
+.floating-notifications .notification-row .notification-background .notification {
+    background-color: alpha(@background, 0.48);
+}

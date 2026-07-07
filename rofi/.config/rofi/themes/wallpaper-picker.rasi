@@ -1,0 +1,128 @@
+configuration {
+    font: "JetBrains Mono Nerd Font 12";
+    show-icons: true;
+    hover-select: true;
+    me-select-entry: "MouseSecondary";
+    me-accept-entry: "MousePrimary";
+}
+* {
+    text-color: #cdd6f4;
+    background-color: transparent;
+    border-color: rgba(205, 214, 244, 0.10);
+}
+/* ── Panel de cristal (blur via Hyprland layerrule) ── */
+window {
+    transparency: "real";
+    fullscreen: false;
+    cursor: "default";
+    border-radius: 16px;
+    location: center;
+    anchor: center;
+    width: 75%;
+    background-color: rgba(14, 6, 6, 0.62);
+    border: 1px solid;
+    border-color: rgba(205, 214, 244, 0.10);
+}
+mainbox {
+    children: [ "inputbar", "listview", "message" ];
+    background-color: transparent;
+    padding: 14px;
+    spacing: 14px;
+}
+/* ── Píldora de búsqueda (isla) ── */
+inputbar {
+    text-color: rgba(205, 214, 244, 0.85);
+    background-color: rgba(14, 6, 6, 0.45);
+    border: 1px solid;
+    border-color: rgba(205, 214, 244, 0.08);
+    border-radius: 99px;
+    padding: 8px 16px;
+    margin: 0 6px;
+    spacing: 8px;
+    children: [ "prompt", "entry" ];
+}
+/* icono de busqueda pintado en el acento de pywal */
+prompt {
+    text-color: rgba(176, 175, 177, 0.95);
+    background-color: transparent;
+    padding: 0 6px 0 2px;
+}
+entry {
+    text-color: inherit;
+    background-color: transparent;
+    placeholder: "actual: wallhaven-7pzrwv   ·   buscar...";
+    placeholder-color: rgba(205, 214, 244, 0.40);
+}
+/* ── Galería de thumbnails ── */
+listview {
+    columns: 5;
+    lines: 2;
+    padding: 0 6px 6px 6px;
+    cycle: true;
+    dynamic: true;
+    scrollbar: false;
+    layout: horizontal;
+    fixed-height: true;
+    fixed-columns: true;
+    background-color: transparent;
+    spacing: 18px;
+    border: 0px;
+}
+element {
+    orientation: vertical;
+    expand: false;
+    spacing: 8px;
+    padding: 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: transparent;
+    border: 1px solid;
+    border-color: transparent;
+}
+element normal.normal {
+    background-color: transparent;
+    text-color: rgba(205, 214, 244, 0.65);
+}
+/* Thumbnail seleccionado: se "enciende" con el acento */
+element selected.normal {
+    background-color: rgba(176, 175, 177, 0.22);
+    text-color: #cdd6f4;
+    border: 1px solid;
+    border-color: rgba(176, 175, 177, 0.70);
+    border-radius: 12px;
+}
+element alternate.normal {
+    background-color: transparent;
+    text-color: rgba(205, 214, 244, 0.50);
+}
+element-icon {
+    size: 50%;
+    cursor: inherit;
+    expand: false;
+    padding: 0px;
+    background-color: transparent;
+    border-radius: 10px;
+    border: 1px solid;
+    border-color: rgba(205, 214, 244, 0.06);
+}
+element-text {
+    cursor: inherit;
+    background-color: transparent;
+    text-color: inherit;
+    font: "JetBrains Mono Nerd Font 9";
+    horizontal-align: 0.5;
+}
+/* ── Footer de atajos (tenue; contenido via -mesg del script) ── */
+message {
+    background-color: transparent;
+    margin: 6px 0 2px 0;
+    padding: 0;
+}
+message textbox {
+    background-color: transparent;
+    text-color: rgba(205, 214, 244, 0.30);
+    font: "JetBrains Mono Nerd Font 9";
+    padding: 4px;
+    horizontal-align: 0.5;
+    str: "↑↓  Navegar    ⏎  Aplicar    Esc  Cerrar";
+}

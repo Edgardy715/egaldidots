@@ -1,0 +1,15 @@
+# ── Editor / OS cruft ──
+.DS_Store
+*~
+*.swp
+*.swo
+*.tmp
+
+# ── GNU Stow ──
+.stow-recovery
+
+# ── Backups locales (install.sh los escribe fuera del repo; por las dudas) ──
+*.bak
+*.orig
+
+# Nota: ~/Wallpapers SÍ se commitea (parte explícita del repo, decisión del autor).

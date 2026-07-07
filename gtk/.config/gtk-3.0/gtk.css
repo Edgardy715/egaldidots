@@ -1,0 +1,14 @@
+/*
+ * Glass sutil para el selector de archivos GTK (el dialog "Elegir archivo"
+ * que levanta el navegador via xdg-desktop-portal-gtk).
+ *
+ * La paleta viene de FlatColor (wpg/pywal): @theme_bg_color == tu color de fondo
+ * actual → ya va SIEMPRE en sync con el wallpaper. El blur global de Hyprland
+ * (decorations.conf, ignore_opacity=true) se renderiza a través del alpha.
+ *
+ * Alpha 0.92 elegido a propósito: sutil, sin amenazar el contraste del texto
+ * en diálogos chicos. Reversible: borrá este archivo para volver a fondo sólido.
+ */
+filechooser {
+    background-color: alpha(@theme_bg_color, 0.92);
+}

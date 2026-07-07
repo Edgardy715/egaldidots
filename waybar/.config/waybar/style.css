@@ -1,0 +1,221 @@
+@import "../../.cache/wal/colors-waybar.css";
+
+/* ═══════════════════════════════════════════════════════════════
+   WAYBAR · Dynamic-Island aesthetic
+   Vidrio ahumado · acento color4 · lo vivo respira · easing exponencial
+   ═══════════════════════════════════════════════════════════════ */
+* {
+    all: unset;
+    font-family: "SF Pro Display", "Inter", "JetBrainsMono Nerd Font Propo", "Google Sans";
+}
+
+label {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Tooltip · cristal ── */
+tooltip {
+    background-color: alpha(@background, 0.85);
+    color: @foreground;
+    border-radius: 10px;
+    border: 1px solid alpha(@foreground, 0.10);
+    margin: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.40);
+}
+
+/* ── Islas · cristal con catch-light (luz superior interior) ── */
+.modules-left,
+.modules-center,
+.modules-right {
+    background-color: alpha(@background, 0.32);
+    padding: 2px 14px;
+    border-radius: 14px;
+    border: 1px solid alpha(@foreground, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22),
+                inset 0 1px 0 0 alpha(@foreground, 0.06);
+    transition: background-color 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.modules-left  { margin-left: 15px; }
+.modules-right { margin-right: 15px; }
+
+#clock,
+#pulseaudio,
+#network,
+#battery {
+    padding: 0 8px;
+    font-weight: 700;
+    transition: color 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+                background-color 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ── VENTANA ACTIVA · compañera de la isla ── */
+#window {
+    color: alpha(@foreground, 0.85);
+    font-style: italic;
+    font-weight: 500;
+    padding: 0 6px;
+    letter-spacing: 0.2px;
+    transition: color 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+#window.empty {
+    color: alpha(@foreground, 0.22);
+}
+
+/* ── WORKSPACES · puntos respirantes ── */
+#workspaces {
+    padding: 0;
+    margin: 0 4px;
+}
+
+#workspaces button {
+    font-size: 0;
+    min-width: 10px;
+    min-height: 10px;
+    padding: 0;
+    border-radius: 100px;
+    background-color: @foreground;
+    margin: 8px 4px;
+    opacity: 0.5;
+    transition: min-width 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+                opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+                background-color 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+#workspaces button.empty {
+    opacity: 0.15;
+}
+
+/* ── Latido de la isla · el dot activo respira ── */
+@keyframes island-breathe {
+    0%   { box-shadow: 0 0 7px  alpha(@color4, 0.36); }
+    50%  { box-shadow: 0 0 14px alpha(@color4, 0.62); }
+    100% { box-shadow: 0 0 7px  alpha(@color4, 0.36); }
+}
+
+#workspaces button.active {
+    min-width: 30px;
+    background-color: @color4;
+    opacity: 1;
+    box-shadow: 0 0 10px alpha(@color4, 0.50);
+    animation: island-breathe 3.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+#workspaces button:hover {
+    opacity: 0.82;
+}
+
+/* ── MÓDULOS · color por función ── */
+#pulseaudio          { color: @color4; }
+#pulseaudio.muted    { color: @color8; }
+
+#network             { color: @color6; }
+#network.disconnected { color: @color1; }
+
+#battery {
+    color: @color2;
+    transition: color 0.5s cubic-bezier(0.2, 1, 0.2, 1);
+}
+#battery.warning  { color: @color3; }
+#battery.critical { color: @color1; }
+
+/* ── TASKBAR · app-icons con spring suave ── */
+#taskbar {
+    background-color: transparent;
+    padding: 0 2px;
+}
+
+#taskbar button {
+    padding: 2px 4px;
+    background-color: transparent;
+    border-radius: 8px;
+    opacity: 0.5;
+    min-width: 0;
+    transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background-color 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#taskbar button:hover {
+    opacity: 1;
+    background-color: alpha(@color8, 0.18);
+}
+
+#taskbar button.active {
+    opacity: 1;
+    background-color: alpha(@color8, 0.22);
+    box-shadow: inset 0 -1.5px 0 0 alpha(@color4, 0.55);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MPRIS · píldora viva de cristal
+   · aparece al reproducir, se desvanece al pausar (hide-on-pause)
+   · respira con un glow de acento mientras suena → mismo lenguaje
+     que el latido de la isla (coherencia, no RGB)
+   · hover ilumina el vidrio
+   ═══════════════════════════════════════════════════════════════ */
+#mpris {
+    background-color: alpha(@background, 0.42);
+    color: @foreground;
+    font-weight: 700;
+    border-radius: 12px;
+    margin: 4px 6px 4px 10px;
+    padding: 2px 12px;
+    border: 1px solid alpha(@foreground, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 0 alpha(@foreground, 0.06);
+    transition: background-color 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+                color 0.45s cubic-bezier(0.25, 1, 0.5, 1),
+                border-color 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    animation: mpris-breathe 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Respira con el acento del sistema mientras suena */
+@keyframes mpris-breathe {
+    0% {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 0 alpha(@foreground, 0.06),
+                    0 0 5px  rgba(213, 149, 105, 0.00);
+    }
+    50% {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 0 alpha(@foreground, 0.06),
+                    0 0 16px rgba(213, 149, 105, 0.34);
+    }
+    100% {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 0 alpha(@foreground, 0.06),
+                    0 0 5px  rgba(213, 149, 105, 0.00);
+    }
+}
+
+#mpris:hover {
+    background-color: alpha(@foreground, 0.07);
+    border-color: alpha(@color4, 0.32);
+}
+
+/* Spotify · vidrio teñido de verde (lee como Spotify sin romper la paleta) */
+#mpris.spotify {
+    color: #1db954;
+    animation: mpris-breathe-spotify 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes mpris-breathe-spotify {
+    0% {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 0 alpha(@foreground, 0.06),
+                    0 0 5px  rgba(29, 185, 84, 0.00);
+    }
+    50% {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 0 alpha(@foreground, 0.06),
+                    0 0 16px rgba(29, 185, 84, 0.34);
+    }
+    100% {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25),
+                    inset 0 1px 0 0 alpha(@foreground, 0.06),
+                    0 0 5px  rgba(29, 185, 84, 0.00);
+    }
+}
