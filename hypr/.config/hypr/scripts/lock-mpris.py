@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 """
-lock-mpris.py · "now playing" en UNA línea de TEXTO PLANO para hyprlock.
+lock-mpris.py · single-line PLAIN-TEXT "now playing" for hyprlock.
 
-  lock-mpris.py line   →  "󰈹  Artista — Título"   (solo si está sonando)
-                          ""                          (pausado / sin player)
+  lock-mpris.py line   →  "󰈹  Artist — Title"   (only while playing)
+                          ""                       (paused / no player)
 
-Por qué texto plano: hyprlock escapa la salida de `cmd` antes de renderizar,
-así que el markup Pango (<span>) saldría literal en pantalla.  El color lo
-aporta el label del .conf ($accent), no el script.
+Why plain text: hyprlock escapes `cmd` output before rendering, so Pango
+markup (<span>) would show up literally. Color comes from the .conf label
+($accent), not the script.
 
-Por qué una línea sin caja: hyprlock NO recorta el texto al shape → si el
-título es más ancho que la píldora, se desborda.  Una línea tipográfica
-flotante (como el reloj y la fecha, que tampoco tienen caja) evita eso y es
-más minimalista.  Solo visible mientras reproduce (hide-on-pause, igual que
-el módulo mpris de waybar); al pausar o parar la línea desaparece sin dejar
-rastro.
+Why a boxless line: hyprlock doesn't clip text to shapes → a title wider
+than a pill would overflow. A floating typographic line (like the clock and
+date, also boxless) avoids that and is more minimal. Shown only while playing
+(hide-on-pause, like waybar's mpris); on pause/stop the line disappears.
 
-Lectura con una sola llamada `playerctl --format` (rápido).  Tolerante: sin
-player / pausado / sin título / playerctl ausente → nunca rompe, devuelve "".
+One `playerctl --format` call (fast). Tolerant: no player / paused / no
+title / playerctl missing → never throws, returns "".
 """
 import sys, subprocess
 
@@ -33,7 +31,7 @@ MAXLEN = 40
 
 
 def sh(*args):
-    """playerctl callado; '' si no hay player o falla."""
+    """playerctl, quiet; '' if no player or it fails."""
     try:
         r = subprocess.run(args, capture_output=True, text=True, timeout=TIMEOUT)
         return r.stdout.strip() if r.returncode == 0 else ""
@@ -47,9 +45,9 @@ def trunc(s, n):
 
 
 def line():
-    """ 󰈹  Artista — Título  si está sonando;  ''  si no."""
+    """ 󰈹  Artist — Title  if playing;  ''  otherwise."""
     if sh(PLAYER, "status") != "Playing":
-        return ""                            # pausado/parado/idle → invisible
+        return ""                            # paused/stopped/idle → invisible
     meta = sh(PLAYER, "metadata", "--format",
               "{{playerName}}|{{title}}|{{artist}}")
     if not meta or "|" not in meta:
@@ -59,7 +57,7 @@ def line():
         return ""
     player = parts[0].strip()
     artist = parts[-1].strip()
-    title  = "|".join(parts[1:-1]).strip()  # tolera '|' dentro del título
+    title  = "|".join(parts[1:-1]).strip()  # tolerate '|' inside the title
     if not title:
         return ""
     name = f"{artist} — {title}" if artist else title

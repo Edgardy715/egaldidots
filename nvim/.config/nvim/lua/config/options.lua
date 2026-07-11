@@ -3,59 +3,59 @@
 -- Add any additional options here
 
 -- ══════════════════════════════════════════════
---  NÚMEROS DE LÍNEA
+--  LINE NUMBERS
 -- ══════════════════════════════════════════════
-vim.opt.number = true -- muestra el número de línea actual
-vim.opt.relativenumber = true -- líneas arriba/abajo muestran la distancia
+vim.opt.number = true -- shows the current line number
+vim.opt.relativenumber = true -- lines above/below show their distance
 
 -- ══════════════════════════════════════════════
---  INDENTACIÓN
+--  INDENTATION
 -- ══════════════════════════════════════════════
-vim.opt.tabstop = 2 -- un tab equivale a 2 espacios visualmente
-vim.opt.shiftwidth = 2 -- al indentar con >> o <<, mueve 2 espacios
-vim.opt.expandtab = true -- convierte tabs en espacios al escribir
-vim.opt.smartindent = true -- indenta automáticamente al abrir llaves/bloques
+vim.opt.tabstop = 2 -- a tab equals 2 spaces visually
+vim.opt.shiftwidth = 2 -- indenting with >> or << shifts 2 spaces
+vim.opt.expandtab = true -- converts tabs into spaces while typing
+vim.opt.smartindent = true -- auto-indents on opening braces/blocks
 
 -- ══════════════════════════════════════════════
---  SCROLL Y CURSOR
+--  SCROLL & CURSOR
 -- ══════════════════════════════════════════════
-vim.opt.scrolloff = 8 -- mantiene 8 líneas de contexto arriba/abajo del cursor
-vim.opt.sidescrolloff = 8 -- igual pero horizontal
-vim.opt.cursorline = true -- resalta la línea donde está el cursor
+vim.opt.scrolloff = 8 -- keeps 8 lines of context above/below the cursor
+vim.opt.sidescrolloff = 8 -- same but horizontal
+vim.opt.cursorline = true -- highlights the line the cursor is on
 
 -- ══════════════════════════════════════════════
---  BÚSQUEDA
+--  SEARCH
 -- ══════════════════════════════════════════════
-vim.opt.ignorecase = true -- búsqueda sin distinguir mayúsculas
-vim.opt.smartcase = true -- pero si escribes con mayúscula, sí las respeta
+vim.opt.ignorecase = true -- case-insensitive search
+vim.opt.smartcase = true -- but uppercase input is still case-sensitive
 
 -- ══════════════════════════════════════════════
 --  CLIPBOARD
 -- ══════════════════════════════════════════════
-vim.opt.clipboard = "unnamedplus" -- comparte clipboard con el sistema (Wayland/X11)
+vim.opt.clipboard = "unnamedplus" -- shares the clipboard with the system (Wayland/X11)
 
 -- ══════════════════════════════════════════════
 --  VISUAL
 -- ══════════════════════════════════════════════
-vim.opt.colorcolumn = "" -- línea guía en la columna 100
-vim.opt.signcolumn = "yes" -- siempre muestra la columna de signos (errores, git, etc)
-vim.opt.termguicolors = true -- colores de 24 bits en la terminal
-vim.opt.wrap = false -- no parte líneas largas visualmente
+vim.opt.colorcolumn = "" -- no fixed-width guide column
+vim.opt.signcolumn = "yes" -- always shows the sign column (errors, git, etc)
+vim.opt.termguicolors = true -- 24-bit colors in the terminal
+vim.opt.wrap = false -- don't visually wrap long lines
 
 -- ══════════════════════════════════════════════
 --  SPLITS
 -- ══════════════════════════════════════════════
-vim.opt.splitright = true -- nuevos splits verticales abren a la derecha
-vim.opt.splitbelow = true -- nuevos splits horizontales abren abajo
+vim.opt.splitright = true -- new vertical splits open to the right
+vim.opt.splitbelow = true -- new horizontal splits open below
 
 -- ══════════════════════════════════════════════
---  ARCHIVOS
+--  FILES
 -- ══════════════════════════════════════════════
-vim.opt.undofile = true -- guarda el historial de deshacer aunque cierres nvim
-vim.opt.swapfile = false -- no crea archivos .swp
+vim.opt.undofile = true -- keeps the undo history even after closing nvim
+vim.opt.swapfile = false -- doesn't create .swp files
 
 -- ══════════════════════════════════════════════
---  DETECCIÓN DE ARCHIVOS DE RED (CISCO / FORTINET)
+--  NETWORK FILE TYPE DETECTION (CISCO / FORTINET)
 -- ══════════════════════════════════════════════
 vim.filetype.add({
   extension = {

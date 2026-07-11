@@ -8,8 +8,8 @@
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
 -- ─────────────────────────────────────────────────────────────
--- LEE LOS COLORES DE PYWAL
--- Devuelve una tabla indexada desde 0 con los colores de:
+-- READS THE PYWAL COLORS
+-- Returns a 0-indexed table with the colors from:
 --   ~/.cache/wal/colors
 -- ─────────────────────────────────────────────────────────────
 local function get_wal_colors()
@@ -27,8 +27,8 @@ local function get_wal_colors()
 end
 
 -- ─────────────────────────────────────────────────────────────
--- HIGHLIGHTS PERSONALIZADOS GENERALES
--- Texto neutro legible + keywords/tipos/strings con colores pywal
+-- GENERAL CUSTOM HIGHLIGHTS
+-- Readable neutral text + keywords/types/strings with pywal colors
 -- ─────────────────────────────────────────────────────────────
 local function apply_wal_highlights()
   local wal = get_wal_colors()
@@ -71,11 +71,11 @@ local function apply_wal_highlights()
 end
 
 -- ─────────────────────────────────────────────────────────────
--- HIGHLIGHTS PARA SNACKS DASHBOARD
--- Más jerarquía visual:
---   - header más tenue
---   - acciones más claras
---   - footer más discreto
+-- HIGHLIGHTS FOR THE SNACKS DASHBOARD
+-- More visual hierarchy:
+--   - dimmer header
+--   - clearer actions
+--   - more discreet footer
 -- ─────────────────────────────────────────────────────────────
 local function apply_dashboard_highlights()
   local wal = get_wal_colors()
@@ -98,8 +98,8 @@ local function apply_dashboard_highlights()
 end
 
 -- ─────────────────────────────────────────────────────────────
--- HIGHLIGHTS PARA NVIM-NOTIFY
--- Reaplica colores de notify derivados de pywal
+-- HIGHLIGHTS FOR NVIM-NOTIFY
+-- Reapplies pywal-derived notify colors
 -- ─────────────────────────────────────────────────────────────
 local function apply_notify_highlights()
   local wal = get_wal_colors()
@@ -139,8 +139,8 @@ local function apply_notify_highlights()
 end
 
 -- ─────────────────────────────────────────────────────────────
--- HIGHLIGHTS PARA SATELLITE (SCROLLBAR)
--- Reaplica colores del scrollbar y sus marcadores
+-- HIGHLIGHTS FOR SATELLITE (SCROLLBAR)
+-- Reapplies the scrollbar colors and its markers
 -- ─────────────────────────────────────────────────────────────
 local function apply_satellite_highlights()
   local wal = get_wal_colors()
@@ -166,24 +166,24 @@ local function apply_satellite_highlights()
 end
 
 -- ─────────────────────────────────────────────────────────────
--- REFRESCA PLUGINS/UI QUE NECESITAN REAPLICACIÓN ACTIVA
+-- REFRESHES PLUGINS/UI THAT NEED ACTIVE REAPPLY
 -- ─────────────────────────────────────────────────────────────
 local function refresh_dynamic_ui()
   if _G.reload_lualine then
     _G.reload_lualine()
   end
 
-  -- satellite.nvim puede quedarse desincronizado tras cambios visuales;
-  -- su comando recomendado para resincronizar es :SatelliteRefresh
+  -- satellite.nvim can go out of sync after visual changes;
+  -- its recommended resync command is :SatelliteRefresh
   pcall(vim.cmd, "SatelliteRefresh")
 
-  -- Redibuja statusline/winbar
+  -- Redraws the statusline/winbar
   vim.cmd("redrawstatus")
 end
 
 -- ─────────────────────────────────────────────────────────────
--- APLICA TODOS LOS HIGHLIGHTS PERSONALIZADOS
--- Punto central de estilo visual
+-- APPLIES ALL CUSTOM HIGHLIGHTS
+-- Central visual-style entrypoint
 -- ─────────────────────────────────────────────────────────────
 local function apply_all_custom_highlights()
   apply_wal_highlights()
@@ -193,13 +193,13 @@ local function apply_all_custom_highlights()
 end
 
 -- ─────────────────────────────────────────────────────────────
--- RECARGA VISUAL COMPLETA DESDE PYWAL
--- Flujo:
---   1. Limpia caché de pywal16
---   2. Relee ~/.cache/wal/colors
---   3. Aplica colorscheme pywal16
---   4. Reaplica todos los highlights personalizados
---   5. Refresca lualine y satellite
+-- FULL VISUAL RELOAD FROM PYWAL
+-- Flow:
+--   1. Clear the pywal16 cache
+--   2. Re-read ~/.cache/wal/colors
+--   3. Apply the pywal16 colorscheme
+--   4. Re-apply all custom highlights
+--   5. Refresh lualine and satellite
 -- ─────────────────────────────────────────────────────────────
 local function full_wal_reload()
   package.loaded["pywal16"] = nil
@@ -211,11 +211,11 @@ local function full_wal_reload()
 end
 
 -- ─────────────────────────────────────────────────────────────
--- Al cambiar colorscheme:
--- reaplica todos los highlights personalizados y refresca UI.
--- No llamamos full_wal_reload aquí para evitar loops, porque
--- full_wal_reload ejecuta :colorscheme y eso dispararía este
--- mismo autocmd otra vez.
+-- On colorscheme change:
+-- re-apply all custom highlights and refresh the UI.
+-- We don't call full_wal_reload here to avoid loops, because
+-- full_wal_reload runs :colorscheme, which would trigger this
+-- same autocmd again.
 -- ─────────────────────────────────────────────────────────────
 vim.api.nvim_create_autocmd("ColorScheme", {
   callback = function()
@@ -225,9 +225,9 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 })
 
 -- ─────────────────────────────────────────────────────────────
--- Al recibir SIGUSR1 desde el wallpaper picker:
--- recarga completa de pywal + highlights + UI
--- Ejemplo:
+-- On receiving SIGUSR1 from the wallpaper picker:
+-- full reload of pywal + highlights + UI
+-- Example:
 --   pkill -USR1 nvim
 -- ─────────────────────────────────────────────────────────────
 vim.api.nvim_create_autocmd("Signal", {

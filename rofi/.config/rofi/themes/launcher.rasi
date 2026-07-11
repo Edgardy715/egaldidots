@@ -1,7 +1,7 @@
 /**
  * Launcher · Dynamic-Island aesthetic
- * Vidrio ahumado · acento dinámico (color4 vía pywal) · Launchpad glass
- * Colores: @import colors-rofi.rasi (variantes glass incluidas)
+ * Smoked glass · dynamic accent (color4 via pywal) · Launchpad glass
+ * Colors: @import colors-rofi.rasi (glass variants included)
  **/
 
 configuration {
@@ -17,7 +17,7 @@ configuration {
 @import                          "../../../.cache/wal/colors-rofi.rasi"
 @import                          "shared/fonts.rasi"
 
-/*****----- Main Window · cristal ──*****/
+/*****----- Main Window · glass ──*****/
 window {
     transparency:                "real";
     location:                    center;
@@ -48,7 +48,7 @@ mainbox {
     children:                    [ "inputbar", "listview" ];
 }
 
-/*****----- Inputbar · píldora de búsqueda ──*****/
+/*****----- Inputbar · search pill ──*****/
 inputbar {
     enabled:                     true;
     spacing:                     10px;
@@ -75,11 +75,11 @@ entry {
     background-color:            transparent;
     text-color:                  inherit;
     cursor:                      "text";
-    placeholder:                 "Buscar aplicaciones…";
+    placeholder:                 "Search applications…";
     placeholder-color:           @fg-soft;
 }
 
-/*****----- Listview · grid Launchpad ──*****/
+/*****----- Listview · Launchpad grid ──*****/
 listview {
     enabled:                     true;
     columns:                     6;
@@ -108,7 +108,7 @@ scrollbar {
     background-color:            transparent;
 }
 
-/*****----- Elements · tiles de cristal ──*****/
+/*****----- Elements · glass tiles ──*****/
 element {
     enabled:                     true;
     spacing:                     8px;
@@ -129,7 +129,7 @@ element normal.normal {
     text-color:                  @fg-soft;
 }
 
-/* Tile seleccionada · se enciende con el acento del sistema */
+/* Selected tile · lights up with the system accent */
 element selected.normal {
     background-color:            @accent-soft;
     border:                      1px solid;
@@ -162,7 +162,7 @@ element-text {
     font:                        "JetBrainsMono Nerd Font 9";
 }
 
-/*****----- Mensaje de error ──*****/
+/*****----- Error message ──*****/
 error-message {
     padding:                     14px;
     border:                      1px solid;

@@ -1,5 +1,5 @@
 return {
-  -- gitsigns: indicadores de cambios en el margen
+  -- gitsigns: change indicators in the margin
   {
     "lewis6991/gitsigns.nvim",
     opts = {
@@ -11,15 +11,15 @@ return {
         changedelete = { text = "▎" },
         untracked = { text = "▎" },
       },
-      -- Muestra el blame de la línea actual mientras escribes
+      -- Shows the blame for the current line as you type
       current_line_blame = true,
       current_line_blame_opts = {
-        delay = 500, -- aparece después de 500ms de no mover el cursor
+        delay = 500, -- shows up after 500ms without moving the cursor
       },
     },
   },
 
-  -- lazygit: cliente git visual completo
+  -- lazygit: full visual git client
   {
     "kdheepak/lazygit.nvim",
     keys = {

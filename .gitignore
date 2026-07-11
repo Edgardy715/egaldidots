@@ -12,4 +12,4 @@
 *.bak
 *.orig
 
-# Nota: ~/Wallpapers SÍ se commitea (parte explícita del repo, decisión del autor).
+# Note: ~/Wallpapers IS tracked (an explicit part of the repo, by design).

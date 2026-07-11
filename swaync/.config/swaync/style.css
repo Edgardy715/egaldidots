@@ -1,11 +1,11 @@
 @import '../../.cache/wal/colors-waybar.css';
 
 /* ═══════════════════════════════════════════════════════════════
-   SWAYNC · PANEL DE NOTIFICACIONES — Dynamic-Island aesthetic
-   Vidrio ahumado · acento color4 · sombras tonificadas · fluidez
+   SWAYNC · NOTIFICATION PANEL — Dynamic-Island aesthetic
+   Smoked glass · color4 accent · tinted shadows · fluidity
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── RESETEO ANTI-GTK ── */
+/* ── ANTI-GTK RESET ── */
 * {
     font-family: "SF Pro Display", "Inter", "JetBrainsMono Nerd Font Propo", "Google Sans";
     transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
@@ -21,11 +21,11 @@ window, row, button, box, image, label, progress, trough {
 .blank-window { background: transparent; }
 .floating-notifications { background: transparent; }
 
-/* GTK4 aplica opacidad 50% a los labels por defecto — lo neutralizamos */
+/* GTK4 applies 50% opacity to labels by default — we neutralize it */
 .text-box label { filter: none; }
 
 /* ═══════════════════════════════════════════════════════════════
-   PANEL PRINCIPAL — Cristal ahumado
+   MAIN PANEL — Smoked glass
    ═══════════════════════════════════════════════════════════════ */
 .control-center {
     background-color: alpha(@background, 0.42);
@@ -39,7 +39,7 @@ window, row, button, box, image, label, progress, trough {
     max-width: 300px;
 }
 
-/* Placeholder cuando no hay notificaciones */
+/* Placeholder when there are no notifications */
 .control-center .control-center-list-placeholder {
     color: alpha(@foreground, 0.40);
     font-size: 0.85rem;
@@ -47,7 +47,7 @@ window, row, button, box, image, label, progress, trough {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   REPRODUCTOR MPRIS — Tarjeta minimalista
+   MPRIS PLAYER — Minimalist card
    ═══════════════════════════════════════════════════════════════ */
 .widget-mpris {
     background-color: alpha(@foreground, 0.04);
@@ -96,7 +96,7 @@ picture.mpris-background { opacity: 0; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CABECERA — Título + DND
+   HEADER — Title + DND
    ═══════════════════════════════════════════════════════════════ */
 .widget-title {
     color: @foreground;
@@ -149,11 +149,11 @@ picture.mpris-background { opacity: 0; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   TARJETAS DE NOTIFICACIÓN — Vidrio + rail de acento por urgencia
-   El rail izquierdo señala la urgencia sin agregar widgets:
-     · normal  → color4  (acento del sistema, sutil)
-     · baja    → color8  (apagado, discreto)
-     · crítica → rojo de alerta + glow cálido
+   NOTIFICATION CARDS — Glass + accent rail per urgency
+   The left rail signals urgency without adding widgets:
+     · normal   → color4  (system accent, subtle)
+     · low      → color8  (dimmed, discreet)
+     · critical → alert red + warm glow
    ═══════════════════════════════════════════════════════════════ */
 .notification-row {
     background: none;
@@ -164,7 +164,7 @@ picture.mpris-background { opacity: 0; }
     padding: 4px;
 }
 
-/* Tarjeta base (urgencia normal) */
+/* Base card (normal urgency) */
 .notification-row .notification-background .notification {
     background-color: alpha(@background, 0.42);
     border: 1px solid alpha(@foreground, 0.08);
@@ -175,12 +175,12 @@ picture.mpris-background { opacity: 0; }
                 inset 0 1px 0 0 alpha(@foreground, 0.05);
 }
 
-/* Baja prioridad — rail apagado */
+/* Low priority — dimmed rail */
 .notification-row .notification-background .notification.low {
     border-left-color: alpha(@color8, 0.45);
 }
 
-/* Crítica — rail rojo más grueso + glow cálido (rompe paleta a propósito) */
+/* Critical — thicker red rail + warm glow (breaks the palette on purpose) */
 .notification-row .notification-background .notification.critical {
     border: 1px solid rgba(224, 106, 106, 0.28);
     border-left: 3px solid #E06A6A;
@@ -188,7 +188,7 @@ picture.mpris-background { opacity: 0; }
                 inset 0 1px 0 0 alpha(@foreground, 0.06);
 }
 
-/* Acción por defecto (área clickeable de la tarjeta) */
+/* Default action (clickable area of the card) */
 .notification-row .notification-background .notification .notification-default-action {
     padding: 4px;
     border-radius: 12px;
@@ -201,14 +201,14 @@ picture.mpris-background { opacity: 0; }
 
 .notification-content { background: transparent; padding: 0; }
 
-/* Imagen principal (icono / thumbnail) */
+/* Main image (icon / thumbnail) */
 .image {
     border-radius: 10px;
     margin: 4px 8px 4px 4px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
-/* Icono de la app (solo visible cuando hay imagen principal) */
+/* App icon (only visible when there's a main image) */
 .app-icon {
     -gtk-icon-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     margin: 4px;
@@ -216,7 +216,7 @@ picture.mpris-background { opacity: 0; }
 
 .text-box { padding: 2px 4px; }
 
-/* Título */
+/* Title */
 .summary {
     color: @foreground;
     font-weight: 700;
@@ -225,7 +225,7 @@ picture.mpris-background { opacity: 0; }
     margin-bottom: 1px;
 }
 
-/* Marca de tiempo (antes sin estilo) */
+/* Timestamp (previously unstyled) */
 .time {
     color: alpha(@foreground, 0.42);
     font-size: 0.72rem;
@@ -233,20 +233,20 @@ picture.mpris-background { opacity: 0; }
     margin-right: 24px;
 }
 
-/* Cuerpo */
+/* Body */
 .body {
     color: alpha(@foreground, 0.78);
     font-weight: 400;
     font-size: 0.85rem;
 }
 
-/* Imagen extra (body-image) */
+/* Extra image (body-image) */
 .body-image {
     border-radius: 10px;
     margin-top: 6px;
 }
 
-/* Barra de progreso */
+/* Progress bar */
 .notification-content progressbar {
     margin-top: 6px;
 }
@@ -267,7 +267,7 @@ picture.mpris-background { opacity: 0; }
     box-shadow: 0 0 6px alpha(@color4, 0.40);
 }
 
-/* Respuesta inline */
+/* Inline reply */
 .inline-reply { margin-top: 6px; }
 
 .inline-reply-entry {
@@ -304,7 +304,7 @@ picture.mpris-background { opacity: 0; }
     color: alpha(@foreground, 0.40);
 }
 
-/* Acciones alternativas (botones inferiores) */
+/* Alternative actions (bottom buttons) */
 .notification-alt-actions {
     padding: 4px;
     background: transparent;
@@ -323,7 +323,7 @@ picture.mpris-background { opacity: 0; }
     color: @foreground;
 }
 
-/* Botón de cerrar */
+/* Close button */
 .close-button {
     color: alpha(@foreground, 0.45);
     background-color: alpha(@foreground, 0.04);
@@ -341,7 +341,7 @@ picture.mpris-background { opacity: 0; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   NOTIFICACIONES AGRUPADAS
+   GROUPED NOTIFICATIONS
    ═══════════════════════════════════════════════════════════════ */
 .notification-group .notification-group-headers {
     color: alpha(@foreground, 0.80);
@@ -365,9 +365,9 @@ picture.mpris-background { opacity: 0; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   NOTIFICACIONES FLOTANTES (popups)
-   Mismo lenguaje que el panel; sólo más opacas para flotar sobre
-   contenido arbitrario. Heredan rail de urgencia y (en críticas) glow.
+   FLOATING NOTIFICATIONS (popups)
+   Same language as the panel; just more opaque to float over
+   arbitrary content. They inherit the urgency rail and (on critical) the glow.
    ═══════════════════════════════════════════════════════════════ */
 .floating-notifications .notification-row .notification-background {
     padding: 4px;

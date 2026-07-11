@@ -10,7 +10,7 @@ configuration {
     background-color: transparent;
     border-color: rgba(205, 214, 244, 0.10);
 }
-/* ── Panel de cristal (blur via Hyprland layerrule) ── */
+/* ── Glass panel (blur via Hyprland layerrule) ── */
 window {
     transparency: "real";
     fullscreen: false;
@@ -29,7 +29,7 @@ mainbox {
     padding: 14px;
     spacing: 14px;
 }
-/* ── Píldora de búsqueda (isla) ── */
+/* ── Search pill (island) ── */
 inputbar {
     text-color: rgba(205, 214, 244, 0.85);
     background-color: rgba(14, 6, 6, 0.45);
@@ -41,7 +41,7 @@ inputbar {
     spacing: 8px;
     children: [ "prompt", "entry" ];
 }
-/* icono de busqueda pintado en el acento de pywal */
+/* search icon painted in the pywal accent */
 prompt {
     text-color: rgba(176, 175, 177, 0.95);
     background-color: transparent;
@@ -50,10 +50,10 @@ prompt {
 entry {
     text-color: inherit;
     background-color: transparent;
-    placeholder: "actual: wallhaven-7pzrwv   ·   buscar...";
+    placeholder: "current: wallhaven-7pzrwv   ·   search...";
     placeholder-color: rgba(205, 214, 244, 0.40);
 }
-/* ── Galería de thumbnails ── */
+/* ── Thumbnail gallery ── */
 listview {
     columns: 5;
     lines: 2;
@@ -83,7 +83,7 @@ element normal.normal {
     background-color: transparent;
     text-color: rgba(205, 214, 244, 0.65);
 }
-/* Thumbnail seleccionado: se "enciende" con el acento */
+/* Selected thumbnail: "lights up" with the accent */
 element selected.normal {
     background-color: rgba(176, 175, 177, 0.22);
     text-color: #cdd6f4;
@@ -112,7 +112,7 @@ element-text {
     font: "JetBrains Mono Nerd Font 9";
     horizontal-align: 0.5;
 }
-/* ── Footer de atajos (tenue; contenido via -mesg del script) ── */
+/* ── Shortcut footer (faint; content via the script's -mesg) ── */
 message {
     background-color: transparent;
     margin: 6px 0 2px 0;
@@ -124,5 +124,5 @@ message textbox {
     font: "JetBrains Mono Nerd Font 9";
     padding: 4px;
     horizontal-align: 0.5;
-    str: "↑↓  Navegar    ⏎  Aplicar    Esc  Cerrar";
+    str: "↑↓  Navigate    ⏎  Apply    Esc  Close";
 }

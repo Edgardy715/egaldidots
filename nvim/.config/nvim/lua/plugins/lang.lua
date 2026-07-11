@@ -25,7 +25,7 @@ return {
     },
   },
 
-  -- Formateo automático al guardar
+  -- Format on save
   {
     "stevearc/conform.nvim",
     opts = {

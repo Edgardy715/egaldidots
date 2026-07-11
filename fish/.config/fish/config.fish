@@ -1,12 +1,11 @@
-# Configuración base de CachyOS (si está presente; en Arch puro se omite)
+# CachyOS base config (sourced when present; skipped on plain Arch)
 if test -f /usr/share/cachyos-fish-config/cachyos-config.fish
     source /usr/share/cachyos-fish-config/cachyos-config.fish
 end
 
 # ── Pywal + Tide ──────────────────────────────────────────────────────────
-# pywal solo define `fish_color_*` en colors.fish; las variables color0-15
-# viven en colors.sh (formato `color7='#rrggbb'`). Las importamos a fish
-# para que las referencias $colorN de abajo funcionen realmente.
+# pywal defines fish_color_* in colors.fish but colorN live in colors.sh
+# (color7='#rrggbb'); import them so the $colorN refs below resolve.
 function __wal_load_palette --description "Importa color0-15/fg/bg de pywal (~/.cache/wal/colors.sh)"
     test -f ~/.cache/wal/colors.sh; or return
     while read -l line
@@ -23,8 +22,8 @@ function __wal_load_palette --description "Importa color0-15/fg/bg de pywal (~/.
     end < ~/.cache/wal/colors.sh
 end
 
-# Mezcla dos hex (#rrggbb) por t∈[0,1]; t=0→hex1, t=1→hex2. Sirve para
-# derivar el divider (bar tint oscurecido) del fondo del wallpaper.
+# Mix two #rrggbb by t∈[0,1] (0→hex1, 1→hex2). Used to derive the
+# powerline divider by darkening the wallpaper bg.
 function __wal_hex_mix --argument-names hex1 hex2 t
     test -n "$hex1"; and test -n "$hex2"; or return
     set h1 (string replace -i '#' '' $hex1); set h2 (string replace -i '#' '' $hex2)
@@ -36,20 +35,13 @@ function __wal_hex_mix --argument-names hex1 hex2 t
     printf '%02X%02X%02X' $r $g $b
 end
 
-# ── Tema de Tide derivado del wallpaper (pywal) ──────────────────────────
-# Mantiene la estructura cohesiva (barra única, dividers, paddings, time)
-# que ya vive en las universales, pero deriva los COLORES de la paleta de
-# pywal para que el prompt "sea del wallpaper". Los hemos dividido en:
-#   • superficie dominante (fondo de todos los segmentos) → pywal color8
-#     (bright-black = gris tintado por el wallpaper; NO es oscuro-fijo)
-#   • divider / path / rama git / icono OS            → pywal (tintados)
-#   • acentos semánticos (git staged/untracked, status ok/fail, vi, langs)
-#     → FIJOS catppuccin/Nord: siempre legibles, sin importar el wallpaper,
-#       porque en paletas muy claras los slots adyacentes de pywal colapsan
-#       y (p.ej.) ok vs fail dejarían de distinguirse.
-# Si no hay pywal cae al slate fijo. Se redefine en cada arranque y en cada
-# cambio de wallpaper vía __wal_sync → __wal_apply_colors.
-function __tide_pywal_apply --description "Colorea Tide desde pywal (fallback slate fijo)"
+# ── Tide theme derived from the wallpaper (pywal) ────────────────────────
+# Only COLORS are set here (structure lives in tide-structure.fish) so the
+# prompt tracks the wallpaper. Semantic accents (git stages, status ok/fail,
+# vi, langs) are FIXED catppuccin/Nord, not pywal — adjacent pywal slots
+# collapse on light palettes and ok vs fail would stop reading as distinct.
+# Fixed-slate fallback when pywal is absent.
+function __tide_pywal_apply --description "Color Tide from pywal (fixed-slate fallback)"
     __wal_load_palette
     set -l have
     if set -q color8; and test -n "$color8"
@@ -58,14 +50,14 @@ function __tide_pywal_apply --description "Colorea Tide desde pywal (fallback sl
 
     set -l bg; set -l div
     if test -n "$have"
-        set bg $color8                     # bright-black del wallpaper (gris tintado)
-        set div (__wal_hex_mix $color8 000000 0.55)  # divider = bg oscurecido
+        set bg $color8                     # bright-black of the wallpaper (tinted gray)
+        set div (__wal_hex_mix $color8 000000 0.55)  # divider = bg darkened
     else
         set bg 2E323D; set div 4A5366      # slate fijo (fallback)
     end
 
-    # ── fondo cohesivo: todos los segmentos al mismo color ──
-    # (v = sufijo exacto tras `tide_`; los vars ya terminan en `_bg_color`)
+    # ── cohesive bg: every segment shares one color ──
+    # (v = exact suffix after `tide_`; the vars already end in `_bg_color`)
     for v in pwd_bg_color os_bg_color git_bg_color git_bg_color_unstable git_bg_color_urgent \
              vi_mode_bg_color_default vi_mode_bg_color_insert vi_mode_bg_color_replace vi_mode_bg_color_visual \
              status_bg_color cmd_duration_bg_color jobs_bg_color context_bg_color time_bg_color \
@@ -75,32 +67,32 @@ function __tide_pywal_apply --description "Colorea Tide desde pywal (fallback sl
              distrobox_bg_color toolbox_bg_color zig_bg_color private_mode_bg_color shlvl_bg_color
         set -U tide_$v $bg
     end
-    # vars de fondo huérfanos (de un loop previo mal formado) → borrar
+    # orphan bg vars from a previous malformed loop → delete
     for j in tide_git_bg_color_unstable_bg_color tide_git_bg_color_urgent_bg_color \
              tide_vi_mode_bg_color_default_bg_color tide_vi_mode_bg_color_insert_bg_color \
              tide_vi_mode_bg_color_replace_bg_color tide_vi_mode_bg_color_visual_bg_color
         set -qU $j; and set -eU $j
     end
-    set -U tide_status_bg_color_failure 9E2A2A   # alerta roja siempre fija
+    set -U tide_status_bg_color_failure 9E2A2A   # fixed red alert
 
     set -U tide_prompt_color_separator_same_color $div
     set -U tide_prompt_color_frame_and_connection $div
 
-    # ── texto: tintado por el wallpaper donde no rompe semántica ──
+    # ── text: wallpaper-tinted where it breaks no semantic ──
     if test -n "$have"
-        set -U tide_pwd_color_dirs           $color7    # fg del wallpaper
-        set -U tide_git_color_branch        $color12   # azul brillante
-        set -U tide_os_color                $color15   # icono OS
+        set -U tide_pwd_color_dirs           $color7    # wallpaper fg
+        set -U tide_git_color_branch        $color12   # bright blue
+        set -U tide_os_color                $color15   # OS icon
     else
         set -U tide_pwd_color_dirs           8FA9C0
         set -U tide_git_color_branch         7FD68B
         set -U tide_os_color                 E6EDF3
     end
-    # current dir siempre "pop" (catppuccin) → se distingue sin importar paleta
+    # current dir always pops (catppuccin) → stands out on any palette
     set -U tide_pwd_color_anchors        C8D6E5
     set -U tide_pwd_color_truncated_dirs 6A7B8C
 
-    # ── acentos FIJOS (semánticos: nunca dependen del wallpaper) ──
+    # ── FIXED accents (semantic: never depend on the wallpaper) ──
     set -U tide_git_color_dirty     E0B860
     set -U tide_git_color_staged    E0B860
     set -U tide_git_color_untracked F0A0B0
@@ -132,76 +124,61 @@ function __tide_pywal_apply --description "Colorea Tide desde pywal (fallback sl
     set -U tide_shlvl_color A9B6E5;    set -U tide_direnv_color E5C07B
 end
 
-# Aplica pywal a la SINTAXIS de fish (fish_color_*) Y re-deriva el tema de
-# Tide desde la paleta actual. Llamado al arranque y desde __wal_sync (cambio
-# de wallpaper), así el prompt recolorea en vivo.
-function __wal_apply_colors --description "Refresca fish_color_* y el tema de Tide desde pywal"
+# Apply pywal to fish syntax (fish_color_*) and re-derive the Tide theme
+# from the current palette. Called at startup and from __wal_sync (wallpaper
+# change), so the prompt recolors live.
+function __wal_apply_colors --description "Refresh fish_color_* and the Tide theme from pywal"
     test -f ~/.cache/wal/colors.fish; and source ~/.cache/wal/colors.fish
     __wal_load_palette
 
-    # fish — sintaxis (color del texto que escribes, no del prompt de Tide)
+    # fish syntax (text you type, not the Tide prompt)
     set -g fish_color_command $color7 --bold
     set -g fish_color_param    $color15
     set -g fish_color_error    $color9
     set -g fish_color_comment  $color8
 
-    # tide — tema derivado del wallpaper
+    # tide — wallpaper-derived theme
     __tide_pywal_apply
 end
 
-# Aplicar al iniciar (sólo shells interactivos)
+# Apply at startup (interactive shells only)
 if status is-interactive
     __wal_apply_colors
 end
 
-# Re-aplicar en vivo cuando cambia el wallpaper. wallpaper-picker.sh hace
-# `fish -c "set -U wal_sync_signal (date +%s)"`; ese cambio dispara este handler en
-# cada shell interactiva. Además de actualizar las universales tide_*, hay DOS caches
-# que Tide CONGELA al arrancar y que un simple `set -U` NO refresca (motivo por el
-# que el segmento pwd "se quedaba con el color del wallpaper anterior" hasta
-# cerrar/reabrir la terminal):
-#   1. _tide_pwd — el TEXTO del pwd (color de las dirs + su fondo interno en
-#      `reset_to_color_dirs`) se hornea UNA sola vez al cargar fish_prompt.fish
-#      (`source (functions --details _tide_pwd)`). Cambiar tide_pwd_color_* NO
-#      re-hornea la función → el pwd pintaba el texto con el color8 de arranque.
-#      OJO: la CAJA del pwd (bg del segmento) sí es live (la pinta _tide_print_item
-#      leyendo tide_pwd_bg_color a la vez); lo que se quedaba viejo era el texto.
-#   2. _tide_cache_variables — hornea el divisor (tide_prompt_color_separator_*).
-# Re-sourcear/re-correr AMBOS con las universales ya nuevas y luego forzar repaint
-# = el pwd y el resto recolorean en vivo sin cerrar/reabrir. Verificado empíricamente
-# (cambiar el color sin re-sourcear deja _tide_pwd con el valor viejo; re-sourcear
-# lo renueva, y _tide_print_item usa el bg live).
+# Recolor live on wallpaper change (picker sets $wal_sync_signal).
+# Re-source _tide_pwd + _tide_cache_variables: Tide bakes them once at load.
 function __wal_sync --on-variable wal_sync_signal
     __wal_apply_colors
     if status is-interactive
-        _tide_cache_variables                 # re-hornea divisor (+color rama git) de las univ. nuevas
-        source (functions --details _tide_pwd) # re-hornea _tide_pwd: texto/fondo del pwd al nuevo color8
-        set -e _tide_repaint 2>/dev/null      # que el próximo fish_prompt lance un job fresco
+        _tide_cache_variables                 # re-bake separator (+git branch color) from new univs
+        source (functions --details _tide_pwd) # re-bake _tide_pwd: pwd text/bg to new color8
+        set -e _tide_repaint 2>/dev/null      # let next fish_prompt spawn a fresh job
         commandline -f repaint
     end
 end
 
-# Reemplaza cat por bat
+# cat → bat
 alias cat='bat --paging=never'
 
-# ── eza: ls con iconos nerd-font (sucesor de lsd/exa) ──
-# ls → simple · ll → larga + git · la → con ocultos · lt → árbol (nivel 2)
+# ── eza: ls with nerd-font icons (lsd/exa successor) ──
+# ls → simple · ll → long + git · la → with hidden · lt → tree (depth 2)
 alias ls='eza --group-directories-first --icons'
 alias ll='eza -l --group-directories-first --icons --git'
 alias la='eza -la --group-directories-first --icons --git'
 alias lt='eza --tree --level=2 --group-directories-first --icons'
 
-# ── zoxide: cd inteligente · z <substr> salta a dirs frecuentes, zi = menú ──
-# (instala con: sudo pacman -S zoxide) → se activa solo al estar presente
+# ── zoxide: smart cd · z <substr> jumps to frequent dirs, zi = menu ──
+# installs with: sudo pacman -S zoxide → activates only if present
 if type -q zoxide
     zoxide init fish | source
 end
 
-# Tema visual
+# Visual theme
 set -x BAT_THEME "Catppuccin Mocha"
 
-# Usa bat para ver man pages con resaltado de sintaxis
+# Use bat to view man pages with syntax highlighting
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
-# Quitar greeting
+# No greeting
 function fish_greeting
 end

@@ -9,7 +9,7 @@ SELECTED=$(python3 ~/.config/hypr/scripts/wall-colors.py |
     -i \
     -markup-rows \
     -p "󰋩" \
-    -mesg "↑↓  Navegar    ⏎  Aplicar    escribe «red/blue/pink…» para filtrar por color    Esc  Cerrar" \
+    -mesg "↑↓  Navigate    ⏎  Apply    type «red/blue/pink…» to filter by color    Esc  Close" \
     -show-icons \
     -icon-theme "" \
     -theme ~/.config/rofi/themes/wallpaper-picker.rasi \
@@ -17,7 +17,7 @@ SELECTED=$(python3 ~/.config/hypr/scripts/wall-colors.py |
 
 [ -z "$SELECTED" ] && exit 0
 
-# wall-colors.py emite el content como «NOMBRE  ·  BUCKET» → descarto el bucket
+# wall-colors.py emits content as "NAME  ·  BUCKET" → drop the bucket
 NAME="${SELECTED%%  ·  *}"
 
 [ -z "$NAME" ] && exit 0
@@ -39,9 +39,6 @@ awww img "$FULL_PATH" \
   ln -sf "$FULL_PATH" ~/.cache/wal/current-wallpaper
   python3 ~/.config/hypr/scripts/generate-rofi-theme.py
   pkill -USR1 nvim 2>/dev/null
-  # for tty in /dev/pts/[0-9]*; do
-  #   cat ~/.cache/wal/sequences >"$tty" 2>/dev/null &
-  # done
 
   fish -c "set -U wal_sync_signal (date +%s)"
 ) &

@@ -1,30 +1,29 @@
 #!/usr/bin/env python3
 """
-wall-colors.py · Indexa los wallpapers de ~/Wallpapers por color dominante
-y los emite, ordenados por espectro (rojo→violeta→mono), listos para
-`rofi -dmenu`.
+wall-colors.py · Index ~/Wallpapers by dominant color and emit them sorted
+by spectrum (red→violeta→mono) for `rofi -dmenu`.
 
-Cada línea es (formato canónico de rofi: un \0 tras la entrada, opciones encadenadas con \x1f):
-  NOMBRE  ·  BUCKET \0display\x1f <span color>●</span>   NOMBRE \x1ficon\x1f ~/.cache/wall-picker/thumbs/<archivo>.png
-  · visible  : ● (punto del color dominante) + NOMBRE limpio, vía `display` → sin ruido
-  · filtable : escribe "blue", "red", "pink"…  (el bucket vive en el content)
-  · -select NOMBRE resalta el wallpaper actual (el content arranca con el nombre)
+Each line (canonical rofi row format: one \0 after the entry, options chained by \x1f):
+  NAME  ·  BUCKET \0display\x1f <span color>●</span>   NAME \x1ficon\x1f ~/.cache/wall-picker/thumbs/<file>.png
+  · visible : ● (dominant-color dot) + clean NAME via `display` → no clutter
+  · filterable: type "blue", "red", "pink"… (the bucket lives in the content)
+  · -select NAME highlights the current wallpaper (content starts with the name)
 
-El punto conserva el *matiz* del wallpaper pero `dot_color()` sube value/sat
-para que se vea sobre tema oscuro (el píxel dominante 1×1 suele caer en
-zonas oscuras). Requiere `rofi -markup-rows` para que pango renderice el
-<span>; de lo contrario el caller vería el markup literal.
+The dot keeps the wallpaper's hue, but `dot_color()` raises value/sat so it
+reads on dark themes (the 1×1 dominant pixel often lands in a dark area).
+Needs `rofi -markup-rows` so pango renders the <span>, else the caller
+sees the markup literally.
 
-rofi devuelve el *content* → el caller debe quedarse con el nombre:
+rofi returns the *content* → the caller keeps only the name:
     SELECTED="${SELECTED%%  ·  *}"
 
-Caché mtime-keyed en ~/.cache/wall-picker/index.json → solo re-extrae lo
-nuevo/cambiado. En el primer arranque de cada wallpaper extrae su color
-dominante con `magick` (mismo truco 1×1 que usa ilyamiro, pero con un umbral
-más honesto para casi-negros/grises → "mono" en vez de falsos rojos).
+mtime-keyed cache at ~/.cache/wall-picker/index.json → only re-extracts new/
+changed wallpapers. On first run it extracts the dominant color with `magick`
+(same 1×1 trick as ilyamiro, but a more honest threshold for near-blacks/
+grays → "mono" instead of false reds).
 
-Nos apoyamos en pywal para los colores del tema del picker; este script
-solo clasifica los wallpapers en sí.
+Relies on pywal for the picker theme's colors; this script only classifies
+the wallpapers themselves.
 """
 import os, sys, subprocess, json, concurrent.futures
 
@@ -32,17 +31,17 @@ WALL_DIR = os.path.expanduser("~/Wallpapers")
 CACHE_DIR = os.path.expanduser("~/.cache/wall-picker")
 CACHE = os.path.join(CACHE_DIR, "index.json")
 EXTS = (".jpg", ".jpeg", ".png", ".webp")
-SEP = "  ·  "                       # separador SOLO en content (display lo oculta)
+SEP = "  ·  "                       # separator ONLY in content (display hides it)
 SPECTRUM = ["red", "orange", "yellow", "green", "blue", "purple", "pink", "mono"]
 FALLBACK = "#888888"
-# Miniaturas: rofi no escala bien megapíxeles (5443×3061 / 15 MB → carga lenta o
-# falla y no muestra nada). Generamos thumbs 480×270 y apuntamos el \0icon a ellas.
+# Thumbnails: rofi scales megapixels poorly (5443×3061 / 15 MB → slow load or
+# fails to show). Generate 480×270 thumbs and point the \0icon at them.
 THUMB_DIR = os.path.join(CACHE_DIR, "thumbs")
 THUMB_BOX = "480x270"
 
 
 def magick_dominant(path):
-    """Color dominante (hex #RRGGBB) via magick 1×1, o None si falla."""
+    """Dominant color (hex #RRGGBB) via magick 1×1, or None on failure."""
     try:
         out = subprocess.run(
             ["magick", path, "-resize", "1x1^", "-gravity", "center",
@@ -75,7 +74,7 @@ def hex_to_hsv(h):
 
 
 def hsv_to_hex(hh, s, v):
-    """HSV (h en grados, s/v en 0..1) → #RRGGBB."""
+    """HSV (h in degrees, s/v in 0..1) → #RRGGBB."""
     c = v * s
     x = c * (1 - abs((hh / 60.0) % 2 - 1))
     m = v - c
@@ -90,20 +89,20 @@ def hsv_to_hex(hh, s, v):
 
 
 def dot_color(hex_):
-    """Color del punto: conserva el matiz del wallpaper pero sube value/sat
-    para que siempre se vea sobre tema oscuro (el píxel dominante 1×1
-    suele caer en zonas oscuras y daría un punto invisible)."""
+    """Dot color: keep the wallpaper's hue but raise value/saturation so it's
+    always visible on dark themes (the 1×1 dominant pixel often lands in a
+    dark area and would give an invisible dot)."""
     try:
         hh, s, v = hex_to_hsv(hex_)
     except Exception:
         return FALLBACK
-    if v < 0.10 or s < 0.15:        # casi-negros y grises → gris (matiz inestable)
+    if v < 0.10 or s < 0.15:        # near-blacks and grays → gray (unstable hue)
         return FALLBACK
     return hsv_to_hex(hh, max(s, 0.45), max(v, 0.62))
 
 
 def bucket_of(hh, s, v):
-    if v < 0.10 or s < 0.15:        # casi-negros y grises desaturados → mono (más honesto)
+    if v < 0.10 or s < 0.15:        # desaturated near-blacks and grays → mono (more honest)
         return "mono"
     if hh >= 345 or hh < 15:
         return "red"
@@ -138,10 +137,10 @@ def save_cache(c):
 
 
 def ensure_thumb(path, name):
-    """Devuelve la miniatura 480×270 (letterbox transparente) de `path`,
-    cacheada en ~/.cache/wall-picker/thumbs/<name>.png y regenerada solo si
-    el mtime del wallpaper cambia. Si no puede generarla, devuelve `path`
-    (rofi aún intentará la original como fallback)."""
+    """Return the 480×270 thumbnail (transparent letterbox) of `path`, cached in
+    ~/.cache/wall-picker/thumbs/<name>.png and regenerated only when the
+    wallpaper's mtime changes. If it can't be generated, return `path` (rofi
+    will fall back to the original)."""
     os.makedirs(THUMB_DIR, exist_ok=True)
     thumb = os.path.join(THUMB_DIR, os.path.splitext(name)[0] + ".png")
     try:
@@ -157,14 +156,14 @@ def ensure_thumb(path, name):
         try:
             subprocess.run(
                 ["magick", path,
-                 "-resize", THUMB_BOX + ">",        # solo encoge, no amplía
+                 "-resize", THUMB_BOX + ">",        # only shrink, don't enlarge
                  "-background", "none",
                  "-gravity", "center",
-                 "-extent", THUMB_BOX,              # canvas exacto 16:9, márgenes transparentes
+                 "-extent", THUMB_BOX,              # exact 16:9 canvas, transparent margins
                  "-strip", "-define", "png:compression-level=6", thumb],
                 capture_output=True, timeout=20)
             try:
-                os.utime(thumb, (mtime, mtime))     # sincroniza mtime para la key caché
+                os.utime(thumb, (mtime, mtime))     # sync mtime for the cache key
             except OSError:
                 pass
         except Exception:
@@ -173,7 +172,7 @@ def ensure_thumb(path, name):
 
 
 def compute(path, name, live_names):
-    """Devuelve el dict {hex,bucket,...} cacheado o recién extraído."""
+    """Return the cached or freshly-extracted {hex,bucket,...} dict."""
     try:
         mtime = int(os.path.getmtime(path))
     except OSError:
@@ -182,7 +181,7 @@ def compute(path, name, live_names):
     c = load_cache()
     e = c["entries"].get(name)
     if e and e.get("mtime") == mtime:
-        # reutiliza; pero aprovecha para purgar los borrados de la caché
+        # reuse; but also purge deleted entries from the cache
         if set(c["entries"].keys()) - live_names:
             for k in list(c["entries"]):
                 if k not in live_names:
@@ -195,7 +194,7 @@ def compute(path, name, live_names):
     e = {"hex": hex_, "bucket": bucket_of(hh, s, v),
          "mtime": mtime, "hue": round(hh, 1), "sat": round(s, 3), "val": round(v, 3)}
     c["entries"][name] = e
-    # purga los que ya no existen
+    # purge ones that no longer exist
     for k in list(c["entries"]):
         if k not in live_names:
             del c["entries"][k]
@@ -219,7 +218,7 @@ def main():
 
     rows.sort(key=lambda r: (r[0], r[1].lower()))
 
-    # Pre-genera las miniaturas en paralelo (caché fría: ~13 s → ~2 s).
+    # Pre-generate thumbnails in parallel (cold cache: ~13s → ~2s).
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
         thumbs = dict(zip(names, ex.map(
             lambda n: ensure_thumb(os.path.join(WALL_DIR, n), n), names)))
@@ -231,9 +230,9 @@ def main():
         thumb = thumbs[n]
         line = f"{clean}{SEP}{e['bucket']}"
         disp = f'<span foreground="{dot}">●</span>   {clean}'
-        # Formato canónico de rofi para varias opciones de fila: UN \0 tras la
-        # entrada, pares key\x1fvalue encadenados por \x1f.  Con \0 extra el
-        # parser se traga `icon` dentro de `display` y el thumb no carga nunca.
+        # Canonical rofi row-options format: ONE \0 after the entry, key\x1fvalue
+        # pairs chained by \x1f. An extra \0 makes the parser swallow `icon` into
+        # `display` and the thumb never loads.
         out.write(f"{line}\0display\x1f{disp}\x1ficon\x1f{thumb}\n")
     out.flush()
 

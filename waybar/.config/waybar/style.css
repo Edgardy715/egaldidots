@@ -2,7 +2,7 @@
 
 /* ═══════════════════════════════════════════════════════════════
    WAYBAR · Dynamic-Island aesthetic
-   Vidrio ahumado · acento color4 · lo vivo respira · easing exponencial
+   Smoked glass · color4 accent · living breathing island · exponential easing
    ═══════════════════════════════════════════════════════════════ */
 * {
     all: unset;
@@ -13,7 +13,7 @@ label {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* ── Tooltip · cristal ── */
+/* ── Tooltip · glass ── */
 tooltip {
     background-color: alpha(@background, 0.85);
     color: @foreground;
@@ -24,7 +24,7 @@ tooltip {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.40);
 }
 
-/* ── Islas · cristal con catch-light (luz superior interior) ── */
+/* ── Islands · glass with catch-light (inner top light) ── */
 .modules-left,
 .modules-center,
 .modules-right {
@@ -50,7 +50,7 @@ tooltip {
                 background-color 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* ── VENTANA ACTIVA · compañera de la isla ── */
+/* ── ACTIVE WINDOW · island companion ── */
 #window {
     color: alpha(@foreground, 0.85);
     font-style: italic;
@@ -64,7 +64,7 @@ tooltip {
     color: alpha(@foreground, 0.22);
 }
 
-/* ── WORKSPACES · puntos respirantes ── */
+/* ── WORKSPACES · breathing dots ── */
 #workspaces {
     padding: 0;
     margin: 0 4px;
@@ -88,7 +88,7 @@ tooltip {
     opacity: 0.15;
 }
 
-/* ── Latido de la isla · el dot activo respira ── */
+/* ── Island heartbeat · the active dot breathes ── */
 @keyframes island-breathe {
     0%   { box-shadow: 0 0 7px  alpha(@color4, 0.36); }
     50%  { box-shadow: 0 0 14px alpha(@color4, 0.62); }
@@ -107,7 +107,7 @@ tooltip {
     opacity: 0.82;
 }
 
-/* ── MÓDULOS · color por función ── */
+/* ── MODULES · color by function ── */
 #pulseaudio          { color: @color4; }
 #pulseaudio.muted    { color: @color8; }
 
@@ -121,7 +121,7 @@ tooltip {
 #battery.warning  { color: @color3; }
 #battery.critical { color: @color1; }
 
-/* ── TASKBAR · app-icons con spring suave ── */
+/* ── TASKBAR · app-icons with a soft spring ── */
 #taskbar {
     background-color: transparent;
     padding: 0 2px;
@@ -150,11 +150,11 @@ tooltip {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   MPRIS · píldora viva de cristal
-   · aparece al reproducir, se desvanece al pausar (hide-on-pause)
-   · respira con un glow de acento mientras suena → mismo lenguaje
-     que el latido de la isla (coherencia, no RGB)
-   · hover ilumina el vidrio
+   MPRIS · living glass pill
+   · shows up on play, fades on pause (hide-on-pause)
+   · breathes with an accent glow while playing → same language
+     as the island heartbeat (coherent, not RGB)
+   · hover lights up the glass
    ═══════════════════════════════════════════════════════════════ */
 #mpris {
     background-color: alpha(@background, 0.42);
@@ -172,7 +172,7 @@ tooltip {
     animation: mpris-breathe 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-/* Respira con el acento del sistema mientras suena */
+/* Breathes with the system accent while playing */
 @keyframes mpris-breathe {
     0% {
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25),
@@ -196,7 +196,7 @@ tooltip {
     border-color: alpha(@color4, 0.32);
 }
 
-/* Spotify · vidrio teñido de verde (lee como Spotify sin romper la paleta) */
+/* Spotify · green-tinted glass (reads as Spotify without breaking the palette) */
 #mpris.spotify {
     color: #1db954;
     animation: mpris-breathe-spotify 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;

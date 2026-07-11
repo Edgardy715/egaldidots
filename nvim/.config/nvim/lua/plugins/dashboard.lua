@@ -35,7 +35,7 @@ return {
 
       opts.dashboard.formats = opts.dashboard.formats or {}
 
-      -- Hace que el texto de las acciones se vea un poco más limpio
+      -- Makes the action text look a bit cleaner
       opts.dashboard.formats.key = function(item)
         return { { "[", hl = "Comment" }, { item.key, hl = "Special" }, { "]", hl = "Comment" } }
       end

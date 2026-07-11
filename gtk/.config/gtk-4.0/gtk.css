@@ -1,8 +1,8 @@
 /*
- * Glass sutil para selectores de archivos GTK4 (forward-compat para apps
- * modernas / xdg-desktop-portal-gnome si algún día lo instalás).
- * Misma lógica que gtk-3.0/gtk.css: paleta FlatColor/pywal + blur Hyprland.
- * Reversible: borrá este archivo para volver a fondo sólido.
+ * Subtle glass for GTK4 file choosers (forward-compat for modern apps /
+ * xdg-desktop-portal-gnome if you ever install it).
+ * Same logic as gtk-3.0/gtk.css: FlatColor/pywal palette + Hyprland blur.
+ * Reversible: delete this file to go back to a solid background.
  */
 filechooser {
     background-color: alpha(@theme_bg_color, 0.92);

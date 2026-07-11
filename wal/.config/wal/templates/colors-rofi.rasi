@@ -14,7 +14,7 @@
     color6:         {color6};
     color7:         {color7};
     color8:         {color8};
-    /* Variantes glass (alpha) · dinámicas con el wallpaper */
+    /* Glass variants (alpha) · dynamic with the wallpaper */
     glass-bg:       rgba({background.rgb}, 0.55);
     glass-bg-soft:  rgba({background.rgb}, 0.40);
     glass-border:   rgba({foreground.rgb}, 0.10);
