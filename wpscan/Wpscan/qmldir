@@ -1,0 +1,7 @@
+module Wpscan
+linktarget wpscanpluginplugin
+optional plugin wpscanpluginplugin
+classname WpscanPlugin
+typeinfo wpscanplugin.qmltypes
+prefer :/Wpscan/
+

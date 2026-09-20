@@ -1,0 +1,19 @@
+singleton Motion Motion.qml
+singleton IslaPalette IslaPalette.qml
+singleton Theme Theme.qml
+singleton Flags Flags.qml
+singleton Players Players.qml
+singleton WinMap WinMap.qml
+singleton Cava Cava.qml
+singleton Notifs Notifs.qml
+singleton Wallpapers Wallpapers.qml
+singleton Icons Icons.qml
+singleton Apps Apps.qml
+singleton Brightness Brightness.qml
+singleton KeepAwake KeepAwake.qml
+singleton Session Session.qml
+singleton Auth Auth.qml
+singleton Nmcli Nmcli.qml
+# NotifData NO es singleton: es un tipo instanciable (uno por notificación, vía
+# notifComp.createObject). Mismo patrón que NotifCard en components/ (plain type 1.0).
+NotifData 1.0 NotifData.qml

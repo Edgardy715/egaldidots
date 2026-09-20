@@ -1,0 +1,19 @@
+# graphify knowledge graph (regenerable)
+graphify-out/
+tools/__pycache__/
+
+# backups del bar (mantenidos a mano, no versionar)
+bar.bak.*/
+
+# OJO: wpscan/build NO es descartable — el binario del plugin Wpscan tiene el
+# RUNPATH hardcoded a esta ruta y quickshell lo resuelve en runtime. No borrar.
+# wpscan/Wpscan/ es el módulo desplegado que `import Wpscan` carga (también vive
+# una instalación de sistema en /usr/lib/qt6/qml/Wpscan/).
+wpscan/build/*
+!wpscan/build/libwpscanplugin.so
+!wpscan/build/libwpscanpluginplugin.so
+!wpscan/build/qmldir
+!wpscan/build/wpscanplugin.qmltypes
+
+# quickshell managed config
+.qmlls.ini

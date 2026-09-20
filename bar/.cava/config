@@ -1,0 +1,19 @@
+[general]
+bars = 24
+framerate = 30
+
+[input]
+method = pulse
+source = alsa_output.usb-Corsair_Corsair_HS65_SURROUND-00.analog-stereo.monitor
+
+[output]
+method = raw
+raw_target = /dev/stdout
+data_bits = 8
+channels = mono
+
+[smoothing]
+noise_reduction = 88
+
+[color]
+gradient = 0
