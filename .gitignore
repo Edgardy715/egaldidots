@@ -23,3 +23,8 @@ wpscan/build/*
 !wpscan/build/libwpscanpluginplugin.so
 !wpscan/build/qmldir
 !wpscan/build/wpscanplugin.qmltypes
+
+# Source captures used to prepare README screenshots
+assets/raw-*.png
+assets/quickshell-bar.png
+assets/quickshell-idle.png

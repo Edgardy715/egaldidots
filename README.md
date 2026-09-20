@@ -11,12 +11,12 @@ notifications and fetch all recolor from it in one stroke.
 [![License: MIT](https://img.shields.io/badge/license-MIT-6e6e6e)](./LICENSE)
 [![Theming: pywal16](https://img.shields.io/badge/theming-pywal16-9b59b6)](#-how-the-theming-works)
 
-<!-- ─────────────────────────────────────────────────────────────────────── -->
-<!--  TODO: drop your screenshots here, e.g.  ./assets/screenclean.png        -->
-<!--  ![clean](./assets/screenclean.png)   ![rofi](./assets/rofi.png)        -->
-<!-- ─────────────────────────────────────────────────────────────────────── -->
+![Quickshell wallpaper picker](assets/quickshell-wallpaper.png)
 
-> 📸 **Screenshots:** add them under `assets/` and uncomment the block above.
+<p align="center">
+  <img src="assets/quickshell-calendar.png" alt="Quickshell calendar" width="32%" />
+  <img src="assets/quickshell-connectivity.png" alt="Quickshell connectivity panel" width="32%" />
+</p>
 
 </div>
 
