@@ -1,0 +1,16 @@
+/*
+ * Subtle glass for the GTK file chooser (the "Choose file" dialog
+ * raised by the browser via xdg-desktop-portal-gtk).
+ *
+ * The palette comes from FlatColor (wpg/pywal): @theme_bg_color == your
+ * current background color → it's ALWAYS in sync with the wallpaper.
+ * Hyprland's global blur (decorations.conf, ignore_opacity=true) renders
+ * through the alpha.
+ *
+ * Alpha 0.92 chosen on purpose: subtle, without threatening the text
+ * contrast in small dialogs. Reversible: delete this file to go back to a
+ * solid background.
+ */
+filechooser {
+    background-color: alpha(@theme_bg_color, 0.92);
+}

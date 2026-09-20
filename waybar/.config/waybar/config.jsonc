@@ -1,0 +1,105 @@
+{
+    "spacing": 15,
+    "margin-top": 15,
+    "modules-left": [
+        "hyprland/window"
+    ],
+    "modules-center": [
+        "clock",
+        "hyprland/workspaces",
+        "pulseaudio",
+        "network",
+        "battery"
+    ],
+    "modules-right": [
+        "wlr/taskbar",
+        "mpris"
+    ],
+    "hyprland/window": {
+        "format": "{}",
+        "separate-outputs": true,
+        "max-length": 40,
+        "tooltip": false
+    },
+    "clock": {
+        "interval": 60,
+        "format": "{:%d %b  %I:%M %p}",
+        "max-length": 25,
+        "tooltip": false
+    },
+    "hyprland/workspaces": {
+        "format": "",
+        "persistent-workspaces": {
+            "eDP-1": [6,7,8,9,10],
+            "DP-1": [1,2,3,4,5]
+        },
+        "on-click": "activate"
+    },
+    "pulseaudio": {
+        "format": "{volume}% {icon}",
+        "format-bluetooth": "{volume}% {icon}",
+        "format-muted": "muted ",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "phone-muted": "",
+            "portable": "",
+            "car": "",
+            "default": ["", ""]
+        },
+        "scroll-step": 1,
+        "on-click": "pavucontrol",
+        "ignored-sinks": [
+            "Easy Effects Sink"
+        ]
+    },
+    "network": {
+        "format": "󰤨",
+        "format-wifi": "󰤨 {essid}",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "󰤮",
+        "tooltip-format": "{essid} ({signalStrength}%)",
+        "tooltip-format-ethernet": "󰈀 {ifname}",
+        "max-length": 20
+    },
+    "battery": {
+        "format": "{icon} {capacity}%",
+        "format-charging": "{icon} {capacity}%",
+        "format-plugged": "{icon} {capacity}%",
+        "format-icons": ["", "", "", "", ""]
+    },
+    "wlr/taskbar": {
+        "format": "{icon}",
+        "icon-size": 18,
+        "icon-theme": "Papirus",
+        "tooltip": true,
+        "tooltip-format": "{title}",
+        "on-click": "activate",
+        "all-outputs": false,
+        "ignore-list": []
+    },
+    "mpris": {
+        "format": "{player_icon} {title}",
+        "format-paused": "{player_icon} {title}",
+        "tooltip-format": "{player_icon}  {artist} — {title}\n{album}",
+        "interval": 1,
+        "dynamic-len": 35,
+        "hide-on-pause": true,
+        "hide-when-empty": true,
+        "ignored-players": ["playerctld"],
+        "player-icons": {
+            "default": "♪",
+            "spotify": "󰓇",
+            "firefox": "󰈹",
+            "chromium": ""
+        },
+        "status-icons": {
+            "playing": "▶",
+            "paused": ""
+        },
+        "max-length": 22,
+        "dynamic-order": ["spotify", "firefox", "chromium"]
+    }
+}

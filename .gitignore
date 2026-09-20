@@ -1,19 +1,25 @@
-# graphify knowledge graph (regenerable)
+# ── Editor / OS cruft ──
+.DS_Store
+*~
+*.swp
+*.swo
+*.tmp
+
+# ── GNU Stow ──
+.stow-recovery
+
+# ── Backups locales (install.sh los escribe fuera del repo; por las dudas) ──
+*.bak
+*.orig
+
+# Note: ~/Wallpapers IS tracked (an explicit part of the repo, by design).
+
+# Quickshell local/generated files
+.qmlls.ini
 graphify-out/
 tools/__pycache__/
-
-# backups del bar (mantenidos a mano, no versionar)
-bar.bak.*/
-
-# OJO: wpscan/build NO es descartable — el binario del plugin Wpscan tiene el
-# RUNPATH hardcoded a esta ruta y quickshell lo resuelve en runtime. No borrar.
-# wpscan/Wpscan/ es el módulo desplegado que `import Wpscan` carga (también vive
-# una instalación de sistema en /usr/lib/qt6/qml/Wpscan/).
 wpscan/build/*
 !wpscan/build/libwpscanplugin.so
 !wpscan/build/libwpscanpluginplugin.so
 !wpscan/build/qmldir
 !wpscan/build/wpscanplugin.qmltypes
-
-# quickshell managed config
-.qmlls.ini
