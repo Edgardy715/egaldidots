@@ -17,6 +17,8 @@ ClippingRectangle {
     property bool closing: false
     property bool suspended: false
     property real reveal: 1
+    property string displayedSurface: ""
+    property real swapOpacity: 1
 
     signal requestClose()
 
@@ -27,26 +29,53 @@ ClippingRectangle {
     radius: root.surfaceRadius
     color: "transparent"
     enabled: root.open && !root.suspended
-    opacity: root.open && !root.suspended ? root.reveal : 0
+    opacity: root.suspended ? 0 : root.reveal * root.swapOpacity
 
-    Behavior on opacity {
-        enabled: !root.suspended
-        NumberAnimation { duration: Motion.standard; easing.type: Motion.easeStandard }
+    Behavior on swapOpacity {
+        NumberAnimation {
+            duration: Flags.reduceMotion ? 0 : Motion.fast
+            easing.type: Easing.InOutQuad
+
+        }
+    }
+
+    Timer {
+        id: swapTimer
+        interval: Flags.reduceMotion ? 0 : Motion.fast
+        onTriggered: {
+            if (root.surface.length > 0) root.displayedSurface = root.surface
+            root.swapOpacity = 1
+        }
+    }
+
+    onSurfaceChanged: {
+        if (surface.length > 0 && displayedSurface.length > 0 && surface !== displayedSurface) {
+            swapOpacity = 0
+            swapTimer.restart()
+        } else {
+            swapTimer.stop()
+            swapOpacity = 1
+            if (surface.length > 0) displayedSurface = surface
+            else if (morphCloseness <= 0.01) displayedSurface = ""
+        }
+    }
+    onMorphClosenessChanged: {
+        if (!open && morphCloseness <= 0.01) displayedSurface = ""
     }
 
     Loader {
         id: surfaceLoader
         anchors.fill: parent
-        active: root.open && root.surface.length > 0
+        active: root.displayedSurface.length > 0
         // La URL depende del nombre, no del orden de actualización de `open`.
-        source: root.surface.length > 0
-            ? Qt.resolvedUrl("../surfaces/" + root.surface.charAt(0).toUpperCase()
-                             + root.surface.slice(1) + "Surface.qml")
+        source: root.displayedSurface.length > 0
+            ? Qt.resolvedUrl("../surfaces/" + root.displayedSurface.charAt(0).toUpperCase()
+                             + root.displayedSurface.slice(1) + "Surface.qml")
             : ""
 
         onLoaded: {
             item.s = Qt.binding(() => root.scaleFactor)
-            item.open = Qt.binding(() => root.open)
+            item.open = Qt.binding(() => root.displayedSurface.length > 0)
             item.closing = Qt.binding(() => root.closing)
             item.morphCloseness = Qt.binding(() => root.morphCloseness)
             item.morphRadius = Qt.binding(() => root.morphRadius)

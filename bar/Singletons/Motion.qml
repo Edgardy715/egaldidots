@@ -21,7 +21,7 @@ import Quickshell
 Singleton {
     id: root
 
-    readonly property real mult: Flags.reduceMotion ? 0.28 : 1
+    readonly property real mult: (Flags.reduceMotion ? 0.28 : 1) * Flags.motionScale
 
     // durations (ms)
     readonly property int fast:       Math.round(140 * mult)

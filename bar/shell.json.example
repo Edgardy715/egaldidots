@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "appearance": {
+    "glassAlpha": 0.34,
+    "pillBlur": false,
+    "topGap": 1.0,
+    "appGap": 1.0,
+    "uiScale": 1.0,
+    "fontScale": 1.0,
+    "spacingScale": 1.0,
+    "radiusScale": 1.0,
+    "motionScale": 1.0,
+    "fontFamily": "Google Sans Flex",
+    "fontMonoFamily": "JetBrainsMono Nerd Font",
+    "fontDisplayFamily": "Rubik",
+    "reduceMotion": false,
+    "time12h": true,
+    "clockSeconds": false,
+    "showGlyphs": true,
+    "fontMediaFamily": "Inter"
+  },
+  "paths": {
+    "wallpaperDir": "~/Wallpapers",
+    "wallpaperCacheDir": "~/.cache/quickshell/wallpapers",
+    "walColorsFile": "~/.cache/wal/colors.json",
+    "wallpaperApplyScript": "~/.config/hypr/scripts/apply-wallpaper.sh"
+  }
+}

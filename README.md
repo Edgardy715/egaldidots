@@ -86,6 +86,16 @@ symlinks every package into `$HOME` with **GNU Stow** — without ever touching
 - **Quickshell** is the current shell in `bar/`, with its QML components,
   surfaces and the `wpscan/` wallpaper plugin. The Waybar configuration stays
   in the repository as part of the previous rice and as a reference.
+  Its optional user settings live in `~/.config/isla/shell.json`; copy
+  `bar/shell.json.example` there to customize appearance without editing QML.
+- **Fluid Island** adds a shared spring-based droplet engine: media lives to the
+  right of the clock, while the session menu appears as a temporary left droplet.
+  Interrupted transitions preserve motion; reduced motion resolves directly.
+  Media headers are shared by the launcher, wallpaper picker and overview.
+  See the [September 2026 changes](CHANGELOG.md),
+  [shell architecture](docs/SHELL_ARCHITECTURE.md),
+  [motion design](bar/fluid/MOTION_LANGUAGE.md) and
+  [validation checklist](bar/TESTING.md).
 - **fastfetch** with a custom Mario-style ASCII hat and nerd-font section
   separators.
 - **micro** editor with Catppuccin color schemes; **bat** with a Catppuccin
@@ -193,7 +203,7 @@ committed.
 
 ## 🗂 Repository structure
 
-Each top-level directory is a **Stow package** that mirrors its path under
+The dotfile package directories mirror their paths under
 `$HOME` (so `hypr/.config/hypr/...` symlinks to `~/.config/hypr/...`).
 
 ```
@@ -254,6 +264,9 @@ instead:
 ---
 
 ## 🎨 Customizing
+
+The shell provides validated settings and IPC to preview, discard and save changes.
+See the [architecture and configuration contract](docs/SHELL_ARCHITECTURE.md).
 
 - **Change the prompt structure** (which items, separators, icons): edit
   `fish/.config/fish/conf.d/tide-structure.fish` — it's the source of truth.

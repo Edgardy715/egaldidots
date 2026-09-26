@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
-import Quickshell.Services.Mpris
 import "../"
 import "../components"
 import "../Singletons"
@@ -9,112 +8,44 @@ import "../Singletons"
 PillSurface {
     id: root
 
-    mTop: Theme.marginMd
-    mLeft: Theme.marginMd
-    mRight: Theme.marginMd
-    mBottom: Theme.marginMd
+    mTop: 24
+    mLeft: 24
+    mRight: 24
+    mBottom: 24
 
-    readonly property var player: Players.active
-    readonly property bool hasPlayer: player !== null
-    readonly property bool isPlaying: hasPlayer && player.isPlaying
-    readonly property string title: hasPlayer ? (player.trackTitle || qsTr("Sin título")) : qsTr("Sin contenido")
-    readonly property string artist: hasPlayer ? (player.trackArtist || qsTr("Artista desconocido")) : ""
-    readonly property string album: hasPlayer ? (player.trackAlbum || "") : ""
-    readonly property bool albumDistinct: album.length > 0
-        && album.toLowerCase() !== title.toLowerCase()
-        && album.toLowerCase() !== artist.toLowerCase()
-    readonly property bool canSeek: hasPlayer && !!player.canControl && !!player.canSeek
-        && !!player.positionSupported && !!player.lengthSupported
-        && isFinite(player.length) && player.length > 0
-    readonly property bool canShuffle: hasPlayer && !!player.canControl && !!player.shuffleSupported
-    readonly property bool canRepeat: hasPlayer && !!player.canControl && !!player.loopSupported
-    readonly property bool canPrevious: hasPlayer && !!player.canControl && !!player.canGoPrevious
-    readonly property bool canNext: hasPlayer && !!player.canControl && !!player.canGoNext
-    readonly property bool canToggle: hasPlayer && !!player.canControl && !!player.canTogglePlaying
+    readonly property string mediaFont: Theme.fontMedia
 
-    property real position: hasPlayer ? Math.max(0, player.position || 0) : 0
-    property real lastPositionAt: 0
-    property bool dragging: false
-    property real dragFraction: 0
-    readonly property real progress: canSeek
-        ? Math.max(0, Math.min(1, (dragging ? dragFraction * player.length : position) / player.length))
-        : 0
+    readonly property bool musicPresentation: Players.isMusicSource
+    // The host uses this presentation hint to reserve the album line.
+    readonly property bool albumDistinct: session.albumDistinct
     readonly property string consumerId: "media:" + (root.screenName || "default")
+    property string registeredConsumerId: ""
 
-    readonly property var loopNone: MprisLoopState.None
-    readonly property var loopTrack: MprisLoopState.Track
-    readonly property bool repeatOne: canRepeat && player.loopState === loopTrack
-
-    function syncPosition() {
-        if (!dragging && player) {
-            position = Math.max(0, player.position || 0)
-            lastPositionAt = Date.now()
-        }
+    MediaSession {
+        id: session
+        player: Players.active
+        trackKey: Players.trackKey
+        active: root.open
     }
 
-    function syncCava() { Cava.setConsumer(root.consumerId, root.open && root.isPlaying) }
-    function invoke(method) { if (player && typeof player[method] === "function") player[method]() }
-
-    function seekTo(value) {
-        if (!canSeek) return
-        const next = Math.max(0, Math.min(player.length, value))
-        position = next
-        lastPositionAt = Date.now()
-        player.position = next
+    function syncCava() {
+        if (registeredConsumerId && registeredConsumerId !== consumerId)
+            Cava.setConsumer(registeredConsumerId, false)
+        registeredConsumerId = consumerId
+        Cava.setConsumer(consumerId, root.open && session.isPlaying)
     }
-
-    function toggleShuffle() { if (canShuffle) player.shuffle = !player.shuffle }
-
-    function cycleRepeat() {
-        if (!canRepeat) return
-        const next = player.loopState === loopNone
-            ? loopTrack
-            : player.loopState === loopTrack ? MprisLoopState.Playlist : loopNone
-        player.loopState = next
-    }
-
-    function formatTime(value) {
-        if (!isFinite(value) || value < 0) return "—:—"
-        const total = Math.floor(value)
-        return Math.floor(total / 60) + ":" + String(total % 60).padStart(2, "0")
-    }
-
-    Component.onCompleted: { syncPosition(); syncCava() }
-    Component.onDestruction: Cava.setConsumer(root.consumerId, false)
+    Component.onCompleted: syncCava()
+    Component.onDestruction: Cava.setConsumer(registeredConsumerId, false)
     onOpenChanged: syncCava()
-    onIsPlayingChanged: syncCava()
-    onScreenNameChanged: syncCava()
-    onPlayerChanged: { dragging = false; dragFraction = 0; syncPosition(); syncCava() }
-
+    onConsumerIdChanged: syncCava()
     Connections {
-        target: root.player
-        ignoreUnknownSignals: true
-        function onPositionChanged() { root.syncPosition() }
+        target: session
         function onIsPlayingChanged() { root.syncCava() }
-    }
-    Connections {
-        target: Players
-        function onTrackKeyChanged() { root.dragging = false; root.dragFraction = 0; root.syncPosition() }
-    }
-
-    Timer {
-        interval: 60
-        repeat: true
-        running: root.open && root.canSeek && root.isPlaying && !root.dragging
-        onTriggered: {
-            if (!root.player) return
-            const now = Date.now()
-            const elapsed = root.lastPositionAt > 0 ? (now - root.lastPositionAt) / 1000 : 0
-            root.lastPositionAt = now
-            const rate = isFinite(root.player.rate) && root.player.rate > 0 ? root.player.rate : 1
-            if (elapsed > 0 && elapsed < 2)
-                root.position = Math.min(root.player.length, root.position + elapsed * rate)
-        }
     }
 
     Item {
         anchors.fill: parent
-        visible: !root.hasPlayer
+        visible: !session.hasPlayer
         opacity: visible ? 1 : 0
         Behavior on opacity { Anim { type: Anim.DefaultEffects } }
         ColumnLayout {
@@ -130,8 +61,8 @@ PillSurface {
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 text: qsTr("Ningún medio disponible")
-                color: Theme.iconSecondary
-                font.family: Theme.font
+                color: Qt.alpha(Theme.foreground, 0.72)
+                font.family: root.mediaFont
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
             }
         }
@@ -139,22 +70,22 @@ PillSurface {
 
     RowLayout {
         anchors.fill: parent
-        spacing: Theme.spacingXxl * root.s
-        visible: root.hasPlayer
+        spacing: 24 * root.s
+        visible: session.hasPlayer
         opacity: visible ? 1 : 0
         Behavior on opacity { Anim { type: Anim.DefaultEffects } }
 
         Item {
             id: artworkColumn
             Layout.preferredWidth: Math.min(208 * root.s, parent.height)
-            Layout.preferredHeight: Layout.preferredWidth
+            Layout.preferredHeight: root.musicPresentation ? Layout.preferredWidth : Layout.preferredWidth * 9 / 16
             Layout.alignment: Qt.AlignVCenter
 
             Image {
                 id: artSource
                 anchors.fill: parent
                 source: Players.artUrl
-                fillMode: Image.PreserveAspectCrop
+                fillMode: root.musicPresentation ? Image.PreserveAspectCrop : Image.PreserveAspectFit
                 asynchronous: true
                 cache: true
                 sourceSize: Qt.size(416 * root.s, 416 * root.s)
@@ -200,49 +131,45 @@ PillSurface {
         ColumnLayout {
             id: content
             Layout.fillWidth: true
-            Layout.fillHeight: true
             Layout.alignment: Qt.AlignVCenter
-            spacing: Theme.spacingMd * root.s
+            spacing: 6 * root.s
 
             RowLayout {
                 Layout.fillWidth: true
                 spacing: Theme.spacingSm * root.s
-                Rectangle {
-                    Layout.preferredWidth: statusText.implicitWidth + 20 * root.s
-                    Layout.preferredHeight: 24 * root.s
-                    radius: height / 2
-                    color: Qt.alpha(root.isPlaying ? Theme.accent : Theme.foreground,
-                                    root.isPlaying ? Theme.alphaChip : Theme.alphaSoft)
-                    border.color: Qt.alpha(root.isPlaying ? Theme.accent : Theme.foreground,
-                                           root.isPlaying ? Theme.alphaStrong : Theme.alphaHairline)
-                    border.width: Theme.borderHairline * root.s
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: Theme.spacingXs * root.s
-                        MaterialIcon {
-                            iconName: root.isPlaying ? "graphic_eq" : "pause_circle"
-                            color: root.isPlaying ? Theme.accent : Theme.iconSecondary
-                            font.pixelSize: Theme.fontSizeLabel * root.s
-                        }
-                        Text {
-                            id: statusText
-                            text: root.isPlaying ? qsTr("EN REPRODUCCIÓN") : qsTr("EN PAUSA")
-                            color: root.isPlaying ? Theme.accent : Theme.iconSecondary
-                            font.family: Theme.font
-                            font.pixelSize: Theme.fontSizeCaption * root.s
-                            font.weight: Font.DemiBold
-                            font.letterSpacing: 0.6 * root.s
-                        }
+                Text {
+                    text: session.isPlaying ? (root.musicPresentation ? qsTr("Ahora suena") : qsTr("Reproduciendo")) : qsTr("En pausa")
+                    color: Qt.alpha(Theme.foreground, 0.65)
+                    font.family: root.mediaFont
+                    font.pixelSize: 11 * root.s
+                }
+                Item { Layout.fillWidth: true }
+                Item {
+                    Layout.preferredWidth: 16 * root.s
+                    Layout.preferredHeight: 16 * root.s
+                    Image {
+                        id: sourceIcon
+                        anchors.fill: parent
+                        source: Players.serviceIcon
+                        sourceSize: Qt.size(32, 32)
+                        fillMode: Image.PreserveAspectFit
+                        asynchronous: true
+                    }
+                    MaterialIcon {
+                        anchors.fill: parent
+                        visible: sourceIcon.status !== Image.Ready
+                        iconName: Players.sourceInfo.glyph
+                        color: Players.sourceInfo.color || Theme.iconSecondary
+                        font.pixelSize: 16 * root.s
                     }
                 }
                 Text {
-                    Layout.fillWidth: true
-                    text: Players.serviceLabel || ""
-                    color: Theme.iconMuted
-                    font.family: Theme.font
+                    Layout.maximumWidth: 110 * root.s
+                    text: Players.serviceLabel
+                    color: Theme.iconSecondary
+                    font.family: root.mediaFont
                     font.pixelSize: Theme.fontSizeSmall * root.s
                     elide: Text.ElideRight
-                    horizontalAlignment: Text.AlignRight
                 }
                 Row {
                     visible: Players.list.length > 1
@@ -254,53 +181,47 @@ PillSurface {
 
             Text {
                 Layout.fillWidth: true
-                text: root.title
+                text: session.title
                 color: Theme.iconPrimary
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeDisplay * root.s
-                font.weight: Font.Medium
-                font.letterSpacing: -0.15 * root.s
+                font.family: root.mediaFont
+                font.pixelSize: 20 * Flags.fontScale * root.s
+                font.weight: Font.DemiBold
+                font.letterSpacing: -0.35 * root.s
+                wrapMode: Text.Wrap
+                maximumLineCount: 2
+                lineHeight: 1.12
                 elide: Text.ElideRight
             }
             Text {
                 Layout.fillWidth: true
-                text: root.artist
-                color: Theme.iconSecondary
-                font.family: Theme.font
+                text: session.artist + (root.musicPresentation && session.albumDistinct ? " · " + session.album : "")
+                color: Qt.alpha(Theme.foreground, 0.72)
+                font.family: root.mediaFont
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
                 font.letterSpacing: 0.05 * root.s
                 elide: Text.ElideRight
             }
-            Text {
-                Layout.fillWidth: true
-                visible: root.albumDistinct
-                text: root.album
-                color: Theme.iconMuted
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeSmall * root.s
-                elide: Text.ElideRight
-            }
-
             Item {
                 id: cavaView
+                visible: root.musicPresentation
                 Layout.fillWidth: true
-                Layout.preferredHeight: 46 * root.s
-                readonly property int count: Math.max(12, Math.min(48, Math.floor(width / (8 * root.s))))
+                Layout.preferredHeight: 18 * root.s
+                readonly property int count: Math.max(12, Math.min(32, Math.floor(width / (8 * root.s))))
                 readonly property real gap: 3 * root.s
                 readonly property real barWidth: Math.max(2 * root.s, (width - (count - 1) * gap) / count)
                 Repeater {
                     model: cavaView.count
                     delegate: Rectangle {
                         required property int index
-                        readonly property real signal: root.isPlaying && Cava.available && Cava.values.length > 0
+                        readonly property real signal: session.isPlaying && Cava.available && Cava.values.length > 0
                             ? Cava.values[Math.min(Cava.values.length - 1,
                               Math.floor(index * Cava.values.length / cavaView.count))] || 0 : 0
                         width: cavaView.barWidth
-                        height: Math.max(2 * root.s, (8 * root.s) + signal * 34 * root.s)
+                        height: Math.max(2 * root.s, (2 * root.s) + signal * 14 * root.s)
                         x: index * (cavaView.barWidth + cavaView.gap)
                         y: cavaView.height - height
                         radius: width / 2
-                        color: Qt.alpha(Theme.accent, Theme.alphaEmphasis + signal * 0.55)
+                        color: Qt.alpha(Theme.foreground, 0.20 + signal * 0.35)
                         Behavior on height { Anim { type: Anim.FastEffects } }
                         Behavior on color { ColorAnimation { duration: Motion.fast } }
                     }
@@ -310,8 +231,8 @@ PillSurface {
             Item {
                 id: seekBar
                 Layout.fillWidth: true
-                Layout.preferredHeight: 28 * root.s
-                visible: root.canSeek
+                Layout.preferredHeight: 24 * root.s
+                visible: session.canSeek
                 readonly property real trackInset: 2 * root.s
                 readonly property real trackWidth: width - 4 * root.s
                 function fractionAt(x) { return Math.max(0, Math.min(1, (x - trackInset) / trackWidth)) }
@@ -323,50 +244,52 @@ PillSurface {
                     radius: height / 2
                     color: Qt.alpha(Theme.foreground, Theme.alphaSubtle)
                     Rectangle {
-                        width: parent.width * root.progress
+                        width: parent.width * session.progress
                         height: parent.height
                         radius: parent.radius
-                        color: Theme.accent
-                        Behavior on width { enabled: !root.dragging; Anim { type: Anim.FastEffects } }
+                        color: Qt.alpha(Theme.foreground, 0.85)
+                        Behavior on width { enabled: !session.dragging; Anim { type: Anim.FastEffects } }
                     }
                 }
                 Rectangle {
-                    x: seekBar.trackInset + seekBar.trackWidth * root.progress - width / 2
+                    x: seekBar.trackInset + seekBar.trackWidth * session.progress - width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     width: 9 * root.s
                     height: width
                     radius: width / 2
-                    color: Theme.accent
-                    scale: seekMouse.containsMouse || root.dragging ? 1.2 : 1
+                    color: Theme.foreground
+                    opacity: seekMouse.containsMouse || session.dragging ? 1 : 0
+                    Behavior on opacity { Anim { type: Anim.FastEffects } }
+                    scale: seekMouse.containsMouse || session.dragging ? 1.2 : 1
                     Behavior on scale { Anim { type: Anim.FastEffects } }
                 }
                 MouseArea {
                     id: seekMouse
                     anchors.fill: parent
                     hoverEnabled: true
-                    enabled: root.canSeek
+                    enabled: session.canSeek
                     cursorShape: Qt.PointingHandCursor
-                    onPressed: (mouse) => { root.dragging = true; root.dragFraction = seekBar.fractionAt(mouse.x) }
-                    onPositionChanged: (mouse) => { if (root.dragging) root.dragFraction = seekBar.fractionAt(mouse.x) }
-                    onReleased: (mouse) => { root.dragging = false; root.seekTo(seekBar.fractionAt(mouse.x) * root.player.length) }
-                    onCanceled: root.dragging = false
+                    onPressed: (mouse) => { session.beginDrag(seekBar.fractionAt(mouse.x)) }
+                    onPositionChanged: (mouse) => { if (session.dragging) session.dragFraction = seekBar.fractionAt(mouse.x) }
+                    onReleased: (mouse) => { session.commitDrag(seekBar.fractionAt(mouse.x)) }
+                    onCanceled: session.cancelDrag()
                 }
             }
             RowLayout {
                 Layout.fillWidth: true
-                visible: root.canSeek
+                visible: session.canSeek
                 Text {
-                    text: root.formatTime(root.dragging ? root.dragFraction * root.player.length : root.position)
-                    color: Theme.iconPrimary
-                    font.family: Theme.fontMono
+                    text: session.formatTime(session.displayPosition)
+                    color: Theme.iconSecondary
+                    font.family: root.mediaFont
                     font.pixelSize: Theme.fontSizeSmall * root.s
                     font.letterSpacing: 0.2 * root.s
                     Layout.fillWidth: true
                 }
                 Text {
-                    text: root.formatTime(root.player ? root.player.length : 0)
+                    text: "−" + session.formatTime(session.remaining)
                     color: Theme.iconSecondary
-                    font.family: Theme.fontMono
+                    font.family: root.mediaFont
                     font.pixelSize: Theme.fontSizeSmall * root.s
                     font.letterSpacing: 0.2 * root.s
                     horizontalAlignment: Text.AlignRight
@@ -376,21 +299,22 @@ PillSurface {
             RowLayout {
                 Layout.fillWidth: true
                 spacing: Theme.spacingLg * root.s
-                CtrlBtn { iconName: "shuffle"; accessibleName: qsTr("Aleatorio"); active: root.canShuffle && root.player.shuffle; dim: !root.canShuffle; s: root.s; onClicked: root.toggleShuffle() }
+                CtrlBtn { visible: root.musicPresentation || session.canShuffle; iconName: "shuffle"; accessibleName: qsTr("Aleatorio"); active: session.shuffleEnabled; dim: !session.canShuffle; s: root.s; onClicked: session.toggleShuffle() }
                 Item { Layout.fillWidth: true }
-                CtrlBtn { iconName: "skip_previous"; accessibleName: qsTr("Anterior"); dim: !root.canPrevious; s: root.s; onClicked: root.invoke("previous") }
+                CtrlBtn { iconName: "skip_previous"; iconSize: 28; accessibleName: qsTr("Anterior"); dim: !session.canPrevious; s: root.s; onClicked: session.previous() }
                 CtrlBtn {
-                    iconName: root.isPlaying ? "pause" : "play_arrow"
-                    accessibleName: root.isPlaying ? qsTr("Pausar") : qsTr("Reproducir")
-                    size: 48
-                    active: true
-                    dim: !root.canToggle
+                    iconName: session.isPlaying ? "pause" : "play_arrow"
+                    accessibleName: session.isPlaying ? qsTr("Pausar") : qsTr("Reproducir")
+                    size: 52
+                    iconSize: 30
+                    primary: true
+                    dim: !session.canToggle
                     s: root.s
-                    onClicked: root.invoke("togglePlaying")
+                    onClicked: session.togglePlaying()
                 }
-                CtrlBtn { iconName: "skip_next"; accessibleName: qsTr("Siguiente"); dim: !root.canNext; s: root.s; onClicked: root.invoke("next") }
+                CtrlBtn { iconName: "skip_next"; iconSize: 28; accessibleName: qsTr("Siguiente"); dim: !session.canNext; s: root.s; onClicked: session.next() }
                 Item { Layout.fillWidth: true }
-                CtrlBtn { iconName: root.repeatOne ? "repeat_one" : "repeat"; accessibleName: qsTr("Repetir"); active: root.canRepeat && root.player.loopState !== root.loopNone; dim: !root.canRepeat; s: root.s; onClicked: root.cycleRepeat() }
+                CtrlBtn { visible: root.musicPresentation || session.canRepeat; iconName: session.repeatOne ? "repeat_one" : "repeat"; accessibleName: qsTr("Repetir"); active: session.repeatEnabled; dim: !session.canRepeat; s: root.s; onClicked: session.cycleRepeat() }
             }
         }
     }

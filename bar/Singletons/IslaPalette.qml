@@ -55,9 +55,14 @@ Singleton {
         rlProc.running = true
     }
 
+    Connections {
+        target: Config
+        function onWalColorsFileChanged() { root.forceReload() }
+    }
+
     Process {
         id: rlProc
-        command: ["bash", "-c", "cat /home/zdito/.cache/wal/colors.json"]
+        command: ["cat", Config.walColorsFile]
         running: false
         stdout: StdioCollector {
             id: rlCollector

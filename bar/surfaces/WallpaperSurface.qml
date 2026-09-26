@@ -2,7 +2,6 @@ import "../"
 import "../Singletons"
 import "../components"
 import QtQuick
-import QtQuick.Effects
 import Quickshell.Widgets
 
 /** Selector de fondos de Isla. Una imagen principal, navegación circular y
@@ -10,20 +9,13 @@ import Quickshell.Widgets
 PillSurface {
     id: root
 
-    readonly property real contentW: parent.width - (mLeft + mRight) * s
-    readonly property real cardW: Math.min(430 * s, contentW * 0.38)
-    readonly property real cardH: Math.round(cardW * 9 / 16)
-    readonly property real itemH: cardH + 28 * s
-    readonly property real nearOffset: contentW * 0.28
-    readonly property real farOffset: contentW * 0.46
-    readonly property real sideScale: 0.6
-    readonly property real sideOpacity: 0.52
-    readonly property real sideTilt: 9
     property bool navigating: false
     property bool footerEntered: false
     property string pendingPath: ""
     property string feedback: ""
     property real wheelTravel: 0
+    property url previousPreview: ""
+    property url readyPreview: ""
     readonly property var sel: wpModel.count > 0 ? wpModel.get(Math.max(0, Math.min(pathView.currentIndex, wpModel.count - 1))) : null
     readonly property string selName: sel ? displayName(sel.baseName || "") : ""
     readonly property bool selApplied: sel ? (sel.applied === true) : false
@@ -259,21 +251,6 @@ PillSurface {
         target: Wallpapers
     }
 
-    Rectangle {
-        anchors.fill: parent
-        color: Qt.alpha(root.previewAccent, Theme.alphaGhost)
-    }
-
-    Rectangle {
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: 58 * s
-        width: 500 * s
-        height: 250 * s
-        radius: width / 2
-        color: Qt.alpha(root.previewAccent, 0.055)
-        visible: !Flags.reduceMotion
-    }
-
     Item {
         id: header
 
@@ -283,48 +260,6 @@ PillSurface {
         height: 64 * s
         z: 10
         opacity: root.footerEntered ? 1 : 0
-
-        Item {
-            x: 26 * s
-            y: 55 * s
-            width: parent.width - 52 * s
-            height: 12 * s
-
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                width: parent.width
-                height: 2 * s
-                radius: height / 2
-                color: Qt.alpha(Theme.foreground, 0.1)
-
-                Rectangle {
-                    width: wpModel.count > 0 ? parent.width * (pathView.currentIndex + 1) / wpModel.count : 0
-                    height: parent.height
-                    radius: height / 2
-                    color: root.previewAccent
-
-                    Behavior on width {
-                        Anim {
-                            type: Anim.Emphasized
-                        }
-
-                    }
-
-                }
-
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: wpModel.count > 0 && !Wallpapers.applying
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => {
-                    return root.selectIndex(Math.round(mouse.x / width * (wpModel.count - 1)));
-                }
-            }
-
-        }
 
         Rectangle {
             x: 23 * s
@@ -448,6 +383,30 @@ PillSurface {
 
         }
 
+        Row {
+            anchors.right: refreshButton.left
+            anchors.rightMargin: 116 * root.s
+            anchors.verticalCenter: refreshButton.verticalCenter
+            spacing: 10 * root.s
+            visible: Players.has
+
+            IslandMediaSummary {
+                s: root.s
+                coverDiameter: 32 * root.s
+                textWidth: 200 * root.s
+                spacing: 10 * root.s
+                metadataSpacing: 2 * root.s
+                titlePixelSize: 12.5 * root.s
+                artistPixelSize: 11 * root.s
+                artUrl: Players.artUrl
+                hasProgress: Players.active && Players.active.length > 0
+                progress: hasProgress ? Math.max(0, Math.min(1,
+                    Players.active.position / Players.active.length)) : 0
+                title: Players.title
+                artist: Players.artist
+            }
+        }
+
         Text {
             anchors.right: refreshButton.left
             anchors.rightMargin: 16 * s
@@ -469,515 +428,193 @@ PillSurface {
 
     Item {
         id: shelf
-
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: footer.top
-        anchors.leftMargin: mLeft * s
-        anchors.rightMargin: mRight * s
-        clip: true
+        anchors.margins: 12 * root.s
         visible: wpModel.count > 0
 
-        // wheel sobre la estantería → navega (mismo canal que el teclado)
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.NoButton
-            onWheel: (wheel) => {
-                var delta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.pixelDelta.y;
-                root.wheelTravel += delta;
-                if (Math.abs(root.wheelTravel) >= (wheel.angleDelta.y !== 0 ? 90 : 32)) {
-                    root.cycle(root.wheelTravel > 0 ? -1 : 1);
-                    root.wheelTravel = 0;
+        Item {
+            id: previewArea
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: pathView.top
+            anchors.bottomMargin: 18 * root.s
+
+            ClippingRectangle {
+                id: preview
+                objectName: "wallpaperPreview"
+                anchors.centerIn: parent
+                height: Math.max(0, parent.height)
+                width: Math.min(parent.width, height * 16 / 9)
+                radius: 16 * root.s
+                color: Qt.alpha(Theme.background, 0.5)
+                border.width: Theme.borderHairline
+                border.color: Qt.alpha(Theme.foreground, 0.18)
+
+                Image {
+                    anchors.fill: parent
+                    objectName: "previewThumbnail"
+                    source: root.sel ? root.sel.thumbSource : ""
+                    opacity: root.previousPreview.toString().length > 0 ? 0 : 1 - heroImage.opacity
+                    sourceSize: Qt.size(960, 540)
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
                 }
-                wheel.accepted = true;
+                Image {
+                    anchors.fill: parent
+                    objectName: "previousPreview"
+                    source: root.previousPreview
+                    opacity: 1 - heroImage.opacity
+                    sourceSize: Qt.size(1280, 720)
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                }
+                Image {
+                    id: heroImage
+                    objectName: "heroImage"
+                    anchors.fill: parent
+                    source: root.sel ? "file://" + encodeURI(root.sel.path) : ""
+                    sourceSize: Qt.size(1280, 720)
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    opacity: 0
+                    function revealReady() {
+                        if (status !== Image.Ready || heroReveal.running || opacity === 1) return
+                        root.readyPreview = source
+                        heroReveal.restart()
+                    }
+                    onSourceChanged: {
+                        root.previousPreview = root.readyPreview
+                        heroReveal.stop()
+                        opacity = 0
+                        Qt.callLater(revealReady)
+                    }
+                    onStatusChanged: if (status === Image.Ready) Qt.callLater(revealReady)
+                    NumberAnimation {
+                        id: heroReveal
+                        target: heroImage
+                        property: "opacity"
+                        from: 0; to: 1
+                        duration: Flags.reduceMotion ? 0 : Motion.standard
+                        easing.type: Easing.InOutQuad
+                    }
+                }
+                Rectangle {
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    anchors.margins: 14 * root.s
+                    width: currentLabel.implicitWidth + 24 * root.s
+                    height: 28 * root.s
+                    radius: height / 2
+                    color: Qt.alpha(Theme.background, 0.82)
+                    visible: root.selApplied
+                    Text {
+                        id: currentLabel
+                        anchors.centerIn: parent
+                        text: qsTr("Fondo actual")
+                        color: Theme.foreground
+                        font.family: Theme.font
+                        font.pixelSize: 11 * root.s
+                    }
+                }
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    visible: heroImage.status === Image.Error
+                    iconName: "broken_image"
+                    color: Theme.dim
+                    font.pixelSize: 30 * root.s
+                }
             }
         }
 
-        PathView {
+        ListView {
             id: pathView
-
-            anchors.fill: parent
+            objectName: "wallpaperThumbnails"
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: 66 * root.s
+            orientation: ListView.Horizontal
+            spacing: 10 * root.s
             model: wpModel
+            clip: true
             interactive: !Wallpapers.applying
-            dragMargin: 42 * s
-            flickDeceleration: 1000
-            pathItemCount: Math.min(wpModel.count, 5)
-            cacheItemCount: 2
-            snapMode: PathView.SnapOneItem
-            preferredHighlightBegin: 0.5
-            preferredHighlightEnd: 0.5
-            highlightRangeMode: PathView.StrictlyEnforceRange
-            highlightMoveDuration: Motion.emphasizedLarge
-            onCurrentIndexChanged: {
-                if (pathView.currentIndex >= 0)
-                    requestVisibleThumbs();
-
-            }
-
-            highlight: Item {
-                width: root.cardW
-                height: root.itemH
-            }
-
-            path: Path {
-                startX: pathView.width / 2 - root.farOffset
-                startY: pathView.height / 2
-
-                PathAttribute {
-                    name: "sc"
-                    value: root.sideScale
-                }
-
-                PathAttribute {
-                    name: "op"
-                    value: root.sideOpacity
-                }
-
-                PathAttribute {
-                    name: "ry"
-                    value: -root.sideTilt
-                }
-
-                PathLine {
-                    x: pathView.width / 2 - root.nearOffset
-                    y: pathView.height / 2
-                }
-
-                PathAttribute {
-                    name: "sc"
-                    value: 0.78
-                }
-
-                PathAttribute {
-                    name: "op"
-                    value: 0.82
-                }
-
-                PathAttribute {
-                    name: "ry"
-                    value: -root.sideTilt * 0.5
-                }
-
-                PathLine {
-                    x: pathView.width / 2
-                    y: pathView.height / 2
-                }
-
-                PathAttribute {
-                    name: "sc"
-                    value: 1
-                }
-
-                PathAttribute {
-                    name: "op"
-                    value: 1
-                }
-
-                PathAttribute {
-                    name: "ry"
-                    value: 0
-                }
-
-                PathLine {
-                    x: pathView.width / 2 + root.nearOffset
-                    y: pathView.height / 2
-                }
-
-                PathAttribute {
-                    name: "sc"
-                    value: 0.78
-                }
-
-                PathAttribute {
-                    name: "op"
-                    value: 0.82
-                }
-
-                PathAttribute {
-                    name: "ry"
-                    value: root.sideTilt * 0.5
-                }
-
-                PathLine {
-                    x: pathView.width / 2 + root.farOffset
-                    y: pathView.height / 2
-                }
-
-                PathAttribute {
-                    name: "sc"
-                    value: root.sideScale
-                }
-
-                PathAttribute {
-                    name: "op"
-                    value: root.sideOpacity
-                }
-
-                PathAttribute {
-                    name: "ry"
-                    value: root.sideTilt
-                }
-
-            }
+            boundsBehavior: Flickable.StopAtBounds
+            highlightRangeMode: ListView.ApplyRange
+            preferredHighlightBegin: width / 2 - 48 * root.s
+            preferredHighlightEnd: width / 2 + 48 * root.s
+            highlightMoveDuration: Flags.reduceMotion ? 0 : Motion.morph
+            onCurrentIndexChanged: root.requestVisibleThumbs()
 
             delegate: Item {
-                id: del
-
+                id: thumbnail
                 required property int index
+                required property string thumbSource
                 required property string path
-                required property string baseName
                 required property string thumb
                 required property bool thumbReady
-                required property string thumbSource
-                required property int cacheRevision
-                required property bool thumbFailed
                 required property bool applied
-
-                // valores consultados desde los PathAttributes de la ruta; fuera
-                // de la ruta (invisible) → colapsados.
-                readonly property bool isCurrent: PathView.isCurrentItem
-                readonly property bool onPath: PathView.onPath
-                readonly property real sc: PathView.onPath ? PathView.sc : 0
-                readonly property real op: PathView.onPath ? PathView.op : 0
-                // PathView.ry devuelve undefined cuando el item está fuera del
-                // path (caching/lazy load) → ternario defensivo para evitar el
-                // loop "Unable to assign undefined to double" en angle.
-                readonly property real ry: PathView.onPath ? PathView.ry : 0
-                // PathView interpola escala/opacidad en ambos extremos con valores
-                // iguales. Ordenar por distancia circular evita empates de z que
-                // hacían que una tarjeta extrema saltara encima de su vecina.
-                readonly property int distanceFromCurrent: {
-                    if (wpModel.count < 2) return 0
-                    var distance = Math.abs(index - pathView.currentIndex)
-                    return Math.min(distance, wpModel.count - distance)
+                required property bool thumbFailed
+                readonly property bool selected: ListView.isCurrentItem
+                Component.onCompleted: {
+                    if (!thumbReady && !thumbFailed) Wallpapers.requestThumbnail(path, thumb)
                 }
-                property bool hovered: false
-
-                width: root.cardW
-                height: root.itemH
-                // La profundidad sigue el recorrido, incluso al seleccionar un
-                // extremo: cada tarjeta queda detrás de las más próximas al centro.
-                z: 10 - del.distanceFromCurrent
-                // profundidad: inclinación diagonal del cover-flow + los laterales
-                // quedan un pelín hundidos respecto al centro.
-                transform: [
-                    Rotation {
-                        axis.x: 0
-                        axis.y: 1
-                        axis.z: 0
-                        // PathView ya interpola estos valores en cada fotograma.
-                        angle: del.ry
-                    },
-                    Translate {
-                        y: (1 - del.sc) * 7 * root.s
+                width: 96 * root.s
+                height: pathView.height
+                ClippingRectangle {
+                    anchors.centerIn: parent
+                    width: parent.width
+                    height: 54 * root.s
+                    radius: 8 * root.s
+                    color: Theme.cardBot
+                    border.width: thumbnail.selected ? 2 * root.s : Theme.borderHairline
+                    border.color: thumbnail.selected ? root.previewAccent : Theme.border
+                    opacity: thumbnail.selected || thumbMouse.containsMouse ? 1 : 0.72
+                    Behavior on opacity { Anim { type: Anim.FastEffects } }
+                    Image {
+                        anchors.fill: parent
+                        anchors.margins: 3 * root.s
+                        source: thumbnail.thumbSource
+                        sourceSize: Qt.size(192, 108)
+                        fillMode: Image.PreserveAspectCrop
+                        asynchronous: true
                     }
-                ]
-
-                Item {
-                    id: inner
-
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.top
-                    width: root.cardW
-                    height: root.itemH
-                    scale: del.sc
-                    opacity: del.op
-                    transformOrigin: Item.Center
-
-                    Item {
-                        id: cardSlot
-
-                        anchors.top: parent.top
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: root.cardW
-                        height: root.cardH
-
-                        Item {
-                            anchors.centerIn: parent
-                            width: parent.width + 8 * root.s
-                            height: parent.height + 8 * root.s
-
-                            BreatheBorder {
-                                radius: Motion.rTile * root.s + 4 * root.s
-                                s: root.s
-                                width_: 1
-                                alphaMin: 0
-                                alphaMax: 0.24
-                                period: 2900
-                                glowColor: root.previewAccent
-                                running: isCurrent && del.onPath && root.open && !Flags.reduceMotion
-                            }
-
-                        }
-
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: parent.width
-                            height: parent.height
-                            radius: Motion.rTile * root.s
-                            color: Theme.cardBot
-                            border.width: Theme.borderHairline
-                            border.color: Theme.border
-                            layer.enabled: del.isCurrent && del.onPath
-
-                            layer.effect: MultiEffect {
-                                shadowEnabled: true
-                                shadowColor: Qt.rgba(0, 0, 0, 0.55)
-                                shadowBlur: 0.7
-                                shadowVerticalOffset: 8 * root.s
-                            }
-
-                        }
-
-                        ClippingRectangle {
-                            id: board
-
-                            anchors.fill: parent
-                            radius: Motion.rTile * root.s
-                            scale: del.hovered && del.isCurrent ? 1.015 : 1
-                            border.width: Theme.borderHairline
-                            border.color: Theme.border
-                            color: Theme.cardBot
-                            contentInsideBorder: false
-                            antialiasing: true
-
-                            Rectangle {
-                                anchors.fill: parent
-                                gradient: Gradient {
-                                    GradientStop { position: 0; color: Theme.cardTop }
-                                    GradientStop { position: 1; color: Theme.cardBot }
-                                }
-                            }
-
-                            Image {
-                                id: thumbImage
-
-                                anchors.fill: parent
-                                source: del.thumbReady ? del.thumbSource : ""
-                                fillMode: Image.PreserveAspectCrop
-                                asynchronous: true
-                                smooth: true
-                                sourceSize: Qt.size(board.width * 2, board.height * 2)
-                                antialiasing: true
-                                opacity: status === Image.Ready ? 1 : 0
-
-                                Behavior on opacity {
-                                    NumberAnimation {
-                                        duration: Motion.fast
-                                        easing.type: Easing.OutQuad
-                                    }
-
-                                }
-
-                            }
-
-                            Image {
-                                id: fullImage
-
-                                anchors.fill: parent
-                                source: del.isCurrent ? ("file://" + encodeURI(del.path)) : ""
-                                sourceSize: Qt.size(board.width * 2, board.height * 2)
-                                asynchronous: true
-                                smooth: true
-                                fillMode: Image.PreserveAspectCrop
-                                opacity: del.isCurrent && status === Image.Ready ? 1 : 0
-
-                                Behavior on opacity {
-                                    NumberAnimation {
-                                        duration: Motion.standardLarge
-                                        easing.type: Easing.OutCubic
-                                    }
-
-                                }
-
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                color: Theme.cardBot
-                                opacity: thumbImage.status === Image.Ready || fullImage.status === Image.Ready ? 0 : 1
-
-                                Behavior on opacity {
-                                    Anim {
-                                        type: Anim.FastEffects
-                                    }
-
-                                }
-
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                visible: !del.thumbReady && !del.thumbFailed && del.onPath
-                                color: "transparent"
-
-                                Rectangle {
-                                    width: board.width * 0.5
-                                    height: parent.height
-                                    color: Qt.alpha(root.previewAccent, Theme.alphaFaint)
-
-                                    SequentialAnimation on x {
-                                        running: !del.thumbReady && !del.thumbFailed && del.onPath && root.open && !Flags.reduceMotion
-                                        loops: Animation.Infinite
-
-                                        NumberAnimation {
-                                            from: -board.width * 0.5
-                                            to: board.width
-                                            duration: 1100
-                                            easing.type: Easing.InOutCubic
-                                        }
-
-                                        NumberAnimation {
-                                            from: board.width
-                                            to: -board.width * 0.5
-                                            duration: 0
-                                        }
-
-                                    }
-
-                                }
-
-                            }
-
-                            MaterialIcon {
-                                anchors.centerIn: parent
-                                visible: (del.thumbFailed || thumbImage.status === Image.Error) && fullImage.status !== Image.Ready
-                                iconName: "broken_image"
-                                color: Theme.dim
-                                font.pixelSize: 28 * root.s
-                            }
-
-                            Rectangle {
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.bottom: parent.bottom
-                                height: 34 * root.s
-                                visible: del.isCurrent
-
-                                gradient: Gradient {
-                                    GradientStop {
-                                        position: 0
-                                        color: "transparent"
-                                    }
-
-                                    GradientStop {
-                                        position: 1
-                                        color: Qt.rgba(0, 0, 0, 0.46)
-                                    }
-
-                                }
-
-                            }
-
-                            // wash de hover (la tarjeta "se enciende" bajo el cursor)
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: board.radius
-                                color: Qt.alpha(root.previewAccent, del.hovered && del.onPath ? 0.1 : 0)
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Motion.fast
-                                    }
-
-                                }
-
-                            }
-
-                            // borde del piloto / hover
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: board.radius
-                                color: "transparent"
-                                border.width: (isCurrent || (onPath && hovered)) ? 2 : 0
-                                border.color: isCurrent ? root.previewAccent : Qt.alpha(root.previewAccent, Theme.alphaCritical)
-
-                                Behavior on border.color {
-                                    ColorAnimation {
-                                        duration: Motion.fast
-                                    }
-
-                                }
-
-                                Behavior on border.width {
-                                    Anim {
-                                        type: Anim.FastEffects
-                                    }
-
-                                }
-
-                            }
-
-                            Rectangle {
-                                anchors.top: parent.top
-                                anchors.right: parent.right
-                                anchors.margins: 10 * root.s
-                                width: 24 * root.s
-                                height: 24 * root.s
-                                radius: width / 2
-                                color: root.previewAccent
-                                opacity: del.applied ? 1 : 0
-                                visible: opacity > 0
-                                scale: del.applied ? 1 : 0.6
-
-                                MaterialIcon {
-                                    anchors.centerIn: parent
-                                    iconName: Icons.iCheck
-                                    color: root.onPreviewAccent
-                                    font.pixelSize: Theme.fontSizeBody * root.s
-                                }
-
-                                Behavior on opacity {
-                                    Anim {
-                                        type: Anim.FastEffects
-                                    }
-
-                                }
-
-                                Behavior on scale {
-                                    Anim {
-                                        type: Anim.Emphasized
-                                    }
-
-                                }
-
-                            }
-
-                            MouseArea {
-                                id: tileMa
-
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onContainsMouseChanged: {
-                                    del.hovered = containsMouse;
-                                }
-                                onClicked: {
-                                    if (!isCurrent)
-                                        root.selectIndex(index);
-
-                                }
-                                onDoubleClicked: root.applyPath(del.path)
-                            }
-
-                            Behavior on scale {
-                                Anim {
-                                    type: Anim.FastSpatial
-                                }
-
-                            }
-
-                        }
-
+                    MaterialIcon {
+                        anchors.centerIn: parent
+                        visible: thumbnail.thumbFailed
+                        iconName: "broken_image"
+                        color: Theme.dim
+                        font.pixelSize: 18 * root.s
                     }
-
+                    MouseArea {
+                        id: thumbMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        enabled: !Wallpapers.applying
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.selectIndex(thumbnail.index)
+                        onDoubleClicked: root.applyPath(thumbnail.path)
+                    }
                 }
-
             }
-
         }
 
+        MouseArea {
+            anchors.fill: previewArea
+            acceptedButtons: Qt.NoButton
+            onWheel: (wheel) => {
+                const delta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.pixelDelta.y
+                root.wheelTravel += delta
+                if (Math.abs(root.wheelTravel) >= (wheel.angleDelta.y !== 0 ? 90 : 32)) {
+                    root.cycle(root.wheelTravel > 0 ? -1 : 1)
+                    root.wheelTravel = 0
+                }
+                wheel.accepted = true
+            }
+        }
     }
 
     Item {
@@ -1180,7 +817,7 @@ PillSurface {
             }
 
             SequentialAnimation on opacity {
-                running: Wallpapers.scanning
+                running: Wallpapers.scanning && root.open && !Flags.reduceMotion
                 loops: Animation.Infinite
 
                 NumberAnimation {

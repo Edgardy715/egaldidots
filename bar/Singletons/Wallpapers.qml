@@ -7,8 +7,8 @@ import Wpscan
 Singleton {
     id: root
 
-    readonly property string wallDir: Quickshell.env("HOME") + "/Wallpapers"
-    readonly property string cacheDir: Quickshell.env("HOME") + "/.cache/quickshell/wallpapers"
+    readonly property string wallDir: Config.wallpaperDir
+    readonly property string cacheDir: Config.wallpaperCacheDir
 
     property var list: []
     property string current: ""
@@ -20,7 +20,7 @@ Singleton {
     property var pendingThumbs: ({})
     property var colorIndex: ({})
 
-    readonly property string applyScript: Quickshell.env("HOME") + "/.config/hypr/scripts/apply-wallpaper.sh"
+    readonly property string applyScript: Config.wallpaperApplyScript
 
     readonly property int thumbW: 320
     readonly property int thumbH: 180

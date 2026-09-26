@@ -28,3 +28,17 @@ wpscan/build/*
 assets/raw-*.png
 assets/quickshell-bar.png
 assets/quickshell-idle.png
+
+# Local settings, credentials and runtime output
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+__pycache__/
+*.pyc
+*.log
+.cache/
+bar/shell.json

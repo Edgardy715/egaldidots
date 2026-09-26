@@ -76,8 +76,8 @@ Singleton {
     readonly property color iconOnAccent: Qt.rgba(0, 0, 0, alphaIconOnAcc)        // sobre chips accent
 
     readonly property real shadowOpacity: 0.55
-    readonly property real rSmall: Motion.rSmall
-    readonly property real rTile:  Motion.rTile
+    readonly property real rSmall: Motion.rSmall * Flags.radiusScale
+    readonly property real rTile:  Motion.rTile * Flags.radiusScale
 
     // ──────────────────────────────────────────────────────────────────────
     // Sistema de tokens numéricos (valores BASE — multiplicar por `s` en el sitio)
@@ -96,24 +96,24 @@ Singleton {
     // Escala t-shirt clásica (1, 2, 3, 4, 6, 8, 10, 12, 16) — coincide con
     // Material 3 spacing tokens. Los sites usan siempre `Theme.spacing.X * s`.
     readonly property real spacingNone:  0
-    readonly property real spacingXxs:   1   // hairline (chip↔icono)
-    readonly property real spacingXs:    2   // micro (entre elementos muy juntos)
-    readonly property real spacingSm:    4   // gaps cortos en RowLayout densos
-    readonly property real spacingMd:    8   // gaps estándar (el más común)
-    readonly property real spacingLg:   10   // gaps amplios dentro de tarjetas
-    readonly property real spacingXl:   12   // separación entre secciones
-    readonly property real spacingXxl:  16   // separación entre cards
+    readonly property real spacingXxs:   1 * Flags.spacingScale // hairline (chip↔icono)
+    readonly property real spacingXs:    2 * Flags.spacingScale // micro (entre elementos muy juntos)
+    readonly property real spacingSm:    4 * Flags.spacingScale // gaps cortos en RowLayout densos
+    readonly property real spacingMd:    8 * Flags.spacingScale // gaps estándar (el más común)
+    readonly property real spacingLg:   10 * Flags.spacingScale // gaps amplios dentro de tarjetas
+    readonly property real spacingXl:   12 * Flags.spacingScale // separación entre secciones
+    readonly property real spacingXxl:  16 * Flags.spacingScale // separación entre cards
 
     // ---- Radius (esquinas redondeadas) ----
     // Concentrados en una escala corta. rSmall/rTile vienen de Motion.qml
     // y se usan en lugares críticos — no los duplicamos.
-    readonly property real radiusXs:    4   // pills internos, chips muy compactos
-    readonly property real radiusSm:    8   // botones, tiles pequeños
-    readonly property real radiusMd:    9   // sliders, botones medianos
-    readonly property real radiusLg:   10   // tarjetas estándar
-    readonly property real radiusXl:   12   // tarjetas grandes (session, mixer)
-    readonly property real radiusXxl:  16   // modales, dialogs
-    readonly property real radiusFull: 18   // esquinas casi totales para paneles anchos
+    readonly property real radiusXs:    4 * Flags.radiusScale // pills internos, chips muy compactos
+    readonly property real radiusSm:    8 * Flags.radiusScale // botones, tiles pequeños
+    readonly property real radiusMd:    9 * Flags.radiusScale // sliders, botones medianos
+    readonly property real radiusLg:   10 * Flags.radiusScale // tarjetas estándar
+    readonly property real radiusXl:   12 * Flags.radiusScale // tarjetas grandes (session, mixer)
+    readonly property real radiusXxl:  16 * Flags.radiusScale // modales, dialogs
+    readonly property real radiusFull: 18 * Flags.radiusScale // esquinas casi totales para paneles anchos
 
     // ---- FontSize (jerarquía tipográfica, base a s=1.0) ----
     // Consolida los 10 niveles que aparecen en surfaces. hCaption/hSmall/
@@ -122,26 +122,26 @@ Singleton {
     // IMPORTANTE: todos `real` (no `int`) — los callers hacen `Theme.fontSizeX * s`
     // y el resultado de multiplicar int por real es double, que Qt no puede asignar
     // a una property `int` (Warning: Unable to assign double to int).
-        readonly property real fontSizeCaption:    9   // mono pequeño (URGENTE, timestamps)
-    readonly property real fontSizeLabel:     10   // chips, contadores (countTxt)
-    readonly property real fontSizeSmall:      11   // body small, secundarios
-    readonly property real fontSizeBody:      12   // body estándar, NotifCard body
-    readonly property real fontSizeBodyLg:    13   // body destacado (hSmall original)
-    readonly property real fontSizeTitle:     15   // títulos de surface (hTitle original)
-    readonly property real fontSizeTitleLg:   16   // títulos grandes, valores numéricos
-    readonly property real fontSizeHeadline:  17   // clock, headlines
-    readonly property real fontSizeHead:      18   // hHead original, iconos grandes
-    readonly property real fontSizeDisplay:   20   // cover art label, media chrome
-    readonly property real fontSizeDisplayLg: 22   // cifras grandes (counter, score)
-    readonly property real fontSizeIcon:      28   // iconos grandes (notif genericBadge)
-    readonly property real fontSizeHero:      24   // hero title (WallpaperSurface)
-    readonly property real fontSizeCalendar:  30   // calendar day number (MediaSurface)
-    readonly property real fontSizeHeroLg:    34   // calendar huge number
-    readonly property real fontSizePreview:   40   // OverviewScreen preview label
-    readonly property real fontSizeCover:     52   // cover art text overlay
+    readonly property real fontSizeCaption:    9 * Flags.fontScale // mono pequeño (URGENTE, timestamps)
+    readonly property real fontSizeLabel:     10 * Flags.fontScale // chips, contadores (countTxt)
+    readonly property real fontSizeSmall:      11 * Flags.fontScale // body small, secundarios
+    readonly property real fontSizeBody:      12 * Flags.fontScale // body estándar, NotifCard body
+    readonly property real fontSizeBodyLg:    13 * Flags.fontScale // body destacado (hSmall original)
+    readonly property real fontSizeTitle:     15 * Flags.fontScale // títulos de surface (hTitle original)
+    readonly property real fontSizeTitleLg:   16 * Flags.fontScale // títulos grandes, valores numéricos
+    readonly property real fontSizeHeadline:  17 * Flags.fontScale // clock, headlines
+    readonly property real fontSizeHead:      18 * Flags.fontScale // hHead original, iconos grandes
+    readonly property real fontSizeDisplay:   20 * Flags.fontScale // cover art label, media chrome
+    readonly property real fontSizeDisplayLg: 22 * Flags.fontScale // cifras grandes (counter, score)
+    readonly property real fontSizeIcon:      28 * Flags.fontScale // iconos grandes (notif genericBadge)
+    readonly property real fontSizeHero:      24 * Flags.fontScale // hero title (WallpaperSurface)
+    readonly property real fontSizeCalendar:  30 * Flags.fontScale // calendar day number (MediaSurface)
+    readonly property real fontSizeHeroLg:    34 * Flags.fontScale // calendar huge number
+    readonly property real fontSizePreview:   40 * Flags.fontScale // OverviewScreen preview label
+    readonly property real fontSizeCover:     52 * Flags.fontScale // cover art text overlay
     // legacy aliases — respetan los nombres previos para no romper callers
     readonly property real hCaption: fontSizeCaption
-    readonly property real hSmall:   11
+    readonly property real hSmall:   fontSizeSmall
     readonly property real hBody:    fontSizeBodyLg
     readonly property real hTitle:   fontSizeTitle
     readonly property real hHead:    fontSizeHead
@@ -156,11 +156,11 @@ Singleton {
     // Antes los valores iban de 10 a 22 sin sistema; ahora una escala corta.
     // 0/10 son válidos (sin margen / margen compacto) y se mantienen como tokens.
     readonly property real marginNone:  0
-    readonly property real marginXs:   10   // wallpapersurface (panel ancho)
-    readonly property real marginSm:   14   // surfaces pequeñas (session, utils)
-    readonly property real marginMd:   16   // la más común (calendar, mixer, notifs)
-    readonly property real marginLg:   18   // surfaces grandes (calendar con eventos)
-    readonly property real marginXl:   20   // mixer ancho, surfaces con teclado
+    readonly property real marginXs:   10 * Flags.spacingScale // wallpapersurface (panel ancho)
+    readonly property real marginSm:   14 * Flags.spacingScale // surfaces pequeñas (session, utils)
+    readonly property real marginMd:   16 * Flags.spacingScale // la más común (calendar, mixer, notifs)
+    readonly property real marginLg:   18 * Flags.spacingScale // surfaces grandes (calendar con eventos)
+    readonly property real marginXl:   20 * Flags.spacingScale // mixer ancho, surfaces con teclado
 
     // ---- Hover/Pulse scale (microinteracciones) ----
     readonly property real scaleHover:   1.03   // wash + lift sutil
@@ -171,12 +171,13 @@ Singleton {
     // Google Sans Flex (instalada en ~/.local/share/fonts, variable completa
     // GRAD,ROND,opsz,slnt,wdth,wght) = la headline de caelestia. Rubik para el
     // reloj/monospaciado display. Adwaita Sans como fallback real instalada.
-    readonly property string font: "Google Sans Flex"
+    readonly property string font: Flags.fontFamily
     readonly property string fontFallback: "Adwaita Sans"
-    readonly property string fontMono: "JetBrainsMono Nerd Font"
+    readonly property string fontMono: Flags.fontMonoFamily
     // display/tabular — reloj, porcentajes, contadores (Rubik, fuente "clock"
     // de caelestia). Cae a Inter si no está instalada.
-    readonly property string fontDisplay: "Rubik"
+    readonly property string fontDisplay: Flags.fontDisplayFamily
+    readonly property string fontMedia: Flags.fontMediaFamily
 
     function mix(a, b, t) {
         return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, 1)

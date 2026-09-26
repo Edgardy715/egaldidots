@@ -1,4 +1,6 @@
 singleton Motion Motion.qml
+singleton IslandGeometry IslandGeometry.qml
+singleton Config Config.qml
 singleton IslaPalette IslaPalette.qml
 singleton Theme Theme.qml
 singleton Flags Flags.qml

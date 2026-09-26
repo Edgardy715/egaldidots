@@ -20,6 +20,9 @@ Item {
     property string mode: "rest"
     property real notifBreathGlow: 0
     property string notifState: "idle"
+    property bool suppressEdge: false
+    property real captureExtra: 0
+    property real captureLeftExtra: 0
 
     readonly property real bodyRadius: root.morphRadius + root.notifBreathRadius
 
@@ -27,14 +30,19 @@ Item {
 
     Rectangle {
         id: bodyShadow
-        anchors.fill: parent
-        anchors.margins: -2 * root.s
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: -2 * root.s - root.captureLeftExtra
+        anchors.topMargin: -2 * root.s
+        anchors.bottomMargin: -2 * root.s
+        width: parent.width + root.captureExtra + root.captureLeftExtra + 4 * root.s
         radius: root.bodyRadius + 2 * root.s
         color: "transparent"
         border.width: Theme.borderHairlineSoft * root.s
         border.color: Qt.alpha(root.materialAccent,
                                root.materialAwake ? Theme.alphaMid : Theme.alphaHair)
-        opacity: root.surface === "auth" ? 0 : root.materialAwake ? 0.9 : 0.58
+        opacity: root.surface === "auth" || root.suppressEdge ? 0 : root.materialAwake ? 0.9 : 0.58
         layer.enabled: true
         layer.effect: MultiEffect {
             shadowEnabled: true
@@ -48,13 +56,19 @@ Item {
 
     Rectangle {
         id: materialHalo
-        anchors.fill: parent
-        anchors.margins: -7 * root.s
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: -7 * root.s - root.captureLeftExtra
+        anchors.topMargin: -7 * root.s
+        anchors.bottomMargin: -7 * root.s
+        width: parent.width + root.captureExtra + root.captureLeftExtra + 14 * root.s
         radius: root.morphRadius + 7 * root.s
         color: "transparent"
         border.width: Math.max(1, Theme.borderHairline * root.s)
         border.color: Qt.alpha(root.materialAccent, 0.32)
-        opacity: root.surface === "auth" ? 0 : (root.materialAwake ? 0.16 : 0) + root.materialPulse * 0.34
+        opacity: root.surface === "auth" || root.suppressEdge ? 0
+            : (root.materialAwake ? 0.16 : 0) + root.materialPulse * 0.34
         scale: 1 + root.materialPulse * 0.028
         layer.enabled: opacity > 0.01
         layer.effect: MultiEffect {
@@ -83,12 +97,13 @@ Item {
             Image {
                 anchors.fill: parent
                 anchors.margins: -80
-                source: Players.artUrl
+                source: root.surface === "media" ? Players.artUrl : ""
                 fillMode: Image.PreserveAspectCrop
                 opacity: 0.12
                 smooth: true
                 asynchronous: true
-                sourceSize: Qt.size(root.width * 2, root.height * 2)
+                // Stable decode size: resizing the glass must not reload the artwork.
+                sourceSize: Qt.size(256, 256)
                 Behavior on opacity {
                     SequentialAnimation {
                         NumberAnimation { to: 0; duration: 120 * Motion.mult; easing.type: Easing.OutCubic }
@@ -115,10 +130,14 @@ Item {
 
     ClippingRectangle {
         id: body
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.leftMargin: -root.captureLeftExtra
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width: parent.width + root.captureExtra + root.captureLeftExtra
         radius: root.bodyRadius
         border.width: root.surface === "auth" ? 1 : Theme.borderHairline
-        border.color: Qt.alpha(Theme.foreground,
+        border.color: root.suppressEdge ? "transparent" : Qt.alpha(Theme.foreground,
                                 root.surface === "auth" ? 0.18 : root.materialAwake ? Theme.alphaHairline : Theme.alphaHair)
         color: "transparent"
         contentUnderBorder: true
@@ -188,6 +207,7 @@ Item {
             height: 1.5 * root.s
             radius: height / 2
             color: Theme.sheen
+            visible: !root.suppressEdge
         }
 
         Rectangle {

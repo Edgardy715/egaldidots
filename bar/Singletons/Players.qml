@@ -2,11 +2,12 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Mpris
+import "MediaSource.js" as MediaSource
 
 /**
  * Isla · Players. Wrapper lean de Quickshell.Services.Mpris (molde Ricelin
- * Players.qml): descarta playerctld (proxy), elige el activo (primero el que
- * sonando, sino el primero) y expone lo que MediaSurface lee: title/artist/
+ * Players.qml): descarta playerctld (proxy) y reproductores detenidos, elige
+ * primero el que suena y después uno pausado, y expone: title/artist/
  * artUrl/playing/trackKey. `active` es por-objeto para sobrevivir churn de
  * metadata y caer cuando el proceso muere.
  */
@@ -22,20 +23,24 @@ Singleton {
         var all = Mpris.players.values
         var out = []
         for (var i = 0; i < all.length; i++)
-            if (all[i] && !isProxy(all[i])) out.push(all[i])
+            if (all[i] && !isProxy(all[i])
+                    && all[i].playbackState !== MprisPlaybackState.Stopped) out.push(all[i])
         return out
     }
 
     /** player fijado manualmente (por el switcher ‹› del MediaSurface), o null.
      *  Si está set y aún vive en `list` → tiene prioridad; si se fue, auto-cae. */
     property var manual: null
+    property var recent: null
 
     readonly property var active: {
         var l = root.list
         if (root.manual && l.indexOf(root.manual) >= 0) return root.manual
         for (var i = 0; i < l.length; i++) if (l[i].isPlaying) return l[i]
+        if (root.recent && l.indexOf(root.recent) >= 0) return root.recent
         return l.length > 0 ? l[0] : null
     }
+    onActiveChanged: if (root.playing) root.recent = root.active
 
     /** ciclo manual entre players (dir ±1) — para el switcher del media surface. */
     function cycleManual(dir) {
@@ -50,7 +55,16 @@ Singleton {
 
     readonly property bool has: root.active !== null
     readonly property bool playing: root.has && root.active.isPlaying
+    onPlayingChanged: if (root.playing) root.recent = root.active
     readonly property bool live: root.playing
+    // MPRIS position advances on read, but does not notify on each elapsed second.
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.live && root.active.positionSupported
+        onTriggered: if (root.active) root.active.positionChanged()
+    }
+
     readonly property string title: root.has && root.active.trackTitle ? root.active.trackTitle : "Nothing playing"
     readonly property string artist: root.has ? (root.active.trackArtist || "") : ""
     // ---- cover pegajoso per-track (anti "lo sabía y lo olvidó") ----
@@ -86,7 +100,15 @@ Singleton {
             return root._artStash
         return ""
     }
-    readonly property string serviceLabel: root.has ? (root.active.identity || root.active.desktopEntry || "") : ""
+    readonly property var sourceInfo: MediaSource.describe(
+        root.has ? root.active.identity : "",
+        root.has ? root.active.desktopEntry : "",
+        root.has ? root.active.dbusName : "",
+        root.has && root.active.metadata ? root.active.metadata["xesam:url"] : "")
+    readonly property bool isMusicSource: root.has && sourceInfo.music
+    readonly property string serviceLabel: root.has ? sourceInfo.label : ""
+    readonly property string serviceIcon: sourceInfo.icon.length > 0
+        ? Quickshell.iconPath(sourceInfo.icon, true) : ""
     readonly property string trackKey: root.has ? (root.title + "::" + root.artist + "::" + (root.artUrl)) : ""
     readonly property var pickable: root.list
 }

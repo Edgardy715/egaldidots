@@ -27,7 +27,7 @@ PillSurface {
     id: root
     // La cabecera multimedia vive en el mismo Pill.qml; el contenido del
     // launcher empieza debajo de ella, dentro del mismo vidrio.
-    mTop: Theme.marginMd + 94
+    mTop: Theme.marginMd + 78
     mLeft: Theme.marginMd; mRight: Theme.marginMd; mBottom: 20
     focus: open && !closing
     activeFocusOnTab: true
@@ -132,10 +132,15 @@ PillSurface {
         }
     }
 
-    onClosingChanged: if (closing) {
-        searchDebounce.stop()
-        focusTimer.stop()
-        retryFocusTimer.stop()
+    onClosingChanged: {
+        if (closing) {
+            searchDebounce.stop()
+            focusTimer.stop()
+            retryFocusTimer.stop()
+        } else if (open) {
+            focusTimer.restart()
+            searchDebounce.restart()
+        }
     }
 
     // debounce: la búsqueda (fzf sobre todos los .desktop) es costosa en el 1er
@@ -193,7 +198,7 @@ PillSurface {
                 color: Theme.dim
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
-                visible: searchInput.text.length === 0 && !searchInput.activeFocus
+                visible: searchInput.text.length === 0
             }
 
             // input text con animaciones de escritura (cursor + placeholder)
