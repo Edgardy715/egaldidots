@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import QtQuick.Layouts
 import QtQuick.Controls.Basic
 import "../"
@@ -10,14 +11,20 @@ PillSurface {
     mTop: 24; mLeft: 24; mRight: 24; mBottom: 24
     // Injection keeps interaction tests entirely separate from system commands.
     property var actions: Session
-    property int focused: 0
+    property int focused: 4
     property int pending: -1
     readonly property var choices: [
         { icon: "lock", label: qsTr("Bloquear"), detail: qsTr("Tu sesión seguirá abierta."), action: "lock" },
         { icon: "logout", label: qsTr("Cerrar sesión"), detail: qsTr("Se cerrarán tus aplicaciones."), action: "logout" },
         { icon: "restart_alt", label: qsTr("Reiniciar"), detail: qsTr("El equipo volverá a iniciarse."), action: "reboot" },
-        { icon: "power_settings_new", label: qsTr("Apagar"), detail: qsTr("El equipo se apagará."), action: "shutdown" }
+        { icon: "power_settings_new", label: qsTr("Apagar"), detail: qsTr("El equipo se apagará."), action: "shutdown" },
+        { icon: "dark_mode", label: qsTr("Suspender"), detail: qsTr("Tu sesión seguirá abierta."), action: "suspend" }
     ]
+    readonly property var primaryOrder: [4, 2, 3, 1]
+    readonly property var navigationOrder: [4, 2, 3, 1, 0]
+    readonly property string userName: Config.profile.displayName.trim() || Quickshell.env("USER") || qsTr("Usuario")
+    property date now: new Date()
+    readonly property string greeting: now.getHours() < 12 ? qsTr("Buenos días") : now.getHours() < 19 ? qsTr("Buenas tardes") : qsTr("Buenas noches")
     focus: root.open
     onOpenChanged: {
         pending = -1
@@ -30,15 +37,15 @@ PillSurface {
         onTriggered: if (root.open) root.forceActiveFocus()
     }
     function select(index) {
-        focused = (index + 4) % 4
+        focused = (index + choices.length) % choices.length
         pending = -1
     }
     function activate(index) {
         if (index < 0 || index >= choices.length) return
         focused = index
-        if (index === 0) {
+        if (index === 0 || index === 4) {
             pending = -1
-            actions.lock()
+            actions[choices[index].action]()
             requestClose()
         } else pending = index
     }
@@ -59,145 +66,143 @@ PillSurface {
             if (pending >= 0) cancel(); else requestClose()
         } else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_Space) {
             if (pending >= 0) confirm(); else activate(focused)
-        } else if (k >= Qt.Key_1 && k <= Qt.Key_4) activate(k - Qt.Key_1)
-        else if ([Qt.Key_Left, Qt.Key_Up, Qt.Key_H, Qt.Key_K].indexOf(k) >= 0) select(focused - 1)
-        else if ([Qt.Key_Right, Qt.Key_Down, Qt.Key_L, Qt.Key_J].indexOf(k) >= 0) select(focused + 1)
+        } else if (k >= Qt.Key_1 && k <= Qt.Key_5) activate(k - Qt.Key_1)
+        else if ([Qt.Key_Left, Qt.Key_Up, Qt.Key_H, Qt.Key_K].indexOf(k) >= 0) select(navigationOrder[(navigationOrder.indexOf(focused) + navigationOrder.length - 1) % navigationOrder.length])
+        else if ([Qt.Key_Right, Qt.Key_Down, Qt.Key_L, Qt.Key_J].indexOf(k) >= 0) select(navigationOrder[(navigationOrder.indexOf(focused) + 1) % navigationOrder.length])
         else return
         event.accepted = true
     }
 
+    Timer { interval: 60000; repeat: true; running: root.open; onTriggered: root.now = new Date() }
     ColumnLayout {
         anchors.fill: parent
-        spacing: 18 * root.s
+        spacing: 16 * root.s
         RowLayout {
             Layout.fillWidth: true
-            ColumnLayout {
+            Text {
                 Layout.fillWidth: true
-                spacing: 5 * root.s
-                Text {
-                    text: qsTr("Sesión y energía")
-                    font.family: Theme.fontMedia
-                    font.pixelSize: 21 * Flags.fontScale * root.s
-                    font.weight: Font.DemiBold
-                    font.letterSpacing: -0.4 * root.s
-                    color: Theme.foreground
-                }
-                Text {
-                    text: qsTr("Bloquea la pantalla o finaliza tu sesión.")
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSizeBody * root.s
-                    color: Qt.alpha(Theme.foreground, 0.6)
-                }
+                text: qsTr("Sesión y energía")
+                font.family: Theme.fontMedia; font.pixelSize: 22 * Flags.fontScale * root.s
+                font.weight: Font.Medium; color: Theme.foreground
             }
-            Item { Layout.fillWidth: true }
-            CtrlBtn {
-                iconName: "close"; size: 30; s: root.s
-                accessibleName: qsTr("Cerrar panel")
-                onClicked: root.requestClose()
+            CtrlBtn { iconName: "close"; size: 30; s: root.s; accessibleName: qsTr("Cerrar panel"); onClicked: root.requestClose() }
+        }
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 8 * root.s
+            UserAvatar {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 82 * root.s; Layout.preferredHeight: 82 * root.s
+                name: root.userName; source: "file://" + Config.userAvatar; fontFamily: Theme.fontMedia
+            }
+            Text {
+                Layout.fillWidth: true
+                text: root.userName; horizontalAlignment: Text.AlignHCenter; elide: Text.ElideRight
+                font.family: Theme.fontMedia; font.pixelSize: 21 * Flags.fontScale * root.s
+                font.weight: Font.DemiBold; color: Theme.foreground
+            }
+            Text {
+                Layout.fillWidth: true
+                text: root.greeting; horizontalAlignment: Text.AlignHCenter
+                font.family: Theme.fontMedia; font.pixelSize: 13 * Flags.fontScale * root.s
+                color: Qt.alpha(Theme.foreground, 0.65)
             }
         }
-
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 10 * root.s
+            spacing: 12 * root.s
             Repeater {
-                model: root.choices
-                delegate: Button {
-                    id: actionButton
-                    required property var modelData
-                    required property int index
+                model: root.primaryOrder
+                delegate: MotionButton {
+                    id: tile
+                    objectName: "sessionAction" + modelData
+                    expressive: true
+                    required property int modelData
+                    readonly property var choice: root.choices[modelData]
+                    readonly property color tint: modelData === 4 ? "#98baff" : modelData === 3 ? "#ff8395" : modelData === 1 ? "#ffbd80" : Theme.foreground
+                    readonly property bool selected: root.focused === modelData || root.pending === modelData
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 112 * root.s
-                    hoverEnabled: true
-                    Accessible.name: modelData.label
-                    readonly property bool selected: root.pending === index || (root.pending < 0 && root.focused === index)
-                    onClicked: root.activate(index)
-                    onActiveFocusChanged: if (activeFocus && root.pending < 0) root.focused = index
+                    Layout.minimumWidth: 0
+                    Layout.preferredHeight: 108 * root.s
+                    Accessible.name: choice.label
+                    onClicked: root.activate(modelData)
+                    onActiveFocusChanged: if (activeFocus && root.pending < 0) root.focused = modelData
                     background: Rectangle {
-                        radius: 20 * root.s
-                        color: Qt.alpha(Theme.foreground, actionButton.down ? 0.12 : actionButton.hovered || actionButton.selected ? 0.065 : 0)
+                        radius: 22 * root.s
+                        gradient: Gradient {
+                            GradientStop { position: 0; color: Qt.alpha(tile.tint, 0.11 + 0.07 * tile.interaction.presence + 0.05 * tile.interaction.pressure) }
+                            GradientStop { position: 1; color: Qt.alpha(tile.tint, 0.025) }
+                        }
+                        border.color: Qt.alpha(tile.tint, tile.activeFocus ? 0.7 : tile.selected ? 0.35 : 0.15)
                         border.width: root.s
-                        border.color: Qt.alpha(Theme.foreground, actionButton.activeFocus ? 0.55 : actionButton.selected ? 0.16 : 0)
-                        Behavior on color { ColorAnimation { duration: Motion.fast } }
-                        Behavior on border.color { ColorAnimation { duration: Motion.fast } }
+                        Behavior on border.color { ColorAnimation { duration: Motion.hover } }
                     }
-                    contentItem: Column {
-                        spacing: 10 * root.s
-                        anchors.centerIn: parent
-                        Rectangle {
+                    contentItem: Item {
+                        MaterialIcon {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            width: 56 * root.s; height: width; radius: width / 2
-                            color: Qt.alpha(Theme.foreground, actionButton.selected ? 0.14 : 0.07)
-                            border.width: root.s
-                            border.color: Qt.alpha(Theme.foreground, 0.10)
-                            scale: actionButton.down ? 0.93 : actionButton.hovered ? 1.045 : 1
-                            Behavior on scale { enabled: !Flags.reduceMotion; Anim { type: Anim.FastEffects } }
-                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-                            MaterialIcon {
-                                anchors.centerIn: parent
-                                iconName: actionButton.modelData.icon
-                                font.pixelSize: 28 * root.s
-                                fill: 1
-                                color: Theme.foreground
-                            }
+                            y: 14 * root.s
+                            interaction: tile.interaction
+                            objectName: "sessionIcon" + tile.modelData
+                            iconName: tile.choice.icon
+                            font.pixelSize: 34 * root.s; color: tile.tint
+                            fill: tile.modelData === 4 ? 1 : 0
                         }
                         Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: actionButton.modelData.label
-                            font.family: Theme.font
-                            font.pixelSize: Theme.fontSizeBody * root.s
-                            font.weight: Font.Medium
-                            color: Qt.alpha(Theme.foreground, actionButton.selected ? 1 : 0.78)
+                            anchors.left: parent.left; anchors.right: parent.right
+                            anchors.bottom: parent.bottom; anchors.bottomMargin: 12 * root.s
+                            transform: Translate { y: -Motion.labelTravel * tile.interaction.presence }
+                            text: tile.choice.label
+                            horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
+                            font.family: Theme.fontMedia; font.pixelSize: 12 * Flags.fontScale * root.s
+                            font.weight: Font.Medium; color: Theme.foreground
                         }
                     }
                 }
             }
         }
-        Rectangle { Layout.fillWidth: true; implicitHeight: root.s; color: Qt.alpha(Theme.foreground, 0.09) }
+        Rectangle { Layout.fillWidth: true; implicitHeight: root.s; color: Qt.alpha(Theme.foreground, 0.10) }
         Item {
             Layout.fillWidth: true
-            Layout.preferredHeight: 48 * root.s
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("← →  Elegir     ↵  Continuar     Esc  Cerrar")
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeSmall * root.s
-                color: Qt.alpha(Theme.foreground, 0.5)
-                opacity: root.pending < 0 ? 1 : 0
-                Behavior on opacity { Anim { type: Anim.FastEffects } }
+            Layout.preferredHeight: 52 * root.s
+            RowLayout {
+                anchors.fill: parent
+                visible: root.pending < 0
+                FooterButton { text: qsTr("Bloquear"); onClicked: root.activate(0) }
+                Item { Layout.fillWidth: true }
+                Text {
+                    text: qsTr("← → Elegir · Esc Cerrar")
+                    font.family: Theme.fontMedia; font.pixelSize: 10 * Flags.fontScale * root.s
+                    color: Qt.alpha(Theme.foreground, 0.5)
+                }
             }
             RowLayout {
                 anchors.fill: parent
-                spacing: 10 * root.s
-                opacity: root.pending >= 0 ? 1 : 0
-                enabled: root.pending >= 0
-                visible: opacity > 0
-                Behavior on opacity { Anim { type: Anim.FastEffects } }
+                visible: root.pending >= 0
+                spacing: 12 * root.s
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 4 * root.s
                     Text {
-                        text: root.pending >= 0 ? (root.pending === 1 ? qsTr("¿Cerrar sesión?") : root.pending === 2 ? qsTr("¿Reiniciar el equipo?") : qsTr("¿Apagar el equipo?")) : ""
-                        font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s
+                        Layout.fillWidth: true
+                        text: root.pending >= 0 ? qsTr("¿%1?").arg(root.choices[root.pending].label) : ""
+                        font.family: Theme.fontMedia; font.pixelSize: 13 * Flags.fontScale * root.s
                         font.weight: Font.Medium; color: Theme.foreground
                     }
                     Text {
+                        Layout.fillWidth: true
                         text: root.pending >= 0 ? root.choices[root.pending].detail : ""
-                        font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s
+                        wrapMode: Text.WordWrap
+                        font.family: Theme.fontMedia; font.pixelSize: 10 * Flags.fontScale * root.s
                         color: Qt.alpha(Theme.foreground, 0.6)
                     }
                 }
                 FooterButton { text: qsTr("Cancelar"); onClicked: root.cancel() }
-                FooterButton {
-                    text: root.pending >= 0 ? root.choices[root.pending].label : ""
-                    prominent: true
-                    onClicked: root.confirm()
-                }
+                FooterButton { text: qsTr("Confirmar"); prominent: true; onClicked: root.confirm() }
             }
         }
     }
-    component FooterButton: Button {
+    component FooterButton: MotionButton {
         id: control
         property bool prominent: false
         implicitHeight: 36 * root.s
@@ -212,8 +217,9 @@ PillSurface {
             Behavior on color { ColorAnimation { duration: Motion.fast } }
         }
         contentItem: Text {
+            transform: Translate { y: -Motion.labelTravel * control.interaction.presence }
             text: control.text
-            font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s
+            font.family: Theme.fontMedia; font.pixelSize: Theme.fontSizeBody * root.s
             font.weight: Font.Medium
             horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
             color: control.prominent ? Theme.background : Theme.foreground

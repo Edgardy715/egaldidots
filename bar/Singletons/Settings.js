@@ -24,7 +24,11 @@ var fields = {
         clockSeconds: { type: "boolean", default: false },
         showGlyphs: { type: "boolean", default: true }
     },
+    profile: {
+        displayName: { type: "string", default: "", minLength: 0 }
+    },
     paths: {
+        userAvatar: { type: "string", path: true, base: "home", suffix: "/.face" },
         walColorsFile: { type: "string", path: true, base: "cacheHome", suffix: "/wal/colors.json" },
         wallpaperDir: { type: "string", path: true, base: "home", suffix: "/Wallpapers" },
         wallpaperCacheDir: { type: "string", path: true, base: "cacheHome", suffix: "/quickshell/wallpapers" },
@@ -89,8 +93,8 @@ function validate(document, context) {
                 errors.push(name + " is outside its allowed range")
                 return
             }
-            if (rule.type === "string" && (!value.trim().length || value.indexOf("\u0000") !== -1)) {
-                errors.push(name + " must be a nonempty string without NUL")
+            if (rule.type === "string" && ((value.trim().length < (rule.minLength === undefined ? 1 : rule.minLength)) || value.indexOf("\u0000") !== -1)) {
+                errors.push(name + " has an invalid length or contains NUL")
                 return
             }
             if (rule.path) {

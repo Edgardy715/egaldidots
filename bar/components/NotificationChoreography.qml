@@ -4,6 +4,7 @@ import QtQuick
 QtObject {
     id: root
     property bool surfaceOpen: false
+    property bool blocked: false
     property int collapseDuration: 0
     property int expandDuration: 0
     property int holdDuration: 0
@@ -25,7 +26,23 @@ QtObject {
     property string notifState: "idle"
 
     property var popup: null
-    onPopupChanged: {
+    onPopupChanged: syncPopup()
+    onBlockedChanged: {
+        if (!blocked) { syncPopup(); return }
+        notifHoldIn.stop()
+        notifExpandTimer.stop()
+        notifHoldTimer.stop()
+        notifCollapseOutTimer.stop()
+        notifReturnTimer.stop()
+        surfaceRestoreTimer.stop()
+        activeNotif = null
+        notifAnimating = false
+        notifState = "idle"
+        surfaceNotifSuspended = false
+        surfaceReveal = 1
+    }
+    function syncPopup() {
+        if (blocked) return
         if (popup) {
             // Si había una restauración pendiente y entra otra notificación,
             // mantenemos la surface fuera hasta que termine toda la secuencia.
@@ -150,6 +167,7 @@ QtObject {
     }
 
     onSurfaceOpenChanged: {
+        if (blocked) return
         if (!surfaceOpen) {
             surfaceRestoreTimer.stop()
             surfaceNotifSuspended = false

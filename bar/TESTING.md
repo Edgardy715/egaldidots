@@ -159,3 +159,50 @@ pill móvil y movimiento reducido. Ejecutar también media-motion y absorption
 para verificar el mismo motor a la derecha. QA real: comando de Win+M
 `qs -c bar ipc call island session ""`, Escape, repetición; no ejecutar acciones
 reales de energía. Comprobar que media sigue a la derecha y la sesión desaparece.
+
+### Interacciones de controles
+
+`bar/interaction-regression.qml` verifica entrada real QtTest, cancelación fuera
+ del hit target, teclado, disabled, toggle, límites del slider, cambio rápido de
+ iconos y reduceMotion. `bar/interaction-surfaces-regression.qml` carga las 12
+ surfaces sin Auth; no invoca acciones. Ejecutar offscreen y exigir PASS.
+`bar/interaction-preview.qml` y `bar/interaction-performance.qml` usan Wayland:
+ secuencia visual con acciones falsas y stress finito de 96 controles. Detalles,
+ métricas y límites en `docs/INTERACTION_SYSTEM.md`. No están en la shell normal.
+
+
+### Iconos vectoriales (referencia Animate UI)
+
+`QT_QPA_PLATFORM=wayland timeout 8s quickshell -p bar/animated-icons-preview.qml`
+verifica 16 familias nativas, movimiento de piezas, fin de secuencia, reduceMotion
+y parada al ocultar. Guarda rest/motion en `/tmp/isla-icons-*.png` para inspección.
+No invoca servicios ni acciones de energía. Qt >= 6.10 para ShapePath.trim.
+
+### Solicitud de contraseña (sudo/Polkit)
+
+`python bar/tests/auth-backend.py` prueba el backend en copia temporal con agente
+fake y servidor inactivo. `QT_QPA_PLATFORM=wayland timeout 12s quickshell -p
+bar/auth-prompt-regression.qml` usa AuthPrompt inyectado y credenciales simuladas:
+foco, teclado, máscaras, reintento, éxito, prioridad, geometría e interrupciones.
+Documentación y límites en `docs/AUTHENTICATION.md`. No abre Auth real ni pide
+contraseñas. Config/paleta clara vía ISLA_CONFIG temporal; ISLA_AUTH_SHOTS cambia
+el prefijo de capturas. Comprobar PASS, no sólo exit.
+
+`python bar/tests/auth-bridge.py` prueba askpass y el wrapper del repositorio mediante socket temporal
+y forwarding de opciones fish con sudo/qs falsos. No usa operaciones privilegiadas.
+
+`python bar/tests/auth-transport.py` comprueba el socket real de una copia aislada
+de Auth al iniciar y tras cuatro recargas del método de shell.qml. Requiere
+Wayland; usa runtime temporal, Polkit falso y respuestas simuladas.
+
+
+### Lockscreen
+
+`python bar/tests/lockscreen-launcher.py` prueba instalación con backup y rutas
+XDG temporales, limpieza de preview, entrada del repo y fallback con procesos
+falsos. No bloquea la sesión. `QT_QPA_PLATFORM=offscreen quickshell -p
+bar/lockscreen-regression.qml` comprueba guardas del campo, limpieza de secretos,
+confirmación de energía y reduced motion. `QT_QPA_PLATFORM=wayland quickshell
+-p bar/lockscreen-motion-regression.qml` verifica interrupción, rechazo, éxito
+y retorno usando LockSurface sin adquirir WlSessionLock ni iniciar PAM.
+ISLA_LOCK_CAPTURE_DIR permite guardar capturas de esa última fixture.

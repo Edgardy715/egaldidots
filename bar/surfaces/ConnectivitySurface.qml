@@ -193,6 +193,7 @@ PillSurface {
 
                         // toggle animado estilo iOS (componente unificado)
                         Toggle {
+                            accessibleName: qsTr("Wi-Fi")
                             checked: Nmcli.wifiEnabled
                             onToggled: Nmcli.toggleWifi()
                         }
@@ -219,26 +220,32 @@ PillSurface {
                             opacity: Nmcli.wifiEnabled ? 1 : 0.3
                             Behavior on opacity { Anim { type: Anim.DefaultEffects } }
                             Rectangle {
+        scale: scanWifiHover.motion.visualScale
                                 anchors.fill: parent; radius: Theme.radiusXl * s
                                 color: scanWifiHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : "transparent"
                                 border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaIconSec)
                                 Behavior on color { ColorAnimation { duration: Motion.fast } }
                             }
                             MaterialIcon {
+                                interaction: scanWifiHover.motion
                                 anchors.centerIn: parent
                                 iconName: Icons.iRefresh
+                                hovered: scanWifiHover.containsMouse
+                                scale: scanWifiHover.motion.visualScale
                                 color: Nmcli.scanning ? Theme.accent : Theme.foreground
                                 font.pixelSize: Theme.fontSizeTitle * s
                                 RotationAnimator on rotation {
                                     from: 0; to: 360
                                     duration: 900
                                     loops: Animation.Infinite
-                                    running: Nmcli.scanning
+                                    running: Nmcli.scanning && root.open && !Flags.reduceMotion
                                 }
                             }
-                            MouseArea {
+                            MotionArea {
                                 id: scanWifiHover
-                                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                anchors.fill: parent
+                                accessibleName: qsTr("Buscar redes Wi-Fi")
+                                hoverWash: false
                                 onClicked: Nmcli.rescanWifi()
                             }
                         }
@@ -328,6 +335,8 @@ PillSurface {
                                     spacing: Theme.spacingXxs * s
                                     Layout.fillWidth: true
                                     Text {
+                                        scale: netRowHover.motion.visualScale
+                                        transform: Translate { y: -Motion.labelTravel * netRowHover.motion.presence }
                                         text: modelData.ssid
                                         color: modelData.active ? Theme.accent : Theme.foreground
                                         font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * s
@@ -336,6 +345,8 @@ PillSurface {
                                         Layout.fillWidth: true
                                     }
                                     Text {
+                                        scale: netRowHover.motion.visualScale
+                                        transform: Translate { y: -Motion.labelTravel * netRowHover.motion.presence }
                                         text: modelData.active
                                             ? "Conectado"
                                             : (modelData.isSecure ? "Protegida · WPA" : "Abierta")
@@ -348,6 +359,8 @@ PillSurface {
 
                                 // icono candado
                                 MaterialIcon {
+                                    compressWithControl: true
+                                    interaction: netRowHover.motion
                                     iconName: Icons.iLock
                                     visible: modelData.isSecure && !modelData.active
                                     color: Theme.iconMuted
@@ -377,25 +390,34 @@ PillSurface {
                                     width: 24 * s; height: 24 * s
                                     visible: modelData.active
                                     Rectangle {
+        scale: disconnectWifiHover.motion.visualScale
                                         anchors.fill: parent; radius: Theme.radiusXl * s
                                         color: Qt.alpha(Theme.accent, Theme.alphaGlow)
                                         MaterialIcon {
+                                            interaction: disconnectWifiHover.motion
                                             anchors.centerIn: parent
                                             iconName: Icons.iClose
+                                            hovered: disconnectWifiHover.containsMouse
                                             color: Theme.accent
                                             font.pixelSize: Theme.fontSizeSmall * s
                                         }
                                     }
-                                    MouseArea {
-                                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                    MotionArea {
+                                        id: disconnectWifiHover
+                                        anchors.fill: parent
+                                        accessibleName: qsTr("Desconectar de %1").arg(modelData.ssid)
+                                        hoverWash: false
                                         onClicked: Nmcli.disconnectFromNetwork()
                                     }
                                 }
                             }
 
-                            MouseArea {
+                            MotionArea {
                                 id: netRowHover
-                                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                accessibleName: qsTr("Conectar a %1").arg(modelData.ssid)
+                                focusOnTab: false
+                                anchors.fill: parent
+                                hoverWash: false
                                 onClicked: root.connectTo(modelData)
                             }
                         }
@@ -463,6 +485,7 @@ PillSurface {
 
                         // toggle animado estilo iOS (componente unificado)
                         Toggle {
+                            accessibleName: qsTr("Bluetooth")
                             checked: btCard.btEnabled
                             onToggled: {
                                 const a = Bluetooth.defaultAdapter
@@ -485,26 +508,32 @@ PillSurface {
                             opacity: btCard.btEnabled ? 1 : 0.3
                             Behavior on opacity { Anim { type: Anim.DefaultEffects } }
                             Rectangle {
+        scale: scanBtHover.motion.visualScale
                                 anchors.fill: parent; radius: Theme.radiusXl * s
                                 color: scanBtHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : "transparent"
                                 border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaIconSec)
                                 Behavior on color { ColorAnimation { duration: Motion.fast } }
                             }
                             MaterialIcon {
+                                interaction: scanBtHover.motion
                                 anchors.centerIn: parent
                                 iconName: Icons.iRefresh
+                                hovered: scanBtHover.containsMouse
+                                scale: scanBtHover.motion.visualScale
                                 color: btCard.btDiscovering ? Theme.accent : Theme.foreground
                                 font.pixelSize: Theme.fontSizeTitle * s
                                 RotationAnimator on rotation {
                                     from: 0; to: 360
                                     duration: 900
                                     loops: Animation.Infinite
-                                    running: btCard.btDiscovering
+                                    running: btCard.btDiscovering && root.open && !Flags.reduceMotion
                                 }
                             }
-                            MouseArea {
+                            MotionArea {
                                 id: scanBtHover
-                                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                anchors.fill: parent
+                                accessibleName: qsTr("Buscar dispositivos Bluetooth")
+                                hoverWash: false
                                 onClicked: {
                                     const a = Bluetooth.defaultAdapter
                                     if (a) a.discovering = !a.discovering
@@ -601,6 +630,7 @@ PillSurface {
                                         border.width: Theme.borderHairline
                                         border.color: modelData.connected ? Qt.alpha(Theme.accent, Theme.alphaMid) : Qt.alpha(Theme.border, Theme.alphaCritical)
                                         MaterialIcon {
+                                            interaction: btRowHover.motion
                                             anchors.centerIn: parent
                                             iconName: Icons.iBluetooth
                                             color: modelData.connected ? Theme.accent : Theme.foreground
@@ -613,6 +643,8 @@ PillSurface {
                                         }
                                         // spinner mientras conecta/vincula (mismos ejes que el scan de Wi-Fi)
                                         MaterialIcon {
+                                            compressWithControl: true
+                                            interaction: btRowHover.motion
                                             anchors.centerIn: parent
                                             iconName: Icons.iRefresh
                                             color: modelData.connected ? Theme.accent : Theme.accent
@@ -622,7 +654,7 @@ PillSurface {
                                                 from: 0; to: 360
                                                 duration: 900
                                                 loops: Animation.Infinite
-                                                running: busy
+                                                running: busy && root.open && !Flags.reduceMotion
                                             }
                                         }
                                     }
@@ -632,6 +664,8 @@ PillSurface {
                                     spacing: Theme.spacingXxs * s
                                     Layout.fillWidth: true
                                     Text {
+                                        scale: btRowHover.motion.visualScale
+                                        transform: Translate { y: -Motion.labelTravel * btRowHover.motion.presence }
                                         text: displayName
                                         color: modelData.connected ? Theme.accent : Theme.foreground
                                         font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * s; font.weight: Font.DemiBold
@@ -640,6 +674,8 @@ PillSurface {
                                         Behavior on color { ColorAnimation { duration: Motion.fast } }
                                     }
                                     Text {
+                                        scale: btRowHover.motion.visualScale
+                                        transform: Translate { y: -Motion.labelTravel * btRowHover.motion.presence }
                                         text: {
                                             if (modelData.pairing) return "Vinculando…"
                                             if (modelData.state === BluetoothDeviceState.Connecting) return "Conectando…"
@@ -697,9 +733,13 @@ PillSurface {
                                             Behavior on color { ColorAnimation { duration: Motion.fast } }
                                         }
                                     }
-                                    MouseArea {
-                                        anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                    MotionArea {
+                                        anchors.fill: parent
                                         enabled: !busy
+                                        accessibleName: modelData.connected ? qsTr("Desconectar %1").arg(displayName)
+                                            : modelData.paired ? qsTr("Conectar %1").arg(displayName)
+                                            : qsTr("Vincular %1").arg(displayName)
+                                        hoverWash: false
                                         onClicked: {
                                             if (modelData.connected)         modelData.disconnect()
                                             else if (modelData.paired)       modelData.connect()
@@ -716,6 +756,7 @@ PillSurface {
                                     visible: width > 0
                                     Behavior on width { Anim { type: Anim.FastSpatial } }
                                     Rectangle {
+        scale: btForgetHover.motion.visualScale
                                         anchors.fill: parent; radius: Theme.radiusXl * s
                                         color: btForgetHover.containsMouse
                                             ? Qt.alpha(Theme.accentStrong, Theme.alphaGlow)
@@ -724,26 +765,30 @@ PillSurface {
                                         border.color: Qt.alpha(Theme.border, Theme.alphaCritical)
                                         Behavior on color { ColorAnimation { duration: Motion.fast } }
                                         MaterialIcon {
+                                            interaction: btForgetHover.motion
                                             anchors.centerIn: parent
                                             iconName: "delete"
+                                            hovered: btForgetHover.containsMouse
                                             color: Theme.iconSecondary
                                             font.pixelSize: Theme.fontSizeBody * s
                                         }
                                     }
-                                    MouseArea {
+                                    MotionArea {
                                         id: btForgetHover
                                         anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
+                                        accessibleName: qsTr("Olvidar %1").arg(displayName)
+                                        hoverWash: false
                                         onClicked: modelData.forget()
                                     }
                                 }
                             }
-                            MouseArea {
+                            MotionArea {
                                 id: btRowHover
-                                anchors.fill: parent; hoverEnabled: true
+                                accessibleName: qsTr("Vincular %1").arg(displayName)
+                                focusOnTab: false
+                                anchors.fill: parent
                                 visible: !modelData.connected && !modelData.paired
-                                cursorShape: Qt.PointingHandCursor
+                                hoverWash: false
                                 onClicked: modelData.pair()
                             }
                         }
@@ -826,16 +871,17 @@ PillSurface {
                 easing.type: Easing.OutCubic
                 running: pwDialog.visible
             }
-            MouseArea {
+            MotionArea {
                 anchors.fill: parent
-                            onClicked: {
-                                root.showPasswordDialog = false
-                                root.passwordField = ""
-                                root.passwordError = ""
-                                root.passwordConnecting = false
-                                root.connectingToSsid = ""
-                                connectTimeout.stop()
-                            }
+                hoverWash: false
+                onClicked: {
+                    root.showPasswordDialog = false
+                    root.passwordField = ""
+                    root.passwordError = ""
+                    root.passwordConnecting = false
+                    root.connectingToSsid = ""
+                    connectTimeout.stop()
+                }
             }
         }
 
@@ -1033,28 +1079,32 @@ PillSurface {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 32 * s
                         Rectangle {
+        scale: cancelHover.motion.visualScale
                             anchors.fill: parent; radius: Theme.radiusLg * s
                             color: cancelHover.containsMouse ? Qt.alpha(Theme.accentStrong, Theme.alphaWashStrong) : Qt.alpha(Theme.accentStrong, Theme.alphaSoft)
                             border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.accentStrong, Theme.alphaEmphasis)
                             Behavior on color { ColorAnimation { duration: Motion.fast } }
                             Text {
+                                transform: Translate { y: -Motion.labelTravel * cancelHover.motion.presence }
                                 anchors.centerIn: parent
                                 text: "Cancelar"
                                 color: Theme.accentStrong
                                 font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s; font.weight: Font.Medium
                             }
                         }
-                        MouseArea {
+                        MotionArea {
                             id: cancelHover
-                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    root.showPasswordDialog = false
-                    root.passwordField = ""
-                    root.passwordError = ""
-                    root.passwordConnecting = false
-                    root.connectingToSsid = ""
-                    connectTimeout.stop()
-                }
+                            anchors.fill: parent
+                            accessibleName: qsTr("Cancelar")
+                            hoverWash: false
+                            onClicked: {
+                                root.showPasswordDialog = false
+                                root.passwordField = ""
+                                root.passwordError = ""
+                                root.passwordConnecting = false
+                                root.connectingToSsid = ""
+                                connectTimeout.stop()
+                            }
                         }
                     }
 
@@ -1063,22 +1113,26 @@ PillSurface {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 32 * s
                         Rectangle {
+        scale: connectHover.motion.visualScale
                             anchors.fill: parent; radius: Theme.radiusLg * s
                             color: root.passwordField.length > 0 && !root.passwordConnecting
                                 ? (connectHover.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent)
                                 : Qt.alpha(Theme.accent, Theme.alphaMid)
                             Behavior on color { ColorAnimation { duration: Motion.fast } }
                             Text {
+                                transform: Translate { y: -Motion.labelTravel * connectHover.motion.presence }
                                 anchors.centerIn: parent
                                 text: root.passwordConnecting ? "…" : "Conectar"
                                 color: root.passwordField.length > 0 && !root.passwordConnecting ? "#000" : Qt.alpha(Theme.foreground, Theme.alphaStrong)
                                 font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s; font.weight: Font.DemiBold
                             }
                         }
-                        MouseArea {
+                        MotionArea {
                             id: connectHover
-                            anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                            anchors.fill: parent
                             enabled: !root.passwordConnecting
+                            accessibleName: qsTr("Conectar a %1").arg(root.connectingToSsid)
+                            hoverWash: false
                             onClicked: root.submitPassword()
                         }
                     }

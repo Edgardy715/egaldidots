@@ -122,7 +122,7 @@ PillSurface {
                     anchors.fill: parent
                     radius: Theme.radiusLg * root.s
                     transformOrigin: Item.Center
-                    scale: workspace.active ? 1 : (mouse.containsMouse ? 1.035 : 1)
+                    scale: mouse.motion.visualScale
                     gradient: Gradient {
                         GradientStop {
                             position: 0
@@ -141,8 +141,6 @@ PillSurface {
                     border.color: workspace.active
                         ? Qt.alpha(Theme.accent, 0.90)
                         : Qt.alpha(Theme.foreground, mouse.containsMouse ? Theme.alphaSoft : Theme.alphaHair)
-
-                    Behavior on scale { Anim { type: Anim.FastEffects } }
 
                     Rectangle {
                         anchors.top: parent.top
@@ -208,8 +206,9 @@ PillSurface {
                     }
                 }
 
-                MouseArea {
+                MotionArea {
                     id: mouse
+                    accessibleName: qsTr("Ir al escritorio %1").arg(workspace.wsId)
 
                     anchors.fill: parent
                     hoverEnabled: true

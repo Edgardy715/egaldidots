@@ -17,6 +17,8 @@ Singleton {
     readonly property string configFile: Quickshell.env("ISLA_CONFIG") || configHome + "/isla/shell.json"
     readonly property var context: ({ home: home, configHome: configHome, cacheHome: cacheHome })
     readonly property var schema: Settings.schema(context)
+    readonly property var profile: _effective.profile
+    readonly property string userAvatar: _effective.paths.userAvatar
     readonly property var appearance: _effective.appearance
     readonly property string walColorsFile: _effective.paths.walColorsFile
     readonly property string wallpaperDir: _effective.paths.wallpaperDir

@@ -110,6 +110,7 @@ PillSurface {
                         Item { Layout.fillWidth: true }
 
                         Toggle {
+                            accessibleName: qsTr("Mantener despierto")
                             checked: KeepAwake.enabled
                             onToggled: KeepAwake.toggle()
                         }
@@ -192,17 +193,24 @@ PillSurface {
                             color: briMinusHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
                             border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaCritical)
                             Behavior on color { ColorAnimation { duration: Motion.fast } }
+
+                            MotionArea {
+                                id: briMinusHover
+                                anchors.fill: parent
+                                accessibleName: qsTr("Bajar brillo")
+                                hoverWash: false
+                                onClicked: Brightness.decrease()
+                            }
+
                             MaterialIcon {
+                                compressWithControl: true
+                                interaction: briMinusHover.motion
                                 anchors.centerIn: parent
                                 iconName: Icons.iMinus
                                 color: Theme.foreground
                                 font.pixelSize: Theme.fontSizeTitleLg * s
                             }
-                            MouseArea {
-                                id: briMinusHover
-                                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                                onClicked: Brightness.decrease()
-                            }
+
                         }
 
                         Item { Layout.fillWidth: true }
@@ -222,17 +230,24 @@ PillSurface {
                             color: briPlusHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
                             border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaCritical)
                             Behavior on color { ColorAnimation { duration: Motion.fast } }
+
+                            MotionArea {
+                                id: briPlusHover
+                                anchors.fill: parent
+                                accessibleName: qsTr("Subir brillo")
+                                hoverWash: false
+                                onClicked: Brightness.increase()
+                            }
+
                             MaterialIcon {
+                                compressWithControl: true
+                                interaction: briPlusHover.motion
                                 anchors.centerIn: parent
                                 iconName: Icons.iPlus
                                 color: Theme.foreground
                                 font.pixelSize: Theme.fontSizeTitleLg * s
                             }
-                            MouseArea {
-                                id: briPlusHover
-                                anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                                onClicked: Brightness.increase()
-                            }
+
                         }
                     }
                 }
@@ -343,8 +358,9 @@ PillSurface {
                                         font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s; font.weight: Font.Medium
                                         Behavior on color { ColorAnimation { duration: Motion.fast } }
                                     }
-                                    MouseArea {
+                                    MotionArea {
                                         anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                        hoverWash: false
                                         onClicked: root.setProfile(modelData)
                                     }
                                 }

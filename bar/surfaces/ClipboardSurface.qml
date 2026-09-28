@@ -240,9 +240,9 @@ PillSurface {
                 id: clipDelegate
                 width: ListView.view ? ListView.view.width : 0
                 height: modelData.isImage ? 80 * root.s : 56 * root.s
-                s: root.s
 
                 Rectangle {
+        scale: controlHit1.motion.visualScale
                     id: delegateBg
                     anchors.fill: parent
                     radius: Theme.radiusLg * root.s
@@ -273,6 +273,7 @@ PillSurface {
                             }
 
                             MaterialIcon {
+                                interaction: controlHit1.motion
                                 anchors.centerIn: parent
                                 visible: !modelData.isImage
                                 iconName: Icons.iContentCopy
@@ -293,6 +294,7 @@ PillSurface {
                                 spacing: Theme.spacingXs * root.s
 
                                 Text {
+                                    transform: Translate { y: -Motion.labelTravel * controlHit1.motion.presence }
                                     text: modelData.isImage ? "[Imagen]" : modelData.preview
                                     color: modelData.isImage ? Theme.accent : Theme.foreground
                                     font.family: Theme.font
@@ -302,25 +304,25 @@ PillSurface {
                                     wrapMode: Text.NoWrap
                                 }
 
-                                if (!modelData.isImage && modelData.text.length > modelData.preview.length) {
-                                    Text {
-                                        text: modelData.text.substring(0, 150) + (modelData.text.length > 150 ? "…" : "")
-                                        color: Theme.dim
-                                        font.family: Theme.font
-                                        font.pixelSize: Theme.fontSizeSmall * root.s
-                                        elide: Text.ElideRight
-                                        wrapMode: Text.NoWrap
-                                    }
+                                Text {
+                                    transform: Translate { y: -Motion.labelTravel * controlHit1.motion.presence }
+                                    visible: !modelData.isImage && modelData.text.length > modelData.preview.length
+                                    text: modelData.text.substring(0, 150) + (modelData.text.length > 150 ? "…" : "")
+                                    color: Theme.dim
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.fontSizeSmall * root.s
+                                    elide: Text.ElideRight
+                                    wrapMode: Text.NoWrap
                                 }
                             }
                         }
                     }
                 }
 
-                MouseArea {
+                MotionArea {
+        id: controlHit1
                     anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
+                    hoverWash: false
                     onClicked: {
                         selectedIndex = index
                         listView.currentIndex = index

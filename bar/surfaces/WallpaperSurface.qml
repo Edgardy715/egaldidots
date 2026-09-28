@@ -312,15 +312,9 @@ PillSurface {
             radius: Theme.radiusSm * s
             color: closeMouse.containsMouse ? Qt.alpha(Theme.foreground, 0.13) : Qt.alpha(Theme.foreground, 0.06)
 
-            MaterialIcon {
-                anchors.centerIn: parent
-                iconName: "close"
-                color: Theme.foreground
-                font.pixelSize: 18 * s
-            }
-
-            MouseArea {
+            MotionArea {
                 id: closeMouse
+                accessibleName: qsTr("Cerrar")
 
                 anchors.fill: parent
                 hoverEnabled: true
@@ -333,6 +327,16 @@ PillSurface {
                     duration: Motion.fast
                 }
 
+            }
+
+            MaterialIcon {
+                compressWithControl: true
+                interaction: closeMouse.motion
+                hovered: closeMouse.containsMouse
+                anchors.centerIn: parent
+                iconName: "close"
+                color: Theme.foreground
+                font.pixelSize: 18 * s
             }
 
         }
@@ -348,24 +352,9 @@ PillSurface {
             radius: Theme.radiusSm * s
             color: refreshMouse.containsMouse ? Qt.alpha(Theme.foreground, 0.13) : Qt.alpha(Theme.foreground, 0.06)
 
-            MaterialIcon {
-                anchors.centerIn: parent
-                iconName: "refresh"
-                color: Theme.foreground
-                font.pixelSize: 18 * s
-
-                RotationAnimation on rotation {
-                    from: 0
-                    to: 360
-                    duration: 900
-                    loops: Animation.Infinite
-                    running: Wallpapers.scanning && root.open && !Flags.reduceMotion
-                }
-
-            }
-
-            MouseArea {
+            MotionArea {
                 id: refreshMouse
+                accessibleName: qsTr("Actualizar fondos")
 
                 anchors.fill: parent
                 enabled: !Wallpapers.applying
@@ -377,6 +366,25 @@ PillSurface {
             Behavior on color {
                 ColorAnimation {
                     duration: Motion.fast
+                }
+
+            }
+
+            MaterialIcon {
+                compressWithControl: true
+                interaction: refreshMouse.motion
+                hovered: refreshMouse.containsMouse
+                anchors.centerIn: parent
+                iconName: "refresh"
+                color: Theme.foreground
+                font.pixelSize: 18 * s
+
+                RotationAnimation on rotation {
+                    from: 0
+                    to: 360
+                    duration: 900
+                    loops: Animation.Infinite
+                    running: Wallpapers.scanning && root.open && !Flags.reduceMotion
                 }
 
             }
@@ -583,14 +591,18 @@ PillSurface {
                         asynchronous: true
                     }
                     MaterialIcon {
+                        interaction: thumbMouse.motion
+                        hovered: thumbMouse.containsMouse
+                        scale: thumbMouse.motion.visualScale
                         anchors.centerIn: parent
                         visible: thumbnail.thumbFailed
                         iconName: "broken_image"
                         color: Theme.dim
                         font.pixelSize: 18 * root.s
                     }
-                    MouseArea {
+                    MotionArea {
                         id: thumbMouse
+                        accessibleName: qsTr("Seleccionar fondo")
                         anchors.fill: parent
                         hoverEnabled: true
                         enabled: !Wallpapers.applying
@@ -681,17 +693,10 @@ PillSurface {
                     color: navMouse.containsMouse ? Qt.alpha(Theme.foreground, 0.14) : Qt.alpha(Theme.foreground, 0.07)
                     border.width: Theme.borderHairline
                     border.color: Theme.border
-                    scale: navMouse.pressed ? 0.92 : 1
 
-                    MaterialIcon {
-                        anchors.centerIn: parent
-                        iconName: modelData
-                        color: Theme.foreground
-                        font.pixelSize: 22 * root.s
-                    }
-
-                    MouseArea {
+                    MotionArea {
                         id: navMouse
+                        accessibleName: index === 0 ? qsTr("Anterior") : qsTr("Siguiente")
 
                         anchors.fill: parent
                         enabled: !Wallpapers.applying
@@ -707,14 +712,17 @@ PillSurface {
 
                     }
 
-                    Behavior on scale {
-                        Anim {
-                            type: Anim.FastSpatial
-                        }
-
+                    MaterialIcon {
+                        compressWithControl: true
+                        interaction: navMouse.motion
+                        hovered: navMouse.containsMouse
+                        anchors.centerIn: parent
+                        iconName: modelData
+                        color: Theme.foreground
+                        font.pixelSize: 22 * root.s
                     }
 
-                }
+}
 
             }
 
@@ -724,41 +732,10 @@ PillSurface {
                 radius: Theme.radiusLg * root.s
                 color: applyMouse.pressed ? Qt.darker(root.previewAccent, 1.1) : applyMouse.containsMouse ? Qt.lighter(root.previewAccent, 1.1) : root.previewAccent
                 opacity: Wallpapers.applying ? 0.65 : 1
-                scale: applyMouse.pressed ? 0.97 : 1
 
-                Row {
-                    anchors.centerIn: parent
-                    spacing: 7 * root.s
-
-                    MaterialIcon {
-                        anchors.verticalCenter: parent.verticalCenter
-                        iconName: root.feedback === "done" ? Icons.iCheck : Wallpapers.applying ? "progress_activity" : "wallpaper"
-                        color: root.onPreviewAccent
-                        font.pixelSize: 18 * root.s
-
-                        RotationAnimation on rotation {
-                            from: 0
-                            to: 360
-                            duration: 850
-                            loops: Animation.Infinite
-                            running: Wallpapers.applying && root.open && !Flags.reduceMotion
-                        }
-
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: root.feedback === "done" ? "Listo" : Wallpapers.applying ? "Aplicando…" : "Aplicar fondo"
-                        color: root.onPreviewAccent
-                        font.family: Theme.font
-                        font.pixelSize: 13 * root.s
-                        font.weight: Font.DemiBold
-                    }
-
-                }
-
-                MouseArea {
+                MotionArea {
                     id: applyMouse
+                    accessibleName: qsTr("Aplicar fondo")
 
                     anchors.fill: parent
                     enabled: !Wallpapers.applying && root.feedback !== "done"
@@ -774,9 +751,38 @@ PillSurface {
 
                 }
 
-                Behavior on scale {
-                    Anim {
-                        type: Anim.FastSpatial
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 7 * root.s
+
+                    MaterialIcon {
+                        compressWithControl: true
+                        interaction: applyMouse.motion
+                        anchors.verticalCenter: parent.verticalCenter
+                        hovered: applyMouse.containsMouse
+                        iconName: root.feedback === "done" ? Icons.iCheck : Wallpapers.applying ? "progress_activity" : "wallpaper"
+                        color: root.onPreviewAccent
+                        font.pixelSize: 18 * root.s
+
+                        RotationAnimation on rotation {
+                            from: 0
+                            to: 360
+                            duration: 850
+                            loops: Animation.Infinite
+                            running: Wallpapers.applying && root.open && !Flags.reduceMotion
+                        }
+
+                    }
+
+                    Text {
+                        scale: applyMouse.motion.visualScale
+                        transform: Translate { y: -Motion.labelTravel * applyMouse.motion.presence }
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: root.feedback === "done" ? "Listo" : Wallpapers.applying ? "Aplicando…" : "Aplicar fondo"
+                        color: root.onPreviewAccent
+                        font.family: Theme.font
+                        font.pixelSize: 13 * root.s
+                        font.weight: Font.DemiBold
                     }
 
                 }

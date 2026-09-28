@@ -50,10 +50,10 @@ Item {
     }
 
     function glyph() {
-        if (root.status === "charging") return "⚡"
-        if (root.percent <= 10) return "🪫"
-        if (root.percent <= 25) return "🔋"
-        return "🔋"
+        if (root.status === "charging") return "battery_charging_full"
+        if (root.percent <= 10) return "battery_alert"
+        if (root.percent <= 25) return "battery_full"
+        return "battery_full"
     }
 
     Rectangle {
@@ -68,11 +68,11 @@ Item {
             anchors.fill: parent
             anchors.leftMargin: root.pad
             spacing: Theme.spacingSm * root.s
-            Text {
+            MaterialIcon {
                 anchors.verticalCenter: parent.verticalCenter
-                text: root.glyph()
+                iconName: root.glyph()
                 color: root.percent <= 10 ? "#f38ba8" : Theme.accent
-                font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeBody * root.s
+                font.pixelSize: Theme.fontSizeBody * root.s
             }
             Text {
                 anchors.verticalCenter: parent.verticalCenter

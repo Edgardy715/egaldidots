@@ -102,6 +102,7 @@ Row {
 
         Text {
             id: clockText
+            scale: clockHit.motion.visualScale
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 1.5 * root.s
             height: root.coreH
@@ -119,12 +120,15 @@ Row {
                     + Math.round(12 * root.s) + "px'>"
                     + Qt.formatDateTime(root.now, "ap").toUpperCase() + "</span>"
             }
-            MouseArea {
-                anchors.fill: parent
-                anchors.margins: -6 * root.s
-                cursorShape: Qt.PointingHandCursor
-                onClicked: root.requestCalendar()
-            }
+
+        }
+        MotionArea {
+            id: clockHit
+            accessibleName: qsTr("Abrir calendario")
+            anchors.fill: parent
+            anchors.margins: -6 * root.s
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.requestCalendar()
         }
     }
 }

@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-09-28 — Controls, authorization, lockscreen and Starship
+
+- Shared interaction feedback across Isla: fixed hit targets, keyboard focus,
+  bounded spring return, reduced motion and finite Lucide icon animations.
+- AuthPrompt shared by sudo/Polkit presentation, with masked input, immediate
+  retry, account selection, cancellation and retained success feedback.
+  The Fish Stow package includes the sudo askpass helper and option-preserving
+  wrapper; reloads hand off the socket instead of deleting its replacement.
+- Repository lockscreen with wallpaper blur, profile/avatar, media, guarded PAM
+  input and pill-to-card/return choreography. Its installer backs up the prior
+  launcher; hyprlock remains available as a failure fallback.
+- Session menu refreshed with a profile header and four action cards. New
+  settings: `profile.displayName` and `paths.userAvatar`.
+- Fish now uses Starship with the 🎩 signature, Git/development context and
+  transient history. Its colors follow pywal with contrast adjustment.
+- Bootstrap dependencies, source packages, licenses, documentation and safe
+  regression fixtures updated. Qt >= 6.10 is required for icon path trimming.
+
+Publication validation: 24 core checks and Wayland fixtures for icons,
+AuthPrompt and lockscreen motion passed. The repository askpass bridge and
+launcher installer also pass with fake credentials/processes and temporary
+paths. Visual captures were inspected; they do not measure every frame or
+full-shell GPU performance. Multi-monitor lockscreen behavior and extended use
+remain to be verified. Publication tests never lock, authenticate or run power
+actions against the real session.
+
 ## 2026-09-26 — Fluid Island
 
 ### Shell and interaction

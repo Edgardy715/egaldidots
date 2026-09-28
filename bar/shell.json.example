@@ -23,6 +23,10 @@
     "wallpaperDir": "~/Wallpapers",
     "wallpaperCacheDir": "~/.cache/quickshell/wallpapers",
     "walColorsFile": "~/.cache/wal/colors.json",
-    "wallpaperApplyScript": "~/.config/hypr/scripts/apply-wallpaper.sh"
+    "wallpaperApplyScript": "~/.config/hypr/scripts/apply-wallpaper.sh",
+    "userAvatar": "~/.face"
+  },
+  "profile": {
+    "displayName": ""
   }
 }

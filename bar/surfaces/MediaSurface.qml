@@ -260,7 +260,7 @@ PillSurface {
                     color: Theme.foreground
                     opacity: seekMouse.containsMouse || session.dragging ? 1 : 0
                     Behavior on opacity { Anim { type: Anim.FastEffects } }
-                    scale: seekMouse.containsMouse || session.dragging ? 1.2 : 1
+                    scale: Flags.reduceMotion ? 1 : seekMouse.containsMouse || session.dragging ? Motion.gripScale : 1
                     Behavior on scale { Anim { type: Anim.FastEffects } }
                 }
                 MouseArea {

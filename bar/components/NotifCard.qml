@@ -182,8 +182,6 @@ Item {
         }
     }
 
-    Behavior on implicitHeight { Anim { type: Anim.DefaultSpatial } }
-
     // ---- hover + click feedback ----
     Rectangle {
         anchors.fill: parent; radius: Motion.rTile
@@ -193,8 +191,10 @@ Item {
         z: -1
     }
 
-    MouseArea {
+    MotionArea {
         id: ma
+        enabled: card.compact
+        accessibleName: qsTr("Cerrar notificación")
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: card.compact ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -254,6 +254,8 @@ Item {
                 // anterior resolvió. Cubre iconos de tema inexistentes y resúmenes
                 // sin icono (teclado, screenshot sin archivo, etc.).
                 MaterialIcon {
+                    compressWithControl: true
+                    interaction: ma.motion
                     anchors.centerIn: parent
                     visible: (card.iconPath.length === 0 || img.status !== Image.Ready)
                              && iconImg.status !== IconImage.Ready
@@ -273,6 +275,8 @@ Item {
                     spacing: Theme.spacingMd * s
 
                     Text {
+                        scale: ma.motion.visualScale
+                        transform: Translate { y: -Motion.labelTravel * ma.motion.presence }
                         Layout.fillWidth: true
                         text: card.md.summary || (card.md.appName || "")
                         color: Theme.foreground
@@ -293,6 +297,8 @@ Item {
                         color: Qt.alpha(Theme.accentStrong, Theme.alphaChip)
                         border.color: Qt.alpha(Theme.accentStrong, Theme.alphaDisabled); border.width: Theme.borderHairline
                         Text {
+                            scale: ma.motion.visualScale
+                            transform: Translate { y: -Motion.labelTravel * ma.motion.presence }
                             id: urgTxt
                             anchors.centerIn: parent
                             text: "URGENTE"
@@ -306,6 +312,8 @@ Item {
 
                 // app · tiempo
                 Text {
+                    scale: ma.motion.visualScale
+                    transform: Translate { y: -Motion.labelTravel * ma.motion.presence }
                     Layout.fillWidth: true
                     visible: text.length > 0
                     text: {
@@ -321,6 +329,8 @@ Item {
 
                 // body con expand/collapse
                 Text {
+                    scale: ma.motion.visualScale
+                    transform: Translate { y: -Motion.labelTravel * ma.motion.presence }
                     id: bodyText
                     Layout.fillWidth: true
                     visible: text.length > 0
@@ -341,6 +351,8 @@ Item {
 
                 // expand toggle
                 Text {
+                    scale: ma.motion.visualScale
+                    transform: Translate { y: -Motion.labelTravel * ma.motion.presence }
                     Layout.fillWidth: true
                     visible: !card.compact && card.bodyTruncated
                     text: card.expanded ? "mostrar menos" : "···"
@@ -348,7 +360,8 @@ Item {
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeLabel * card.s
                     font.weight: Font.Medium
-                    MouseArea {
+                    MotionArea {
+                        accessibleName: card.expanded ? qsTr("Mostrar menos") : qsTr("Expandir notificación")
                         anchors.fill: parent
                         anchors.margins: -4 * s
                         cursorShape: Qt.PointingHandCursor
@@ -373,10 +386,20 @@ Item {
                     color: act.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaChip) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
                     border.color: Qt.alpha(Theme.foreground, Theme.alphaSoft); border.width: Theme.borderHairline
                     transformOrigin: Item.Center
-                    scale: act.containsMouse ? 1.02 : 1.0
                     Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                    Behavior on scale { Anim { type: Anim.FastEffects } }
+
+                    MotionArea {
+                        id: act
+        accessibleName: modelData.text || qsTr("Acción de notificación")
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: if (modelData && typeof modelData.invoke === "function") modelData.invoke()
+                    }
+
                     Text {
+                        scale: act.motion.visualScale
+                        transform: Translate { y: -Motion.labelTravel * act.motion.presence }
                         anchors.centerIn: parent
                         text: modelData.text || ""
                         color: Theme.foreground
@@ -385,14 +408,8 @@ Item {
                         font.weight: Font.Medium
                         elide: Text.ElideRight
                     }
-                    MouseArea {
-                        id: act
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: if (modelData && typeof modelData.invoke === "function") modelData.invoke()
-                    }
-                }
+
+}
             }
         }
     }

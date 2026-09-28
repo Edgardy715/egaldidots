@@ -5,7 +5,7 @@ import "../"
 /**
  * Isla · Toggle. Interruptor iOS unificado (reemplaza las 3 copias en Utils/
  * Connectivity): track 40×24 con relleno acento, knob blanco 20×20 que se
- * desliza con bounceCurve (BezierSpline, cero springs).
+ * desliza suavemente; compresión y retorno compartidos.
  *
  * Props:
  *   checked — estado (bind a la fuente de verdad externa)
@@ -15,8 +15,8 @@ import "../"
 Item {
     id: root
 
+    property string accessibleName: qsTr("Interruptor")
     property bool checked: false
-    property bool enabled: true
 
     signal toggled(bool on)
 
@@ -26,14 +26,36 @@ Item {
 
     opacity: root.enabled ? 1 : 0.4
 
+    activeFocusOnTab: enabled
+    Accessible.role: Accessible.CheckBox
+    Accessible.name: root.accessibleName
+    Accessible.checked: checked
+    property bool keyboardDown: false
+    Keys.onPressed: event => {
+        if (event.isAutoRepeat || (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter)) return
+        keyboardDown = true; event.accepted = true
+    }
+    Keys.onReleased: event => {
+        if (event.isAutoRepeat || !keyboardDown || (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter)) return
+        keyboardDown = false; toggled(!checked); event.accepted = true
+    }
+    onActiveFocusChanged: if (!activeFocus) keyboardDown = false
+    onEnabledChanged: if (!enabled) keyboardDown = false
+    Behavior on opacity { NumberAnimation { duration: Motion.hover } }
+    InteractionMotion {
+        id: response
+        hovered: ma.containsMouse; pressed: root.keyboardDown || (ma.pressed && ma.containsMouse)
+        focused: root.activeFocus; enabled: root.enabled; extent: 24
+    }
     Rectangle {
         id: track
+        scale: response.visualScale
         anchors.fill: parent
         radius: height / 2
         color: root.checked
             ? (ma.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaIconOnAcc) : Qt.alpha(Theme.accent, Theme.alphaIconSec))
             : (ma.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWashStrong) : Qt.alpha(Theme.foreground, Theme.alphaGlow))
-        border.width: Theme.borderHairline
+        border.width: root.activeFocus ? 2 * Theme.borderHairline : Theme.borderHairline
         border.color: root.checked
             ? Qt.alpha(Theme.accent, Theme.alphaCritical)
             : Qt.alpha(Theme.foreground, Theme.alphaHair)
@@ -48,7 +70,7 @@ Item {
             color: "#ffffff"
             anchors.verticalCenter: parent.verticalCenter
             x: root.checked ? parent.width - width - 2 * s : 2 * s
-            Behavior on x { Anim { type: Anim.FastSpatial; easing.bezierCurve: Motion.bounceCurve } }
+            Behavior on x { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Motion.hover; velocity: -1 } }
         }
     }
 
@@ -56,6 +78,7 @@ Item {
         id: ma
         anchors.fill: parent
         enabled: root.enabled
+        hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: root.toggled(!root.checked)
     }

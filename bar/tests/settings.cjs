@@ -30,4 +30,8 @@ assert.throws(() => settings.merge(original, { appearance: JSON.parse('{"__proto
 const schema = settings.schema(context);
 assert.equal(schema.sections.appearance.fontScale.minimum, 0.75);
 assert.equal(schema.sections.paths.wallpaperDir.default, '/home/test/Wallpapers');
+assert.equal(validate({}).effective.paths.userAvatar, '/home/test/.face');
+assert.equal(validate({ profile: { displayName: 'Nombre' } }).effective.profile.displayName, 'Nombre');
+assert.equal(validate({ profile: { displayName: 123 } }).ok, false);
+assert.equal(validate({ paths: { userAvatar: 'relative.png' } }).ok, false);
 console.log('PASS: settings defaults, legacy format, validation, paths, patch isolation, extension preservation');

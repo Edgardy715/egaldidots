@@ -231,18 +231,22 @@ PillSurface {
                 color: prevMa.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaGlow) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
                 border.color: prevMa.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Qt.alpha(Theme.foreground, Theme.alphaSoft)
                 border.width: Theme.borderHairline
-                scale: prevMa.containsMouse ? 1.05 : 1.0
                 transformOrigin: Item.Center
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                Behavior on scale { Anim { type: Anim.FastEffects } }
+
+                MotionArea { id: prevMa; accessibleName: qsTr("Mes anterior"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(-1) }
+
                 MaterialIcon {
+                    compressWithControl: true
+                    interaction: prevMa.motion
                     anchors.centerIn: parent
                     iconName: Icons.iChevronLeft
+                    hovered: prevMa.containsMouse
                     color: prevMa.containsMouse ? Theme.accent : Theme.foreground
                     font.pixelSize: Theme.fontSizeTitleLg * s
                     Behavior on color { ColorAnimation { duration: Motion.fast } }
                 }
-                MouseArea { id: prevMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.shiftMonth(-1) }
+
             }
 
             Item { Layout.fillWidth: true }
@@ -267,18 +271,22 @@ PillSurface {
                 color: nextMa.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaGlow) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
                 border.color: nextMa.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Qt.alpha(Theme.foreground, Theme.alphaSoft)
                 border.width: Theme.borderHairline
-                scale: nextMa.containsMouse ? 1.05 : 1.0
                 transformOrigin: Item.Center
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                Behavior on scale { Anim { type: Anim.FastEffects } }
+
+                MotionArea { id: nextMa; accessibleName: qsTr("Mes siguiente"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(1) }
+
                 MaterialIcon {
+                    compressWithControl: true
+                    interaction: nextMa.motion
                     anchors.centerIn: parent
                     iconName: Icons.iChevronRight
+                    hovered: nextMa.containsMouse
                     color: nextMa.containsMouse ? Theme.accent : Theme.foreground
                     font.pixelSize: Theme.fontSizeTitleLg * s
                     Behavior on color { ColorAnimation { duration: Motion.fast } }
                 }
-                MouseArea { id: nextMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.shiftMonth(1) }
+
             }
         }
 
@@ -417,6 +425,8 @@ PillSurface {
 
                             // número del día
                             Text {
+                                scale: cellMa.motion.visualScale
+                                transform: Translate { y: -Motion.labelTravel * cellMa.motion.presence }
                                 anchors.centerIn: parent
                                 text: inMonth ? dayNum : ""
                                 color: isToday ? Theme.background
@@ -442,11 +452,13 @@ PillSurface {
                             }
                         }
 
-                        MouseArea {
+                        MotionArea {
                             id: cellMa
+                            accessibleName: qsTr("Seleccionar día %1").arg(dayNum)
+                            focusOnTab: false
                             anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: inMonth ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            enabled: inMonth
+                            hoverWash: false
                             onClicked: if (inMonth) root.selectedDay = dayNum
                         }
                     }

@@ -22,6 +22,7 @@ Item {
     readonly property var surfaceItem: surfaceHost.loadedItem
     readonly property real visualX: leftSide ? 2 * bodyX + bodyW - xPos - wPos : xPos
     readonly property real visualCapX: leftSide ? bodyX - captureExtra + bodyRadius : capX
+    readonly property bool pressed: compactHit.enabled && compactHit.pressed && compactHit.containsMouse
     signal requestToggle()
 
     readonly property real bodyX: body ? body.x : 0
@@ -278,7 +279,10 @@ Item {
             onRequestClose: root.requestToggle()
         }
 
-        MouseArea {
+        MotionArea {
+            id: compactHit
+            accessibleName: qsTr("Abrir panel multimedia")
+            feedbackEnabled: false
             anchors.fill: parent
             enabled: !root.expanded && root.cardFraction < 0.05
             hoverEnabled: true

@@ -24,6 +24,7 @@ Item {
     Behavior on opacity { Anim { type: Anim.DefaultEffects } }
 
     Row {
+        scale: hit.motion.visualScale
         anchors.centerIn: parent
         spacing: 2.5 * root.s
 
@@ -54,7 +55,9 @@ Item {
         }
     }
 
-    MouseArea {
+    MotionArea {
+        id: hit
+        accessibleName: qsTr("Abrir controles multimedia")
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
         onClicked: root.requestMedia()

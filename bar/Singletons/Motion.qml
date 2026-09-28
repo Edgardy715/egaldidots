@@ -5,7 +5,7 @@ import Quickshell
 
 /**
  * Isla · Motion system. Molde de Ricelin (pill/Singletons/Motion.qml) + curvas
- * emphasized de Material 3 / Apple. 100% BezierSpline, CERO SpringAnimation.
+ * emphasized de Material 3 / Apple. Curvas para coreografía; retorno físico breve para controles.
  * `mult` reduce duraciones si el usuario pide reduce-motion.
  *
  * Sistema de tokens (igual que caelestia Anim.qml / Material motion):
@@ -61,6 +61,24 @@ Singleton {
     // Standard decel/accel: cubic-bezier(0, 0, 0, 1) y (0.3, 0, 1, 1).
     readonly property var standardDecelCurve: [0, 0, 0, 1, 1, 1]
     readonly property var standardAccelCurve: [0.3, 0, 1, 1, 1, 1]
+
+    // Shared control grammar. Reduced motion keeps color feedback, no travel.
+    readonly property int hover: Math.round(120 * mult)
+    readonly property int press: Math.round(70 * mult)
+    readonly property int iconGesture: Flags.reduceMotion ? 0 : Math.round(650 * Flags.motionScale)
+    readonly property int iconSwap: Flags.reduceMotion ? 0 : Math.round(190 * mult)
+    readonly property real iconLift: Flags.reduceMotion ? 0 : 1.5
+    readonly property real iconEmphasisSubtle: 0.025
+    readonly property real iconEmphasis: 0.045
+    readonly property real iconEmphasisStrong: 0.065
+    readonly property real labelTravel: Flags.reduceMotion ? 0 : 1
+    readonly property real gripScale: 1.08
+    readonly property real iconTravel: Flags.reduceMotion ? 0 : 2
+    readonly property real pressScaleSmall: 0.96
+    readonly property real pressScale: 0.975
+    readonly property real pressScaleExpressive: 0.965
+    readonly property real controlSpring: Math.min(5, 4 / Flags.motionScale)
+    readonly property real controlDamping: 0.35
 
     // radii
     readonly property real rSmall: 7

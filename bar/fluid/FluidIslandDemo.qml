@@ -1,5 +1,7 @@
 import QtQuick
 import QtQuick.Shapes
+import "../components"
+import "../Singletons"
 
 Item {
     id: root
@@ -266,71 +268,83 @@ Item {
     }
     property alias bodyHit: body
 
-    Rectangle {
+    Item {
         id: drop
         z: 1
         x: root.dropX; y: root.dropY; width: root.dropW; height: root.dropH
-        radius: Math.min(width, height) / 2
         visible: root.dropActive && !root.dropConcealed
-        gradient: Gradient {
-            GradientStop { position: 0; color: Qt.lighter(root.theme.cardTop, 1.08) }
-            GradientStop { position: 0.42; color: root.theme.cardTop }
-            GradientStop { position: 1; color: Qt.darker(root.theme.cardBot, 1.12) }
-        }
-        border.color: root.joined ? "transparent" : Qt.alpha(root.theme.foreground, root.theme.alphaHairline)
-        border.width: root.u
         Rectangle {
-            anchors.top: parent.top
-            anchors.topMargin: root.u
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width * 0.52
-            height: root.u
-            radius: height / 2
-            color: root.joined ? "transparent" : Qt.alpha(root.theme.foreground, root.theme.alphaFaint)
-        }
-
-        Item {
+            id: dropVisual
             anchors.fill: parent
-            anchors.margins: 20 * root.u
-            opacity: root.contentProgress
-            visible: opacity > 0.01
-            Text {
-                id: title
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                text: qsTr("Surface player")
-                color: root.theme.iconPrimary
-                font.family: root.theme.font
-                font.pixelSize: 16 * root.u
-                font.weight: Font.DemiBold
-                elide: Text.ElideRight
+            radius: Math.min(width, height) / 2
+            scale: dropInteraction.motion.visualScale
+            transformOrigin: Item.Center
+            gradient: Gradient {
+                GradientStop { position: 0; color: Qt.lighter(root.theme.cardTop, 1.08) }
+                GradientStop { position: 0.42; color: root.theme.cardTop }
+                GradientStop { position: 1; color: Qt.darker(root.theme.cardBot, 1.12) }
             }
-            Text {
-                anchors.top: title.bottom; anchors.topMargin: 5 * root.u
-                anchors.left: parent.left; anchors.right: parent.right
-                text: qsTr("La misma gota; contenido estable")
-                color: root.theme.iconSecondary
-                font.family: root.theme.font
-                font.pixelSize: 12 * root.u
-                elide: Text.ElideRight
-            }
+            border.color: root.joined ? "transparent" : Qt.alpha(root.theme.foreground, root.theme.alphaHairline)
+            border.width: root.u
             Rectangle {
-                anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: controls.top
-                anchors.bottomMargin: 14 * root.u
-                height: 4 * root.u; radius: height / 2
-                color: Qt.alpha(root.theme.foreground, root.theme.alphaSubtle)
-                Rectangle { width: parent.width * 0.42; height: parent.height; radius: parent.radius; color: root.theme.accent }
+                anchors.top: parent.top
+                anchors.topMargin: root.u
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width * 0.52
+                height: root.u
+                radius: height / 2
+                color: root.joined ? "transparent" : Qt.alpha(root.theme.foreground, root.theme.alphaFaint)
             }
-            Text {
-                id: controls
-                anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom
-                text: "◀   ❚❚   ▶"
-                color: root.theme.iconPrimary
-                font.pixelSize: 17 * root.u
+
+            Item {
+                anchors.fill: parent
+                anchors.margins: 20 * root.u
+                opacity: root.contentProgress
+                visible: opacity > 0.01
+                Text {
+                    id: title
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    text: qsTr("Surface player")
+                    color: root.theme.iconPrimary
+                    font.family: root.theme.font
+                    font.pixelSize: 16 * root.u
+                    font.weight: Font.DemiBold
+                    elide: Text.ElideRight
+                }
+                Text {
+                    anchors.top: title.bottom; anchors.topMargin: 5 * root.u
+                    anchors.left: parent.left; anchors.right: parent.right
+                    text: qsTr("La misma gota; contenido estable")
+                    color: root.theme.iconSecondary
+                    font.family: root.theme.font
+                    font.pixelSize: 12 * root.u
+                    elide: Text.ElideRight
+                }
+                Rectangle {
+                    anchors.left: parent.left; anchors.right: parent.right; anchors.bottom: controls.top
+                    anchors.bottomMargin: 14 * root.u
+                    height: 4 * root.u; radius: height / 2
+                    color: Qt.alpha(root.theme.foreground, root.theme.alphaSubtle)
+                    Rectangle { width: parent.width * 0.42; height: parent.height; radius: parent.radius; color: root.theme.accent }
+                }
+                Text {
+                    id: controls
+                    anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom
+                    text: "◀   ❚❚   ▶"
+                    color: root.theme.iconPrimary
+                    font.pixelSize: 17 * root.u
+                }
             }
         }
-        MouseArea { anchors.fill: parent; onClicked: root.toggleDirection() }
+        MotionArea {
+            id: dropInteraction
+            anchors.fill: parent
+            hoverWash: false
+            feedbackEnabled: false
+            onClicked: root.toggleDirection()
+        }
     }
     Item {
         id: dropInput
@@ -361,15 +375,25 @@ Item {
             spacing: 6 * root.u
             Repeater {
                 model: [qsTr("Nacer"), qsTr("Separar"), qsTr("Expandir"), qsTr("Compactar"), qsTr("Fusionar")]
-                delegate: Rectangle {
+                delegate: Item {
                     required property int index
                     required property string modelData
-                    width: 94 * root.u; height: 28 * root.u; radius: height / 2
-                    color: Qt.alpha(root.theme.cardBot, index === 2 ? 0.88 : 0.72)
-                    border.color: Qt.alpha(root.theme.foreground, root.theme.alphaHairline); border.width: 1
-                    Text { anchors.centerIn: parent; text: modelData; color: root.theme.iconPrimary; font.family: root.theme.font; font.pixelSize: 11 * root.u }
-                    MouseArea {
+                    width: 94 * root.u; height: 28 * root.u
+                    Rectangle {
+                        id: controlVisual
                         anchors.fill: parent
+                        radius: parent.height / 2
+                        scale: controlInteraction.motion.visualScale
+                        transformOrigin: Item.Center
+                        color: Qt.alpha(root.theme.cardBot, index === 2 ? 0.88 : 0.72 + 0.06 * controlInteraction.motion.presence)
+                        border.color: Qt.alpha(root.theme.foreground, root.theme.alphaHairline); border.width: 1
+                        Behavior on color { ColorAnimation { duration: Motion.hover } }
+                        Text { anchors.centerIn: parent; text: modelData; color: root.theme.iconPrimary; font.family: root.theme.font; font.pixelSize: 11 * root.u }
+                    }
+                    MotionArea {
+                        id: controlInteraction
+                        anchors.fill: parent
+                        feedbackRadius: parent.height / 2
                         onClicked: {
                             if (index === 0) root.birth()
                             else if (index === 1) root.separate()

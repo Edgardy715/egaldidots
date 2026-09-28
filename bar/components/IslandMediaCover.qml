@@ -21,6 +21,7 @@ Item {
     width: diameter
     height: diameter
 
+    InteractionMotion { id: response; hovered: root.hovered; pressed: root.pressed; extent: root.diameter }
     Rectangle {
         anchors.centerIn: parent
         width: parent.width
@@ -59,8 +60,7 @@ Item {
         anchors.centerIn: parent
         width: root.diameter - 2 * (root.ringWidth + root.ringGap)
         height: width
-        scale: root.pressed ? 0.96 : root.hovered ? 1.025 : 1
-        Behavior on scale { Anim { type: Anim.FastEffects } }
+        scale: response.visualScale
 
         Image {
             id: artwork

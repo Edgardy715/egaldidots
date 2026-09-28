@@ -124,7 +124,8 @@ PillSurface {
                 font.pixelSize: Theme.fontSizeBodyLg * s
             }
             Item { Layout.fillWidth: true }
-            Rectangle {  // mute toggle
+            Rectangle {
+  // mute toggle
                 Layout.preferredWidth: 64 * s
                 Layout.preferredHeight: 26 * s
                 radius: height / 2
@@ -135,7 +136,18 @@ PillSurface {
                 border.color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
                 border.width: Theme.borderHairline
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+
+                MotionArea {
+                    id: mt
+                    anchors.fill: parent
+                    accessibleName: qsTr("Alternar silencio del audio")
+                    hoverWash: false
+                    onClicked: { if (root.audio && root.sink.ready) root.audio.muted = !root.audio.muted }
+                }
+
                 Text {
+                    scale: mt.motion.visualScale
+                    transform: Translate { y: -Motion.labelTravel * mt.motion.presence }
                     anchors.centerIn: parent
                     text: root.muted ? "Silencio" : "Sonando"
                     color: root.muted ? Theme.accent : Theme.foreground
@@ -143,13 +155,7 @@ PillSurface {
                     font.pixelSize: Theme.fontSizeSmall * s
                     font.weight: Font.Medium
                 }
-                MouseArea {
-                    id: mt
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: { if (root.audio && root.sink.ready) root.audio.muted = !root.audio.muted }
-                }
+
             }
         }
 
@@ -218,7 +224,18 @@ PillSurface {
                 border.color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
                 border.width: Theme.borderHairline
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+
+                MotionArea {
+                    id: smt
+                    anchors.fill: parent
+                    accessibleName: qsTr("Alternar silencio del micrófono")
+                    hoverWash: false
+                    onClicked: { if (root.sourceAudio && root.source.ready) root.sourceAudio.muted = !root.sourceAudio.muted }
+                }
+
                 Text {
+                    scale: smt.motion.visualScale
+                    transform: Translate { y: -Motion.labelTravel * smt.motion.presence }
                     anchors.centerIn: parent
                     text: root.sourceMuted ? "Mudo" : "Activo"
                     color: root.sourceMuted ? Theme.accent : Theme.foreground
@@ -226,13 +243,7 @@ PillSurface {
                     font.pixelSize: Theme.fontSizeSmall * s
                     font.weight: Font.Medium
                 }
-                MouseArea {
-                    id: smt
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: { if (root.sourceAudio && root.source.ready) root.sourceAudio.muted = !root.sourceAudio.muted }
-                }
+
             }
         }
 
@@ -283,9 +294,10 @@ PillSurface {
                         font.pixelSize: Theme.fontSizeBody * s
                         Layout.preferredWidth: 24 * s
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                        MouseArea {
+                        MotionArea {
                             anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
+                            accessibleName: qsTr("Alternar silencio de %1").arg(modelData.appName)
+                            hoverWash: false
                             onClicked: modelData.node.audio.muted = !modelData.node.audio.muted
                         }
                     }

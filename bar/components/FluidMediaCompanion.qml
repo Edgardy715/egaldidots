@@ -32,6 +32,8 @@ Item {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 s: root.s
+                hovered: root.hovered
+                pressed: root.pressed
                 diameter: 34 * root.s
                 ringWidth: 1.8 * root.s
                 ringGap: 2 * root.s

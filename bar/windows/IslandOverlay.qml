@@ -81,7 +81,7 @@ PanelWindow {
     // Spotlight necesita poseer el teclado de forma determinista. El modo
     // OnDemand (usado por `focusable`) depende de la ventana previa y a
     // veces no recibe ni texto ni Escape en Hyprland.
-    WlrLayershell.keyboardFocus: (overlay.launcherOpen && !overlay.launcherClosing) || overlay.wallpaperOpen || overlay.overviewOpen || overlay.surface === "session"
+    WlrLayershell.keyboardFocus: (overlay.launcherOpen && !overlay.launcherClosing) || overlay.wallpaperOpen || overlay.overviewOpen || overlay.surface === "session" || overlay.surface === "auth"
         ? WlrKeyboardFocus.Exclusive
         : overlay.kbFocusWanted ? WlrKeyboardFocus.OnDemand
         : WlrKeyboardFocus.None
@@ -175,7 +175,7 @@ PanelWindow {
     // surface (por ejemplo el TextInput del launcher) tiene el foco.
     Shortcut {
         sequence: "Escape"
-        enabled: overlay.surfaceOpen && !overlay.sessionOpen
+        enabled: overlay.surfaceOpen && !overlay.sessionOpen && overlay.surface !== "auth"
         onActivated: router.close()
     }
 
@@ -190,7 +190,7 @@ PanelWindow {
         // puede correr antes de que el compositor otorgue teclado Exclusive
         // (race) y entonces Tab/flechas no llegarían. Re-clavamos una vez.
         Timer {
-            running: overlay.kbFocusWanted
+            running: overlay.kbFocusWanted && overlay.surface !== "auth"
             interval: Motion.morph + 40
             repeat: false
             onTriggered: if (overlay.kbFocusWanted) focusScope.forceActiveFocus()
@@ -253,31 +253,6 @@ PanelWindow {
             onWheel: (wheel) => {
                 if (pill.surfaceItem && pill.surfaceItem.shiftGroup)
                     pill.surfaceItem.shiftGroup(wheel.angleDelta.y > 0 ? -1 : 1)
-        }
-    }
-
-    // Normal surfaces share this focus scope, but the auth field must
-    // own keyboard focus itself or sudo's askpass bridge receives no
-    // characters and exits with "no password provided".
-    Timer {
-        id: authFocusTimer
-        interval: Motion.morph + 120
-        repeat: false
-        running: overlay.surface === "auth" && !overlay.monFullscreen
-        onTriggered: {
-            if (overlay.surface !== "auth" || overlay.monFullscreen) return
-            if (pill.surfaceItem) {
-                if (pill.surfaceItem.focusInput)
-                    pill.surfaceItem.focusInput()
-                else {
-                    pill.surfaceItem.focus = true
-                    pill.surfaceItem.forceActiveFocus()
-                }
-                console.log("[Auth] auth focus requested, active:",
-                    pill.surfaceItem.activeFocus)
-            } else {
-                restart()
-            }
         }
     }
 

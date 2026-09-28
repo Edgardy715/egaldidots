@@ -14,6 +14,8 @@ ClippingRectangle {
     required property real surfaceRadius
     required property string screenName
     required property color bgColor
+    property bool capsLockOn: false
+    property real authContextWidth: 170 * scaleFactor
     property bool closing: false
     property bool suspended: false
     property real reveal: 1
@@ -74,9 +76,11 @@ ClippingRectangle {
             : ""
 
         onLoaded: {
+            if ("contextWidth" in item) item.contextWidth = Qt.binding(() => root.authContextWidth)
+            if ("capsLockOn" in item) item.capsLockOn = Qt.binding(() => root.capsLockOn)
             item.s = Qt.binding(() => root.scaleFactor)
             item.open = Qt.binding(() => root.displayedSurface.length > 0)
-            item.closing = Qt.binding(() => root.closing)
+            item.closing = Qt.binding(() => root.closing || !root.open)
             item.morphCloseness = Qt.binding(() => root.morphCloseness)
             item.morphRadius = Qt.binding(() => root.morphRadius)
             item.screenName = Qt.binding(() => root.screenName)

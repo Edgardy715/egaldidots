@@ -68,8 +68,17 @@ ShellRoot {
         KeepAwake.enabled      // fuerza singleton KeepAwake
     }
 
+    Binding {
+        target: Auth; property: "polkitFeedbackDuration"
+        value: Flags.reduceMotion ? 220 : Math.max(750, Motion.morph + Motion.iconSwap + Motion.fast)
+    }
+    Binding {
+        target: Auth; property: "sudoFeedbackDuration"
+        value: Flags.reduceMotion ? 220 : Math.max(1100, Motion.morph + Motion.iconSwap + Motion.fast)
+    }
+
     // Polkit entrega las solicitudes gráficas directamente a la pill. Las
-    // solicitudes de sudo en un terminal siguen perteneciendo a su TTY.
+    // solicitudes de sudo del wrapper Fish usan el puente askpass; sudo valida.
     Connections {
         target: Auth
         function openAuthSurface() {
@@ -86,19 +95,12 @@ ShellRoot {
             console.log("[Auth] opening sudo surface")
             openAuthSurface()
         }
-        function onActiveChanged() {
-            if (Auth.active) {
-                openAuthSurface()
-            } else if (Auth.sudoActive) {
-                openAuthSurface()
-            } else if (navigation.openSurface === "auth") {
-                navigation.close()
-            }
+        function onPresentingChanged() {
+            if (Auth.presenting) {
+                if (navigation.openSurface !== "auth") openAuthSurface()
+            } else if (navigation.openSurface === "auth") navigation.close()
         }
-        function onSudoActiveChanged() {
-            if (Auth.sudoActive) openAuthSurface()
-            else if (!Auth.active && navigation.openSurface === "auth") navigation.close()
-        }
+
     }
 
     /** Sólo estos raw-events cambian lo que la pill renderiza. */
@@ -153,9 +155,9 @@ ShellRoot {
          *  Lo invoca el script de setWallpaper via:
          *  qs -c bar ipc call island reloadColors "" */
         function reloadColors(): bool { IslaPalette.forceReload(); return true; }
-        /** Recarga completa de quickshell (hard reload). Útil si algo se congela.
+        /** Recarga de quickshell conservando el traspaso de recursos nativos.
          *  qs -c bar ipc call island reload */
-        function reload(): bool { Quickshell.reload(true); return true; }
+        function reload(): bool { Quickshell.reload(false); return true; }
     }
 
     // ---- reserve (struts, click-through) ----

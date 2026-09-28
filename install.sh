@@ -38,7 +38,7 @@ STOW_PKGS=(
 # · terminals/editors · shell utils · media/clip/brightness/screens · nerd
 # fonts · stow to link · fisher, an official binary in CachyOS/extra).
 PACMAN_PKGS=(
-  hyprland hypridle hyprlock
+  hyprland hypridle hyprlock quickshell
   waybar rofi wlogout swaync
   fish starship python kitty neovim micro fastfetch
   bat eza zoxide fzf fd ripgrep lazygit jq
@@ -224,6 +224,7 @@ fi
 if [ "$DO_DEPS" -eq 1 ]; then install_deps; fi
 if [ "$DO_STOW" -eq 1 ]; then enlace;        fi
 if [ "$DO_STOW" -eq 1 ]; then post_fisher;   fi
+if [ "$DO_STOW" -eq 1 ]; then bash "$STOW_DIR/bar/lockscreen/install.sh"; fi
 
 next_steps
 printf '\n'

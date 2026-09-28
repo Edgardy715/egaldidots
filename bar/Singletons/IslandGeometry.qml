@@ -15,7 +15,7 @@ Singleton {
     readonly property size wallpaperSurface: Qt.size(1000, 640)
     readonly property size launcherSurface: Qt.size(680, 620)
     readonly property size utilitiesSurface: Qt.size(360, 420)
-    readonly property size sessionSurface: Qt.size(540, 304)
+    readonly property size sessionSurface: Qt.size(640, 470)
     readonly property size authSurface: Qt.size(0, 0)
     readonly property size overviewSurface: Qt.size(1000, 340)
     readonly property size connectivitySurface: Qt.size(360, 480)

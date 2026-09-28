@@ -278,7 +278,7 @@ PillSurface {
                                 }
                             }
                         }
-                        MouseArea {
+                        MotionArea {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
@@ -341,19 +341,26 @@ PillSurface {
                         width: 30 * root.s; height: width
                         radius: 9 * root.s
                         color: buttonMouse.containsMouse ? Qt.alpha(Theme.foreground, 0.13) : Qt.alpha(Theme.foreground, 0.06)
-                        MaterialIcon {
-                            anchors.centerIn: parent
-                            iconName: modelData
-                            font.pixelSize: 18 * root.s
-                            color: Theme.foreground
-                        }
-                        MouseArea {
+
+                        MotionArea {
                             id: buttonMouse
+                            accessibleName: index === 2 ? qsTr("Cerrar") : index === 0 ? qsTr("Grupo anterior") : qsTr("Grupo siguiente")
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: index === 2 ? root.requestClose() : root.shiftGroup(index === 0 ? -1 : 1)
                         }
+
+                        MaterialIcon {
+                            compressWithControl: true
+                            interaction: buttonMouse.motion
+                            hovered: buttonMouse.containsMouse
+                            anchors.centerIn: parent
+                            iconName: modelData
+                            font.pixelSize: 18 * root.s
+                            color: Theme.foreground
+                        }
+
                     }
                 }
             }

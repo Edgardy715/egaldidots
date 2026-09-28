@@ -58,9 +58,9 @@ symlinks every package into `$HOME` with **GNU Stow** — without ever touching
 ## ✨ Features
 
 - **Hyprland** (modular config, `source`-split into `modules/`) with
-  **hypridle** idle daemon and a custom **hyprlock** lock screen — a
-  glassy "dynamic-island" aesthetic with a live clock, now-playing
-  (mpris), battery and user/uptime labels, all wallpaper-tinted.
+  **hypridle** idle daemon. **Isla lockscreen** provides a wallpaper-blurred
+  authentication card, profile/avatar, media and a pill-to-card transition.
+  The previous hyprlock configuration remains available as a fallback.
 - **pywal16** is the theming root. A custom wallpaper-picker script
   indexes `~/Wallpapers` by **dominant color** (via `magick`), buckets
   them across the spectrum and renders a searchable rofi menu with
@@ -92,6 +92,9 @@ symlinks every package into `$HOME` with **GNU Stow** — without ever touching
   right of the clock, while the session menu appears as a temporary left droplet.
   Interrupted transitions preserve motion; reduced motion resolves directly.
   Media headers are shared by the launcher, wallpaper picker and overview.
+  Shared controls add finite icon animations, fixed hit targets and keyboard
+  feedback. Session includes a profile header and four power actions; the
+  authorization form handles sudo/Polkit retry, cancellation and success.
   See the [September 2026 changes](CHANGELOG.md),
   [shell architecture](docs/SHELL_ARCHITECTURE.md),
   [motion design](bar/fluid/MOTION_LANGUAGE.md) and
@@ -121,6 +124,8 @@ symlinks every package into `$HOME` with **GNU Stow** — without ever touching
   (`envVars.conf` sets `GBM_BACKEND=nvidia-drm`, `WLR_DRM_DEVICES`, etc.).
   On AMD/Intel, edit `hypr/.config/hypr/modules/envVars.conf` and drop the
   `# Nvidia` block before logging in.
+- **Quickshell** with Qt >= 6.10 is needed for the animated icon paths.
+  The installer includes Quickshell; the lockscreen uses hyprlock's PAM service.
 - For the full look, install a Nerd Font: **JetBrainsMono Nerd Font** is in
   the dependency list (`ttf-jetbrains-mono-nerd`).
 
@@ -268,6 +273,31 @@ instead:
 
 ---
 
+## Isla lockscreen and authorization
+
+Run the shell from this checkout with `quickshell -p bar`. Keep the checkout
+in place while its installed launchers reference it. The existing Hyprland
+configuration also retains the previous Waybar/hyprlock setup.
+
+The main installer also installs the lockscreen launcher. To install it separately:
+
+```sh
+bash bar/lockscreen/install.sh
+```
+
+The script backs up an existing launcher and installs
+`~/.local/share/quickshell-lockscreen/lock.sh` (or the XDG data directory).
+Session's lock action uses that path. To use it from Super+L and hypridle,
+point their lock commands at this launcher. It falls back to hyprlock if
+Quickshell fails. Re-run the installer after moving the checkout.
+
+The Fish Stow package includes the sudo askpass bridge. Open a new Fish session
+and run Isla before using it; Polkit/PAM and sudo still validate credentials.
+For setup, safe previews and checks, see [authentication](docs/AUTHENTICATION.md),
+[lockscreen](docs/LOCKSCREEN_DESIGN.md) and [controls](docs/INTERACTION_SYSTEM.md).
+
+---
+
 ## 🎨 Customizing
 
 The shell provides validated settings and IPC to preview, discard and save changes.
@@ -288,6 +318,7 @@ See the [architecture and configuration contract](docs/SHELL_ARCHITECTURE.md).
 
 - [Hyprland](https://hyprland.org) — the compositor.
 - [Starship](https://starship.rs) — the Fish prompt.
+- [Lucide](https://lucide.dev) — vector icon paths; [ISC/Feather notices](docs/licenses/lucide.txt).
 - [fzf.fish](https://github.com/patrickf1/fzf.fish) (patrickf1) — fzf integration for fish.
 - [LazyVim](https://github.com/LazyVim/LazyVim) — the neovim distribution.
 - [pywal16](https://github.com/eylles/pywal16) (eylles) — the 16-color fork of pywal that powers the palette.

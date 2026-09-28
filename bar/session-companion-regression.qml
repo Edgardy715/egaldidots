@@ -21,7 +21,7 @@ ShellRoot {
             drop.start()
             for (let i = 0; i < 150; i++) drop.advanceMotion(1 / 60)
             check(drop.visualX + drop.wPos <= body.x - 11, "card left of pill")
-            check(Math.abs(drop.wPos - 540) < 1 && Math.abs(drop.hPos - 304) < 1, "session geometry")
+            check(Math.abs(drop.wPos - drop.cardW) < 1 && Math.abs(drop.hPos - IslandGeometry.sessionSurface.height) < 1, "session geometry")
             check(drop.cardContentProgress === 1, "full content revealed")
             drop.close()
             for (let i = 0; i < 8; i++) drop.advanceMotion(1 / 60)

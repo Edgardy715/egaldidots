@@ -77,3 +77,20 @@ código, material ni recursos propietarios de Apple.
   launcher; no inicia barridos de luz ni respiración de notificaciones.
 - El fondo difuminado decodifica la carátula a 256 px constantes. Nunca cambiar
   `sourceSize` según el tamaño animado: causa recargas durante el morph.
+
+## Controles y microinteracciones (2026-09-28)
+
+El hit target permanece fijo. Sólo fondo/contenido/ícono comprimen; el retorno
+corto usa SpringAnimation con tokens propios, independientes del motor de gotas.
+Hover no expande universalmente los controles. Flechas y chevrons indican dirección;
+los cambios de ligadura solapan salida/entrada. ReduceMotion elimina viaje y
+compresión. Ver `docs/INTERACTION_SYSTEM.md` para cobertura, tokens y pruebas.
+
+### Iconos por trazos (referencia Animate UI)
+
+MaterialIcon resuelve los nombres existentes a geometría Lucide local y delega
+las piezas en AnimatedSymbol. Animar arco/vástago, ondas, shackle, campana/badajo
+y flecha interior conserva la caja 24×24. Secuencia finita al hover/foco/tap,
+retorno desde progreso actual al salir; sin loops ornamentales. Estado nuevo
+revela sus strokes; reduceMotion y ocultar completan inmediatamente. Theme
+sigue siendo dueño del color y el control sigue siendo dueño del hit target.

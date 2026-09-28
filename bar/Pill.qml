@@ -127,7 +127,7 @@ Item {
     readonly property var surfaceSize: IslandGeometry.surfaceSizes
     readonly property var sizeFor: surfaceOpen && surfaceSize[pill.surface]
         ? surfaceSize[pill.surface] : IslandGeometry.fallbackSurface
-    readonly property real authInputW: 350 * s
+    readonly property real authInputW: 400 * s
     // El buscador queda anclado por su propia altura. Cuando aparecen resultados
     // la superficie crece hacia abajo, sin recentrar el campo ni desplazarlo.
     readonly property real launcherSearchH: (44 + Theme.marginMd * 2) * s
@@ -143,7 +143,8 @@ Item {
         if (launcherReturning) return coreH
         if (surface === "launcher" && launcherClosing) return launcherSearchH
         if (!surfaceOpen) return coreH
-        if (surface === "auth") return 58 * s
+        if (surface === "auth") return Math.max(82, Math.max(44, Theme.fontSizeBodyLg + Flags.fontScale + 20)
+            + 3 + Math.max(18, Theme.fontSizeLabel + 6) + 16) * s
         if (surface === "launcher") return launcherH
         if (surface === "media") return mediaH
         return sizeFor.height * s
@@ -200,12 +201,7 @@ Item {
     height: Math.min(targetH, 2000 * s)
     property real morphRadius: targetRadius
     transformOrigin: Item.Top
-    scale: hovered && !surfaceOpen && !notifAnimating ? 1.015 : 1
-    Behavior on scale { Anim { type: Anim.FastEffects } }
-    transform: Translate {
-        y: pill.hovered && !pill.surfaceOpen && !pill.notifAnimating ? -1.5 * pill.s : 0
-        Behavior on y { Anim { type: Anim.FastSpatial } }
-    }
+    // Hover is expressed by PillMaterial; geometry and all hit targets stay fixed.
 
     // Retargets conserve velocity, including reversals during a morph.
     readonly property int _morphDuration: notifAnimating ? Motion.notifCollapse : Motion.morph
@@ -244,6 +240,7 @@ Item {
 
     NotificationChoreography {
         id: notificationMotion
+        blocked: pill.surface === "auth"
         popup: pill.notificationsEnabled ? Notifs.activePopup : null
         surfaceOpen: pill.surfaceOpen
         collapseDuration: Motion.notifCollapse + 50
@@ -505,6 +502,8 @@ Item {
         surfaceRadius: material.bodyRadius
         screenName: pill.screenName
         bgColor: pill.bgColor
+        capsLockOn: pill.capsLockOn
+        authContextWidth: restContent.implicitWidth + 56 * pill.s
         closing: pill.launcherClosing
         suspended: pill.surfaceNotifSuspended
         reveal: pill.launcherReturning ? 0 : pill.surfaceReveal

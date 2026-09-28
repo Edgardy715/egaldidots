@@ -36,6 +36,10 @@ Archivo: `$ISLA_CONFIG`, o `$XDG_CONFIG_HOME/isla/shell.json` con fallback a
 - `Flags` es de sólo lectura. Cambiar ajustes con `Config.update`, no asignando
   `Flags.fontScale` ni modificando un objeto anidado directamente.
 - `appearance.fontMediaFamily` configura la familia multimedia antes fija en Inter.
+- `profile.displayName` acepta vacío para usar el nombre de sesión;
+  `paths.userAvatar` apunta a la foto (default `~/.face`). Estos ajustes sólo
+  cambian presentación: no alteran el usuario PAM. El lockscreen independiente
+  lee ajustes persistidos; una previsualización del proceso de barra no se comparte.
 
 ### IPC disponible
 

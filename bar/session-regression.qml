@@ -9,13 +9,14 @@ ShellRoot {
     property int closes: 0
     QtObject {
         id: fake
+        function suspend() { test.calls++; test.lastAction = "suspend" }
         function lock() { test.calls++; test.lastAction = "lock" }
         function logout() { test.calls++; test.lastAction = "logout" }
         function reboot() { test.calls++; test.lastAction = "reboot" }
         function shutdown() { test.calls++; test.lastAction = "shutdown" }
     }
     Item {
-        width: 540; height: 304
+        width: 640; height: 470
         SessionSurface { id: surface; open: true; actions: fake; onRequestClose: test.closes++ }
     }
     function check(ok, message) { if (!ok) { console.error("FAIL: " + message); Qt.exit(1) } }
@@ -48,9 +49,11 @@ ShellRoot {
             surface.open = true
             test.check(surface.pending === -1, "reopen resets confirmation")
             surface.select(-1)
-            test.check(surface.focused === 3, "keyboard wraps")
+            test.check(surface.focused === 4, "keyboard wraps")
             surface.activate(0)
             test.check(test.lastAction === "lock" && test.closes === 4, "lock and close")
+            surface.activate(4)
+            test.check(test.lastAction === "suspend" && test.closes === 5, "suspend and close")
             console.log("PASS: session confirmation, cancellation, repeat-click isolation, reopen and fake actions")
             Qt.quit()
         }

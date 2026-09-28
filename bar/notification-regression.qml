@@ -57,7 +57,19 @@ ShellRoot {
         id: restored; interval: 180
         onTriggered: {
             test.check(flow.notifState === "idle" && !flow.surfaceNotifSuspended, "late-opened surface restored")
-            console.log("PASS: notification phases, queue, early expiry, surface close and late-open restoration")
+            flow.popup = test.first
+            const advances = test.advances
+            flow.blocked = true
+            test.check(flow.notifState === "idle" && !flow.notifAnimating && !flow.surfaceNotifSuspended && flow.surfaceReveal === 1, "auth interrupts notification immediately")
+            flow.popup = test.second
+            test.check(!flow.activeNotif && test.advances === advances, "auth defers notification without dismissing it")
+            flow.blocked = false
+            test.check(flow.activeNotif === test.second && flow.notifState === "collapse-in", "pending notification resumes after auth")
+            flow.blocked = true
+            flow.popup = null
+            flow.blocked = false
+            test.check(!flow.activeNotif && flow.notifState === "idle", "expired notification is not replayed")
+            console.log("PASS: notification phases, queue, early expiry, surface close, late-open restoration and auth priority")
             Qt.quit()
         }
     }

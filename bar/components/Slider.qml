@@ -21,7 +21,6 @@ Item {
     property real value: 0
     property real height_: 12
     property bool knob: false
-    property bool enabled: true
     property real s: 1
     property real trackRadius: 0
 
@@ -68,20 +67,21 @@ Item {
         radius: width / 2
         color: ma.containsMouse ? Qt.lighter("#ffffff", 1.02) : "#ffffff"
         x: root.value * (parent.width - root.knobD)
-        y: (height - root.knobD) / 2
+        y: (root.height - root.knobD) / 2
         Behavior on x { Anim { type: Anim.FastEffects } }
-        scale: ma.containsMouse || ma.pressed ? 1.15 : 1.0
-        Behavior on scale { Anim { type: Anim.FastEffects } }
+        scale: Flags.reduceMotion ? 1 : ma.containsMouse || ma.pressed ? Motion.gripScale : 1
+        Behavior on scale { SmoothedAnimation { duration: Motion.hover; velocity: -1 } }
     }
 
     MouseArea {
         id: ma
         anchors.fill: parent
         enabled: root.enabled
+        hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onPressed: (m) => { root.sliderChanged(root.clamp(m.x / width)); root.sliderLiveChanged(root.clamp(m.x / width)) }
+        onPressed: (m) => { root.sliderChanged(root.valFromX(m.x)); root.sliderLiveChanged(root.valFromX(m.x)) }
         onPositionChanged: (m) => {
-            if (pressed) { root.sliderChanged(root.clamp(m.x / width)); root.sliderLiveChanged(root.clamp(m.x / width)) }
+            if (pressed) { root.sliderChanged(root.valFromX(m.x)); root.sliderLiveChanged(root.valFromX(m.x)) }
         }
     }
 }

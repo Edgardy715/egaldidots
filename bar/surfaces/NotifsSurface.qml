@@ -59,6 +59,7 @@ PillSurface {
 
                     // DND toggle
                     Toggle {
+                        accessibleName: qsTr("No molestar")
                         checked: Notifs.dnd
                         onToggled: Notifs.toggleDnd()
                     }
@@ -73,21 +74,35 @@ PillSurface {
                         color: clr.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaChip) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
                         border.color: clr.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Qt.alpha(Theme.foreground, Theme.alphaSoft)
                         border.width: Theme.borderHairline
-                        transformOrigin: Item.Center; scale: clr.containsMouse ? 1.02 : 1.0
+                        transformOrigin: Item.Center
                         Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                         Behavior on border.color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                        Behavior on scale { Anim { type: Anim.FastEffects } }
+
+                        MotionArea {
+                            id: clr
+                            anchors.fill: parent
+                            enabled: Notifs.count > 0
+                            accessibleName: qsTr("Limpiar todas las notificaciones")
+                            hoverWash: false
+                            onClicked: Notifs.clearAll()
+                        }
+
                         Row {
                             id: clearRow
                             anchors.centerIn: parent
                             spacing: Theme.spacingXs * root.s
                             MaterialIcon {
+                                compressWithControl: true
+                                interaction: clr.motion
                                 anchors.verticalCenter: parent.verticalCenter
                                 iconName: Icons.iClearAll
+                                hovered: clr.containsMouse
                                 color: clr.containsMouse ? Theme.accent : Theme.iconSecondary
                                 font.pixelSize: 15 * root.s
                             }
                             Text {
+                                scale: clr.motion.visualScale
+                                transform: Translate { y: -Motion.labelTravel * clr.motion.presence }
                                 id: clearTxt
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: qsTr("Limpiar todo")
@@ -97,15 +112,7 @@ PillSurface {
                                 font.weight: Font.Medium
                             }
                         }
-                        MouseArea {
-                            id: clr
-                            anchors.fill: parent
-                            hoverEnabled: true; cursorShape: Qt.PointingHandCursor
-                            enabled: Notifs.count > 0
-                            Accessible.role: Accessible.Button
-                            Accessible.name: qsTr("Limpiar todas las notificaciones")
-                            onClicked: Notifs.clearAll()
-                        }
+
                     }
                 }
             }
@@ -159,7 +166,7 @@ delegate: StaggerItem {
             }
 
             ColumnLayout {
-                anchors.centerIn: parent
+                Layout.alignment: Qt.AlignCenter
                 spacing: Theme.spacingLg * s
                 visible: Notifs.count === 0
                 Rectangle {

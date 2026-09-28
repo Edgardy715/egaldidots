@@ -30,6 +30,7 @@ Item {
 
     signal clicked()
 
+    InteractionMotion { id: response; hovered: washMa.containsMouse; pressed: washMa.pressed && washMa.containsMouse; enabled: root.clickable; extent: root.height }
     // sombra separada: un rect fantasma detrás recibe el blur; el vidrio (que
     // contiene texto) se dibuja limpio encima.
     Rectangle {
@@ -50,6 +51,7 @@ Item {
 
     Rectangle {
         id: glass
+        scale: response.visualScale
         anchors.fill: parent
         radius: root.radius_
         gradient: Gradient {
@@ -79,21 +81,25 @@ Item {
             color: washMa.containsMouse ? root.washColor : "transparent"
             Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
         }
-        MouseArea {
-            id: washMa
-            anchors.fill: parent
-            hoverEnabled: root.clickable
-            cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
-            onClicked: if (root.clickable) root.clicked()
-        }
+
     }
 
     // capa de contenido (default property): todo lo declarado dentro cae aquí
     default property alias content: contentItem.data
     Item {
         id: contentItem
+        scale: response.visualScale
         anchors.fill: parent
         anchors.margins: root.pad
         z: 1
+    }
+    MotionArea {
+        id: washMa
+        anchors.fill: parent
+        enabled: root.clickable
+        feedbackEnabled: false
+        hoverEnabled: root.clickable
+        cursorShape: root.clickable ? Qt.PointingHandCursor : Qt.ArrowCursor
+        onClicked: if (root.clickable) root.clicked()
     }
 }

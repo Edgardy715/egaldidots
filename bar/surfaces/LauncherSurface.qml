@@ -235,21 +235,29 @@ PillSurface {
                 onActiveFocusChanged: if (!activeFocus && root.open) focusTimer.restart()
             }
 
-            // clear ✖ a la derecha
-            MaterialIcon {
+            // Stable clear target with an independently animated icon.
+            Item {
                 anchors.right: parent.right
                 anchors.rightMargin: 14 * root.s
                 anchors.verticalCenter: parent.verticalCenter
-                iconName: Icons.iClose
-                color: Theme.dim
-                font.pixelSize: Theme.fontSizeBodyLg * root.s
+                width: 24 * root.s; height: 28 * root.s
                 visible: searchInput.text.length > 0
-                MouseArea {
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    iconName: Icons.iClose
+                    color: Theme.dim
+                    font.pixelSize: Theme.fontSizeBodyLg * root.s
+                    hovered: clearHit.containsMouse
+                    scale: clearHit.motion.visualScale
+                }
+                MotionArea {
+                    id: clearHit
                     anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
+                    accessibleName: qsTr("Limpiar búsqueda")
                     onClicked: { searchInput.text = ""; searchInput.forceActiveFocus() }
                 }
             }
+
         }
 
         // ---- calculator result (when math expression is detected) ----
