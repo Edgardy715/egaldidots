@@ -29,7 +29,7 @@ BACKUP_DIR="$BACKUP_BASE-$(date +%Y%m%d-%H%M%S)"
 
 # Stow packages = each top-level repo directory is one.
 STOW_PKGS=(
-  hypr waybar rofi wlogout swaync kitty fish fastfetch
+  hypr waybar rofi wlogout swaync kitty fish starship fastfetch
   nvim micro bat wal wpg gtk thunar git wallpapers
 )
 
@@ -40,7 +40,7 @@ STOW_PKGS=(
 PACMAN_PKGS=(
   hyprland hypridle hyprlock
   waybar rofi wlogout swaync
-  fish kitty neovim micro fastfetch
+  fish starship python kitty neovim micro fastfetch
   bat eza zoxide fzf fd ripgrep lazygit jq
   playerctl wl-clipboard cliphist wl-clip-persist brightnessctl hyprshot
   libnotify gnome-keyring pavucontrol thunar imagemagick
@@ -156,12 +156,12 @@ enlace() {
   done
 }
 
-# ── Post: fish plugins (tide + fzf.fish) ──────────────────────────────────────
+# ── Post: fish plugins (fzf.fish) ──────────────────────────────────────
 post_fisher() {
-  step "Fish plugins (fisher: tide + fzf.fish)"
+  step "Fish plugins (fisher: fzf.fish)"
   if command -v fish >/dev/null 2>&1 && command -v fisher >/dev/null 2>&1; then
     if fish -c "fisher update" </dev/null; then
-      ok "fisher updated (tide + fzf.fish ready)"
+      ok "fisher updated (fzf.fish ready)"
     else
       warn "fisher update failed — open fish and run: fisher update"
     fi

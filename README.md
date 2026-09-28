@@ -43,7 +43,7 @@ notifications and fetch all recolor from it in one stroke.
 is a **single-source-of-truth rice**: exactly one daemon (`pywal16`) derives a
 16-color palette from the active wallpaper, and every UI surface reads from that
 palette — either directly (kitty, rofi, hyprland, hyprlock, waybar, swaync,
-wlogout) or through a thin adapter (Tide prompt in fish, LazyVim statusline in
+wlogout) or through a thin adapter (Starship prompt in fish, LazyVim statusline in
 neovim, fastfetch). Change the wallpaper once and the whole desktop follows in
 real time, even in already-open terminals.
 
@@ -67,11 +67,11 @@ symlinks every package into `$HOME` with **GNU Stow** — without ever touching
   thumbnails. Select one → `awww` swaps it, pywal regenerates the
   palette, wpgtk rebuilds the GTK theme, and a `wal_sync_signal`
   universal-variable fans the recolor out to **every** surface live.
-- **fish** + **Tide** (v6) with a pywal-derived **"slate" prompt theme**:
-  a single cohesive bar (`color8` surface, darkened dividers), wallpaper-
-  tinted pwd/branch, and fixed Catppuccin/Nord accents for semantic states
-  (git staged/dirty, status ok/fail, vi modes) so they stay legible on any
-  palette. Re-applied live on wallpaper change without restarting the shell.
+- **fish** + **Starship** with the 🎩 Isla signature, a two-line prompt,
+  Git change counts, development environments, and compact command history.
+  Every prompt color follows pywal; dark accents are mixed toward the palette's
+  foreground until they reach 4.5:1 contrast against its background. Colors
+  refresh live through `wal_sync_signal`, including the transient prompt.
 - **kitty** with translucent blurred background, powerline tabs and pywal
   colors.
 - **LazyVim** (neovim) heavily customized: pywal-synced statusline,
@@ -182,7 +182,7 @@ committed.
                               │
         wpgtk ─────────────► ~/.local/share/themes/FlatColor (GTK theme, regenerated)
 
-        fish: __wal_apply_colors() ─► Tide universal vars (colors) + fish_color_* (syntax)
+        fish: __wal_apply_colors() ─► Starship pywal palette + fish_color_* (syntax)
               __wal_sync --on-variable wal_sync_signal ─► live recolor + repaint
         nvim: statusline/notify/satellite read ~/.cache/wal/colors
         fastfetch: colors block from pywal
@@ -193,7 +193,7 @@ committed.
   scripts in `hypr/.config/hypr/scripts/` that drive the picker, recolor and
   now-playing label.
 - **Generated (never committed):** everything in `~/.cache/wal/`, the GTK
-  `FlatColor` theme and wpgtk schemes/samples, and Tide's render caches.
+  `FlatColor` theme and wpgtk schemes/samples, and `~/.cache/starship/pywal.toml`.
 - **Portability:** hardcoded home paths were removed. Hyprland/kitty use `~`
   expansion (`source = ~/.cache/...`, `include ~/.cache/...`), and GTK CSS
   files use relative `@import` (`../../.cache/wal/...`, `../../../.cache/wal/...`)
@@ -219,8 +219,8 @@ egaldidots/
 ├── wlogout/             .config/wlogout/ (layout, style.css)
 ├── swaync/              .config/swaync/  (config.json, style.css)
 ├── kitty/              .config/kitty/   (kitty.conf → user.conf → pywal)
-├── fish/               .config/fish/    (config.fish, fish_plugins,
-│                                        conf.d/tide-structure.fish)
+├── fish/               .config/fish/    (config.fish, fish_plugins)
+├── starship/           .config/         (starship.toml, starship/pywal.py)
 ├── nvim/               .config/nvim/    (LazyVim: init.lua, lua/{config,plugins}/)
 ├── micro/              .config/micro/   (settings, catppuccin color schemes)
 ├── fastfetch/          .config/fastfetch/ (config.jsonc, hat.txt)
@@ -233,12 +233,17 @@ egaldidots/
 └── wallpapers/         Wallpapers/          (15 wallpapers, symlinked to ~/Wallpapers)
 ```
 
-> **fish** notes: the Tide *structure* (which items show, separators, icons,
-> padding, transient mode) is reproduced cleanly in
-> `conf.d/tide-structure.fish` as universal vars — it deliberately does **not**
-> commit the fisher-managed `functions/`/`completions/` (tide, fzf.fish, fisher
-> regenerate those from `fish_plugins`), nor the dirty `fish_variables` cache.
-> Tide *colors* are pywal-derived at runtime by `config.fish`, never pinned.
+> **Fish / Starship:** `starship/.config/starship.toml` defines the prompt.
+> `starship/.config/starship/pywal.py` reads `~/.cache/wal/colors.json` and
+> atomically generates `~/.cache/starship/pywal.toml`. Fish selects it through
+> `STARSHIP_CONFIG` at startup and on wallpaper changes. Without a valid pywal
+> palette, the base configuration provides fallback colors. Existing shells
+> need `exec fish` once after upgrading. Fisher manages fzf.fish; plugin
+> functions/completions and `fish_variables` remain untracked.
+>
+> Check the adapter: `python3 starship/.config/starship/test_pywal.py`.
+> Contrast is measured against pywal's background, not every pixel visible
+> through a transparent terminal.
 
 ---
 
@@ -268,12 +273,10 @@ instead:
 The shell provides validated settings and IPC to preview, discard and save changes.
 See the [architecture and configuration contract](docs/SHELL_ARCHITECTURE.md).
 
-- **Change the prompt structure** (which items, separators, icons): edit
-  `fish/.config/fish/conf.d/tide-structure.fish` — it's the source of truth.
-  Don't run `tide configure`; its changes would be overwritten on the next
-  interactive shell.
-- **Change prompt *colors*:** they're pywal-derived in `config.fish`
-  (`__tide_pywal_apply`). Edit the fixed-accent block there.
+- **Change the prompt structure** (modules, icons, spacing): edit
+  `starship/.config/starship.toml`.
+- **Change prompt colors:** they follow pywal. Adjust the `wal*` assignments in
+  `starship.toml` or the contrast adjustment in `starship/.config/starship/pywal.py`.
 - **Monitors / resolution / refresh rate:** `hypr/.config/hypr/modules/monitors.conf`.
 - **GPU (non-NVIDIA):** trim the `# Nvidia` block in `hypr/.../modules/envVars.conf`.
 - **Add wallpapers:** drop files into `wallpapers/Wallpapers/` (they're
@@ -284,7 +287,7 @@ See the [architecture and configuration contract](docs/SHELL_ARCHITECTURE.md).
 ## 🙏 Credits
 
 - [Hyprland](https://hyprland.org) — the compositor.
-- [Tide](https://github.com/ilancosman/tide) (ilancosman) — the fish prompt.
+- [Starship](https://starship.rs) — the Fish prompt.
 - [fzf.fish](https://github.com/patrickf1/fzf.fish) (patrickf1) — fzf integration for fish.
 - [LazyVim](https://github.com/LazyVim/LazyVim) — the neovim distribution.
 - [pywal16](https://github.com/eylles/pywal16) (eylles) — the 16-color fork of pywal that powers the palette.
