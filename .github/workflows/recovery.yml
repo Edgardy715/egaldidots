@@ -1,0 +1,21 @@
+name: Recovery checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y stow
+      - name: Installer syntax
+        run: bash -n install.sh bar/lockscreen/lock.sh fish/.local/bin/isla fish/.local/bin/isla-lock hypr/.config/hypr/scripts/apply-wallpaper.sh
+      - name: Recovery with real Stow and simulated system commands
+        run: python3 scripts/test-install.py
+      - name: Lockscreen launcher
+        run: python3 bar/tests/lockscreen-launcher.py
+      - name: Starship palette
+        run: python3 starship/.config/starship/test_pywal.py

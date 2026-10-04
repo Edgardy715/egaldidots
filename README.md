@@ -50,8 +50,8 @@ real time, even in already-open terminals.
 `install.sh` reproduces the setup on a fresh Arch / CachyOS box: it installs
 the dependency list **derived from what these configs actually use** (not a
 generic bootstrap), backs up any pre-existing config with a timestamp, and
-symlinks every package into `$HOME` with **GNU Stow** — without ever touching
-`/etc`, `/usr` or `/boot`.
+symlinks dotfiles into `$HOME` with **GNU Stow**, and generates the runtime assets
+needed by Isla. System packages and services are managed through pacman/systemctl.
 
 ---
 
@@ -106,8 +106,8 @@ symlinks every package into `$HOME` with **GNU Stow** — without ever touching
 - **Clipboard** persistence (`wl-clip-persist` + `cliphist`), **GNOME
   Keyring** secret store, **brightnessctl**, **hyprshot** screenshots,
   **playerctl** media control.
-- A laptop docked to an external **240 Hz** monitor with **VRR**, with the
-  internal panel disabled — NVIDIA-flavored env in `envVars.conf`.
+- An optional original hardware profile for the NVIDIA laptop docked to an
+  external **240 Hz** monitor with **VRR**. Portable defaults enable all monitors.
 
 ---
 
@@ -117,13 +117,10 @@ symlinks every package into `$HOME` with **GNU Stow** — without ever touching
   EndeavourOS, Garuda…). `install.sh` detects this from `/etc/os-release`
   and **aborts** otherwise (override with `--force`, at your own risk).
 - `pacman`; and **yay** or **paru** for the two AUR packages
-  (`python-pywal16`, `wpgtk`). If neither is present the installer skips AUR
-  and tells you what to run.
+  (`python-pywal16`, `wpgtk`). If neither is present the installer builds yay as the normal user.
 - **GNU Stow** is installed automatically by the installer (`extra/stow`).
-- A **Wayland** session with an **NVIDIA** GPU is the intended target
-  (`envVars.conf` sets `GBM_BACKEND=nvidia-drm`, `WLR_DRM_DEVICES`, etc.).
-  On AMD/Intel, edit `hypr/.config/hypr/modules/envVars.conf` and drop the
-  `# Nvidia` block before logging in.
+- Working GPU drivers and a Wayland-capable system. Portable defaults enable
+  connected monitors. The original NVIDIA/dock profile is an explicit option.
 - **Quickshell** with Qt >= 6.10 is needed for the animated icon paths.
   The installer includes Quickshell; the lockscreen uses hyprlock's PAM service.
 - For the full look, install a Nerd Font: **JetBrainsMono Nerd Font** is in
@@ -131,40 +128,51 @@ symlinks every package into `$HOME` with **GNU Stow** — without ever touching
 
 ---
 
-## 🚀 Installation
+## 🚀 Installation and recovery
+
+Start from an installed Arch/CachyOS system with working GPU drivers, internet,
+a normal user with sudo access, and Git. This restores the desktop and tracked
+application configuration; it does not install the operating system or recover
+personal files, passwords, SSH keys or uncommitted changes.
 
 ```bash
 git clone https://github.com/Edgardy715/egaldidots.git ~/egaldidots
 cd ~/egaldidots
-
-# review what it will do first (it never touches /etc, /usr or /boot):
-./install.sh --help
-
-# full bootstrap: deps + timestamped backup + stow symlinks + fisher plugins
 ./install.sh
 ```
 
-Flags:
+The installer upgrades the system, installs official/AUR dependencies (building
+`yay` as the normal user if needed), backs up conflicting files, links dotfiles,
+sets Isla to start in Hyprland, installs Fish plugins and the lockscreen launcher,
+builds Wpscan against the installed Qt, restores locked Neovim plugins, builds
+FlatColor GTK templates, seeds a wallpaper palette, enables network/audio
+services, and selects Fish as the login shell. Mandatory failures stop the run.
+Keep the checkout in place: configuration links reference it.
 
-| Flag | Effect |
-| --- | --- |
-| `./install.sh` | everything (default) |
-| `--stow-only` | skip dependency install (everything already on the box) |
-| `--deps-only` | install packages only, no symlinking |
-| `--no-backup` | overwrite/push through conflicts instead of backing them up |
-| `--force` | proceed even if the OS is not Arch/CachyOS |
-| `--help` | show this help |
-
-After `install.sh` finishes, **seed the palette** by picking a wallpaper:
+Log out and choose Hyprland in your existing display manager, or run `Hyprland`
+from a TTY. Then validate the live session:
 
 ```bash
-wal -i ~/Wallpapers/<your-wallpaper>.png
-# or, once you're in Hyprland, press Super+W for the dominant-color picker
+./install.sh --check
 ```
 
-The first `wal` run populates `~/.cache/wal/`, and every surface recolors from
-it (open programs included, via `wal_sync_signal`). Then open a fish shell and
-start Hyprland.
+| Option | Effect |
+| --- | --- |
+| `--stow-only` | Restore configuration using dependencies already installed |
+| `--deps-only` | Install and check required dependencies |
+| `--check` | Check installed files, plugins, services and the active Isla session |
+| `--wallpaper FILE` | Choose the initial wallpaper; otherwise reuse previous/bundled |
+| `--hardware-profile portable` | Preferred modes for connected monitors (default) |
+| `--hardware-profile original` | Original NVIDIA laptop/external 240 Hz monitor setup |
+| `--keep-shell` | Preserve the current login shell |
+| `--help` | Show usage |
+
+Backups are stored in `~/.egaldidots-backup-*`. Unrelated files are preserved.
+Custom monitor/GPU overrides belong in `~/.config/hypr/local.hardware.conf` and
+survive a repeat installation unless a hardware profile is explicitly selected.
+The old `--force` and `--no-backup` options are removed.
+
+See [recovery and validation](docs/RECOVERY.md) for the supported boundary and tests.
 
 ---
 
@@ -254,8 +262,7 @@ egaldidots/
 
 ## 🔧 Manual (sudo) steps — not done by the installer
 
-`install.sh` never touches system paths. What needs root is documented here
-instead:
+Optional bootloader/display-manager themes are installed separately:
 
 - **GRUB theme — Elegant-grub2-themes** (`vinceliuice/Elegant-grub2-themes`):
 
@@ -267,17 +274,16 @@ instead:
   sudo grub-mkconfig -o /boot/grub/grub.cfg
   ```
 
-- **awww / pywal / wpgtk first-time setup:** these are installed by the
-  installer, but the *palette* isn't seeded until you pick a wallpaper (see
-  [Installation](#-installation)). No sudo needed — just `wal -i ~/Wallpapers/<file>`.
+- **Wallpaper changes:** the installer seeds a palette automatically. Use
+  Super+W in Isla, or `bash ~/.config/hypr/scripts/apply-wallpaper.sh IMAGE`,
+  to update pywal, GTK and the live shell together.
 
 ---
 
 ## Isla lockscreen and authorization
 
 Run the shell from this checkout with `quickshell -p bar`. Keep the checkout
-in place while its installed launchers reference it. The existing Hyprland
-configuration also retains the previous Waybar/hyprlock setup.
+in place while its installed launchers reference it. Hyprland starts Isla automatically; hyprlock remains the lockscreen fallback.
 
 The main installer also installs the lockscreen launcher. To install it separately:
 
@@ -287,8 +293,7 @@ bash bar/lockscreen/install.sh
 
 The script backs up an existing launcher and installs
 `~/.local/share/quickshell-lockscreen/lock.sh` (or the XDG data directory).
-Session's lock action uses that path. To use it from Super+L and hypridle,
-point their lock commands at this launcher. It falls back to hyprlock if
+Session, Super+L and hypridle use `~/.local/bin/isla-lock`, which resolves that launcher. It falls back to hyprlock if
 Quickshell fails. Re-run the installer after moving the checkout.
 
 The Fish Stow package includes the sudo askpass bridge. Open a new Fish session
@@ -307,8 +312,8 @@ See the [architecture and configuration contract](docs/SHELL_ARCHITECTURE.md).
   `starship/.config/starship.toml`.
 - **Change prompt colors:** they follow pywal. Adjust the `wal*` assignments in
   `starship.toml` or the contrast adjustment in `starship/.config/starship/pywal.py`.
-- **Monitors / resolution / refresh rate:** `hypr/.config/hypr/modules/monitors.conf`.
-- **GPU (non-NVIDIA):** trim the `# Nvidia` block in `hypr/.../modules/envVars.conf`.
+- **Monitors / resolution / refresh rate:** `~/.config/hypr/local.hardware.conf`.
+- **GPU overrides:** `~/.config/hypr/local.hardware.conf`; portable defaults avoid NVIDIA-specific environment variables.
 - **Add wallpapers:** drop files into `wallpapers/Wallpapers/` (they're
   symlinked into `~/Wallpapers` by Stow, then `wal`/`awww` pick them up).
 
@@ -334,3 +339,4 @@ See the [architecture and configuration contract](docs/SHELL_ARCHITECTURE.md).
 ## 📜 License
 
 MIT © 2026 [Edgardy715](https://github.com/Edgardy715) — see [LICENSE](./LICENSE).
+
