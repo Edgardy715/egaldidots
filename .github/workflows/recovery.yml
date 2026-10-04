@@ -10,9 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y stow
+      - run: sudo apt-get update && sudo apt-get install -y stow ripgrep
       - name: Installer syntax
-        run: bash -n install.sh bar/lockscreen/lock.sh fish/.local/bin/isla fish/.local/bin/isla-lock hypr/.config/hypr/scripts/apply-wallpaper.sh
+        run: |
+          for script in install.sh bar/lockscreen/install.sh bar/lockscreen/lock.sh fish/.local/bin/isla fish/.local/bin/isla-lock hypr/.config/hypr/scripts/apply-wallpaper.sh hypr/.config/hypr/scripts/wallpaper-picker.sh; do
+            bash -n "$script"
+          done
       - name: Recovery with real Stow and simulated system commands
         run: python3 scripts/test-install.py
       - name: Lockscreen launcher

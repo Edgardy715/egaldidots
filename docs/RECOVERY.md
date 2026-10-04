@@ -40,6 +40,8 @@ python3 scripts/test-install.py
 python3 bar/tests/lockscreen-launcher.py
 ```
 
+Install Python, GNU Stow and ripgrep before running these checks.
+
 The recovery suite uses real GNU Stow in temporary home directories, including
 paths with spaces and legacy folded links. Package managers, desktop processes,
 downloads, Qt compilation, Neovim and service operations are simulated. These

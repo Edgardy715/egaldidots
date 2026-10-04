@@ -1,7 +1,7 @@
 """Recovery regression: real GNU Stow; package/desktop commands are simulated.
 
 Runs in temporary homes. No package installs, user shell changes or real locks.
-Requires Python and GNU Stow (or STOW_BIN pointing at the real executable).
+Requires Python, ripgrep and GNU Stow (or STOW_BIN pointing at the real executable).
 """
 import json
 import os
@@ -15,6 +15,8 @@ REPO = Path(__file__).resolve().parents[1]
 STOW = os.environ.get('STOW_BIN') or shutil.which('stow')
 if not STOW:
     raise SystemExit('GNU Stow is required for this test')
+if not shutil.which('rg'):
+    raise SystemExit('ripgrep (rg) is required for this test')
 
 FAKE = r'''#!/usr/bin/env python3
 import json,os,sys
