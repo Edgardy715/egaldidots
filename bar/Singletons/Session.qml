@@ -22,7 +22,7 @@ Singleton {
     Component.onCompleted: console.log("[Session] singleton instanciado")
 
     // Comandos (override via Flags en el futuro — por ahora valores seguros)
-    readonly property string lockCmd: "~/.local/share/quickshell-lockscreen/lock.sh"
+    readonly property string lockCmd: "~/.local/bin/isla-lock"
     readonly property string logoutCmd: "hyprctl dispatch exit 0"
     readonly property string shutdownCmd: "systemctl poweroff"
     readonly property string rebootCmd: "systemctl reboot"
