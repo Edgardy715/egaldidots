@@ -153,8 +153,8 @@ PillSurface {
                 color: Qt.alpha(root.stateColor, root.hasError ? 0.07 : 0.035)
                 border.width: Theme.borderHairline
                 border.color: Qt.alpha(root.stateColor, root.hasError || root.successState ? 0.35 : password.activeFocus ? 0.19 : 0.07)
-                Behavior on color { enabled: root.active && root.visible && root.exposure > 0; ColorAnimation { id: fieldColor; duration: Motion.fast } }
-                Behavior on border.color { enabled: root.active && root.visible && root.exposure > 0; ColorAnimation { id: fieldBorder; duration: Motion.fast } }
+                Behavior on color { enabled: root.active && root.visible && root.exposure > 0 && !Flags.reduceMotion; ColorAnimation { id: fieldColor; duration: Motion.fast } }
+                Behavior on border.color { enabled: root.active && root.visible && root.exposure > 0 && !Flags.reduceMotion; ColorAnimation { id: fieldBorder; duration: Motion.fast } }
             }
             MaterialIcon {
                 x: 12 * root.s; anchors.verticalCenter: parent.verticalCenter
@@ -165,12 +165,14 @@ PillSurface {
             TextField {
                 id: password
                 objectName: "authPassword"
+                cursorDelegate: InputCaret { input: password; color: Theme.foreground; motionActive: root.active && root.exposure > 0 }
                 x: 40 * root.s; width: Math.max(1, parent.width - 92 * root.s); height: parent.height
                 leftPadding: 0; rightPadding: 0; topPadding: 0; bottomPadding: 0
                 echoMode: root.responseVisible ? TextInput.Normal : TextInput.Password
                 passwordCharacter: "•"; passwordMaskDelay: 0
                 placeholderText: root.successState ? qsTr("Autorizado") : root.verifying ? qsTr("Verificando…") : root.prompt
-                placeholderTextColor: root.successState ? root.stateColor : Theme.iconSecondary
+                placeholderTextColor: "transparent"
+                InputPlaceholder { input: password; color: root.successState ? root.stateColor : Theme.iconSecondary; motionActive: root.active && root.exposure > 0 }
                 color: Theme.foreground; font.family: Theme.font; font.pixelSize: (Theme.fontSizeBodyLg + Flags.fontScale) * root.s
                 selectByMouse: true
                 readOnly: !root.canRespond

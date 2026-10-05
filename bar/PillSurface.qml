@@ -4,7 +4,7 @@ import "Singletons"
 /**
  * Isla · PillSurface. Base de surfaces (puerto de Ricelin PillSurface.qml):
  * rellena el cuerpo de la pill inset por sus márgenes (escalados por `s`), entra
- * con el morph a medida que se asienta (`Math.pow(morphCloseness, 1.3)`), y sólo
+ * con el morph a medida que se asienta (una curva suave ligada a `morphCloseness`), y sólo
  * está habilitada cuando está abierta. El host fija `open`, `s`, `morphCloseness`;
  * la surface declara `mTop/mLeft/mRight/mBottom`. `requestClose()` pide al host
  * despido. El contenido se revela según la geometría actual del vidrio.
@@ -30,6 +30,7 @@ Item {
     property real mRight: Theme.marginNone
     property real mBottom: Theme.marginNone
     readonly property bool active: open && !closing
+    readonly property bool contentReady: active && morphCloseness > 0.2
     // Nota: si la surface pone `clip: true` a nivel root, recortará también el
     // fondo a sus propios límites (con márgenes ≠ 0 volvería el "rectángulo
     // dentro"). En ese caso, mover el clip al contenedor de contenido interno
@@ -48,7 +49,8 @@ Item {
     anchors.rightMargin: surface.mRight * surface.s
     anchors.bottomMargin: surface.mBottom * surface.s
     enabled: open
-    opacity: open ? Math.pow(morphCloseness, 1.3) : 0
+    readonly property real morphExposure: Math.max(0, Math.min(1, morphCloseness))
+    opacity: open ? morphExposure * morphExposure * (3 - 2 * morphExposure) : 0
     visible: opacity > 0.01
 
     Rectangle {

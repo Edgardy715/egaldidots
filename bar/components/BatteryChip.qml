@@ -30,7 +30,7 @@ Item {
     property string status: ""
 
     readonly property real pad: 8 * s
-    readonly property real glyphW: 18 * s
+    readonly property real glyphW: 27 * s
     readonly property real pctW: 34 * s
     readonly property real airR: 8 * s
     readonly property real chipW: pad + glyphW + 4*s + pctW + pad + airR
@@ -49,35 +49,30 @@ Item {
         batChipHide.restart()
     }
 
-    function glyph() {
-        if (root.status === "charging") return "battery_charging_full"
-        if (root.percent <= 10) return "battery_alert"
-        if (root.percent <= 25) return "battery_full"
-        return "battery_full"
-    }
-
     Rectangle {
         anchors.fill: parent
         anchors.rightMargin: root.airR
         radius: height / 2
-        color: Qt.alpha(Theme.accent, Theme.alphaWash)
-        border.color: Qt.alpha(Theme.accent, Theme.alphaSelected)
+        color: Qt.alpha(batteryGlyph.tint, Theme.alphaWash)
+        border.color: Qt.alpha(batteryGlyph.tint, Theme.alphaSelected)
         border.width: Theme.borderHairline
 
         Row {
             anchors.fill: parent
             anchors.leftMargin: root.pad
             spacing: Theme.spacingSm * root.s
-            MaterialIcon {
+            BatteryIndicator {
+                id: batteryGlyph
                 anchors.verticalCenter: parent.verticalCenter
-                iconName: root.glyph()
-                color: root.percent <= 10 ? "#f38ba8" : Theme.accent
-                font.pixelSize: Theme.fontSizeBody * root.s
+                s: root.s
+                level: root.percent / 100
+                charging: root.status === "charging"
+                chargePaused: root.status === "paused"
             }
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.percent + "%"
-                color: Theme.accent
+                color: batteryGlyph.tint
                 font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeLabel * root.s
                 font.weight: Font.DemiBold
             }

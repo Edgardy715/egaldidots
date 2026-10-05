@@ -152,6 +152,15 @@ Item {
             }
         }
 
+        InnerGlow {
+            anchors.fill: parent
+            glowColor: root.materialAccent
+            focusX: root.mode === "status" ? 0.76 : root.mode === "rest" ? 0.5 : 0.26
+            opacity: root.mode === "lateral" || root.width >= 300 * root.s || root.height > 80 * root.s ? 0
+                : root.materialAwake ? 0.48 : root.mode === "rest" ? 0.34 : root.mode === "status" ? 0.38 : 0
+            Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+        }
+
         Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
@@ -215,13 +224,6 @@ Item {
             radius: body.radius
             color: root.materialAccent
             opacity: 0.035
-            SequentialAnimation on opacity {
-                running: root.mode === "rest"
-                loops: Animation.Infinite
-                NumberAnimation { from: 0.025; to: 0.075; duration: Motion.breathe; easing.type: Easing.InOutSine }
-                NumberAnimation { from: 0.075; to: 0.025; duration: Motion.breathe; easing.type: Easing.InOutSine }
-                PauseAnimation { duration: Math.round(1100 * Motion.mult) }
-            }
         }
     }
 }

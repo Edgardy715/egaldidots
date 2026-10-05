@@ -13,6 +13,9 @@ PillSurface {
     property var actions: Session
     property int focused: 4
     property int pending: -1
+    // Keep the outgoing confirmation copy while its row fades away.
+    property int displayedPending: -1
+    onPendingChanged: if (pending >= 0) displayedPending = pending
     readonly property var choices: [
         { icon: "lock", label: qsTr("Bloquear"), detail: qsTr("Tu sesión seguirá abierta."), action: "lock" },
         { icon: "logout", label: qsTr("Cerrar sesión"), detail: qsTr("Se cerrarán tus aplicaciones."), action: "logout" },
@@ -167,7 +170,14 @@ PillSurface {
             Layout.preferredHeight: 52 * root.s
             RowLayout {
                 anchors.fill: parent
-                visible: root.pending < 0
+                enabled: root.pending < 0
+                opacity: root.pending < 0 ? 1 : 0
+                visible: opacity > 0.01
+                transform: Translate {
+                    y: Flags.reduceMotion || root.pending < 0 ? 0 : -3 * root.s
+                    Behavior on y { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+                }
+                Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                 FooterButton { text: qsTr("Bloquear"); onClicked: root.activate(0) }
                 Item { Layout.fillWidth: true }
                 Text {
@@ -178,20 +188,27 @@ PillSurface {
             }
             RowLayout {
                 anchors.fill: parent
-                visible: root.pending >= 0
+                enabled: root.pending >= 0
+                opacity: root.pending >= 0 ? 1 : 0
+                visible: opacity > 0.01
+                transform: Translate {
+                    y: Flags.reduceMotion || root.pending >= 0 ? 0 : 3 * root.s
+                    Behavior on y { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+                }
+                Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                 spacing: 12 * root.s
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 4 * root.s
-                    Text {
+                    AnimatedLabel {
                         Layout.fillWidth: true
-                        text: root.pending >= 0 ? qsTr("¿%1?").arg(root.choices[root.pending].label) : ""
+                        value: root.displayedPending >= 0 ? qsTr("¿%1?").arg(root.choices[root.displayedPending].label) : ""
                         font.family: Theme.fontMedia; font.pixelSize: 13 * Flags.fontScale * root.s
                         font.weight: Font.Medium; color: Theme.foreground
                     }
-                    Text {
+                    AnimatedLabel {
                         Layout.fillWidth: true
-                        text: root.pending >= 0 ? root.choices[root.pending].detail : ""
+                        value: root.displayedPending >= 0 ? root.choices[root.displayedPending].detail : ""
                         wrapMode: Text.WordWrap
                         font.family: Theme.fontMedia; font.pixelSize: 10 * Flags.fontScale * root.s
                         color: Qt.alpha(Theme.foreground, 0.6)

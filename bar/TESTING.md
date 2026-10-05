@@ -72,6 +72,10 @@ cerrar con Escape y comprobar expulsión de la gota después del morph.
 comprueba que mostrar los workspaces 2 y 10 y volver al reloj conserva el ancho.
 Con reproducción activa verifica que MPRIS notifica la posición periódicamente.
 
+`ISLA_CONFIG=/tmp/isla-motion-test.json QT_QPA_PLATFORM=offscreen quickshell -p bar/top-workspace-motion-regression.qml`
+comprueba viaje, cambio de destino, reposo, movimiento reducido y ocultación de la
+lente del rail. Usa una ruta de configuración temporal, no los ajustes personales.
+
 ### Overview compacto (Win + Tab)
 
 `QT_QPA_PLATFORM=offscreen quickshell -p bar/overview-regression.qml`
@@ -138,7 +142,7 @@ notificación. No publica notificaciones reales ni modifica el historial.
 ### Continuidad de absorción
 
 `QT_QPA_PLATFORM=offscreen quickshell -p bar/absorption-regression.qml`
-integra frames a 30/60/144Hz simulados y cuatro tamaños de partida. Comprueba
+integra frames a 30/60/144/240Hz simulados y cuatro tamaños de partida. Comprueba
 captura con velocidad residual, cobertura antes de ocultar y retirada completa
 del cap. Complementar con observación real de apertura/cierre del launcher:
 la prueba no mide FPS ni certifica la sensación perceptual.
@@ -206,3 +210,60 @@ confirmación de energía y reduced motion. `QT_QPA_PLATFORM=wayland quickshell
 -p bar/lockscreen-motion-regression.qml` verifica interrupción, rechazo, éxito
 y retorno usando LockSurface sin adquirir WlSessionLock ni iniciar PAM.
 ISLA_LOCK_CAPTURE_DIR permite guardar capturas de esa última fixture.
+
+### Portapapeles y rendimiento de surfaces
+
+`bash bar/tests/clipboard-regression.sh` usa cliphist y wl-copy simulados:
+carga asíncrona, selección tras filtrar, miniaturas y vista previa seleccionada,
+y copia exacta de texto multilínea e imagen PNG. No modifica el portapapeles real.
+Incluye limpieza asíncrona con retraso simulado, error y doble llamada: la UI
+continúa produciendo frames y conserva la lista si falla el borrado.
+Requiere ImageMagick (`magick`), igual que la generación de vistas previas.
+QA Wayland: Super+V, buscar, seleccionar una imagen con ↑/↓ y cerrar con Escape.
+Las imágenes se generan en un directorio privado temporal que se elimina al
+descargar la surface; el original se copia sin transformar.
+
+Mediciones y alcance: `docs/SURFACE_PERFORMANCE_AUDIT.md`. Para análisis estático
+usar `/usr/lib/qt6/bin/qmllint`: `/usr/bin/qmllint` en este equipo pertenece a Qt5.
+Los avisos de tipos/imports y referencias sin calificar no equivalen a errores
+de sintaxis; contrastarlos con las pruebas de carga y ejecución.
+
+### Microinteracciones
+
+`QT_QPA_PLATFORM=wayland ISLA_CONFIG=/ruta/temporal.json quickshell -p
+bar/microinteraction-regression.qml` comprueba salida intermedia de contenido,
+retarget sin salto, último texto tras cambios rápidos, respuesta al clic y
+detención al ocultar, retirada/recolocación nativa de filas y movimiento reducido.
+Usar configuración temporal con `{}`; también admite offscreen para lógica.
+`ContentMotion`, `AnimatedLabel` y `MotionList` comparten los tokens Motion.
+No usar AnimatedLabel en contadores/porcentajes que se actualizan continuamente.
+Clipboard añade salida breve antes del estado vacío; `clear-reduced` valida
+el vaciado inmediato sin desplazamiento. Capturas opcionales de su fixture con
+ISLA_CLIPBOARD_CAPTURE_DIR y QT_QPA_PLATFORM=wayland, usando los comandos falsos.
+
+## Coreografía y escritura compartidas
+
+Con ISLA_CONFIG temporal, ejecutar `quickshell -p bar/surface-choreography-regression.qml`
+y `quickshell -p bar/input-motion-regression.qml` en offscreen o Wayland. La primera
+cubre carga asíncrona, destinos sucesivos, cancelación, stagger interrumpido y
+activación de movimiento reducido durante el viaje. La segunda cubre escritura
+y cierre del launcher. `ISLA_MOTION_CAPTURE_DIR` permite capturas de la primera
+fixture en un directorio existente. Las nuevas fixtures desactivan hot reload
+para evitar destruir QtTest durante una edición de imports.
+
+La fixture interaction-surfaces-regression incluye ahora Apariencia: 13 superficies
+no-auth. Qt6 qmllint está en `/usr/lib/qt6/bin/qmllint`; el ejecutable genérico
+puede finalizar255 sin diagnóstico.
+
+## Textboxes: edición y animación
+
+`ISLA_CONFIG=/tmp/isla-typing.json QT_QPA_PLATFORM=offscreen quickshell -p bar/textbox-motion-regression.qml`
+comprueba posición nativa del cursor, escritura, selección/borrado, inserción
+larga Unicode, Inicio/Fin, hints, máscara, ocultación y reduceMotion. Repetir
+en Wayland; ISLA_TEXTBOX_SHOTS apunta a un directorio existente para capturas
+sintéticas. No usa ni modifica el portapapeles real.
+
+`bar/lockscreen-typing-regression.qml` cubre inserciones/borrados por rango,
+cambios rápidos, overflow, selección y modelo visual sin secretos. Usa
+ISLA_LOCK_CAPTURE_DIR para capturas opcionales. Son previews: no bloquean
+la sesión ni envían PAM. IME real necesita validación adicional.

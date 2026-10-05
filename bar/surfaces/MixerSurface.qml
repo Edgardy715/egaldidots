@@ -7,14 +7,8 @@ import "../components"
 import "../Singletons"
 
 /**
- * Isla · MixerSurface. Volumen del sink por defecto (Pipewire): barra táctil +
- * % con mono-font (eco pulseaudio waybar) + mute. Entra con morphCloseness vía
- * PillSurface. Wheel del body ya ajusta inline; aquí es control fino.
- *
- * v2: añade streams per-app (Pipewire.nodes.isStream) — cada app con su propio
- * slider horizontal + mute. Filtra todo lo que tenga application.name en
- * properties (videojuegos / browsers / electron). Inspira en el mixer de
- * caelestia dashboard sin saturar (lista compacta con row por stream).
+ * Audio del sink, micrófono y streams Pipewire. Los controles comparten Slider
+ * y la lista de aplicaciones usa el espacio restante del vidrio.
  */
 PillSurface {
     id: root
@@ -63,17 +57,22 @@ PillSurface {
     }
 
     function clamp01(v) { return Math.max(0, Math.min(1, v)) }
+    function setVolume(device, v) {
+        if (!device || !device.audio) return
+        device.audio.volume = clamp01(v)
+        device.audio.muted = false
+    }
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: Theme.spacingXl * s
+        spacing: Theme.spacingLg * s
 
         // header
         RowLayout {
             Layout.fillWidth: true
             spacing: Theme.spacingLg * s
             Text {
-                text: root.muted ? "Volumen · silenciado" : "Volumen"
+                text: "Volumen"
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeTitle * s
@@ -81,48 +80,40 @@ PillSurface {
             }
             Item { Layout.fillWidth: true }
             Text {
-                text: (root.muted ? "M" : "♪")
-                color: Theme.accent
+                text: Math.round(root.vol * 100) + "%"
+                color: Theme.foreground
                 font.family: Theme.fontMono
                 font.pixelSize: Theme.fontSizeBodyLg * s
             }
         }
 
         // volume bar
-        Item {
+        Slider {
             Layout.fillWidth: true
-            Layout.preferredHeight: 12 * s
+            value: root.muted ? 0 : root.clamp01(root.vol)
+            s: root.s
+            enabled: !!root.sink && root.sink.ready
+            activeFocusOnTab: enabled
+            Accessible.role: Accessible.Slider
+            Accessible.name: qsTr("Volumen de salida")
+            Accessible.description: Math.round(root.vol * 100) + "%"
+            Accessible.onIncreaseAction: root.setVolume(root.sink, root.vol + 0.05)
+            Accessible.onDecreaseAction: root.setVolume(root.sink, root.vol - 0.05)
+            Keys.onLeftPressed: root.setVolume(root.sink, root.vol - 0.05)
+            Keys.onRightPressed: root.setVolume(root.sink, root.vol + 0.05)
+            onSliderChanged: v => root.setVolume(root.sink, v)
             Rectangle {
-                id: track
                 anchors.fill: parent
                 radius: height / 2
-                color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
-                border.color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                border.width: Theme.borderHairline
-                Rectangle {
-                    width: parent.width * (root.muted ? 0 : root.clamp01(root.vol))
-                    height: parent.height
-                    radius: parent.radius
-                    color: Theme.accent
-                    Behavior on width { Anim { type: Anim.FastEffects } }
-                }
-            }
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-            onPressed: (m) => { if (root.audio && root.sink.ready) root.audio.volume = root.clamp01(m.x / width) }
-            onPositionChanged: (m) => { if (root.audio && root.sink.ready && pressed) root.audio.volume = root.clamp01(m.x / width) }
+                color: "transparent"
+                border.color: Theme.accent
+                border.width: parent.activeFocus ? Theme.borderHairline : 0
+                Accessible.ignored: true
             }
         }
 
         RowLayout {
             Layout.fillWidth: true
-            Text {
-                text: Math.round(root.vol * 100) + "%"
-                color: Theme.dim
-                font.family: Theme.fontMono
-                font.pixelSize: Theme.fontSizeBodyLg * s
-            }
             Item { Layout.fillWidth: true }
             Rectangle {
   // mute toggle
@@ -140,16 +131,17 @@ PillSurface {
                 MotionArea {
                     id: mt
                     anchors.fill: parent
+                    enabled: !!root.sink && root.sink.ready
                     accessibleName: qsTr("Alternar silencio del audio")
                     hoverWash: false
                     onClicked: { if (root.audio && root.sink.ready) root.audio.muted = !root.audio.muted }
                 }
 
-                Text {
+                AnimatedLabel {
                     scale: mt.motion.visualScale
                     transform: Translate { y: -Motion.labelTravel * mt.motion.presence }
                     anchors.centerIn: parent
-                    text: root.muted ? "Silencio" : "Sonando"
+                    value: root.muted ? qsTr("Silencio") : qsTr("Sonando")
                     color: root.muted ? Theme.accent : Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeSmall * s
@@ -164,55 +156,48 @@ PillSurface {
             Layout.fillWidth: true
             spacing: Theme.spacingLg * s
             Text {
-                text: root.sourceMuted ? "Micrófono · silenciado" : "Micrófono"
+                text: "Micrófono"
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeTitle * s
                 font.weight: Font.DemiBold
             }
             Item { Layout.fillWidth: true }
-            MaterialIcon {
-                iconName: Icons.getMicVolumeIcon(root.sourceVol, root.sourceMuted)
-                color: Theme.accent
+            Text {
+                text: Math.round(root.sourceVol * 100) + "%"
+                color: Theme.foreground
+                font.family: Theme.fontMono
                 font.pixelSize: Theme.fontSizeBodyLg * s
             }
         }
 
         // mic volume bar
-        Item {
+        Slider {
             Layout.fillWidth: true
-            Layout.preferredHeight: 12 * s
+            value: root.sourceMuted ? 0 : root.clamp01(root.sourceVol)
+            s: root.s
+            enabled: !!root.source && root.source.ready
+            activeFocusOnTab: enabled
+            Accessible.role: Accessible.Slider
+            Accessible.name: qsTr("Volumen del micrófono")
+            Accessible.description: Math.round(root.sourceVol * 100) + "%"
+            Accessible.onIncreaseAction: root.setVolume(root.source, root.sourceVol + 0.05)
+            Accessible.onDecreaseAction: root.setVolume(root.source, root.sourceVol - 0.05)
+            Keys.onLeftPressed: root.setVolume(root.source, root.sourceVol - 0.05)
+            Keys.onRightPressed: root.setVolume(root.source, root.sourceVol + 0.05)
+            onSliderChanged: v => root.setVolume(root.source, v)
             Rectangle {
-                id: micTrack
                 anchors.fill: parent
                 radius: height / 2
-                color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
-                border.color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                border.width: Theme.borderHairline
-                Rectangle {
-                    width: parent.width * (root.sourceMuted ? 0 : root.clamp01(root.sourceVol))
-                    height: parent.height
-                    radius: parent.radius
-                    color: Theme.accent
-                    Behavior on width { Anim { type: Anim.FastEffects } }
-                }
-            }
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onPressed: (m) => { if (root.sourceAudio && root.source.ready) root.sourceAudio.volume = root.clamp01(m.x / width) }
-                onPositionChanged: (m) => { if (root.sourceAudio && root.source.ready && pressed) root.sourceAudio.volume = root.clamp01(m.x / width) }
+                color: "transparent"
+                border.color: Theme.accent
+                border.width: parent.activeFocus ? Theme.borderHairline : 0
+                Accessible.ignored: true
             }
         }
 
         RowLayout {
             Layout.fillWidth: true
-            Text {
-                text: Math.round(root.sourceVol * 100) + "%"
-                color: Theme.dim
-                font.family: Theme.fontMono
-                font.pixelSize: Theme.fontSizeBodyLg * s
-            }
             Item { Layout.fillWidth: true }
             Rectangle {
                 Layout.preferredWidth: 64 * s
@@ -228,16 +213,17 @@ PillSurface {
                 MotionArea {
                     id: smt
                     anchors.fill: parent
+                    enabled: !!root.source && root.source.ready
                     accessibleName: qsTr("Alternar silencio del micrófono")
                     hoverWash: false
                     onClicked: { if (root.sourceAudio && root.source.ready) root.sourceAudio.muted = !root.sourceAudio.muted }
                 }
 
-                Text {
+                AnimatedLabel {
                     scale: smt.motion.visualScale
                     transform: Translate { y: -Motion.labelTravel * smt.motion.presence }
                     anchors.centerIn: parent
-                    text: root.sourceMuted ? "Mudo" : "Activo"
+                    value: root.sourceMuted ? qsTr("Mudo") : qsTr("Activo")
                     color: root.sourceMuted ? Theme.accent : Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeSmall * s
@@ -247,76 +233,135 @@ PillSurface {
             }
         }
 
-        Item { Layout.fillWidth: true; Layout.preferredHeight: 1; visible: root.appStreams.length > 0
-            Rectangle { anchors.fill: parent; color: Theme.border; opacity: 0.5 }
+        Rectangle { Layout.fillWidth: true; Layout.preferredHeight: Theme.borderHairline; color: Theme.hair }
+
+        Text {
+            Layout.fillWidth: true
+            text: qsTr("Aplicaciones")
+            color: Theme.foreground
+            font.family: Theme.font
+            font.pixelSize: Theme.fontSizeBodyLg * s
+            font.weight: Font.DemiBold
         }
 
         // ---- streams per-app ----
-        Repeater {
-            model: root.appStreams
-            delegate: StaggerItem {
-                id: streamItem
-                Layout.fillWidth: true
-                staggerIndex: index
-                entered: root.open
-                s: root.s
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
 
-                RowLayout {
+            ColumnLayout {
+                anchors.fill: parent
+                visible: root.appStreams.length === 0
+                spacing: Theme.spacingSm * s
+                Item { Layout.fillHeight: true }
+                MaterialIcon {
+                    Layout.alignment: Qt.AlignHCenter
+                    iconName: Icons.iMusic
+                    color: Theme.iconSecondary
+                    font.pixelSize: 24 * s
+                }
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: qsTr("Sin audio de aplicaciones")
+                    color: Theme.iconSecondary
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSizeBody * s
+                }
+                Item { Layout.fillHeight: true }
+            }
+
+            Flickable {
+                anchors.fill: parent
+                visible: root.appStreams.length > 0
+                contentHeight: streamColumn.implicitHeight
+                boundsBehavior: Flickable.StopAtBounds
+                clip: true
+
+                ColumnLayout {
+                    id: streamColumn
                     width: parent.width
                     spacing: Theme.spacingLg * s
-
-                    // app name (truncado)
-                    Text {
-                        text: modelData.appName
-                        color: Theme.foreground
-                        font.family: Theme.font
-                        font.pixelSize: Theme.fontSizeLabel * s
-                        elide: Text.ElideRight
-                        Layout.preferredWidth: 70 * s
-                    }
-
-                    // stream slider
-                    Slider {
-                        Layout.fillWidth: true
-                        value: modelData.node.audio.volume
-                        height_: 10
-                        s: root.s
-                        onSliderChanged: (v) => {
-                            modelData.node.audio.muted = false
-                            modelData.node.audio.volume = v
-                        }
-                    }
-
-                    // mute button
-                    MaterialIcon {
-                        iconName: modelData.node.audio.muted ? Icons.iVolOff : Icons.iVolMed
-                        color: modelData.node.audio.muted ? Theme.accentStrong : Theme.foreground
-                        font.pixelSize: Theme.fontSizeBody * s
-                        Layout.preferredWidth: 24 * s
-                        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                        MotionArea {
-                            anchors.fill: parent
-                            accessibleName: qsTr("Alternar silencio de %1").arg(modelData.appName)
-                            hoverWash: false
-                            onClicked: modelData.node.audio.muted = !modelData.node.audio.muted
+                    Repeater {
+                        model: root.appStreams
+                        delegate: ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Theme.spacingSm * s
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: Theme.spacingMd * s
+                                Image {
+                                    id: appImage
+                                    Layout.preferredWidth: 18 * s
+                                    Layout.preferredHeight: 18 * s
+                                    source: modelData.icon
+                                    fillMode: Image.PreserveAspectFit
+                                    visible: status === Image.Ready
+                                    sourceSize.width: 36
+                                    sourceSize.height: 36
+                                }
+                                MaterialIcon {
+                                    Layout.preferredWidth: 18 * s
+                                    visible: appImage.status !== Image.Ready
+                                    iconName: Icons.iVolume
+                                    color: Theme.iconSecondary
+                                    font.pixelSize: 18 * s
+                                }
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: modelData.appName
+                                    elide: Text.ElideRight
+                                    color: Theme.foreground
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.fontSizeBody * s
+                                }
+                                Text {
+                                    text: Math.round(modelData.node.audio.volume * 100) + "%"
+                                    color: Theme.iconSecondary
+                                    font.family: Theme.fontMono
+                                    font.pixelSize: Theme.fontSizeLabel * s
+                                }
+                                MaterialIcon {
+                                    Layout.preferredWidth: 28 * s
+                                    Layout.preferredHeight: 28 * s
+                                    iconName: modelData.node.audio.muted ? Icons.iVolOff : Icons.iVolMed
+                                    color: modelData.node.audio.muted ? Theme.accent : Theme.foreground
+                                    font.pixelSize: Theme.fontSizeBody * s
+                                    MotionArea {
+                                        anchors.fill: parent
+                                        accessibleName: qsTr("Alternar silencio de %1").arg(modelData.appName)
+                                        hoverWash: false
+                                        onClicked: modelData.node.audio.muted = !modelData.node.audio.muted
+                                    }
+                                }
+                            }
+                            Slider {
+                                Layout.fillWidth: true
+                                value: modelData.node.audio.muted ? 0 : root.clamp01(modelData.node.audio.volume)
+                                height_: 8
+                                s: root.s
+                                activeFocusOnTab: true
+                                Accessible.role: Accessible.Slider
+                                Accessible.name: qsTr("Volumen de %1").arg(modelData.appName)
+                                Accessible.description: Math.round(modelData.node.audio.volume * 100) + "%"
+                                Accessible.onIncreaseAction: root.setVolume(modelData.node, modelData.node.audio.volume + 0.05)
+                                Accessible.onDecreaseAction: root.setVolume(modelData.node, modelData.node.audio.volume - 0.05)
+                                Keys.onLeftPressed: root.setVolume(modelData.node, modelData.node.audio.volume - 0.05)
+                                Keys.onRightPressed: root.setVolume(modelData.node, modelData.node.audio.volume + 0.05)
+                                onSliderChanged: v => root.setVolume(modelData.node, v)
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: height / 2
+                                    color: "transparent"
+                                    border.color: Theme.accent
+                                    border.width: parent.activeFocus ? Theme.borderHairline : 0
+                                    Accessible.ignored: true
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-
-        // hint cuando no hay streams
-        Text {
-            Layout.fillWidth: true
-            visible: root.appStreams.length === 0
-            text: "No hay apps reproduciendo audio."
-            color: Theme.dim
-            font.family: Theme.font
-            font.pixelSize: Theme.fontSizeLabel * s
-            horizontalAlignment: Text.AlignHCenter
-            opacity: 0.6
-        }
-
-        Item { Layout.fillHeight: true }
     }
 }

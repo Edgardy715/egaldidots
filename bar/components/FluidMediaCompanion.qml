@@ -12,9 +12,12 @@ FluidCompanion {
         ? Math.max(0, Math.min(1, (player.position || 0) / player.length)) : 0
     signal requestMedia()
     onRequestToggle: requestMedia()
-    function syncCava(): void { Cava.setConsumer(cavaConsumerId, Players.live) }
+    function syncCava(): void { Cava.setConsumer(cavaConsumerId, Players.live && active && !expanded && visible) }
     Component.onCompleted: syncCava()
     Component.onDestruction: Cava.setConsumer(cavaConsumerId, false)
+    onActiveChanged: syncCava()
+    onExpandedChanged: syncCava()
+    onVisibleChanged: syncCava()
     Connections {
         target: Players
         function onLiveChanged() { root.syncCava() }

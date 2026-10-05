@@ -42,21 +42,21 @@ Item {
         width: root.textWidth
         spacing: root.metadataSpacing
 
-        Text {
+        AnimatedLabel {
             width: parent.width
-            text: root.title
+            value: root.title
             elide: Text.ElideRight
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: root.titlePixelSize
             font.weight: Font.Medium
         }
-        Text {
+        AnimatedLabel {
             width: parent.width
-            text: root.artist
+            value: root.artist
             visible: root.showArtist
             elide: Text.ElideRight
-            color: Theme.dim
+            color: Theme.iconSecondary
             font.family: Theme.font
             font.pixelSize: root.artistPixelSize
         }

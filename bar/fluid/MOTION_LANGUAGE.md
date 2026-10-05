@@ -94,3 +94,51 @@ y flecha interior conserva la caja 24×24. Secuencia finita al hover/foco/tap,
 retorno desde progreso actual al salir; sin loops ornamentales. Estado nuevo
 revela sus strokes; reduceMotion y ocultar completan inmediatamente. Theme
 sigue siendo dueño del color y el control sigue siendo dueño del hit target.
+
+## Cambios de contenido (2026-10-04)
+
+Limpiar retira contenido antes de mostrar el estado vacío: ContentMotion comparte
+opacidad/escala discreta/traslado corto, sin sombra adicional ni frames en reposo.
+Clipboard inicia la salida sólo tras éxito del proceso; el fallo conserva filas.
+AnimatedLabel desvanece etiquetas discretas y metadatos hacia el último valor,
+conservando los números de sliders/tiempos como Text inmediato. MotionList usa
+transiciones nativas add/remove/displaced y ScriptModel mantiene identidad.
+MotionArea confirma activación con un wash breve, sin transformar el hit target.
+ReduceMotion elimina traslados/escala y resuelve texto/geometría; el color sigue
+siendo una señal suave. Ocultar detiene feedback y swaps pendientes.
+
+## Coreografía compartida revisada (2026-10-05)
+
+La carga asíncrona revela el contenido en Motion.standardSmall con traslado de
+4·s; el morph conserva el control del espacio disponible. PillSurface aplica
+smoothstep a su exposición, sin temporizador adicional. Los cambios sucesivos
+de panel conservan la retirada en curso y toman el último destino; volver al
+actual cancela el intercambio. Movimiento reducido completa ambas transiciones.
+
+StaggerItem comparte un único progreso para opacidad, escala y traslado6·s, con
+inversión suave, entrada Motion.standard y salida Motion.fast. El retraso total
+se limita a Motion.standardSmall; calendario, workspaces y ajustes esperan a
+contentReady. Escalas discretas evitan deformar los rótulos durante la entrada.
+
+El cursor de IslaTextField usa comportamiento nativo inmediato; foco y placeholder
+conservan transiciones accesibles. Las alas del lockscreen dependen de expansión
+central, y su media inferior se retira al presentar la vista de acceso.
+
+## Escritura compartida (2026-10-05)
+
+InputCaret deja posición, altura, scroll y composición en manos de TextInput.
+Durante escritura/navegación queda sólido y pasa suavemente de1.5 a2px; al
+reposar alterna opacidad1↔0.25 con Motion.hover y la cadencia cursorFlashTime
+del sistema. Selección, readOnly, ocultación, pérdida de foco o cierre detienen
+el ciclo; reduceMotion mantiene cursor sólido. No hay retraso horizontal,
+animación de caracteres ni copias del texto para pintar el cursor.
+
+InputPlaceholder comparte la ayuda entre búsqueda, Apariencia, WiFi, Auth y
+lockscreen. Se retira inmediatamente al escribir/componer y vuelve en Motion.fast
+al vaciar. El rótulo flotante conserva font.pixelSize y transforma escala/posición
+para evitar reflujo tipográfico. Lockscreen usa puntos con entrada140ms base,
+sin giro ni rebote; los rangos de borrado se acotan al modelo y se conserva
+únicamente identidad numérica.
+
+Referencia API: https://doc.qt.io/qt-6.10/qml-qtquick-textinput.html#cursorDelegate-prop
+Qt posiciona el delegate según cursorRectangle; no asignar x/y desde otro motor.

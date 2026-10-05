@@ -34,12 +34,19 @@ Rectangle {
 
     visible: opacity > 0.01
     opacity: shown ? 1 : 0
-    scale: shown ? 1.0 : 0.92
+    scale: Flags.reduceMotion ? 1 : shown ? 1.0 : 0.92
     Behavior on opacity {
         Anim { type: Anim.FastEffects }
     }
     Behavior on scale {
         Anim { type: Anim.FastEffects }
+    }
+
+    InnerGlow {
+        anchors.fill: parent
+        focusX: 0.42 + overlay.value * 0.40
+        focusY: 0.78
+        opacity: 0.65
     }
 
     Row {

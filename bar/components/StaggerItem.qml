@@ -1,10 +1,9 @@
 import QtQuick
 import "../Singletons"
-import "../"
 
 /**
  * Isla · StaggerItem. Envoltorio de entrada escalonada (stagger): el contenido
- * aparece con opacity 0→1 + scale 0.96→1 + slide 8px, con retraso proporcional
+ * aparece con opacity 0→1 + scale 0.985→1 + slide 6px, con retraso proporcional
  * a `staggerIndex`. Para animar filas/items de una surface que entra con morph.
  *
  * Tiene una capa de contenido (`content`) que rellena el item: los hijos se
@@ -25,14 +24,12 @@ Item {
     property int staggerIndex: 0
     property bool entered: true
     property real s: 1
-    property real scaleFrom: 0.96
+    property real scaleFrom: 0.985
     // al cambiar, re-dispara la animación de entrada (p.ej. al navegar de mes)
     property var restartKey: null
-    onRestartKeyChanged: {
-        if (entered) {
-            root._revealed = false
-            revealTimer.restart()
-        }
+    onRestartKeyChanged: if (entered && !Flags.reduceMotion) {
+        root._revealed = false
+        revealTimer.restart()
     }
 
     // como Item plano, agrega el tamaño del contenido envuelto para que el
@@ -55,27 +52,45 @@ Item {
     }
 
     property bool _revealed: false
-    onEnteredChanged: if (!entered) root._revealed = false
+    property real progress: _revealed ? 1 : 0
+    function updateReveal() {
+        revealTimer.stop()
+        if (!entered) root._revealed = false
+        else if (Flags.reduceMotion) root._revealed = true
+        else revealTimer.start()
+    }
+    onEnteredChanged: updateReveal()
+    Component.onCompleted: updateReveal()
+    Connections {
+        target: Flags
+        function onReduceMotionChanged() {
+            root.updateReveal()
+            if (Flags.reduceMotion) entryAnimation.complete()
+        }
+    }
     Timer {
         id: revealTimer
-        interval: Motion.stagger(root.staggerIndex)
-        running: root.entered
-        repeat: false
-        onTriggered: root._revealed = true
+        // A compact wave, even in the six-row calendar.
+        interval: Math.min(Motion.stagger(root.staggerIndex), Motion.standardSmall)
+        onTriggered: root._revealed = root.entered
     }
 
-    opacity: root._revealed ? 1 : 0
+    opacity: root.progress
     visible: opacity > 0.01
-    transformOrigin: Item.Center
-    scale: root._revealed ? 1 : root.scaleFrom
+    enabled: root.entered && root._revealed
+    transformOrigin: Item.Top
+    scale: Flags.reduceMotion ? 1 : root.scaleFrom + (1 - root.scaleFrom) * root.progress
     transform: Translate {
-        id: entryT
-        y: root._revealed ? 0 : 8 * root.s
-        Behavior on y { Anim { type: Anim.EmphasizedIn } }
+        y: Flags.reduceMotion ? 0 : 6 * root.s * (1 - root.progress)
     }
-
-    Behavior on opacity { Anim { type: Anim.EmphasizedIn } }
-    Behavior on scale { Anim { type: Anim.EmphasizedIn } }
+    Behavior on progress {
+        enabled: !Flags.reduceMotion
+        SmoothedAnimation {
+            id: entryAnimation
+            duration: root._revealed ? Motion.standard : Motion.fast
+            velocity: -1
+        }
+    }
 
     // capa de contenido: rellena el item; los hijos van aquí (default property)
     default property alias content: contentItem.data

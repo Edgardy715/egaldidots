@@ -86,8 +86,18 @@ Item {
         materialPulseAnim.restart()
     }
 
-    onSurfaceChanged: awakenMaterial()
-    onHoveredChanged: if (hovered && !surfaceOpen) awakenMaterial()
+    onSurfaceChanged: if (surfaceOpen) awakenMaterial()
+
+    Connections {
+        target: Flags
+        function onReduceMotionChanged() {
+            if (!Flags.reduceMotion) return
+            materialSweepAnim.stop()
+            materialPulseAnim.stop()
+            pill.materialSweep = -0.55
+            pill.materialPulse = 0
+        }
+    }
 
     SequentialAnimation {
         id: materialSweepAnim
@@ -508,6 +518,7 @@ Item {
         suspended: pill.surfaceNotifSuspended
         reveal: pill.launcherReturning ? 0 : pill.surfaceReveal
         onRequestClose: pill.requestClose()
+        onRequestPage: (name) => pill.requestSurface(name)
     }
     }
 
@@ -624,10 +635,12 @@ Item {
 
     // ---- Battery status (UPower) ----
     function showBatteryOSD() {
-        if (typeof UPower === "undefined") return
         var d = UPower.displayDevice
-        if (!d || !d.isPresent) return
-        restStatus.showBattery(d.percent, d.status)
+        if (!d || !d.ready || !d.isLaptopBattery || !d.isPresent) return
+        var charging = d.state === UPowerDeviceState.Charging
+            || d.state === UPowerDeviceState.FullyCharged && !UPower.onBattery
+        restStatus.showBattery(Math.round(d.percentage * 100), charging ? "charging"
+            : d.state === UPowerDeviceState.PendingCharge ? "paused" : "discharging")
     }
     // Timer que recuerda la batería baja cada 60s mientras esté crítica y descargando
     Timer {
@@ -635,17 +648,17 @@ Item {
         interval: 60000
         repeat: true
         running: {
-            if (typeof UPower === "undefined" || !UPower.displayDevice) return false
             var d = UPower.displayDevice
-            return d && d.isPresent && d.percent <= 15 && d.status !== "charging"
+            return d && d.ready && d.isLaptopBattery && d.isPresent
+                && UPower.onBattery && d.percentage <= 0.15
         }
         onTriggered: pill.showBatteryOSD()
     }
     Connections {
         target: UPower.displayDevice
         ignoreUnknownSignals: true
-        function onStatusChanged() { pill.showBatteryOSD() }
-        function onPercentChanged() { pill.showBatteryOSD() }
+        function onStateChanged() { pill.showBatteryOSD() }
+        function onPercentageChanged() { pill.showBatteryOSD() }
     }
 
     // Pipewire: dispara OSD cuando wpctl/pactl/etc cambian el volume o mute

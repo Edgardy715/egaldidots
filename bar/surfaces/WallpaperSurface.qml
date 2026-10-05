@@ -491,7 +491,6 @@ PillSurface {
                     opacity: 0
                     function revealReady() {
                         if (status !== Image.Ready || heroReveal.running || opacity === 1) return
-                        root.readyPreview = source
                         heroReveal.restart()
                     }
                     onSourceChanged: {
@@ -508,6 +507,7 @@ PillSurface {
                         from: 0; to: 1
                         duration: Flags.reduceMotion ? 0 : Motion.standard
                         easing.type: Easing.InOutQuad
+                        onFinished: if (heroImage.status === Image.Ready) root.readyPreview = heroImage.source
                     }
                 }
                 Rectangle {

@@ -25,7 +25,7 @@ Item {
         let result = "<span style='color:" + ("" + Theme.foreground)
             + ";font-weight:500'>" + escapeText(title || "—") + "</span>"
         if (artist.length > 0)
-            result += "<span style='color:" + ("" + Theme.dim) + "'>   " + escapeText(artist) + "</span>"
+            result += "<span style='color:" + ("" + Theme.iconSecondary) + "'>   " + escapeText(artist) + "</span>"
         return result
     }
     readonly property bool overflow: marqueeText.implicitWidth > width
@@ -43,7 +43,7 @@ Item {
         property bool armed: false
         readonly property real separator: 40 * root.s
 
-        Text {
+        AnimatedLabel {
             id: marqueeText
             anchors.verticalCenter: parent.verticalCenter
             textFormat: Text.RichText
@@ -52,10 +52,11 @@ Item {
             font.pixelSize: 12.5 * root.s
             font.weight: Font.Medium
             font.letterSpacing: 0.05 * root.s
-            text: root.richText
-            x: root.overflow ? marquee.scrollX : (root.width - implicitWidth) / 2
+            value: root.richText
+            onDisplayedChanged: root.reset()
+            x: root.overflow ? (Flags.reduceMotion ? 0 : marquee.scrollX) : (root.width - implicitWidth) / 2
         }
-        Text {
+        AnimatedLabel {
             anchors.verticalCenter: parent.verticalCenter
             textFormat: Text.RichText
             color: Theme.foreground
@@ -63,13 +64,13 @@ Item {
             font.pixelSize: 12.5 * root.s
             font.weight: Font.Medium
             font.letterSpacing: 0.05 * root.s
-            text: root.richText
+            value: root.richText
             x: marqueeText.x + marqueeText.implicitWidth + marquee.separator
-            visible: root.overflow && marquee.armed
+            visible: root.overflow && !Flags.reduceMotion && marquee.armed
         }
         Timer {
             interval: 700
-            running: root.overflow && root.playing && root.visible
+            running: root.overflow && root.playing && root.visible && !Flags.reduceMotion
             onTriggered: marquee.armed = true
         }
         NumberAnimation on scrollX {
@@ -77,10 +78,9 @@ Item {
             to: -(marqueeText.implicitWidth + marquee.separator)
             duration: Math.max(2200, Math.round((marqueeText.implicitWidth + marquee.separator) / 0.045))
             loops: Animation.Infinite
-            running: root.overflow && marquee.armed && root.playing && root.visible
+            running: root.overflow && marquee.armed && root.playing && root.visible && !Flags.reduceMotion
             easing.type: Easing.Linear
         }
     }
 
-    onRichTextChanged: reset()
 }

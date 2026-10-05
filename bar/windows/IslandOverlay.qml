@@ -12,6 +12,7 @@ PanelWindow {
     required property var modelData
     readonly property real s: modelData ? (modelData.height / 1080) * Flags.uiScale : 1
     readonly property real topGap: 8 * Flags.topGap * s
+    readonly property real lateralAvailable: Math.max(0, (width - Math.max(pill.width, pill.targetW)) / 2 - 48 * s)
     readonly property string surface: router.openMon === modelData.name ? router.openSurface : ""
     readonly property bool surfaceOpen: surface.length > 0
     readonly property bool overviewOpen: surface === "overview"
@@ -81,7 +82,7 @@ PanelWindow {
     // Spotlight necesita poseer el teclado de forma determinista. El modo
     // OnDemand (usado por `focusable`) depende de la ventana previa y a
     // veces no recibe ni texto ni Escape en Hyprland.
-    WlrLayershell.keyboardFocus: (overlay.launcherOpen && !overlay.launcherClosing) || overlay.wallpaperOpen || overlay.overviewOpen || overlay.surface === "session" || overlay.surface === "auth"
+    WlrLayershell.keyboardFocus: (overlay.launcherOpen && !overlay.launcherClosing) || overlay.wallpaperOpen || overlay.overviewOpen || overlay.surface === "clipboard" || overlay.surface === "session" || overlay.surface === "auth"
         ? WlrKeyboardFocus.Exclusive
         : overlay.kbFocusWanted ? WlrKeyboardFocus.OnDemand
         : WlrKeyboardFocus.None
@@ -114,6 +115,16 @@ PanelWindow {
         onYChanged: changed()
         onWidthChanged: changed()
         onHeightChanged: changed()
+        Region {
+            x: workspaceRail.x; y: workspaceRail.y
+            width: workspaceRail.visible ? workspaceRail.width : 0
+            height: workspaceRail.visible ? workspaceRail.height : 0
+        }
+        Region {
+            x: systemStatus.x; y: systemStatus.y
+            width: systemStatus.visible ? systemStatus.width : 0
+            height: systemStatus.visible ? systemStatus.height : 0
+        }
     }
     Region {
         id: fullRegion
@@ -197,7 +208,40 @@ PanelWindow {
         }
 
         HoverHandler {
+            parent: pill
             onHoveredChanged: pill.hovered = hovered
+        }
+
+        TopWorkspaceRail {
+            id: workspaceRail
+            z: 1
+            anchors.left: parent.left
+            anchors.leftMargin: 26 * overlay.s
+            anchors.top: parent.top
+            anchors.topMargin: overlay.topGap
+            s: overlay.s
+            screenName: overlay.modelData.name
+            availableWidth: overlay.lateralAvailable
+            opacity: overlay.surfaceOpen || overlay.monFullscreen ? 0 : 1
+            visible: opacity > 0.01 && fits
+            Behavior on opacity { NumberAnimation { duration: Motion.fast } }
+            onRequestWorkspaces: router.toggleSurface(overlay.modelData.name, "workspaces")
+        }
+
+        TopSystemStatus {
+            id: systemStatus
+            z: 1
+            anchors.right: parent.right
+            anchors.rightMargin: 26 * overlay.s
+            anchors.top: parent.top
+            anchors.topMargin: overlay.topGap
+            s: overlay.s
+            screenName: overlay.modelData.name
+            availableWidth: overlay.lateralAvailable
+            opacity: overlay.surfaceOpen || overlay.monFullscreen ? 0 : 1
+            visible: opacity > 0.01 && availableWidth >= 142 * s
+            Behavior on opacity { NumberAnimation { duration: Motion.fast } }
+            onRequestSurface: name => router.toggleSurface(overlay.modelData.name, name)
         }
 
         // ---- navegación de teclado del overview ----

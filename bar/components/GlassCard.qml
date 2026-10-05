@@ -27,6 +27,7 @@ Item {
     property color borderColor: Theme.border
     property real borderWidth: 1
     property color washColor: Qt.alpha(Theme.foreground, Theme.alphaFaint)
+    property real glow: 0
 
     signal clicked()
 
@@ -61,6 +62,12 @@ Item {
         }
         border.width: root.borderWidth
         border.color: root.borderColor
+
+        InnerGlow {
+            anchors.fill: parent
+            opacity: root.glow
+            Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+        }
 
         // catch-light superior
         Rectangle {

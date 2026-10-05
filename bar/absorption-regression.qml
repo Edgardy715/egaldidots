@@ -14,7 +14,7 @@ ShellRoot {
         interval: 20; running: true
         onTriggered: {
             Config.update({ appearance: { reduceMotion: false } })
-            for (const fps of [30, 60, 144]) {
+            for (const fps of [30, 60, 144, 240]) {
                 for (const width of [42, 76, 218, 640]) {
                     drop.phase = "companion"; drop.concealed = false
                     drop.xPos = body.x + body.width + 12
@@ -39,7 +39,7 @@ ShellRoot {
                     check(drop.captureExtra < 0.1, "cap returns to rest")
                 }
             }
-            console.log("PASS: continuous capture at 30/60/144 Hz, compact/playing/hover/card, coverage and return")
+            console.log("PASS: continuous capture at 30/60/144/240 Hz, compact/playing/hover/card, coverage and return")
             Qt.quit()
         }
     }

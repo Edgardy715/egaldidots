@@ -33,22 +33,53 @@ PillSurface {
 
     Timer { interval: 1000; repeat: true; running: true; onTriggered: root.today = new Date() }
 
-    // ---- Weather (wttr.in, robusto: fallback offline + iconos Material) ----
+    // Datos de wttr.in para la vista conjunta de calendario y clima.
     property string weatherTemp: ""
     property string weatherDesc: ""
     property string weatherIcon: "cloud"
     property bool weatherLoading: false
+    property string weatherFeels: ""
+    property string weatherHumidity: ""
+    property string weatherWind: ""
+    property var forecast: []
+    property int weatherView: -1
+    property int weatherTarget: -1
+    property real weatherHeroOpacity: 1
+    readonly property var selectedForecast: weatherView >= 0 && weatherView < forecast.length ? forecast[weatherView] : null
+
+    function selectForecast(index) {
+        if (index === weatherTarget) return
+        weatherTarget = index
+        if (Flags.reduceMotion) { weatherView = index; weatherHeroOpacity = 1; return }
+        weatherHeroOpacity = 0
+        weatherSwap.restart()
+    }
+    Timer {
+        id: weatherSwap
+        interval: Motion.fast
+        onTriggered: { root.weatherView = root.weatherTarget; root.weatherHeroOpacity = 1 }
+    }
+    onClosingChanged: if (closing) { weatherSwap.stop(); weatherHeroOpacity = 1 }
 
     function mapWeather(code: int, isNight: bool): string {
-        if (code >= 200 && code < 300) return "thunderstorm"
-        if (code >= 300 && code < 400) return "rainy_light"
-        if (code >= 500 && code < 600) return "water_drop"
-        if (code >= 600 && code < 700) return "ac_unit"
-        if (code >= 700 && code < 800) return "foggy"
-        if (code === 800) return isNight ? "dark_mode" : "sunny"
-        if (code > 800 && code < 803) return isNight ? "partly_cloudy_night" : "partly_cloudy_day"
-        if (code === 803 || code === 804) return "cloud"
-        return "thermostat"
+        // wttr.in entrega códigos WWO, no los códigos OpenWeather 2xx/8xx.
+        if ([200, 386, 389, 392, 395].includes(code)) return "thunderstorm"
+        if ([179, 182, 185, 227, 230, 281, 284, 311, 314, 317, 320, 323, 326, 329, 332, 335, 338, 350, 362, 365, 368, 371, 374, 377].includes(code)) return "ac_unit"
+        if ([176, 263, 266, 293, 296, 299, 302, 305, 308, 353, 356, 359].includes(code)) return "rainy"
+        if ([143, 248, 260].includes(code)) return "foggy"
+        if (code === 113) return isNight ? "dark_mode" : "sunny"
+        if (code === 116) return isNight ? "partly_cloudy_night" : "partly_cloudy_day"
+        return "cloud"
+    }
+
+    function weatherLabel(code: int): string {
+        if (code === 113) return qsTr("Despejado")
+        if (code === 116) return qsTr("Parcialmente nublado")
+        if ([119, 122].includes(code)) return qsTr("Nublado")
+        if ([143, 248, 260].includes(code)) return qsTr("Niebla")
+        if (mapWeather(code, false) === "thunderstorm") return qsTr("Tormenta")
+        if (mapWeather(code, false) === "ac_unit") return qsTr("Nieve")
+        return qsTr("Lluvia")
     }
 
     Component.onCompleted: {
@@ -68,7 +99,7 @@ PillSurface {
     Process {
         id: getWeather
         running: false
-        command: ["bash", "-c", "curl -sf --connect-timeout 3 --max-time 5 'wttr.in/?format=j1' 2>/dev/null || echo '{}'"]
+        command: ["curl", "-fsS", "--connect-timeout", "3", "--max-time", "8", "https://wttr.in/?format=j1"]
         stdout: StdioCollector {
             id: weatherCol
             onStreamFinished: {
@@ -78,10 +109,20 @@ PillSurface {
                     var cc = d.current_condition && d.current_condition[0]
                     if (cc && cc.temp_C !== undefined) {
                         root.weatherTemp = cc.temp_C + "°"
-                        root.weatherDesc = (cc.weatherDesc && cc.weatherDesc[0] && cc.weatherDesc[0].value) || ""
                         var code = parseInt(cc.weatherCode) || 0
                         var h = (new Date()).getHours()
                         root.weatherIcon = root.mapWeather(code, h < 6 || h >= 20)
+                        root.weatherDesc = root.weatherLabel(code)
+                        root.weatherFeels = cc.FeelsLikeC + "°"
+                        root.weatherHumidity = cc.humidity + "%"
+                        root.weatherWind = cc.windspeedKmph + " km/h"
+                        root.forecast = (d.weather || []).slice(0, 3).map(day => ({
+                            date: day.date,
+                            high: day.maxtempC + "°",
+                            low: day.mintempC + "°",
+                            icon: root.mapWeather(parseInt((day.hourly || [])[4]?.weatherCode || (day.hourly || [])[0]?.weatherCode || "0") || 0, false),
+                            label: root.weatherLabel(parseInt((day.hourly || [])[4]?.weatherCode || (day.hourly || [])[0]?.weatherCode || "0") || 0)
+                        }))
                     }
                 } catch (e) { }
             }
@@ -120,8 +161,13 @@ PillSurface {
         return Math.max(10, Math.min(wAvail, hAvail))
     }
 
-    ColumnLayout {
+    RowLayout {
         anchors.fill: parent
+        spacing: Theme.spacingXl * s
+
+        ColumnLayout {
+        Layout.preferredWidth: 322 * s
+        Layout.fillHeight: true
         spacing: Theme.spacingXl * s
 
         // ═══════════ HEADER: fecha grande + reloj + clima ═══════════
@@ -155,7 +201,7 @@ PillSurface {
 
             Item { Layout.fillWidth: true }
 
-            // bloque derecho: reloj + clima
+            // Hora junto al calendario; el clima ocupa la columna contigua.
             ColumnLayout {
                 spacing: Theme.spacingSm * s
                 Layout.alignment: Qt.AlignVCenter
@@ -172,49 +218,6 @@ PillSurface {
                     font.weight: Font.DemiBold
                 }
 
-                // clima: icono + temp
-                RowLayout {
-                    Layout.alignment: Qt.AlignRight
-                    spacing: Theme.spacingMd * s
-
-                    Rectangle {
-                        Layout.preferredWidth: 28 * s
-                        Layout.preferredHeight: 28 * s
-                        radius: 9 * s
-                        color: Qt.alpha(Theme.accent, Theme.alphaGlow)
-                        border.width: Theme.borderHairline
-                        border.color: Qt.alpha(Theme.accent, Theme.alphaSoft)
-
-                        MaterialIcon {
-                            anchors.centerIn: parent
-                            iconName: root.weatherIcon
-                            color: Theme.accent
-                            font.pixelSize: Theme.fontSizeBodyLg * s
-                        }
-                    }
-                    Text {
-                        text: root.weatherTemp || (root.weatherLoading ? "—" : "")
-                        color: Theme.foreground
-                        font.family: Theme.fontDisplay
-                        font.pixelSize: Theme.fontSizeBodyLg * s
-                        font.weight: Font.Medium
-                    }
-                }
-
-                // desc del clima (elide)
-                Text {
-                    Layout.alignment: Qt.AlignRight
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: 0
-                    Layout.maximumWidth: 132 * s
-                    text: root.weatherDesc
-                    color: Theme.dim
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSizeLabel * s
-                    elide: Text.ElideRight
-                    horizontalAlignment: Text.AlignRight
-                    visible: root.weatherDesc.length > 0
-                }
             }
         }
 
@@ -312,7 +315,7 @@ PillSurface {
                     Layout.preferredWidth: root.cellSize
                     horizontalAlignment: Text.AlignHCenter
                     text: modelData
-                    color: (index === 0 || index === 6) ? Qt.alpha(Theme.accent, Theme.alphaIconSec) : Theme.dim
+                    color: (index === 0 || index === 6) ? Qt.alpha(Theme.accent, Theme.alphaIconSec) : Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeLabel * s
                     font.weight: Font.DemiBold
@@ -349,11 +352,11 @@ PillSurface {
                         readonly property bool selected: inMonth && dayNum === root.selectedDay
                         readonly property bool weekend: (index % 7) === 0 || (index % 7) === 6
 
-                        entered: root.open
+                        entered: root.contentReady
                         staggerIndex: Math.floor(index / 7)
                         s: root.s
                         restartKey: root.monthEpoch
-                        scaleFrom: 0.88
+                        scaleFrom: 0.97
 
                         width: root.cellSize
                         height: root.cellSize
@@ -464,6 +467,133 @@ PillSurface {
                     }
                 }
             }
+        }
+        }
+
+        Rectangle {
+            Layout.preferredWidth: Theme.borderHairline
+            Layout.fillHeight: true
+            color: Qt.alpha(Theme.foreground, Theme.alphaHair)
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: Theme.spacingMd * s
+
+            Text {
+                text: root.selectedForecast ? root.locale.dayName(new Date(root.selectedForecast.date + "T12:00:00").getDay()) : qsTr("Ahora mismo")
+                color: Theme.iconSecondary
+                font.family: Theme.font
+                font.pixelSize: Theme.fontSizeCaption * s
+                font.weight: Font.DemiBold
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 132 * s
+                opacity: root.weatherHeroOpacity
+                Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
+                MaterialIcon {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    iconName: root.selectedForecast ? root.selectedForecast.icon : root.weatherIcon
+                    color: Theme.accent
+                    font.pixelSize: 72 * s
+                    opacity: root.weatherTemp.length ? 1 : 0.4
+                    Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+                }
+                Text {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.selectedForecast ? root.selectedForecast.high : (root.weatherTemp || "—°")
+                    color: Theme.foreground
+                    font.family: Theme.fontDisplay
+                    font.pixelSize: 60 * s
+                    font.weight: Font.Light
+                    Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+                }
+            }
+
+            Text {
+                Layout.fillWidth: true
+                text: root.selectedForecast ? root.selectedForecast.label : (root.weatherDesc || (root.weatherLoading ? qsTr("Consultando clima…") : qsTr("Clima no disponible")))
+                color: Theme.foreground
+                font.family: Theme.font
+                font.pixelSize: Theme.fontSizeTitle * s
+                font.weight: Font.Medium
+                elide: Text.ElideRight
+            }
+
+            Text {
+                text: root.selectedForecast ? qsTr("Mínima %1").arg(root.selectedForecast.low) : (root.weatherFeels.length ? qsTr("Sensación térmica %1").arg(root.weatherFeels) : qsTr("Datos del tiempo actual"))
+                color: Theme.iconSecondary
+                font.family: Theme.font
+                font.pixelSize: Theme.fontSizeCaption * s
+            }
+
+            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: Theme.borderHairline; color: Theme.border }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Theme.spacingMd * s
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    Text { text: qsTr("Humedad"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * s }
+                    Text { text: root.weatherHumidity || "—"; color: Theme.foreground; font.family: Theme.fontDisplay; font.pixelSize: Theme.fontSizeBodyLg * s }
+                }
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    Text { text: qsTr("Viento"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * s }
+                    Text { text: root.weatherWind || "—"; color: Theme.foreground; font.family: Theme.fontDisplay; font.pixelSize: Theme.fontSizeBodyLg * s }
+                }
+            }
+
+            Text {
+                text: qsTr("Próximos días")
+                color: Theme.iconSecondary
+                font.family: Theme.font
+                font.pixelSize: Theme.fontSizeCaption * s
+                font.weight: Font.DemiBold
+            }
+
+            Repeater {
+                model: root.forecast
+                delegate: Item {
+                    required property var modelData
+                    required property int index
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 28 * s
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: Theme.radiusSm * s
+                        color: root.weatherView === index ? Qt.alpha(Theme.accent, Theme.alphaGlow) : "transparent"
+                        Behavior on color { ColorAnimation { duration: Motion.fast } }
+                    }
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 5 * s
+                        anchors.rightMargin: 5 * s
+                        Text {
+                            Layout.preferredWidth: 58 * s
+                            text: root.locale.dayName(new Date(modelData.date + "T12:00:00").getDay()).slice(0, 3)
+                            color: Theme.foreground
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSizeBody * s
+                        }
+                        MaterialIcon { iconName: modelData.icon; color: Theme.accent; font.pixelSize: Theme.fontSizeBodyLg * s }
+                        Item { Layout.fillWidth: true }
+                        Text { text: modelData.high + "  " + modelData.low; color: Theme.foreground; font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeCaption * s }
+                    }
+                    MotionArea {
+                        anchors.fill: parent
+                        accessibleName: qsTr("Ver pronóstico de %1").arg(modelData.date)
+                        hoverWash: false
+                        onClicked: root.selectForecast(root.weatherView === index ? -1 : index)
+                    }
+                }
+            }
+            Item { Layout.fillHeight: true }
         }
     }
 }

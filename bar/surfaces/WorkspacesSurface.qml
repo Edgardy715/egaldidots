@@ -41,6 +41,9 @@ PillSurface {
     Item {
         id: header
 
+        property int markerId: Math.max(1, Math.min(root.count, root.activeId))
+        property bool movingForward: true
+
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
@@ -72,6 +75,34 @@ PillSurface {
             height: Theme.borderHairline
             color: Qt.alpha(Theme.foreground, Theme.alphaHair)
         }
+
+        Rectangle {
+            id: activeTrack
+            property real slotWidth: header.width / root.count
+            property real targetLeft: (header.markerId - 1) * slotWidth
+            property real targetRight: header.markerId * slotWidth
+            property real leftEdge: targetLeft
+            property real rightEdge: targetRight
+            x: leftEdge
+            anchors.bottom: parent.bottom
+            width: Math.max(0, rightEdge - leftEdge)
+            height: 3 * root.s
+            radius: height / 2
+            color: Theme.accent
+            Behavior on leftEdge {
+                enabled: !Flags.reduceMotion && root.open
+                SmoothedAnimation { duration: header.movingForward ? 400 : 300; velocity: -1 }
+            }
+            Behavior on rightEdge {
+                enabled: !Flags.reduceMotion && root.open
+                SmoothedAnimation { duration: header.movingForward ? 300 : 400; velocity: -1 }
+            }
+        }
+    }
+
+    onActiveIdChanged: {
+        header.movingForward = activeId > header.markerId
+        header.markerId = Math.max(1, Math.min(count, activeId))
     }
 
     Grid {
@@ -97,24 +128,12 @@ PillSurface {
                 readonly property bool occupied: info.occupied
                 readonly property int windowCount: info.windows
 
-                entered: root.open
+                entered: root.contentReady
                 staggerIndex: index
                 s: root.s
                 width: (atlas.width - (atlas.columns - 1) * atlas.spacing) / atlas.columns
                 height: (atlas.height - atlas.spacing) / 2
-                scaleFrom: 0.92
-
-                Rectangle {
-                    id: glow
-
-                    anchors.fill: parent
-                    anchors.margins: -2 * root.s
-                    radius: card.radius + 2 * root.s
-                    color: Qt.alpha(Theme.accent, 0.10)
-                    opacity: workspace.active ? 0.8 : 0
-
-                    Behavior on opacity { Anim { type: Anim.DefaultEffects } }
-                }
+                scaleFrom: 0.98
 
                 Rectangle {
                     id: card
@@ -127,20 +146,26 @@ PillSurface {
                         GradientStop {
                             position: 0
                             color: workspace.active
-                                ? Qt.alpha(Theme.accent, 0.34)
+                                ? Qt.alpha(Theme.accent, 0.14)
                                 : Qt.alpha(Theme.foreground, workspace.occupied ? 0.095 : 0.035)
                         }
                         GradientStop {
                             position: 1
                             color: workspace.active
-                                ? Qt.alpha(Theme.accent, 0.17)
+                                ? Qt.alpha(Theme.accent, 0.06)
                                 : Qt.alpha(Theme.background, 0.10)
                         }
                     }
                     border.width: Theme.borderHairline
                     border.color: workspace.active
-                        ? Qt.alpha(Theme.accent, 0.90)
+                        ? Qt.alpha(Theme.accent, 0.56)
                         : Qt.alpha(Theme.foreground, mouse.containsMouse ? Theme.alphaSoft : Theme.alphaHair)
+
+                    InnerGlow {
+                        anchors.fill: parent
+                        opacity: workspace.active ? 0.9 : 0
+                        Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+                    }
 
                     Rectangle {
                         anchors.top: parent.top

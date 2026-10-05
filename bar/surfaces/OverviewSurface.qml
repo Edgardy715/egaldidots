@@ -1,4 +1,5 @@
 import QtQuick
+import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -188,7 +189,7 @@ PillSurface {
                     text: qsTr("Espacios %1–%2").arg(root.groupBase).arg(root.groupBase + root.groupSize - 1)
                     font.family: Theme.font
                     font.pixelSize: 11 * root.s
-                    color: Theme.dim
+                    color: Theme.iconSecondary
                 }
             }
             Row {
@@ -226,6 +227,17 @@ PillSurface {
                     readonly property var windows: WinMap.windowsOn(wsId, root.monId)
                     width: root.tileW
                     height: root.tileH + 36 * root.s
+                    RectangularGlow {
+                        anchors.fill: desktop
+                        anchors.margins: -2 * root.s
+                        cornerRadius: desktop.radius + 2 * root.s
+                        glowRadius: 8 * root.s
+                        spread: 0.08
+                        color: Theme.accent
+                        opacity: tile.selected ? 0.24 : 0
+                        visible: root.open && root.visible && opacity > 0.01
+                        Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+                    }
                     ClippingRectangle {
                         id: desktop
                         objectName: "workspacePreview"
@@ -280,6 +292,7 @@ PillSurface {
                         }
                         MotionArea {
                             anchors.fill: parent
+                            accessibleName: qsTr("Ir al escritorio %1").arg(tile.wsId)
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onPositionChanged: { root._mouseMove(); root._hoverSelect(tile.wsId) }
@@ -293,8 +306,8 @@ PillSurface {
                         anchors.topMargin: 11 * root.s
                         text: tile.windows.length ? String(tile.windows.length) : qsTr("Vacío")
                         font.family: Theme.font
-                        font.pixelSize: 10 * root.s
-                        color: Theme.dim
+                        font.pixelSize: 11 * root.s
+                        color: Theme.iconSecondary
                     }
                     Row {
                         anchors.top: desktop.bottom
@@ -313,7 +326,7 @@ PillSurface {
                             font.family: Theme.font
                             font.pixelSize: 12 * root.s
                             font.weight: tile.selected ? Font.DemiBold : Font.Normal
-                            color: tile.selected ? Theme.foreground : Theme.dim
+                            color: tile.selected ? Theme.foreground : Theme.iconSecondary
                         }
                     }
                 }
@@ -326,7 +339,7 @@ PillSurface {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("← →  elegir     ↵  abrir     esc  cerrar")
-                color: Theme.dim
+                color: Theme.iconSecondary
                 font.family: Theme.font
                 font.pixelSize: 11 * root.s
             }

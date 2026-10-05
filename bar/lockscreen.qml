@@ -23,6 +23,7 @@ ShellRoot {
     property string pendingSecret: ""
     property string promptText: "Contraseña"
     property string errorText: ""
+    property var weather: ({})
 
     function authenticate(secret: string): void {
         if (root.preview || !sessionLock.secure || root.authenticated || !secret || root.busy) return
@@ -74,6 +75,29 @@ ShellRoot {
                 root.palette = ({})
             }
         }
+    }
+
+    // One weather request for all lock surfaces, including multi-monitor sessions.
+    Process {
+        id: weatherRequest
+        command: ["curl", "-fsS", "--connect-timeout", "3", "--max-time", "8", "https://wttr.in/?format=j1"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const current = JSON.parse(text || "{}").current_condition?.[0]
+                    if (current?.temp_C !== undefined)
+                        root.weather = ({temp: current.temp_C + "°", feels: current.FeelsLikeC + "°", humidity: current.humidity + "%", code: Number(current.weatherCode) || 0})
+                    else root.weather = ({})
+                } catch (e) { root.weather = ({}) }
+            }
+        }
+    }
+    Timer {
+        interval: 15 * 60 * 1000
+        repeat: true
+        running: true
+        triggeredOnStart: true
+        onTriggered: if (!weatherRequest.running) weatherRequest.running = true
     }
 
     PamContext {
@@ -148,12 +172,14 @@ ShellRoot {
                     username: root.username
                     wallpaper: root.wallpaper
                     palette: root.palette
+                    weather: root.weather
                     authenticated: root.authenticated
                     busy: root.busy
                     secured: sessionLock.secure
                     responseVisible: pam.responseVisible
                     promptText: root.promptText
                     errorText: root.errorText
+                    onEntryActivated: root.errorText = ""
                     onUnlockRequested: secret => root.authenticate(secret)
                     onPowerRequested: action => root.power(action)
                 }
@@ -178,6 +204,7 @@ ShellRoot {
                     username: root.username
                     wallpaper: root.wallpaper
                     palette: root.palette
+                    weather: root.weather
                     preview: true
                     busy: false
                     secured: true

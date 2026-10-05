@@ -11,10 +11,11 @@ Item {
     property var player: null
     property string artUrl: ""
     property string trackKey: ""
+    property bool embedded: false
     readonly property bool hasPlayer: session.hasPlayer
     implicitHeight: 142 * unit
     MediaSession { id: session; player: root.player; trackKey: root.trackKey; active: root.visible }
-    LockGlass { anchors.fill: parent; radius: 26 * root.unit; wallpaperItem: root.wallpaperItem; sampleX: root.sampleX; sampleY: root.sampleY }
+    LockGlass { anchors.fill: parent; visible: !root.embedded; radius: 26 * root.unit; wallpaperItem: root.wallpaperItem; sampleX: root.sampleX; sampleY: root.sampleY }
     IslandMediaCover {
         x: 20 * root.unit; y: 18 * root.unit
         diameter: 52 * root.unit

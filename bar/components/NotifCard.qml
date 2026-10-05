@@ -15,7 +15,7 @@ import "../Singletons"
  * appIcon (icono de la app via Quickshell.iconPath), luego image://icon/ (icono
  * temático via IconImage del NotificationServer), y si nada → glyph por appName.
  *
- * Urgencia Critical → borde accentStrong + glow que respira (lo vivo respira).
+ * Urgencia Critical → borde accent y luz interior; el borde respira.
  * Hover wash + click del compact oculta el toast (popup=false). Actions (full)
  * en fila con wash/escala. Cero springs.
  */
@@ -118,7 +118,7 @@ Item {
         anchors.fill: parent
         radius: Motion.rTile
         border.width: Theme.borderHairline
-        border.color: critical ? Qt.alpha(Theme.accentStrong, Theme.alphaCritical) : Theme.border
+        border.color: critical ? Qt.alpha(Theme.accent, Theme.alphaCritical) : Theme.border
         gradient: Gradient {
             GradientStop { position: 0.0; color: Qt.alpha(Theme.cardTop, Flags.glassAlpha) }
             GradientStop { position: 1.0; color: Qt.alpha(Theme.cardBot, Flags.glassAlpha) }
@@ -131,17 +131,9 @@ Item {
             color: Theme.sheen
         }
 
-        // glow crítico interior (doble capa)
-        Rectangle {
-            anchors.fill: parent; radius: body.radius; color: Theme.onGlow; opacity: 0
-            visible: critical
-            SequentialAnimation {
-                running: critical; loops: Animation.Infinite
-                NumberAnimation { target: critGlow; property: "opacity"; from: 0.06; to: 0.22; duration: 1800; easing.type: Easing.InOutSine }
-                NumberAnimation { target: critGlow; property: "opacity"; from: 0.22; to: 0.06; duration: 1800; easing.type: Easing.InOutSine }
-                PauseAnimation { duration: Math.round(400 * Motion.mult) }
-            }
-            Rectangle { id: critGlow; anchors.fill: parent; color: parent.color; opacity: parent.opacity }
+        InnerGlow {
+            anchors.fill: parent
+            opacity: critical ? 0.72 : 0
         }
 
         // glow crítico medio (borde respira)
@@ -149,27 +141,12 @@ Item {
             id: glowMid
             anchors.fill: parent; radius: body.radius; color: "transparent"
             border.width: Theme.borderEmphasis * card.s
-            border.color: Qt.alpha(Theme.accentStrong, 0)
+            border.color: Qt.alpha(Theme.accent, 0)
             visible: critical
             SequentialAnimation {
-                running: critical; loops: Animation.Infinite
-                ColorAnimation { target: glowMid.border; property: "color"; from: Qt.alpha(Theme.accentStrong, Theme.alphaTransparent); to: Qt.alpha(Theme.accentStrong, Theme.alphaSelected); duration: 1800; easing.type: Easing.InOutSine }
-                ColorAnimation { target: glowMid.border; property: "color"; from: Qt.alpha(Theme.accentStrong, Theme.alphaSelected); to: Qt.alpha(Theme.accentStrong, Theme.alphaTransparent); duration: 1800; easing.type: Easing.InOutSine }
-                PauseAnimation { duration: Math.round(400 * Motion.mult) }
-            }
-        }
-
-        // glow crítico exterior (tenue)
-        Rectangle {
-            id: glowOuter
-            anchors.fill: parent; radius: body.radius + 8 * card.s; color: "transparent"
-            border.width: Theme.borderHairlineSoft *  card.s
-            border.color: Qt.alpha(Theme.accentStrong, 0)
-            visible: critical
-            SequentialAnimation {
-                running: critical; loops: Animation.Infinite
-                ColorAnimation { target: glowOuter.border; property: "color"; from: Qt.alpha(Theme.accentStrong, Theme.alphaTransparent); to: Qt.alpha(Theme.accentStrong, Theme.alphaWash); duration: 1800; easing.type: Easing.InOutSine }
-                ColorAnimation { target: glowOuter.border; property: "color"; from: Qt.alpha(Theme.accentStrong, Theme.alphaWash); to: Qt.alpha(Theme.accentStrong, Theme.alphaTransparent); duration: 1800; easing.type: Easing.InOutSine }
+                running: critical && card.visible && !Flags.reduceMotion; loops: Animation.Infinite
+                ColorAnimation { target: glowMid.border; property: "color"; from: Qt.alpha(Theme.accent, Theme.alphaTransparent); to: Qt.alpha(Theme.accent, Theme.alphaSelected); duration: 1800; easing.type: Easing.InOutSine }
+                ColorAnimation { target: glowMid.border; property: "color"; from: Qt.alpha(Theme.accent, Theme.alphaSelected); to: Qt.alpha(Theme.accent, Theme.alphaTransparent); duration: 1800; easing.type: Easing.InOutSine }
                 PauseAnimation { duration: Math.round(400 * Motion.mult) }
             }
         }
@@ -320,7 +297,7 @@ Item {
                         var app = card.md.appName || ""
                         return app.length > 0 ? (app + "  ·  " + card.md.timeStr) : card.md.timeStr
                     }
-                    color: Theme.dim
+                    color: Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeLabel * card.s
                     font.letterSpacing: 0.1 * card.s

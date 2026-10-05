@@ -15,6 +15,14 @@ ShellRoot {
         const directory = Quickshell.env("ISLA_LOCK_CAPTURE_DIR")
         if (directory) surface.grabToImage(result => result.saveToFile(directory + "/" + name + ".png"))
     }
+    function find(item, name) {
+        if (item.objectName === name) return item
+        for (const child of item.children) {
+            const found = find(child, name)
+            if (found) return found
+        }
+        return null
+    }
     Window {
         visible: true; width: 1200; height: 900
         title: "Isla · Prueba de movimiento del bloqueo"
@@ -36,6 +44,8 @@ ShellRoot {
             test.check(surface.travel >= surface.expansion, "travel leads growth")
             if (surface.contentOpacity > 0 && !surface.retiring)
                 test.check(surface.expansion > 0.84, "input waits for sufficient geometry")
+            if (surface.wingProgress > 0)
+                test.check(surface.expansion > 0.9, "wings wait for central geometry")
         }
     }
     Timer {
@@ -43,7 +53,9 @@ ShellRoot {
         onTriggered: {
             switch (test.step++) {
             case 0:
+                test.check(surface.presentation === 0 && !surface.authActive, "secured lock starts at rest")
                 test.capture("01-pill")
+                surface.activateInput("")
                 break
             case 1:
                 test.check(surface.presentation > 0 && surface.presentation < 1, "pill expands through intermediate geometry")
@@ -59,10 +71,15 @@ ShellRoot {
                 break
             case 9:
                 test.check(surface.presentation > 0.99, "opening settles")
+                test.check(surface.wingProgress > 0.99, "wings settle with card")
                 test.capture("03-ready")
+                surface.activateInput("x")
+                break
+            case 10:
+                test.check(test.find(surface, "lockPasswordDots").model.count === 1, "typing creates one visual dot")
                 surface.errorText = "Contraseña incorrecta. Inténtalo de nuevo."
                 break
-            case 10: test.capture("04-rejected"); break
+            case 11: test.capture("04-rejected"); break
             case 13:
                 test.check(test.sawRejection && Math.abs(surface.fieldOffset) < 0.01, "rejection recoils and settles")
                 surface.errorText = ""

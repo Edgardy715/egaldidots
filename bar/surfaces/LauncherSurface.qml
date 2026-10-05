@@ -177,7 +177,7 @@ PillSurface {
             }
             border.color: searchInput.activeFocus ? Qt.alpha(Theme.accent, Theme.alphaIconSec) : Qt.alpha(Theme.foreground, Theme.alphaSoft)
             border.width: Theme.borderHairlineSoft
-            Behavior on border.color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+            Behavior on border.color { enabled: root.active && !Flags.reduceMotion; ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
             // ícono lupa (Material Symbols)
             MaterialIcon {
@@ -189,28 +189,19 @@ PillSurface {
                 font.pixelSize: Theme.fontSizeTitle * root.s
             }
 
-            // placeholder text (cuando input vacío)
-            Text {
-                anchors.left: parent.left
-                anchors.leftMargin: 42 * root.s
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Buscar aplicaciones…"
-                color: Theme.dim
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeBodyLg * root.s
-                visible: searchInput.text.length === 0
-            }
-
-            // input text con animaciones de escritura (cursor + placeholder)
+            // Campo y placeholder comparten el lenguaje de escritura de Isla.
             IslaTextField {
                 id: searchInput
+                objectName: "launcherSearch"
                 anchors.fill: parent
                 anchors.leftMargin: 42 * root.s
                 anchors.rightMargin: 38 * root.s
-                anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
+                placeholderText: qsTr("Buscar aplicaciones…")
+                motionActive: root.active && root.visible
                 floating: false
                 chrome: false
+                Accessible.name: qsTr("Buscar aplicaciones")
                 onTextChanged: {
                     root.query = text
                     listView.currentIndex = 0
@@ -241,7 +232,14 @@ PillSurface {
                 anchors.rightMargin: 14 * root.s
                 anchors.verticalCenter: parent.verticalCenter
                 width: 24 * root.s; height: 28 * root.s
-                visible: searchInput.text.length > 0
+                opacity: searchInput.length > 0 ? 1 : 0
+                visible: opacity > 0
+                enabled: searchInput.length > 0
+                scale: Flags.reduceMotion ? 1 : 0.9 + 0.1 * opacity
+                Behavior on opacity {
+                    enabled: root.active && !Flags.reduceMotion
+                    NumberAnimation { duration: Motion.hover; easing.type: Motion.easeStandard }
+                }
                 MaterialIcon {
                     anchors.centerIn: parent
                     iconName: Icons.iClose
@@ -265,13 +263,15 @@ PillSurface {
             id: calcResultArea
             width: parent.width
             height: root.showCalculator ? (44 * root.s) : 0
-            visible: root.showCalculator
+            visible: root.showCalculator || opacity > 0
             opacity: root.showCalculator ? 1 : 0
             clip: true
             Behavior on height {
+                enabled: !Flags.reduceMotion
                 NumberAnimation { duration: Motion.morph; easing.type: Motion.easeMorph; easing.bezierCurve: Motion.morphCurve }
             }
             Behavior on opacity {
+                enabled: !Flags.reduceMotion
                 Anim { type: Anim.DefaultEffects }
             }
 
@@ -317,9 +317,10 @@ PillSurface {
             color: Theme.sheen
             opacity: root.resultsVisible ? 1 : 0
             Behavior on height {
+                enabled: !Flags.reduceMotion
                 NumberAnimation { duration: Motion.morph; easing.type: Motion.easeMorph; easing.bezierCurve: Motion.morphCurve }
             }
-            Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+            Behavior on opacity { enabled: !Flags.reduceMotion; Anim { type: Anim.DefaultEffects } }
         }
 
         // ---- listado de resultados ----
@@ -338,12 +339,14 @@ PillSurface {
             boundsBehavior: Flickable.StopAtBounds
             spacing: Theme.spacingSm * root.s
             // visible solo con query → anims opacity/scale del contenido
-            visible: root.resultsVisible
+            visible: root.resultsVisible || opacity > 0
             opacity: root.resultsVisible ? 1 : 0
             Behavior on opacity {
+                enabled: !Flags.reduceMotion
                 Anim { type: Anim.DefaultEffects }
             }
             Behavior on height {
+                enabled: !Flags.reduceMotion
                 NumberAnimation { duration: Motion.morph; easing.type: Motion.easeMorph; easing.bezierCurve: Motion.morphCurve }
             }
             // ScriptModel evita el churn de destruir/recrear todos los delegates
@@ -360,9 +363,9 @@ PillSurface {
                 border.color: Qt.alpha(Theme.accent, Theme.alphaHair)
                 border.width: Theme.borderHairlineSoft
                 radius: Theme.radiusLg * root.s
-                Behavior on y { Anim { type: Anim.FastEffects } }
+                Behavior on y { enabled: !Flags.reduceMotion; Anim { type: Anim.FastEffects } }
             }
-            highlightMoveDuration: Motion.fast
+            highlightMoveDuration: Flags.reduceMotion ? 0 : Motion.fast
             highlightResizeDuration: 0
             preferredHighlightBegin: 0
             preferredHighlightEnd: listView.height
@@ -384,13 +387,15 @@ PillSurface {
             id: hintRow
             width: parent.width
             height: root.resultsVisible ? (keycapRow.height + 1) : 0
-            visible: root.resultsVisible
+            visible: root.resultsVisible || opacity > 0
             opacity: root.resultsVisible ? 1 : 0
             clip: true
             Behavior on height {
+                enabled: !Flags.reduceMotion
                 NumberAnimation { duration: Motion.morph; easing.type: Motion.easeMorph; easing.bezierCurve: Motion.morphCurve }
             }
             Behavior on opacity {
+                enabled: !Flags.reduceMotion
                 Anim { type: Anim.DefaultEffects }
             }
 

@@ -9,19 +9,21 @@ import "../Singletons"
 
 /**
  * Isla · ConnectivitySurface. Panel de Wi-Fi + Bluetooth.
- * Comportamiento replicado de caelestia (QML puro) con diseño nativo Isla:
- * tarjetas de vidrio, toggles animados, barras de señal dibujadas, filas con
- * entrada escalonada (stagger) y diálogo de password con morph.
+ * Wi-Fi y Bluetooth comparten el servicio existente; cada radio ocupa una
+ * vista enfocada dentro de la misma superficie de la pill.
  */
 PillSurface {
     id: root
     mTop: Theme.marginLg; mLeft: Theme.marginLg; mRight: Theme.marginLg; mBottom: Theme.marginMd
     clip: true
+    property string mode: "wifi"
 
     // ── Estado de conexión WiFi ─────────────────────────────────────────────
     property string connectingToSsid: ""
     property var passwordNetwork: null
     property bool showPasswordDialog: false
+    property bool passwordSucceeded: false
+    property int passwordAttempt: 0
     readonly property string activeSsid: Nmcli.active ? Nmcli.active.ssid : ""
 
     function connectTo(network) {
@@ -34,33 +36,45 @@ PillSurface {
             Nmcli.handleConnect(network, null, null)
             return
         }
+        root.passwordAttempt++
         root.passwordNetwork = network
-        root.showPasswordDialog = true
-        root.passwordField = ""
         root.passwordError = ""
+        root.passwordSucceeded = false
+        root.showPasswordDialog = true
     }
 
-    function submitPassword() {
-        if (!root.passwordNetwork || root.passwordField.length === 0) return
+    function cancelPassword() {
+        if (root.passwordConnecting) return
+        root.passwordAttempt++
+        root.showPasswordDialog = false
+        root.passwordNetwork = null
+        root.passwordError = ""
+        root.passwordSucceeded = false
+        credentials.reset()
+        connectTimeout.stop()
+        successHold.stop()
+    }
+
+    function submitPassword(secret) {
+        if (!root.passwordNetwork || root.passwordConnecting || typeof secret !== "string" || secret.length < 8) return
+        const attempt = ++root.passwordAttempt
         root.connectingToSsid = root.passwordNetwork.ssid
         root.passwordConnecting = true
         root.passwordError = ""
-        const password = root.passwordField
-        root.passwordField = ""
         connectTimeout.restart()
-        Nmcli.connectWithPassword(root.passwordNetwork, password, result => {
+        Nmcli.connectWithPassword(root.passwordNetwork, secret, result => {
+            if (attempt !== root.passwordAttempt || !root.showPasswordDialog) return
             connectTimeout.stop()
             root.passwordConnecting = false
             root.connectingToSsid = ""
             if (result && result.success) {
-                root.showPasswordDialog = false
+                root.passwordSucceeded = true
                 root.passwordError = ""
+                successHold.restart()
             } else if (result && result.needsPassword) {
-                root.passwordError = "Contraseña incorrecta"
-            } else if (result && result.error) {
-                root.passwordError = "Error: " + result.error
+                root.passwordError = qsTr("Contraseña incorrecta. Inténtalo de nuevo.")
             } else {
-                root.passwordError = "No se pudo conectar"
+                root.passwordError = qsTr("No se pudo conectar. Comprueba la red.")
             }
         })
     }
@@ -75,11 +89,10 @@ PillSurface {
         onTriggered: {
             root.passwordConnecting = false
             root.connectingToSsid = ""
-            root.passwordError = "Tiempo de conexión agotado"
+            root.passwordError = qsTr("La conexión tarda más de lo previsto.")
         }
     }
-
-    property string passwordField: ""
+    Timer { id: successHold; interval: Flags.reduceMotion ? 250 : Math.max(850, Motion.standard + Motion.fast); onTriggered: root.cancelPassword() }
     property string passwordError: ""
 
     // evita que la rueda llegue al control de volumen de la pill
@@ -90,39 +103,37 @@ PillSurface {
     }
 
     Flickable {
+        id: networkList
         anchors.fill: parent
         contentHeight: col.implicitHeight
         clip: true
         boundsBehavior: Flickable.StopAtBounds
+        enabled: !root.showPasswordDialog
+        opacity: root.showPasswordDialog ? 0 : 1
+        visible: opacity > 0.01
+        Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
 
         ColumnLayout {
             id: col
             width: parent.width
-            spacing: Theme.spacingXl * s
+            spacing: Theme.spacingLg * s
 
             // ── Header con animación de entrada ─────────────────────────────
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 46 * s
-                opacity: 0
-                scale: 0.92
-                Component.onCompleted: {
-                    opacity = 1
-                    scale = 1
-                }
+                Layout.preferredHeight: 62 * s
+                opacity: root.open ? 1 : 0
                 Behavior on opacity { Anim { type: Anim.DefaultEffects } }
-                Behavior on scale { Anim { type: Anim.Morph } }
 
                 RowLayout {
                     anchors.fill: parent
                     spacing: Theme.spacingLg * s
 
-                    // logo animado
                     Item {
-                        width: 34 * s; height: 34 * s
+                        width: 46 * s; height: 46 * s
                         Rectangle {
                             anchors.fill: parent
-                            radius: Theme.radiusLg * s
+                            radius: Theme.radiusXl * s
                             gradient: Gradient {
                                 GradientStop { position: 0; color: Qt.alpha(Theme.accent, Theme.alphaEmphasis) }
                                 GradientStop { position: 1; color: Qt.alpha(Theme.accent, Theme.alphaGhost) }
@@ -131,9 +142,9 @@ PillSurface {
                             border.color: Qt.alpha(Theme.accent, Theme.alphaMid)
                             MaterialIcon {
                                 anchors.centerIn: parent
-                                iconName: Icons.iWifi
-                                color: root.activeSsid.length > 0 ? Theme.accent : Theme.foreground
-                                font.pixelSize: Theme.fontSizeHead * s
+                                iconName: root.mode === "wifi" ? Icons.iWifi : Icons.iBluetooth
+                                color: Theme.accent
+                                font.pixelSize: Theme.fontSizeTitleLg * s
                                 Behavior on color { ColorAnimation { duration: Motion.fast } }
                             }
                         }
@@ -142,42 +153,77 @@ PillSurface {
                     ColumnLayout {
                         spacing: Theme.spacingXxs * s
                         Layout.fillWidth: true
-                        Text {
-                            text: "Conectividad"
+                        AnimatedLabel {
+                            value: root.mode === "wifi" ? qsTr("Wi-Fi") : qsTr("Bluetooth")
                             color: Theme.foreground
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeTitle * s; font.weight: Font.DemiBold
                         }
-                        Text {
-                            text: root.activeSsid.length > 0
-                                ? "Wi-Fi: " + root.activeSsid
-                                : "Sin conexión Wi-Fi"
-                            color: root.activeSsid.length > 0 ? Theme.accent : Theme.iconSecondary
+                        AnimatedLabel {
+                            value: root.mode === "wifi"
+                                ? (Nmcli.wifiEnabled ? (root.activeSsid || qsTr("Busca una red para conectarte")) : qsTr("Desactivado"))
+                                : (btCard.btEnabled ? qsTr("Dispositivos disponibles") : qsTr("Desactivado"))
+                            color: Theme.iconSecondary
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s
                             elide: Text.ElideRight
                             Layout.fillWidth: true
                         }
                     }
 
-                    // indicador de conexión activa
-                    Rectangle {
-                        width: 8 * s; height: 8 * s; radius: Theme.radiusXs * s
-                        color: root.activeSsid.length > 0 ? Theme.accent : Qt.rgba(1,1,1,0.12)
-                        scale: root.activeSsid.length > 0 ? 1 : 0.6
-                        Behavior on color { ColorAnimation { duration: Motion.fast } }
-                        Behavior on scale { Anim { type: Anim.FastEffects } }
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40 * s
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Theme.radiusLg * s
+                    color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
+                }
+                Rectangle {
+                    x: root.mode === "wifi" ? 3 * s : parent.width / 2
+                    y: 3 * s
+                    width: parent.width / 2 - 3 * s
+                    height: parent.height - 6 * s
+                    radius: Theme.radiusMd * s
+                    color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
+                    Behavior on x { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Motion.morph; velocity: -1 } }
+                }
+                RowLayout {
+                    anchors.fill: parent
+                    spacing: 0
+                    Repeater {
+                        model: [{ key: "wifi", label: "Wi-Fi" }, { key: "bluetooth", label: "Bluetooth" }]
+                        delegate: Item {
+                            required property var modelData
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Text {
+                                anchors.centerIn: parent
+                                text: modelData.label
+                                color: root.mode === modelData.key ? Theme.foreground : Theme.iconSecondary
+                                font.family: Theme.font
+                                font.pixelSize: Theme.fontSizeBody * s
+                                font.weight: root.mode === modelData.key ? Font.DemiBold : Font.Normal
+                            }
+                            MotionArea {
+                                anchors.fill: parent
+                                accessibleName: qsTr("Mostrar %1").arg(modelData.label)
+                                hoverWash: false
+                                onClicked: root.mode = modelData.key
+                            }
+                        }
                     }
                 }
             }
 
             // ════════════════════ WI-FI ════════════════════
             Rectangle {
+                id: wifiCard
+                visible: root.mode === "wifi"
                 Layout.fillWidth: true
                 radius: Theme.radiusXxl * s
-                gradient: Gradient {
-                    GradientStop { position: 0; color: Qt.rgba(Theme.cardTop.r, Theme.cardTop.g, Theme.cardTop.b, 0.6) }
-                    GradientStop { position: 1; color: Qt.rgba(Theme.cardBot.r, Theme.cardBot.g, Theme.cardBot.b, 0.45) }
-                }
-                border.width: Theme.borderHairline; border.color: Theme.border
+                color: "transparent"
                 implicitHeight: wifiCol.implicitHeight + 20 * s
 
                 ColumnLayout {
@@ -198,8 +244,8 @@ PillSurface {
                             onToggled: Nmcli.toggleWifi()
                         }
 
-                        Text {
-                            text: "Wi-Fi"
+                        AnimatedLabel {
+                            value: Nmcli.wifiEnabled ? qsTr("Redes disponibles") : qsTr("Wi-Fi desactivado")
                             color: Nmcli.wifiEnabled ? Theme.foreground : Theme.iconMuted
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * s; font.weight: Font.DemiBold
                             Behavior on color { ColorAnimation { duration: Motion.fast } }
@@ -208,7 +254,7 @@ PillSurface {
                         Item { Layout.fillWidth: true }
 
                         Text {
-                            text: Nmcli.scanning ? "escanneando…" : (Nmcli.active ? Nmcli.active.ssid : "")
+                            text: Nmcli.scanning ? qsTr("Buscando…") : ""
                             color: Theme.iconSecondary
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * s
                             visible: text.length > 0
@@ -252,7 +298,13 @@ PillSurface {
                     }
 
                     // ── Lista de redes ──
-                    Repeater {
+                    MotionList {
+                        id: wifiRows
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: count * 44 * root.s + Math.max(0, count - 1) * spacing
+                        spacing: Theme.spacingLg * root.s
+                        interactive: false
+                        clip: true
                         visible: Nmcli.wifiEnabled
                         model: ScriptModel {
                             values: [...Nmcli.networks].sort((a, b) => {
@@ -266,27 +318,8 @@ PillSurface {
                             required property Nmcli.AccessPoint modelData
                             required property int index
                             readonly property bool isConnecting: root.connectingToSsid === modelData.ssid
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 44 * s
-
-                            // entrada escalonada (stagger por índice)
-                            opacity: 0
-                            scale: 0.9
-                            Behavior on opacity { Anim { type: Anim.DefaultEffects } }
-                            Behavior on scale { Anim { type: Anim.Morph } }
-                            Component.onCompleted: {
-                                entryDelay.interval = Math.max(0, index * 45)
-                                entryDelay.start()
-                            }
-                            Timer {
-                                id: entryDelay
-                                interval: 0
-                                repeat: false
-                                onTriggered: {
-                                    netRow.opacity = 1
-                                    netRow.scale = 1
-                                }
-                            }
+                            width: wifiRows.width
+                            height: 44 * root.s
 
                             Rectangle {
                                 anchors.fill: parent
@@ -295,8 +328,8 @@ PillSurface {
                                     if (modelData.active) return Qt.alpha(Theme.accent, Theme.alphaGlow)
                                     return netRowHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaHair) : Qt.alpha(Theme.cardTop, Theme.alphaCritical)
                                 }
-                                border.width: modelData.active ? 1 : 1
-                                border.color: modelData.active ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Qt.alpha(Theme.border, Theme.alphaCritical)
+                                border.width: modelData.active ? Theme.borderHairline : 0
+                                border.color: Qt.alpha(Theme.accent, Theme.alphaStrong)
                                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                                 Behavior on border.color { ColorAnimation { duration: Motion.fast } }
                             }
@@ -381,6 +414,7 @@ PillSurface {
                                             from: 0; to: 360
                                             duration: 700
                                             loops: Animation.Infinite
+                                            running: isConnecting && root.open && !Flags.reduceMotion
                                         }
                                     }
                                 }
@@ -426,13 +460,14 @@ PillSurface {
                     // estado vacío
                     Text {
                         Layout.fillWidth: true
-                        visible: Nmcli.wifiEnabled && Nmcli.networks.length === 0 && !Nmcli.scanning
+                        readonly property bool presented: Nmcli.wifiEnabled && Nmcli.networks.length === 0 && !Nmcli.scanning
+                        visible: opacity > 0
                         text: "Sin redes disponibles"
                         color: Theme.iconSecondary
                         font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s
                         horizontalAlignment: Text.AlignHCenter
-                        opacity: 0
-                        NumberAnimation on opacity { from: 0; to: 0.7; duration: Motion.morph }
+                        opacity: presented ? 0.7 : 0
+                        Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                     }
 
                     // hint cuando wifi apagado
@@ -459,13 +494,10 @@ PillSurface {
             // ════════════════════ BLUETOOTH ════════════════════
             Rectangle {
                 id: btCard
+                visible: root.mode === "bluetooth"
                 Layout.fillWidth: true
                 radius: Theme.radiusXxl * s
-                gradient: Gradient {
-                    GradientStop { position: 0; color: Qt.rgba(Theme.cardTop.r, Theme.cardTop.g, Theme.cardTop.b, 0.6) }
-                    GradientStop { position: 1; color: Qt.rgba(Theme.cardBot.r, Theme.cardBot.g, Theme.cardBot.b, 0.45) }
-                }
-                border.width: Theme.borderHairline; border.color: Theme.border
+                color: "transparent"
                 implicitHeight: btCol.implicitHeight + 20 * s
 
                 readonly property bool btEnabled: Bluetooth.defaultAdapter ? Bluetooth.defaultAdapter.enabled : false
@@ -543,7 +575,13 @@ PillSurface {
                     }
 
                     // ── Dispositivos ──
-                    Repeater {
+                    MotionList {
+                        id: btRows
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: count * 44 * root.s + Math.max(0, count - 1) * spacing
+                        spacing: Theme.spacingLg * root.s
+                        interactive: false
+                        clip: true
                         visible: btCard.btEnabled
                         model: ScriptModel {
                             // `name` lee el Alias de BlueZ, que para un dispositivo sin
@@ -563,8 +601,8 @@ PillSurface {
                         delegate: Item {
                             required property BluetoothDevice modelData
                             required property int index
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 44 * s
+                            width: btRows.width
+                            height: 44 * root.s
 
                             // estado transitorio: connecting/disconnecting/pairing
                             readonly property bool busy: modelData.state === BluetoothDeviceState.Connecting
@@ -584,25 +622,6 @@ PillSurface {
                                         && modelData.name !== modelData.address.replace(/:/g, "-").toUpperCase())
                                     return modelData.name
                                 return "Dispositivo desconocido"
-                            }
-
-                            // entrada escalonada
-                            opacity: 0
-                            scale: 0.9
-                            Behavior on opacity { Anim { type: Anim.DefaultEffects } }
-                            Behavior on scale { Anim { type: Anim.Morph } }
-                            Component.onCompleted: {
-                                btEntryDelay.interval = Math.max(0, index * 45)
-                                btEntryDelay.start()
-                            }
-                            Timer {
-                                id: btEntryDelay
-                                interval: 0
-                                repeat: false
-                                onTriggered: {
-                                    parent.opacity = 1
-                                    parent.scale = 1
-                                }
                             }
 
                             Rectangle {
@@ -819,325 +838,27 @@ PillSurface {
         }
     }
 
-    // ════════════════════ DIÁLOGO DE PASSWORD ════════════════════
-    FocusScope {
-        id: pwDialog
+    // La lista cede el mismo vidrio a la credencial; no aparece un segundo modal.
+    WifiCredentials {
+        id: credentials
         anchors.fill: parent
-        visible: root.showPasswordDialog
-        activeFocusOnTab: true
-        focus: visible
-        z: 100
-
-        onVisibleChanged: {
-            if (visible) {
-                root.passwordField = ""
-                root.passwordError = ""
-                pwCard.scale = 0.8
-                pwCard.opacity = 0
-                pwScaleAnim.start()
-                pwOpacityAnim.start()
-                passwordFocusTimer.restart()
-            } else {
-                passwordFocusTimer.stop()
-            }
+        s: root.s
+        ssid: root.passwordNetwork ? root.passwordNetwork.ssid : ""
+        active: root.showPasswordDialog
+        busy: root.passwordConnecting
+        succeeded: root.passwordSucceeded
+        errorText: root.passwordError
+        visible: opacity > 0.01
+        enabled: root.showPasswordDialog && !root.passwordSucceeded
+        opacity: root.showPasswordDialog ? 1 : 0
+        transform: Translate {
+            y: root.showPasswordDialog ? 0 : 14 * root.s
+            Behavior on y { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Motion.morph; velocity: -1 } }
         }
-
-        onActiveFocusChanged: {
-            if (visible && !activeFocus)
-                passwordFocusTimer.restart()
-        }
-
-        Timer {
-            id: passwordFocusTimer
-            interval: 50
-            repeat: true
-            onTriggered: {
-                if (pwDialog.visible) {
-                    pwDialog.forceActiveFocus()
-                    if (pwDialog.activeFocus) passwordFocusTimer.stop()
-                } else passwordFocusTimer.stop()
-            }
-        }
-
-        // backdrop
-        Rectangle {
-            anchors.fill: parent
-            color: Qt.rgba(0, 0, 0, 0.35)
-            opacity: 0
-            NumberAnimation on opacity {
-                id: backdropAnim
-                from: 0; to: 0.35
-                duration: Motion.morph
-                easing.type: Easing.OutCubic
-                running: pwDialog.visible
-            }
-            MotionArea {
-                anchors.fill: parent
-                hoverWash: false
-                onClicked: {
-                    root.showPasswordDialog = false
-                    root.passwordField = ""
-                    root.passwordError = ""
-                    root.passwordConnecting = false
-                    root.connectingToSsid = ""
-                    connectTimeout.stop()
-                }
-            }
-        }
-
-        Keys.onPressed: event => {
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                root.submitPassword()
-                event.accepted = true
-            } else if (event.key === Qt.Key_Backspace) {
-                if (event.modifiers & Qt.ControlModifier) root.passwordField = ""
-                else root.passwordField = root.passwordField.slice(0, -1)
-                event.accepted = true
-            } else if (event.key === Qt.Key_Escape) {
-                root.showPasswordDialog = false
-                root.passwordField = ""
-                root.passwordError = ""
-                root.passwordConnecting = false
-                root.connectingToSsid = ""
-                connectTimeout.stop()
-                event.accepted = true
-            } else if (event.text && event.text.length > 0 && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))) {
-                root.passwordField += event.text
-                event.accepted = true
-            }
-        }
-
-        // tarjeta del diálogo con morph
-        Rectangle {
-            id: pwCard
-            anchors.centerIn: parent
-            width: Math.min(parent.width * 0.9, 340 * s)
-            radius: Theme.radiusFull * s
-            color: Qt.rgba(Theme.cardBot.r, Theme.cardBot.g, Theme.cardBot.b, 0.95)
-            border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.accent, Theme.alphaEmphasis)
-            implicitHeight: pwCol.implicitHeight + 20 * s
-
-            scale: 0.8
-            opacity: 0
-            transformOrigin: Item.Center
-            NumberAnimation on scale { id: pwScaleAnim; from: 0.8; to: 1; duration: Motion.morph; easing.bezierCurve: Motion.bounceCurve }
-            NumberAnimation on opacity { id: pwOpacityAnim; from: 0; to: 1; duration: Motion.standard; easing.type: Easing.OutCubic }
-
-            // brillo superior (catch-light)
-            Rectangle {
-                anchors.top: parent.top
-                anchors.topMargin: 1 * s
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width * 0.7
-                height: 1 * s
-                radius: Theme.radiusXs * s
-                color: Theme.sheen
-            }
-
-            ColumnLayout {
-                id: pwCol
-                anchors.fill: parent; anchors.margins: 14 * s
-                spacing: Theme.spacingLg * s
-
-                // icono + título
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: Theme.spacingMd * s
-                    Item {
-                        width: 32 * s; height: 32 * s
-                        Rectangle {
-                            anchors.fill: parent; radius: Theme.radiusMd * s
-                            color: Qt.alpha(Theme.accent, Theme.alphaGlow)
-                            MaterialIcon {
-                                anchors.centerIn: parent
-                                iconName: Icons.iLock
-                                color: Theme.accent
-                                font.pixelSize: Theme.fontSizeTitle * s
-                            }
-                        }
-                    }
-                    ColumnLayout {
-                        spacing: Theme.spacingXxs * s
-                        Layout.fillWidth: true
-                        Text {
-                            text: "Contraseña de red"
-                            color: Theme.foreground
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * s; font.weight: Font.DemiBold
-                        }
-                        Text {
-                            text: root.passwordNetwork ? root.passwordNetwork.ssid : ""
-                            color: Theme.accent
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                        }
-                    }
-                }
-
-                // campo de password con animación de formas (patrón lockscreen caelestia)
-                Item {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 40 * s
-                    clip: true
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.radiusLg * s
-                        color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                        border.width: pwDialog.activeFocus ? 1 : 1
-                        border.color: pwDialog.activeFocus ? Qt.alpha(Theme.accent, Theme.alphaCritical) : Qt.alpha(Theme.border, Theme.alphaIconSec)
-                        Behavior on border.color { ColorAnimation { duration: Motion.fast } }
-                    }
-
-                    // formas geométricas aleatorias → círculo (lockscreen caelestia)
-                    ShapePasswordInput {
-                        anchors.centerIn: parent
-                        password: root.passwordField
-                        s: root.s
-                    }
-
-                    // placeholder cuando vacío
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Escribe la contraseña y pulsa Enter"
-                        visible: root.passwordField.length === 0
-                        color: Theme.iconSecondary
-                        font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s
-                        opacity: 0.8
-                    }
-
-                    // cursor parpadeante
-                    Rectangle {
-                        visible: root.passwordField.length > 0
-                        width: 1.5 * s
-                        height: 16 * s
-                        color: Theme.accent
-                        anchors.verticalCenter: parent.verticalCenter
-                        x: {
-                            // sigue el último dot
-                            var last = (root.passwordField.length - 1) * (12 + 5) + 12
-                            var center = parent.width / 2
-                            return Math.min(center + last / 2 + 2 * s, parent.width - 8 * s)
-                        }
-                        opacity: 0
-                        SequentialAnimation on opacity {
-                            loops: Animation.Infinite
-                            NumberAnimation { from: 0; to: 1; duration: 400 }
-                            NumberAnimation { from: 1; to: 0; duration: 400 }
-                        }
-                    }
-                }
-
-                // estado conectando (spinner)
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 20 * s
-                    visible: root.passwordConnecting
-                    spacing: Theme.spacingMd * s
-                    Item {
-                        width: 14 * s; height: 14 * s
-                        Rectangle {
-                            anchors.centerIn: parent
-                            width: 12 * s; height: 12 * s; radius: Theme.radiusSm * s
-                            color: "transparent"
-                            border.width: Theme.borderEmphasis * s
-                            border.color: Theme.accent
-                            NumberAnimation on rotation {
-                                from: 0; to: 360
-                                duration: 700
-                                loops: Animation.Infinite
-                            }
-                        }
-                    }
-                    Text {
-                        text: "Conectando a " + (root.passwordNetwork ? root.passwordNetwork.ssid : "")
-                        color: Theme.accent
-                        font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * s
-                        elide: Text.ElideRight
-                        Layout.fillWidth: true
-                    }
-                }
-
-                // error
-                Text {
-                    Layout.fillWidth: true
-                    visible: root.passwordError.length > 0
-                    text: root.passwordError
-                    color: Theme.accentStrong
-                    font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * s
-                    wrapMode: Text.WordWrap
-                    opacity: 0
-                    NumberAnimation on opacity { from: 0; to: 1; duration: Motion.fast }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    spacing: Theme.spacingMd * s
-
-                    // botón cancelar
-                    Item {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 32 * s
-                        Rectangle {
-        scale: cancelHover.motion.visualScale
-                            anchors.fill: parent; radius: Theme.radiusLg * s
-                            color: cancelHover.containsMouse ? Qt.alpha(Theme.accentStrong, Theme.alphaWashStrong) : Qt.alpha(Theme.accentStrong, Theme.alphaSoft)
-                            border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.accentStrong, Theme.alphaEmphasis)
-                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-                            Text {
-                                transform: Translate { y: -Motion.labelTravel * cancelHover.motion.presence }
-                                anchors.centerIn: parent
-                                text: "Cancelar"
-                                color: Theme.accentStrong
-                                font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s; font.weight: Font.Medium
-                            }
-                        }
-                        MotionArea {
-                            id: cancelHover
-                            anchors.fill: parent
-                            accessibleName: qsTr("Cancelar")
-                            hoverWash: false
-                            onClicked: {
-                                root.showPasswordDialog = false
-                                root.passwordField = ""
-                                root.passwordError = ""
-                                root.passwordConnecting = false
-                                root.connectingToSsid = ""
-                                connectTimeout.stop()
-                            }
-                        }
-                    }
-
-                    // botón conectar
-                    Item {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 32 * s
-                        Rectangle {
-        scale: connectHover.motion.visualScale
-                            anchors.fill: parent; radius: Theme.radiusLg * s
-                            color: root.passwordField.length > 0 && !root.passwordConnecting
-                                ? (connectHover.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent)
-                                : Qt.alpha(Theme.accent, Theme.alphaMid)
-                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-                            Text {
-                                transform: Translate { y: -Motion.labelTravel * connectHover.motion.presence }
-                                anchors.centerIn: parent
-                                text: root.passwordConnecting ? "…" : "Conectar"
-                                color: root.passwordField.length > 0 && !root.passwordConnecting ? "#000" : Qt.alpha(Theme.foreground, Theme.alphaStrong)
-                                font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s; font.weight: Font.DemiBold
-                            }
-                        }
-                        MotionArea {
-                            id: connectHover
-                            anchors.fill: parent
-                            enabled: !root.passwordConnecting
-                            accessibleName: qsTr("Conectar a %1").arg(root.connectingToSsid)
-                            hoverWash: false
-                            onClicked: root.submitPassword()
-                        }
-                    }
-                }
-            }
-        }
+        z: 2
+        Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
+        onSubmitted: secret => root.submitPassword(secret)
+        onCancelled: root.cancelPassword()
+        onEdited: if (root.passwordError.length) root.passwordError = ""
     }
 }

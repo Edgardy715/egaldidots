@@ -32,11 +32,12 @@ PillSurface {
         if (registeredConsumerId && registeredConsumerId !== consumerId)
             Cava.setConsumer(registeredConsumerId, false)
         registeredConsumerId = consumerId
-        Cava.setConsumer(consumerId, root.open && session.isPlaying)
+        Cava.setConsumer(consumerId, root.open && root.visible && session.isPlaying)
     }
     Component.onCompleted: syncCava()
     Component.onDestruction: Cava.setConsumer(registeredConsumerId, false)
     onOpenChanged: syncCava()
+    onVisibleChanged: syncCava()
     onConsumerIdChanged: syncCava()
     Connections {
         target: session
@@ -81,6 +82,24 @@ PillSurface {
             Layout.preferredHeight: root.musicPresentation ? Layout.preferredWidth : Layout.preferredWidth * 9 / 16
             Layout.alignment: Qt.AlignVCenter
 
+            RectangularGlow {
+                objectName: "albumHalo"
+                anchors.fill: parent
+                anchors.margins: -2 * root.s
+                glowRadius: 8 * root.s
+                spread: 0.1
+                cornerRadius: Theme.radiusXxl * root.s + 2 * root.s
+                color: Theme.accent
+                visible: root.open && root.visible && root.musicPresentation
+                    && artSource.status === Image.Ready
+                readonly property real energy: {
+                    if (!visible) return 0
+                    const values = Cava.values
+                    return ((values[4] || 0) + (values[11] || 0) + (values[18] || 0)) / 3
+                }
+                opacity: session.isPlaying && !Flags.reduceMotion && Cava.available && Cava.hasFrame
+                    ? 0.20 + energy * 0.25 : 0.16
+            }
             Image {
                 id: artSource
                 anchors.fill: parent
@@ -179,9 +198,9 @@ PillSurface {
                 }
             }
 
-            Text {
+            AnimatedLabel {
                 Layout.fillWidth: true
-                text: session.title
+                value: session.title
                 color: Theme.iconPrimary
                 font.family: root.mediaFont
                 font.pixelSize: 20 * Flags.fontScale * root.s
@@ -192,9 +211,9 @@ PillSurface {
                 lineHeight: 1.12
                 elide: Text.ElideRight
             }
-            Text {
+            AnimatedLabel {
                 Layout.fillWidth: true
-                text: session.artist + (root.musicPresentation && session.albumDistinct ? " · " + session.album : "")
+                value: session.artist + (root.musicPresentation && session.albumDistinct ? " · " + session.album : "")
                 color: Qt.alpha(Theme.foreground, 0.72)
                 font.family: root.mediaFont
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
@@ -237,6 +256,13 @@ PillSurface {
                 readonly property real trackWidth: width - 4 * root.s
                 function fractionAt(x) { return Math.max(0, Math.min(1, (x - trackInset) / trackWidth)) }
                 Rectangle {
+                    anchors.fill: parent
+                    radius: height / 2
+                    color: "transparent"
+                    border.width: seekMouse.activeFocus ? Theme.borderHairline : 0
+                    border.color: Theme.accent
+                }
+                Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     x: seekBar.trackInset
                     width: seekBar.trackWidth
@@ -268,6 +294,20 @@ PillSurface {
                     anchors.fill: parent
                     hoverEnabled: true
                     enabled: session.canSeek
+                    activeFocusOnTab: session.canSeek
+                    Accessible.role: Accessible.Slider
+                    Accessible.name: qsTr("Posición de reproducción")
+                    Accessible.description: session.formatTime(session.displayPosition)
+                    Accessible.onIncreaseAction: session.seekTo(session.displayPosition + 5)
+                    Accessible.onDecreaseAction: session.seekTo(session.displayPosition - 5)
+                    Keys.onLeftPressed: session.seekTo(session.displayPosition - 5)
+                    Keys.onRightPressed: session.seekTo(session.displayPosition + 5)
+                    Keys.onPressed: event => {
+                        if (event.key === Qt.Key_Home) session.seekTo(0)
+                        else if (event.key === Qt.Key_End) session.seekTo(session.player ? session.player.length : 0)
+                        else return
+                        event.accepted = true
+                    }
                     cursorShape: Qt.PointingHandCursor
                     onPressed: (mouse) => { session.beginDrag(seekBar.fractionAt(mouse.x)) }
                     onPositionChanged: (mouse) => { if (session.dragging) session.dragFraction = seekBar.fractionAt(mouse.x) }

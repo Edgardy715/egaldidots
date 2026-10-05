@@ -18,6 +18,7 @@ import "../Singletons"
  */
 PillSurface {
     id: root
+    signal requestPage(string name)
     mTop: Theme.marginLg; mLeft: Theme.marginLg; mRight: Theme.marginLg; mBottom: Theme.marginMd
     clip: true
 
@@ -55,20 +56,49 @@ PillSurface {
             subtitle: "Sistema"
             iconName: Icons.iSettings2
             s: root.s
-            trailing: Component { MaterialIcon { iconName: Icons.iSettings2; color: Theme.accent; font.pixelSize: Theme.fontSizeHead * root.s } }
+            trailing: Component {
+                Item {
+                    width: 88 * root.s
+                    height: 32 * root.s
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingSm * root.s
+                        MaterialIcon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: Icons.iSettings2
+                            color: Theme.accent
+                            font.pixelSize: Theme.fontSizeBodyLg * root.s
+                        }
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: qsTr("Apariencia")
+                            color: Theme.iconSecondary
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSizeLabel * root.s
+                        }
+                    }
+                    MotionArea {
+                        anchors.fill: parent
+                        accessibleName: qsTr("Abrir ajustes de apariencia")
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.requestPage("appearance")
+                    }
+                }
+            }
         }
 
         // ════════════════════ KEEP AWAKE ════════════════════
         StaggerItem {
             Layout.fillWidth: true
             staggerIndex: 0
-            entered: root.open
+            entered: root.contentReady
             s: root.s
 
             GlassCard {
                 anchors.fill: parent
                 implicitHeight: keepBody.implicitHeight + 20 * s
                 borderColor: KeepAwake.enabled ? Qt.alpha(Theme.accent, Theme.alphaSelected) : Theme.border
+                glow: KeepAwake.enabled ? 0.7 : 0
                 borderWidth: 1
                 Behavior on borderColor { ColorAnimation { duration: Motion.fast } }
 
@@ -134,7 +164,7 @@ PillSurface {
         StaggerItem {
             Layout.fillWidth: true
             staggerIndex: 1
-            entered: root.open && root.showBrightness
+            entered: root.contentReady && root.showBrightness
             s: root.s
             visible: root.showBrightness
 
@@ -258,7 +288,7 @@ PillSurface {
         StaggerItem {
             Layout.fillWidth: true
             staggerIndex: 2
-            entered: root.open
+            entered: root.contentReady
             s: root.s
 
             GlassCard {
@@ -336,8 +366,8 @@ PillSurface {
                             y: 2 * s
                             x: 2 * s + Math.max(0, root.profileIndex()) * segW
                             radius: Theme.radiusSm * s
-                            color: Qt.alpha(Theme.accent, Theme.alphaIconOnAcc)
-                            Behavior on x { Anim { type: Anim.FastSpatial; easing.bezierCurve: Motion.bounceCurve } }
+                            color: Theme.foreground
+                            Behavior on x { enabled: !Flags.reduceMotion; Anim { type: Anim.FastSpatial } }
                             Behavior on color { ColorAnimation { duration: Motion.fast } }
                         }
 
@@ -350,16 +380,20 @@ PillSurface {
                                     width: parent.width / 3
                                     height: parent.height
                                     Text {
+                                        id: profileLabel
                                         anchors.centerIn: parent
                                         text: modelData === "performance" ? "Rendimiento"
                                             : modelData === "balanced" ? "Balanceado"
                                             : modelData === "power-saver" ? "Ahorro" : modelData
-                                        color: root.activeProfile === modelData ? "#000" : Theme.foreground
+                                        color: root.activeProfile === modelData ? Theme.background : Theme.foreground
                                         font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s; font.weight: Font.Medium
                                         Behavior on color { ColorAnimation { duration: Motion.fast } }
                                     }
                                     MotionArea {
                                         anchors.fill: parent; cursorShape: Qt.PointingHandCursor
+                                        accessibleName: qsTr("Perfil de energía: %1").arg(profileLabel.text)
+                                        Accessible.role: Accessible.RadioButton
+                                        Accessible.checked: root.activeProfile === modelData
                                         hoverWash: false
                                         onClicked: root.setProfile(modelData)
                                     }
