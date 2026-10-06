@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import "surfaces"
 ShellRoot {
+    settings.watchFiles: false
     Item {
         width: 1000; height: 340
         OverviewSurface { id: overview; open: true; s: 1; screenName: "overview-test" }

@@ -41,7 +41,16 @@ with tempfile.TemporaryDirectory(prefix='isla-settings-') as directory:
 
         try:
             wait(lambda x: x['loaded'])
-            assert call('schema')['sections']['appearance']['fontScale']['minimum'] == 0.75
+            schema = call('schema')
+            assert schema['sections']['appearance']['fontScale']['minimum'] == 0.75
+            assert schema['sections']['appearance']['fontScale']['label'] == 'Tamaño de texto'
+            catalog = call('catalog')
+            assert catalog['availabilityIsLive'] is False
+            assert catalog['sections']['appearance']['pillBlur']['availability'] == 'inactive'
+            assert catalog['sections']['appearance']['clockSeconds']['availability'] == 'partial'
+            assert catalog['requiredModules'][0]['id'] == 'pill'
+            assert len(catalog['surfaces']) == 14
+            assert catalog['optionalModules'][1]['dependencyMode'] == 'any'
             assert call('validate', '{"appearance":{"fontScale":0}}')['ok'] is False
             assert call('update', '{"appearance":{"fontScale":1.2},"custom":{"keep":7}}')['ok']
             assert call('get')['dirty']

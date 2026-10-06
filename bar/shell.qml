@@ -6,7 +6,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Hyprland
 import "Singletons"
 import "components"
 import "windows"
@@ -27,8 +26,8 @@ import "windows"
  *    retraída.
  *
  * `IpcHandler { target: "island" }` expone clock/mixer/media/calendar/peek/hide
- * para keybinds. Un monitor vacío resuelve al foco. Raw-event allowlist →
- * `refresh()` (sólo lo que cambia lo renderizado).
+ * para keybinds. Un monitor vacío resuelve al foco. ShellRuntime integra
+ * los servicios del escritorio con el router.
  */
 ShellRoot {
     id: root
@@ -37,92 +36,9 @@ ShellRoot {
 
     SurfaceRouter {
         id: navigation
-        focusedMonitorName: Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
-        reduceMotion: Flags.reduceMotion
-        resultsDuration: Motion.standard
-        morphDuration: Motion.morph
-        onAuthCloseRequested: {
-            if (Auth.sudoActive) Auth.cancelSudo()
-            if (Auth.active) Auth.cancel()
-        }
-        onOpenSurfaceChanged: {
-            WinMap.active = navigation.openSurface === "overview"
-            if (WinMap.active) WinMap.updateAll()
-            Notifs.centerOpen = navigation.openSurface === "notifs"
-        }
     }
 
-    function refresh() {
-        Hyprland.refreshMonitors();
-        Hyprland.refreshWorkspaces();
-        Hyprland.refreshToplevels();
-    }
-
-    Component.onCompleted: {
-        // fuerza instanciación de singletons referenciándolos explícitamente
-        refresh()
-        Config.loaded
-        Brightness.available
-        Session.lockCmd
-        Auth.active
-        KeepAwake.enabled      // fuerza singleton KeepAwake
-    }
-
-    Binding {
-        target: Auth; property: "polkitFeedbackDuration"
-        value: Flags.reduceMotion ? 220 : Math.max(750, Motion.morph + Motion.iconSwap + Motion.fast)
-    }
-    Binding {
-        target: Auth; property: "sudoFeedbackDuration"
-        value: Flags.reduceMotion ? 220 : Math.max(1100, Motion.morph + Motion.iconSwap + Motion.fast)
-    }
-
-    // Polkit entrega las solicitudes gráficas directamente a la pill. Las
-    // solicitudes de sudo del wrapper Fish usan el puente askpass; sudo valida.
-    Connections {
-        target: Auth
-        function openAuthSurface() {
-            var mon = Hyprland.focusedMonitor
-            if (!mon && Quickshell.screens.length > 0)
-                mon = Quickshell.screens[0]
-            navigation.present(mon ? mon.name : "", "auth")
-            console.log("[Auth] surface monitor:", navigation.openMon)
-        }
-        function onAuthenticationRequestStarted() {
-            openAuthSurface()
-        }
-        function onSudoRequestStarted() {
-            console.log("[Auth] opening sudo surface")
-            openAuthSurface()
-        }
-        function onPresentingChanged() {
-            if (Auth.presenting) {
-                if (navigation.openSurface !== "auth") openAuthSurface()
-            } else if (navigation.openSurface === "auth") navigation.close()
-        }
-
-    }
-
-    /** Sólo estos raw-events cambian lo que la pill renderiza. */
-    readonly property var refreshEvents: ({
-        workspace: true, workspacev2: true,
-        createworkspace: true, createworkspacev2: true,
-        destroyworkspace: true, destroyworkspacev2: true,
-        moveworkspace: true, moveworkspacev2: true,
-        renameworkspace: true, activespecial: true,
-        focusedmon: true, focusedmonv2: true,
-        openwindow: true, closewindow: true,
-        movewindow: true, movewindowv2: true,
-        fullscreen: true,
-        monitoradded: true, monitoraddedv2: true, monitorremoved: true
-    })
-
-    Connections {
-        target: Hyprland
-        function onRawEvent(event) {
-            if (root.refreshEvents[event.name]) root.refresh();
-        }
-    }
+    ShellRuntime { router: navigation }
 
     IpcHandler {
         target: "island"

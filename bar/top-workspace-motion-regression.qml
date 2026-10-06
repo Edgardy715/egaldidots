@@ -10,7 +10,6 @@ ShellRoot {
         height: 50
         TopWorkspaceRail {
             id: rail
-            screenName: "motion-test"
             availableWidth: 300
         }
     }

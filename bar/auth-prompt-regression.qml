@@ -6,6 +6,7 @@ import "Singletons"
 
 // Fake service: this file never imports Auth or registers Polkit/askpass.
 ShellRoot {
+    settings.watchFiles: false
     Window {
         id: window
         visible: true; width: 760; height: 280; color: Theme.background

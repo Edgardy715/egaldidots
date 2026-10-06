@@ -79,7 +79,25 @@ ShellRoot {
             test.check(router.openSurface === "" && router.openMon === "" && router.launcherClosePhase === 0, "complete two-phase close")
             router.focusedMonitorName = ""
             router.toggleSurface("", "calendar")
-            test.check(router.openSurface === "", "no monitor no pending navigation")
+            test.check(router.openSurface === "" && router.pendingFocusSurface === "calendar", "startup request waits for monitor")
+            router.toggleSurface("", "launcher")
+            router.focusedMonitorName = "DP-1"
+            test.check(router.mediaDockPendingMon === "DP-1" && router.mediaDockPendingSurface === "launcher", "latest startup request resumes docking")
+            router.finishMediaDock("DP-1")
+            test.check(router.openSurface === "launcher", "first launcher request survives monitor startup")
+            router.close()
+            router.reduceMotion = true
+            router.close()
+            router.focusedMonitorName = ""
+            router.toggleSurface("", "calendar")
+            router.toggleSurface("", "calendar")
+            router.focusedMonitorName = "DP-1"
+            test.check(router.openSurface === "" && router.pendingFocusSurface === "", "repeated startup toggle cancels")
+            router.focusedMonitorName = ""
+            router.toggleSurface("", "calendar")
+            router.close()
+            router.focusedMonitorName = "DP-1"
+            test.check(router.openSurface === "", "hide cancels startup request")
             console.log("PASS: routing, dock cancellation, auth priority, two-phase close, interruption and reduced motion")
             Qt.quit()
         }

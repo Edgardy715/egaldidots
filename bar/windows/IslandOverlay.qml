@@ -35,15 +35,31 @@ PanelWindow {
     readonly property bool mediaDocking: router.mediaDockPendingMon === modelData.name
     readonly property bool launcherClosing: launcherOpen && router.launcherClosePhase !== 0
     readonly property bool launcherReturning: launcherOpen && router.launcherClosePhase === 2
+    OverlayInputPolicy {
+        id: inputPolicy
+        monitorName: overlay.modelData ? overlay.modelData.name : ""
+        focusedMonitorName: Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
+        monitors: Hyprland.monitors.values
+        surface: overlay.surface
+        launcherClosing: overlay.launcherClosing
+        pillX: pill.x; pillY: pill.y
+        pillWidth: pill.width; pillHeight: pill.height
+        pillTargetW: pill.targetW; pillTargetH: pill.targetH
+        mediaActive: fluidCompanion.active
+        mediaX: fluidCompanion.xPos; mediaY: fluidCompanion.yPos
+        mediaW: fluidCompanion.wPos; mediaH: fluidCompanion.hPos
+        sessionActive: sessionCompanion.active
+        sessionX: sessionCompanion.visualX; sessionY: sessionCompanion.yPos
+        sessionW: sessionCompanion.wPos; sessionH: sessionCompanion.hPos
+    }
     /** Este monitor es el que tiene foco (para que el overview/wallpaper sólo
      *  robe teclado en él y las flechas/Tab operen en la pantalla correcta). */
-    readonly property bool monitorIsFocused:
-        (Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : "") === (modelData ? modelData.name : "")
+    readonly property bool monitorIsFocused: inputPolicy.monitorIsFocused
     /** Una surface abierta debe conservar siempre su ruta de cierre. No
      *  dependemos del monitor enfocado: una llamada IPC puede abrirla
      *  durante el mismo frame en que Hyprland aún no actualizó
      *  `focusedMonitor`, y eso dejaba ESC sin receptor. */
-    readonly property bool kbFocusWanted: surfaceOpen && !monFullscreen && !launcherClosing
+    readonly property bool kbFocusWanted: inputPolicy.kbFocusWanted
     // modal = agarra input full-screen + backdrop-dismiss. SOLO cuando una
     // surface real está abierta (overview/media/calendar/…). En reposo NUNCA:
     // ni hover ni peek capturan la pantalla (pill.pinned es sólo visual).
@@ -52,24 +68,14 @@ PanelWindow {
     // congelado": el dismiss MouseArea se los comía; si el HoverHandler no
     // soltaba hovered, quedaba pegado para siempre). Tide-island usa unión
     // de regiones por-surface (nunca full-screen) — acá removemos la causa.
-    readonly property bool modal: surfaceOpen && !launcherClosing
+    readonly property bool modal: inputPolicy.modal
 
     /**
      * True mientras el workspace activo de este monitor tiene una
      * ventana en fullscreen real: la pill se retrae y la capa entera
      * es click-through. (defensivo: si lastIpcObject falta → false)
      */
-    readonly property bool monFullscreen: {
-        var mons = Hyprland.monitors.values;
-        for (var i = 0; i < mons.length; i++) {
-            if (mons[i].name === modelData.name) {
-                var ws = mons[i].activeWorkspace;
-                var o = ws ? ws.lastIpcObject : null;
-                return o ? !!o.hasfullscreen : false;
-            }
-        }
-        return false;
-    }
+    readonly property bool monFullscreen: inputPolicy.monFullscreen
 
     onMonFullscreenChanged: if (monFullscreen) {
         if (router.openMon === modelData.name) router.close();
@@ -82,7 +88,7 @@ PanelWindow {
     // Spotlight necesita poseer el teclado de forma determinista. El modo
     // OnDemand (usado por `focusable`) depende de la ventana previa y a
     // veces no recibe ni texto ni Escape en Hyprland.
-    WlrLayershell.keyboardFocus: (overlay.launcherOpen && !overlay.launcherClosing) || overlay.wallpaperOpen || overlay.overviewOpen || overlay.surface === "clipboard" || overlay.surface === "session" || overlay.surface === "auth"
+    WlrLayershell.keyboardFocus: inputPolicy.exclusiveFocus
         ? WlrKeyboardFocus.Exclusive
         : overlay.kbFocusWanted ? WlrKeyboardFocus.OnDemand
         : WlrKeyboardFocus.None
@@ -97,33 +103,29 @@ PanelWindow {
 
     anchors { top: true; left: true; right: true; bottom: true }
 
-    mask: monFullscreen ? hiddenRegion : (modal ? fullRegion : pillRegion)
+    mask: inputPolicy.maskMode === "hidden" ? hiddenRegion : (inputPolicy.maskMode === "full" ? fullRegion : pillRegion)
     Region { id: hiddenRegion }
     Region {
         id: pillRegion
-        readonly property real baseW: Math.max(pill.width, pill.targetW)
-        readonly property real baseH: Math.max(pill.height, pill.targetH)
-        x: Math.min(pill.x + (pill.width - baseW) / 2,
-                    sessionCompanion.active ? sessionCompanion.visualX : pill.x)
-        y: Math.min(pill.y, fluidCompanion.active ? fluidCompanion.yPos : pill.y)
-        width: Math.max(pill.x + baseW,
-            fluidCompanion.active ? fluidCompanion.xPos + fluidCompanion.wPos : pill.x + baseW) - x
-        height: Math.max(pill.y + baseH,
-            fluidCompanion.active ? fluidCompanion.yPos + fluidCompanion.hPos : pill.y + baseH,
-            sessionCompanion.active ? sessionCompanion.yPos + sessionCompanion.hPos : pill.y + baseH) - y
+        readonly property real baseW: inputPolicy.baseW
+        readonly property real baseH: inputPolicy.baseH
+        x: inputPolicy.maskX
+        y: inputPolicy.maskY
+        width: inputPolicy.maskW
+        height: inputPolicy.maskH
         onXChanged: changed()
         onYChanged: changed()
         onWidthChanged: changed()
         onHeightChanged: changed()
         Region {
-            x: workspaceRail.x; y: workspaceRail.y
-            width: workspaceRail.visible ? workspaceRail.width : 0
-            height: workspaceRail.visible ? workspaceRail.height : 0
+            x: sideModules.workspaceModule.x; y: sideModules.workspaceModule.y
+            width: sideModules.workspaceModule.interactive ? sideModules.workspaceModule.width : 0
+            height: sideModules.workspaceModule.interactive ? sideModules.workspaceModule.height : 0
         }
         Region {
-            x: systemStatus.x; y: systemStatus.y
-            width: systemStatus.visible ? systemStatus.width : 0
-            height: systemStatus.visible ? systemStatus.height : 0
+            x: sideModules.statusModule.x; y: sideModules.statusModule.y
+            width: sideModules.statusModule.interactive ? sideModules.statusModule.width : 0
+            height: sideModules.statusModule.interactive ? sideModules.statusModule.height : 0
         }
     }
     Region {
@@ -155,19 +157,7 @@ PanelWindow {
         z: 0
         onPressed: (mouse) => {
             if (overlay.surfaceOpen) {
-                var inside = mouse.x >= pill.x && mouse.x <= pill.x + pillRegion.baseW
-                          && mouse.y >= pill.y && mouse.y <= pill.y + pillRegion.baseH;
-                var inMedia = fluidCompanion.active
-                    && mouse.x >= fluidCompanion.xPos
-                    && mouse.x <= fluidCompanion.xPos + fluidCompanion.wPos
-                    && mouse.y >= fluidCompanion.yPos
-                    && mouse.y <= fluidCompanion.yPos + fluidCompanion.hPos
-                var inSession = sessionCompanion.active
-                    && mouse.x >= sessionCompanion.visualX
-                    && mouse.x <= sessionCompanion.visualX + sessionCompanion.wPos
-                    && mouse.y >= sessionCompanion.yPos
-                    && mouse.y <= sessionCompanion.yPos + sessionCompanion.hPos
-                if (!inside && !inMedia && !inSession) router.close();
+                if (inputPolicy.outsideBodies(mouse.x, mouse.y)) router.close();
             } else {
                 router.peekMon = "";
             }
@@ -178,7 +168,7 @@ PanelWindow {
     // Limit the grab to auth so ordinary surfaces keep their normal
     // click-through behavior.
     HyprlandFocusGrab {
-        active: overlay.surface === "auth" && overlay.surfaceOpen
+        active: inputPolicy.authFocusGrab
         windows: [overlay]
     }
 
@@ -186,7 +176,7 @@ PanelWindow {
     // surface (por ejemplo el TextInput del launcher) tiene el foco.
     Shortcut {
         sequence: "Escape"
-        enabled: overlay.surfaceOpen && !overlay.sessionOpen && overlay.surface !== "auth"
+        enabled: inputPolicy.escapeShortcutEnabled
         onActivated: router.close()
     }
 
@@ -212,35 +202,15 @@ PanelWindow {
             onHoveredChanged: pill.hovered = hovered
         }
 
-        TopWorkspaceRail {
-            id: workspaceRail
+        TopBarModules {
+            id: sideModules
+            anchors.fill: parent
             z: 1
-            anchors.left: parent.left
-            anchors.leftMargin: 26 * overlay.s
-            anchors.top: parent.top
-            anchors.topMargin: overlay.topGap
             s: overlay.s
             screenName: overlay.modelData.name
+            topGap: overlay.topGap
             availableWidth: overlay.lateralAvailable
-            opacity: overlay.surfaceOpen || overlay.monFullscreen ? 0 : 1
-            visible: opacity > 0.01 && fits
-            Behavior on opacity { NumberAnimation { duration: Motion.fast } }
-            onRequestWorkspaces: router.toggleSurface(overlay.modelData.name, "workspaces")
-        }
-
-        TopSystemStatus {
-            id: systemStatus
-            z: 1
-            anchors.right: parent.right
-            anchors.rightMargin: 26 * overlay.s
-            anchors.top: parent.top
-            anchors.topMargin: overlay.topGap
-            s: overlay.s
-            screenName: overlay.modelData.name
-            availableWidth: overlay.lateralAvailable
-            opacity: overlay.surfaceOpen || overlay.monFullscreen ? 0 : 1
-            visible: opacity > 0.01 && availableWidth >= 142 * s
-            Behavior on opacity { NumberAnimation { duration: Motion.fast } }
+            presented: !overlay.surfaceOpen && !overlay.monFullscreen
             onRequestSurface: name => router.toggleSurface(overlay.modelData.name, name)
         }
 

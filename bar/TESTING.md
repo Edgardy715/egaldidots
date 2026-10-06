@@ -267,3 +267,133 @@ sintéticas. No usa ni modifica el portapapeles real.
 cambios rápidos, overflow, selección y modelo visual sin secretos. Usa
 ISLA_LOCK_CAPTURE_DIR para capturas opcionales. Son previews: no bloquean
 la sesión ni envían PAM. IME real necesita validación adicional.
+
+### Apps del lateral derecho
+
+`ISLA_CONFIG=/tmp/isla-status-test.json QT_QPA_PLATFORM=wayland quickshell -p bar/top-system-status-regression.qml`
+comprueba iconos visibles, identidad/deduplicación, entrada/salida, retarget de
+ancho, vacío, overflow acotado, reduceMotion y ocultación con ventanas falsas.
+Crear config temporal con `{}`; también admite offscreen. ISLA_STATUS_SHOTS
+apunta a un directorio existente para capturas intermedias/finales.
+La misma fixture comprueba ahora nombre inicial1800ms, contracción automática,
+hover real QtTest y retirada, y exclusión del nombre cuando hay varias apps.
+
+### Módulos opcionales
+
+`ISLA_CONFIG=/tmp/isla-modules-test.json QT_QPA_PLATFORM=wayland quickshell -p bar/optional-modules-regression.qml`
+verifica configuración, entrada/salida e inversión, descarga de Loaders, liberación
+inmediata de interacción, controles individuales y acción del mezclador, ancho
+adaptable, ocultación temporal, ausencia de animación y reduceMotion durante
+una salida. `ISLA_MODULE_SHOTS=/directorio/existente` exporta capturas comparables.
+También funciona en offscreen para invariantes; QA visual requiere Wayland.
+`node bar/tests/settings.cjs` cubre defaults y tipos del contrato `modules`.
+
+### Adaptador de estado de la pill
+
+`ISLA_CONFIG=/tmp/isla-status-adapter-check.json QT_QPA_PLATFORM=offscreen quickshell -p bar/island-status-adapter-regression.qml`
+comprueba debounce hacia el último valor, señales volumen/mic/brillo, escala del
+fallback y API Caps Lock. Deshabilita observación de servicios en la fixture;
+no modifica volumen, brillo ni batería reales. Complementar con
+`status-regression.qml` y `motion-regression.qml` al cambiar composición de Pill.
+
+### Modelo de workspaces separado
+
+`ISLA_CONFIG=/tmp/isla-workspace-model-check.json QT_QPA_PLATFORM=wayland quickshell -p bar/workspace-model-regression.qml`
+inyecta dos monitores, valida activo/cantidad/ocupación/urgencia y fallback vacío,
+y pulsa el rail con QtTest para comprobar su señal sin despachar Hyprland real.
+`top-workspace-motion-regression.qml` conserva cobertura de seguimiento,
+inversión, reposo, ocultación y reduceMotion del motor visual independiente.
+
+### Geometría y estado compartido
+
+`ISLA_CONFIG=/tmp/isla-geometry-check.json QT_QPA_PLATFORM=offscreen quickshell -p bar/pill-geometry-regression.qml`
+comprueba dimensiones conocidas de reposo/auth/launcher/media/notificación,
+carga pendiente, calculadora, límite de resultados, retorno y escala/fallback.
+El componente no necesita servicios ni monitores.
+
+`ISLA_CONFIG=/tmp/isla-fanout-check.json QT_QPA_PLATFORM=offscreen quickshell -p bar/desktop-status-fanout-regression.qml`
+inyecta eventos en DesktopStatus con observación externa deshabilitada sólo
+para la fixture. Comprueba dos adapters, debounce, fallback/escala local,
+Caps Lock compartido y un tercer adapter desconectado. No escribe a dispositivos.
+Las fixtures QtTest de opcionales/apps/modelo desactivan hot reload para evitar
+la destrucción de QtTest mientras otro proceso modifica fuentes.
+
+`ISLA_CONFIG=/tmp/isla-material-check.json QT_QPA_PLATFORM=offscreen quickshell -p bar/material-choreography-regression.qml`
+verifica progreso/reinicio/fin del barrido y pulso, y reset/supresión con reduceMotion.
+La regresión de morph prueba también que abrir una surface incrementa epoch,
+que hover no lo hace y que el pulso real se detiene al reducir movimiento.
+
+### Panel de workspaces separado
+
+```sh
+QT_QPA_PLATFORM=offscreen quickshell -p bar/workspaces-surface-regression.qml
+```
+
+Comprueba diez tarjetas, contador de ventanas y aislamiento por monitor,
+workspace activo fuera de la cuadrícula y clic en el espacio vacío 10.
+La vista emite navegación sin ejecutar un cambio de escritorio real.
+
+### Controles rápidos sin servicios
+
+```sh
+ISLA_CONFIG=/tmp/isla-quick-controls-test.json QT_QPA_PLATFORM=offscreen quickshell -p bar/quick-controls-regression.qml
+```
+
+Datos simulados de brillo, permisos, Keep Awake y perfiles; clics/slider emiten
+acciones capturadas por la prueba, sin modificar brillo, inhibición ni energía.
+Confirma también navegación hacia Apariencia. Usar una ruta temporal exclusiva.
+
+
+### Separación integral de las catorce surfaces
+
+`bash bar/tests/verify-config.sh` incluye el gate `surface-boundaries.cjs`:
+catálogo completo, vistas sin servicios/procesos/acciones nativas.
+
+Con ISLA_CONFIG apuntando a una ruta temporal exclusiva y QT_QPA_PLATFORM=offscreen,
+ejecutar `quickshell -p bar/<fixture>.qml` para:
+
+- surface-data-contract-regression: MediaView, OverviewView y borrador/guardado
+  asíncrono de AppearanceEditor con Config simulado.
+- calendar-data-regression: calendario bisiesto, escala, parser WWO y errores,
+  sin consultas de red (`observe: false`).
+- mixer-surface-regression, connectivity-surface-regression y
+  notifs-surface-regression: datos simulados y señales, sin acciones nativas.
+- launcher-controller-regression: búsqueda diferida y calculadora.
+- interaction-surfaces-regression: carga de las 14 surfaces; Auth recibe fakeAuth
+  mediante propiedades iniciales del Loader, evitando registrar Polkit o sustituir
+  el socket sudo de la shell real.
+
+Complementar con auth-prompt-regression, session-regression, media-session-regression,
+overview-regression, input-motion-regression, wallpaper-regression y
+`bash bar/tests/clipboard-regression.sh` (cliphist/wl-copy simulados).
+Exigir marcador PASS y ausencia de FAIL; el exit 0 de QtTest no basta.
+La carga offscreen no sustituye QA visual Wayland ni valida hardware/PAM reales.
+
+
+### Composición de pill y política de input
+
+Con ISLA_CONFIG temporal exclusivo, ejecutar:
+
+```sh
+QT_QPA_PLATFORM=offscreen quickshell -p bar/pill-composition-regression.qml
+QT_QPA_PLATFORM=offscreen quickshell -p bar/overlay-input-policy-regression.qml
+```
+
+La primera inyecta datos de cabecera, hace clic en el reloj, comprueba ancho de
+workspace, reversión de morph, exposición y respiración/reduced motion.
+La segunda usa monitores/dimensiones simulados para comprobar foco, fullscreen,
+regiones de ambos companions, backdrop, Auth y liberación durante cierre.
+Complementar con motion-regression, surface-choreography-regression,
+notification-regression y optional-modules-regression. Exigir PASS y ausencia
+ de FAIL. El gate verify-config también cubre PillHeaderView, PillMorphMotion
+ y OverlayInputPolicy sin servicios o IO.
+
+
+### Catálogo de configuración
+
+verify-config.sh ejecuta settings.cjs: cobertura de todos los campos y surfaces
+físicas, reglas/defaults sin cambios, referencias de dependencias y módulos.
+`python bar/tests/settings-integration.py` comprueba schema/catalog por IPC con
+configuración temporal, además de edición, rechazo, cancelación y persistencia.
+`config-regression.qml` comprueba consumidores reactivos y guardado atómico.
+El catálogo declara disponibilidad, no efectúa detección actual de capacidades.

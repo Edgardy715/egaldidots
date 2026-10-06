@@ -4,6 +4,13 @@ import QtQuick
 QtObject {
     id: root
     property string focusedMonitorName: ""
+    property string pendingFocusSurface: ""
+    onFocusedMonitorNameChanged: {
+        if (!focusedMonitorName || !pendingFocusSurface) return
+        const surface = pendingFocusSurface
+        pendingFocusSurface = ""
+        toggleSurface(focusedMonitorName, surface)
+    }
     property bool reduceMotion: false
     property int resultsDuration: 250
     property int morphDuration: 420
@@ -20,6 +27,7 @@ QtObject {
 
     // An authentication request supersedes pending dock/open/close work.
     function present(mon, surface) {
+        pendingFocusSurface = ""
         launcherCloseResultsTimer.stop()
         launcherClosePillTimer.stop()
         launcherClosePhase = 0
@@ -32,7 +40,11 @@ QtObject {
     /** Monitor vacío → monitor con foco, para que los keybinds salten el jq. */
     function toggleSurface(mon, surface) {
         if (!mon || mon.length === 0) mon = focusedMonitorName
-        if (!mon) return
+        if (!mon) {
+            pendingFocusSurface = pendingFocusSurface === surface ? "" : surface
+            return
+        }
+        pendingFocusSurface = ""
         if (root.mediaDockPendingMon.length > 0) {
             const cancel = surface === root.mediaDockPendingSurface && root.mediaDockPendingMon === mon
             root.mediaDockPendingMon = ""
@@ -71,6 +83,7 @@ QtObject {
     }
 
     function close() {
+        pendingFocusSurface = ""
         root.mediaDockPendingMon = ""
         if (root.openSurface === "launcher") {
             if (root.reduceMotion) {

@@ -16,11 +16,13 @@ ShellRoot {
     Timer {
         interval: 20; running: true
         onTriggered: {
+            check(pill.wsReady, "first workspace action must be ready after construction")
             const epoch = pill.materialEpoch
             pill.hovered = true
             check(pill.materialEpoch === epoch, "hover must not start a decorative sweep")
             pill.hovered = false
             pill.surface = "calendar"
+            check(pill.materialEpoch === epoch + 1, "opening a surface must awaken material")
         }
     }
     Timer { interval: 110; running: true; onTriggered: pill.surface = "mixer" }
@@ -43,7 +45,15 @@ ShellRoot {
             while (host && host.displayedSurface === undefined) host = host.parent
             check(host && host.displayedSurface === "mixer", "surface swap must commit")
             check(host && host.swapOpacity > 0.99, "swap must reveal content")
-            pill.materialPulse = 0.7
+            pill.awakenMaterial()
+            reduceCheck.start()
+        }
+    }
+    Timer {
+        id: reduceCheck
+        interval: 80
+        onTriggered: {
+            check(pill.materialPulse > 0, "material pulse must start")
             Config.update({ appearance: { reduceMotion: true } })
             check(pill.materialPulse === 0, "reduced motion must stop a running material pulse")
             stagger.entered = true
@@ -51,7 +61,7 @@ ShellRoot {
         }
     }
     Timer {
-        interval: 1800; running: true
+        interval: 1900; running: true
         onTriggered: {
             check(Math.abs(pill.width - pill.targetW) < 0.01 && Math.abs(pill.height - pill.targetH) < 0.01,
                   "reduced motion must resolve geometry directly")

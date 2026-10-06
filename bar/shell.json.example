@@ -28,5 +28,14 @@
   },
   "profile": {
     "displayName": ""
+  },
+  "modules": {
+    "workspaceRail": true,
+    "systemStatus": true,
+    "apps": true,
+    "audio": true,
+    "network": true,
+    "battery": true,
+    "animateChanges": true
   }
 }

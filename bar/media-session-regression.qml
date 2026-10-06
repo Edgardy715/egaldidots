@@ -4,6 +4,7 @@ import Quickshell.Services.Mpris
 import "components"
 
 ShellRoot {
+    settings.watchFiles: false
     id: test
     function check(value, message) {
         if (!value) { console.error("FAIL: " + message); Qt.exit(1) }

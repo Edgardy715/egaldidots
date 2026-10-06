@@ -24,4 +24,5 @@ test -f "$root/components/IslandMediaMetadata.qml"
 
 test -f "$root/components/IslandMediaSummary.qml"
 node "$root/tests/settings.cjs"
+node "$root/tests/surface-boundaries.cjs"
 echo 'Isla configuration checks passed.'

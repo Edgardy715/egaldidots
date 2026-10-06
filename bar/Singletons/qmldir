@@ -15,6 +15,7 @@ singleton Brightness Brightness.qml
 singleton KeepAwake KeepAwake.qml
 singleton Session Session.qml
 singleton Auth Auth.qml
+singleton DesktopStatus DesktopStatus.qml
 singleton Nmcli Nmcli.qml
 # NotifData NO es singleton: es un tipo instanciable (uno por notificación, vía
 # notifComp.createObject). Mismo patrón que NotifCard en components/ (plain type 1.0).

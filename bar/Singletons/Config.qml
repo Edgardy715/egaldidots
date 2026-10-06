@@ -17,6 +17,8 @@ Singleton {
     readonly property string configFile: Quickshell.env("ISLA_CONFIG") || configHome + "/isla/shell.json"
     readonly property var context: ({ home: home, configHome: configHome, cacheHome: cacheHome })
     readonly property var schema: Settings.schema(context)
+    readonly property var catalog: Settings.catalog(context)
+    readonly property var modules: _effective.modules
     readonly property var profile: _effective.profile
     readonly property string userAvatar: _effective.paths.userAvatar
     readonly property var appearance: _effective.appearance
@@ -167,6 +169,7 @@ Singleton {
         target: "settings"
         function get(): string { return JSON.stringify(root.snapshot()) }
         function schema(): string { return JSON.stringify(root.schema) }
+        function catalog(): string { return JSON.stringify(root.catalog) }
         function validate(document: string): string {
             try { return JSON.stringify(root.validate(JSON.parse(document))) }
             catch (exception) { return JSON.stringify({ ok: false, errors: [String(exception)] }) }
