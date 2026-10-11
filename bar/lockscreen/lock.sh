@@ -3,6 +3,7 @@ set -u
 
 lock_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 runtime_dir="${XDG_RUNTIME_DIR:-/tmp}"
+export QML_IMPORT_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/isla/qml${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}"
 unset QS_LOCK_PREVIEW QS_LOCK_PREVIEW_SHOT QS_LOCK_PREVIEW_WIDTH QS_LOCK_PREVIEW_HEIGHT QS_LOCK_PREVIEW_DELAY
 
 # hypridle, loginctl and Super+L may request a lock at the same time.

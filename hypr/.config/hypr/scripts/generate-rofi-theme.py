@@ -176,6 +176,10 @@ message textbox {{
 """
 
 output = os.path.expanduser('~/.config/rofi/themes/wallpaper-picker.rasi')
+os.makedirs(os.path.dirname(output), exist_ok=True)
+# A legacy folded Stow link must never write generated CSS into the checkout.
+if os.path.islink(output):
+    os.unlink(output)
 with open(output, 'w') as f:
     f.write(theme)
 

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export QML_IMPORT_PATH="${XDG_DATA_HOME:-$HOME/.local/share}/isla/qml${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}"
+exec quickshell -c bar "$@"
