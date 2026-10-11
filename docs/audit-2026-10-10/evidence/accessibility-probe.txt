@@ -1,0 +1,15 @@
+  INFO: Launching config: "/tmp/isla-audit-isolated/accessibility-probe.qml"
+  INFO: Shell ID: "4b5b6dd8f6df87b352ade7499e72b6c4" Path ID "4b5b6dd8f6df87b352ade7499e72b6c4"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/o6pj8ipmt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ DEBUG qml: PROBE mouse activation 1
+ DEBUG qml: PROBE keyboard activation 2
+ DEBUG qml: PROBE accessible activation 2
+ DEBUG qml: PROBE accessible role/name 43 QA action
+ DEBUG qml: PROBE transport/toggle accessibility 0 0
+ DEBUG qml: PROBE slider right value/tab/role 0.5 false 0
+ DEBUG qml: PROBE slider mouse value 0.9577464788732394
+[codex-output: log=/home/zdito/.cache/codex-economy/output-1yajailr.log exit=0]

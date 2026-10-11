@@ -250,3 +250,25 @@ empezar A; las preferencias nuevas se agregan al contrato cuando se implementan.
 Recomiendo empezar con **app + módulos opcionales + laboratorio de tres escenas**.
 Es una base utilizable y muestra la identidad de Isla. Este documento deja las
 demás ideas priorizadas para decidirlas sin comprometer el funcionamiento actual.
+
+## Aplicación en Edots · 2026-10-06
+
+Revisión directa de fuentes oficiales tras construir la primera app. Caelestia
+consultado en `6f7ce62b7a6ff9e37b66526065643ca6e9d65783`; Serpantinum mantiene
+`f11dab189c4e40df3f28d76187e4d63a7a982fee`. Noctalia consultado en documentación
+v5 actual, distinguiéndola de la versión QML legacy. No se ejecutaron estas
+shells ni se copió su código; las conclusiones de interacción son documentales.
+
+| Evidencia de referencia | Adaptación implementada en Edots |
+| --- | --- |
+| [Nexus PageRegistry](https://github.com/caelestia-dots/shell/blob/6f7ce62b7a6ff9e37b66526065643ca6e9d65783/modules/nexus/PageRegistry.qml) declara categorías, iconos y descripciones. | Seis páginas por intención: Apariencia, Composición, Movimiento, Tipografía, Perfil y Avanzado. |
+| [TaskbarPanel](https://github.com/caelestia-dots/shell/blob/6f7ce62b7a6ff9e37b66526065643ca6e9d65783/modules/nexus/pages/panels/TaskbarPanel.qml) agrupa comportamiento y componentes. | Movimiento separado con laboratorio/presets; tipografía con muestra; campos de avatar junto al perfil. |
+| [Noctalia Shell](https://github.com/noctalia-dev/noctalia/blob/main/docs/user/configuration/shell.mdx) expone show_advanced y expand_all_groups. | Opciones sin consumidor fuera del flujo habitual, descubribles en Avanzado y búsqueda; controles de toggle compactos. |
+| [Serpantinum GuidePopup](https://github.com/ilyamiro/serpantinum/blob/f11dab189c4e40df3f28d76187e4d63a7a982fee/src/quickshell/guide/GuidePopup.qml) indexa etiquetas, descripción, sección y palabras clave. | Búsqueda global por múltiples términos, sin depender de acentos, con total de resultados y edición directa. |
+| [Serpantinum BarGeneralTab](https://github.com/ilyamiro/serpantinum/blob/f11dab189c4e40df3f28d76187e4d63a7a982fee/src/quickshell/guide/bar/BarGeneralTab.qml) ofrece composición visual y reset acotado. | Diagrama izquierda/Isla/derecha con módulos activables; restablecimiento individual al default del contrato sin tocar otros borradores. |
+
+El editor de Edots conserva la posición que realmente soporta Isla: no ofrece
+arrastre/reordenamiento persistente porque no existe ese contrato. `Personalizado`
+significa valor diferente al default, no procedencia de override. Mantiene
+Guardar/Descartar explícitos: no copia el modelo de capas/autoguardado de
+[Noctalia v5](https://docs.noctalia.dev/noctalia/configuration/).

@@ -334,3 +334,11 @@ See the [architecture and configuration contract](docs/SHELL_ARCHITECTURE.md).
 ## 📜 License
 
 MIT © 2026 [Edgardy715](https://github.com/Edgardy715) — see [LICENSE](./LICENSE).
+
+## Edots settings app
+
+Press **Win + I** to unfold settings from Isla to the center of the screen.
+Open `bar/settings/open.sh` while Isla is running, or install its launcher with
+`bar/settings/install.sh`. Native Qt Quick settings, live preview, global search,
+and save/discard use the shell’s existing configuration service.
+See [Edots](docs/EDOTS.md) for controls, motion, validation and scope.

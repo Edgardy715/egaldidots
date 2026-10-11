@@ -1,0 +1,402 @@
+Warning: bar/Singletons/Notifs.qml:229:9: Type QProcess::ExitStatus of parameter exitStatus in signal called exited was not found, but is required to compile onExited. Did you add all imports and dependencies? [signal-handler-parameters]
+        onExited: code => {
+        ^^^^^^^^
+Warning: bar/components/QuickControlsAdapter.qml:70:9: Type QProcess::ExitStatus of parameter exitStatus in signal called exited was not found, but is required to compile onExited. Did you add all imports and dependencies? [signal-handler-parameters]
+        onExited: code => {
+        ^^^^^^^^
+Warning: bar/components/QuickControlsAdapter.qml:79:9: Type QProcess::ExitStatus of parameter exitStatus in signal called exited was not found, but is required to compile onExited. Did you add all imports and dependencies? [signal-handler-parameters]
+        onExited: code => Qt.callLater(() => {
+        ^^^^^^^^
+Info: bar/components/QuickControlsAdapter.qml:2:1: Unused import [unused-imports]
+import Quickshell
+^^^^^^
+Warning: bar/components/QuickControlsAdapter.qml:10:61: Member "open" not found on type "QQuickItem" [missing-property]
+    property bool open: parent && "open" in parent ? parent.open : visible
+                                                            ^^^^
+Warning: bar/components/QuickControlsView.qml:273:29: Cannot combine value source and binding on property "opacity" [duplicate-property-binding]
+                            NumberAnimation on opacity { from: 0; to: 0.8; duration: Motion.fast }
+                            ^^^^^^^^^^^^^^^
+Warning: bar/components/ClipboardController.qml:90:9: Type QProcess::ExitStatus of parameter exitStatus in signal called exited was not found, but is required to compile onExited. Did you add all imports and dependencies? [signal-handler-parameters]
+        onExited: code => {
+        ^^^^^^^^
+Warning: bar/components/ClipboardController.qml:135:9: Type QProcess::ExitStatus of parameter exitStatus in signal called exited was not found, but is required to compile onExited. Did you add all imports and dependencies? [signal-handler-parameters]
+        onExited: code => {
+        ^^^^^^^^
+Warning: bar/components/ClipboardController.qml:150:9: Type QProcess::ExitStatus of parameter exitStatus in signal called exited was not found, but is required to compile onExited. Did you add all imports and dependencies? [signal-handler-parameters]
+        onExited: code => {
+        ^^^^^^^^
+Warning: bar/components/ClipboardController.qml:36:22: Unqualified access [unqualified]
+            entryId: previewJobs.get(index).entryId
+                     ^^^^^^^^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/components/ClipboardController.qml:37:30: Unqualified access [unqualified]
+            selectedPreview: previewJobs.get(index).selectedPreview
+                             ^^^^^^^^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/components/ClipboardController.qml:38:25: Unqualified access [unqualified]
+            previewDir: root.previewDir
+                        ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/components/ClipboardController.qml:39:25: Unqualified access [unqualified]
+            requested: !root.clearing
+                        ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/components/ClipboardController.qml:40:59: Unqualified access [unqualified]
+            onImageSourceChanged: if (imageSource.length) root.setPreview(entryId, selectedPreview, imageSource, false)
+                                                          ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/components/ClipboardController.qml:41:42: Unqualified access [unqualified]
+            onFailedChanged: if (failed) root.setPreview(entryId, selectedPreview, "", true)
+                                         ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/components/ClipboardPreviewAdapter.qml:22:9: Type QProcess::ExitStatus of parameter exitStatus in signal called exited was not found, but is required to compile onExited. Did you add all imports and dependencies? [signal-handler-parameters]
+        onExited: code => {
+        ^^^^^^^^
+Warning: bar/components/MotionArea.qml:7:52: Member "radius" not found on type "QQuickItem" [missing-property]
+    property real feedbackRadius: parent && parent.radius !== undefined ? parent.radius : Theme.radiusSm
+                                                   ^^^^^^
+Warning: bar/components/MotionArea.qml:7:82: Member "radius" not found on type "QQuickItem" [missing-property]
+    property real feedbackRadius: parent && parent.radius !== undefined ? parent.radius : Theme.radiusSm
+                                                                                 ^^^^^^
+Info: bar/components/Toggle.qml:3:1: Unused import [unused-imports]
+import "../"
+^^^^^^
+Warning: bar/components/Toggle.qml:70:40: Unqualified access [unqualified]
+            width: parent.height - 4 * s
+                                       ^
+Info: s is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            width: parent.height - 4 * root.s
+                                       ^^^^^
+Warning: bar/components/Toggle.qml:71:41: Unqualified access [unqualified]
+            height: parent.height - 4 * s
+                                        ^
+Info: s is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            height: parent.height - 4 * root.s
+                                        ^^^^^
+Warning: bar/components/Toggle.qml:75:58: Unqualified access [unqualified]
+            x: root.checked ? parent.width - width - 2 * s : 2 * s
+                                                         ^
+Info: s is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            x: root.checked ? parent.width - width - 2 * root.s : 2 * s
+                                                         ^^^^^
+Warning: bar/components/Toggle.qml:75:66: Unqualified access [unqualified]
+            x: root.checked ? parent.width - width - 2 * s : 2 * s
+                                                                 ^
+Info: s is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            x: root.checked ? parent.width - width - 2 * s : 2 * root.s
+                                                                 ^^^^^
+Warning: bar/windows/IslandOverlay.qml:10:1: Type PanelWindow is not creatable. [uncreatable-type]
+PanelWindow {
+^^^^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:188:66: Unqualified access [unqualified]
+                if (inputPolicy.outsideBodies(mouse.x, mouse.y)) router.close();
+                                                                 ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+                if (inputPolicy.outsideBodies(mouse.x, mouse.y)) overlay.router.close();
+                                                                 ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:190:17: Unqualified access [unqualified]
+                router.peekMon = "";
+                ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+                overlay.router.peekMon = "";
+                ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:219:22: Unqualified access [unqualified]
+        onActivated: router.close()
+                     ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+        onActivated: overlay.router.close()
+                     ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:268:50: Unqualified access [unqualified]
+                    if (!overlay.settingsOpen && router.mediaDockPendingSurface !== "settings")
+                                                 ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+                    if (!overlay.settingsOpen && overlay.router.mediaDockPendingSurface !== "settings")
+                                                 ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:269:25: Unqualified access [unqualified]
+                        router.toggleSurface(overlay.modelData.name, "settings")
+                        ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+                        overlay.router.toggleSurface(overlay.modelData.name, "settings")
+                        ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:270:24: Unqualified access [unqualified]
+                } else router.toggleSurface(overlay.modelData.name, name)
+                       ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+                } else overlay.router.toggleSurface(overlay.modelData.name, name)
+                       ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:288:17: Unqualified access [unqualified]
+                router.close(); event.accepted = true; return
+                ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+                overlay.router.close(); event.accepted = true; return
+                ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:365:33: Unqualified access [unqualified]
+            launcherClosePhase: router.launcherClosePhase
+                                ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            launcherClosePhase: overlay.router.launcherClosePhase
+                                ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:366:26: Unqualified access [unqualified]
+            forcePinned: router.peekMon === overlay.modelData.name
+                         ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            forcePinned: overlay.router.peekMon === overlay.modelData.name
+                         ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:391:41: Unqualified access [unqualified]
+            onRequestSurface: (name) => router.toggleSurface(overlay.modelData.name, name)
+                                        ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            onRequestSurface: (name) => overlay.router.toggleSurface(overlay.modelData.name, name)
+                                        ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:392:29: Unqualified access [unqualified]
+            onRequestClose: router.close()
+                            ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            onRequestClose: overlay.router.close()
+                            ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:414:57: Unqualified access [unqualified]
+            onRequestToggle: { if (overlay.sessionOpen) router.close() }
+                                                        ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            onRequestToggle: { if (overlay.sessionOpen) overlay.router.close() }
+                                                        ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:442:58: Unqualified access [unqualified]
+            onRequestToggle: { if (overlay.settingsOpen) router.close() }
+                                                         ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            onRequestToggle: { if (overlay.settingsOpen) overlay.router.close() }
+                                                         ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:427:37: Unqualified access [unqualified]
+                    profileRequest: overlay.profileRequest
+                                    ^^^^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/windows/IslandOverlay.qml:428:24: Unqualified access [unqualified]
+                    s: overlay.s
+                       ^^^^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/windows/IslandOverlay.qml:429:27: Unqualified access [unqualified]
+                    open: overlay.settingsOpen || (settingsCompanion.active && settingsCompanion.cardContentProgress > 0.01)
+                          ^^^^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/windows/IslandOverlay.qml:429:52: Unqualified access [unqualified]
+                    open: overlay.settingsOpen || (settingsCompanion.active && settingsCompanion.cardContentProgress > 0.01)
+                                                   ^^^^^^^^^^^^^^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/windows/IslandOverlay.qml:429:80: Unqualified access [unqualified]
+                    open: overlay.settingsOpen || (settingsCompanion.active && settingsCompanion.cardContentProgress > 0.01)
+                                                                               ^^^^^^^^^^^^^^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/windows/IslandOverlay.qml:430:31: Unqualified access [unqualified]
+                    closing: !overlay.settingsOpen
+                              ^^^^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/windows/IslandOverlay.qml:431:37: Unqualified access [unqualified]
+                    morphCloseness: settingsCompanion.cardContentProgress
+                                    ^^^^^^^^^^^^^^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/windows/IslandOverlay.qml:432:37: Unqualified access [unqualified]
+                    onRequestClose: router.close()
+                                    ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+                    onRequestClose: <id>.router.close()
+                                    ^^^^^
+      You first have to give the element an idWarning: bar/windows/IslandOverlay.qml:455:36: Unqualified access [unqualified]
+                Qt.callLater(() => router.finishMediaDock(overlay.modelData.name))
+                                   ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+                Qt.callLater(() => overlay.router.finishMediaDock(overlay.modelData.name))
+                                   ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:467:29: Unqualified access [unqualified]
+            onRequestMedia: router.toggleSurface(overlay.modelData.name, "media")
+                            ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+            onRequestMedia: overlay.router.toggleSurface(overlay.modelData.name, "media")
+                            ^^^^^^^^
+Warning: bar/windows/IslandOverlay.qml:460:44: Unqualified access [unqualified]
+                        Qt.callLater(() => router.finishMediaDock(overlay.modelData.name))
+                                           ^^^^^^
+Info: router is a member of a parent element.
+      You can qualify the access with its id to avoid this warning.
+
+                        Qt.callLater(() => overlay.router.finishMediaDock(overlay.modelData.name))
+                                           ^^^^^^^^
+Warning: bar/settings/SettingsPage.qml:225:28: Unqualified access [unqualified]
+                    width: root.width
+                           ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:227:30: Unqualified access [unqualified]
+                    entered: root.visible
+                             ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:231:34: Unqualified access [unqualified]
+                    popupBounds: root.popupBounds
+                                 ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:232:35: Unqualified access [unqualified]
+                    sectionLabel: root.query.trim() ? root.config.catalog.sectionOrder.find(item => item.id === modelData.section).label : ""
+                                  ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:232:55: Unqualified access [unqualified]
+                    sectionLabel: root.query.trim() ? root.config.catalog.sectionOrder.find(item => item.id === modelData.section).label : ""
+                                                      ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:235:28: Unqualified access [unqualified]
+                    value: root.effective[modelData.section] ? root.effective[modelData.section][fieldKey] : undefined
+                           ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:235:64: Unqualified access [unqualified]
+                    value: root.effective[modelData.section] ? root.effective[modelData.section][fieldKey] : undefined
+                                                               ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:236:32: Unqualified access [unqualified]
+                    draftText: root.drafts[modelData.section + "." + fieldKey]
+                               ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:237:40: Unqualified access [unqualified]
+                    validationMessage: root.conflicts[modelData.section + "." + fieldKey] || root.rowErrors[modelData.section + "." + fieldKey] || ""
+                                       ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:237:94: Unqualified access [unqualified]
+                    validationMessage: root.conflicts[modelData.section + "." + fieldKey] || root.rowErrors[modelData.section + "." + fieldKey] || ""
+                                                                                             ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:238:36: Unqualified access [unqualified]
+                    reducedMotion: root.config.appearance.reduceMotion
+                                   ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:239:36: Unqualified access [unqualified]
+                    editorEnabled: root.config.loaded && !root.config.saving
+                                   ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:239:59: Unqualified access [unqualified]
+                    editorEnabled: root.config.loaded && !root.config.saving
+                                                          ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:240:40: Unqualified access [unqualified]
+                    onBrowseRequested: root.choosePath(modelData.section, fieldKey)
+                                       ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:241:39: Unqualified access [unqualified]
+                    onResetRequested: root.resetField(modelData.section, fieldKey)
+                                      ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:242:49: Unqualified access [unqualified]
+                    onChangeRequested: value => root.updateField(modelData.section, fieldKey, value)
+                                                ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:243:45: Unqualified access [unqualified]
+                    onDraftChanged: text => root.setDraft(modelData.section, fieldKey, text)
+                                            ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:244:33: Unqualified access [unqualified]
+                    onAccepted: root.finishField(modelData.section, fieldKey)
+                                ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick
+Warning: bar/settings/SettingsPage.qml:245:52: Unqualified access [unqualified]
+                    onValidationFailed: message => root.setError(modelData.section + "." + fieldKey, message)
+                                                   ^^^^
+Info: Set "pragma ComponentBehavior: Bound" in order to use IDs from outer components in nested components.
+pragma ComponentBehavior: Bound
+import QtQuick

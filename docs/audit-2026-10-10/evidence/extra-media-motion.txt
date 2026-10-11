@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/media-motion-regression.qml"
+  INFO: Shell ID: "b7a084455babea1462ba987953ffefa4" Path ID "b7a084455babea1462ba987953ffefa4"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/y7tycipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: media birth, rebirth, cover exclusion; playing: false
+[codex-output: log=/home/zdito/.cache/codex-economy/output-sn9xjmf9.log exit=0]

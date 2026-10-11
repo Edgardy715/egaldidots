@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/overview-regression.qml"
+  INFO: Shell ID: "a3971d7fa6601fd7065b7ebb746a7360" Path ID "a3971d7fa6601fd7065b7ebb746a7360"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/7yku4ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: overview selection, groups, compact bounds
+[codex-output: log=/home/zdito/.cache/codex-economy/output-isdfapft.log exit=0]

@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/media-timeline-regression.qml"
+  INFO: Shell ID: "59244384a2409ce0468be9fe50ba3ca0" Path ID "59244384a2409ce0468be9fe50ba3ca0"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/k3lz4ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: waveform phase, pause, immediate drag, reduced/hidden/closed and clamped seek
+[codex-output: log=/home/zdito/.cache/codex-economy/output-d3__2z_r.log exit=0]

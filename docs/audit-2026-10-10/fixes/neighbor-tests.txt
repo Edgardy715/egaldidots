@@ -1,0 +1,16 @@
+FIXTURE optional-modules-regression.qml
+  INFO: Launching config: "/tmp/isla-neighbor-check-q9xlmccs/bar/optional-modules-regression.qml"
+  INFO: Shell ID: "8185e67de283ddb236392a9141ae640f" Path ID "8185e67de283ddb236392a9141ae640f"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/2bj1rbjpmt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN quickshell.hyprland.ipc: Got openwindow for workspace "1" which was not previously tracked.
+ DEBUG qml: PASS: optional module settings, lifetime, exit, reversal, input, controls, temporary hide and reduced motion
+
+FIXTURE lockscreen-typing-regression.qml
+  INFO: Launching config: "/tmp/isla-neighbor-check-q9xlmccs/bar/lockscreen-typing-regression.qml"
+  INFO: Shell ID: "1b0867e15882180e120a5afc2c2b192a" Path ID "1b0867e15882180e120a5afc2c2b192a"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/8mj10cjpmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: lockscreen rapid edits, selection, visibility, reduced motion and visual model privacy
+

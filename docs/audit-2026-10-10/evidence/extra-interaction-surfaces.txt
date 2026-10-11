@@ -1,0 +1,12 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/interaction-surfaces-regression.qml"
+  INFO: Shell ID: "22e1dbc4820799ec1dcc0437f760b9ee" Path ID "22e1dbc4820799ec1dcc0437f760b9ee"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/h5uvdipmt/log.qslog"
+  INFO: Configuration Loaded
+  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.
+  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.
+  WARN: Could not load icon "input-keyboard" at size QSize(24, 24) from request
+ DEBUG qml: [Session] singleton instanciado
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+ DEBUG qml: PASS: all 14 surfaces load with shared interaction primitives
+[codex-output: log=/home/zdito/.cache/codex-economy/output-uizjr4xo.log exit=0]

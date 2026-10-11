@@ -1,0 +1,7 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/session-regression.qml"
+  INFO: Shell ID: "89e290d51f813b21f45b56d567ece662" Path ID "89e290d51f813b21f45b56d567ece662"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/qml75ipmt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+ DEBUG qml: PASS: session confirmation, cancellation, repeat-click isolation, reopen and fake actions
+[codex-output: log=/home/zdito/.cache/codex-economy/output-cxfw6hqt.log exit=0]

@@ -1,0 +1,1 @@
+PASS: settings defaults, legacy format, validation, paths, patch isolation, extension preservation

@@ -1,0 +1,5 @@
+  INFO: Launching config: "/tmp/isla-audit-isolated/launcher-native.qml"
+  INFO: Shell ID: "0a2bdfd9118188627f4f1713bd0bd83c" Path ID "0a2bdfd9118188627f4f1713bd0bd83c"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/7hq4aipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: READY: native launcher isolated; no action requested

@@ -1,0 +1,33 @@
+FIXTURE launcher-controller-regression.qml
+  INFO: Launching config: "/tmp/isla-neighbor-tests-yt9kfewp/bar/launcher-controller-regression.qml"
+  INFO: Shell ID: "e4b2f2d5ef72d34a1dab15d86d048166" Path ID "e4b2f2d5ef72d34a1dab15d86d048166"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/nii1zajpmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: launcher search debounce, calculator and close cancellation
+
+FIXTURE optional-modules-regression.qml
+  INFO: Launching config: "/tmp/isla-neighbor-tests-yt9kfewp/bar/optional-modules-regression.qml"
+  INFO: Shell ID: "751df6bfc737635f8131da5439b85e18" Path ID "751df6bfc737635f8131da5439b85e18"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/vii1zajpmt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN quickshell.hyprland.ipc: Got openwindow for workspace "1" which was not previously tracked.
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///tmp/isla-avatar-fixture.png
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///tmp/isla-avatar-fixture.png
+ DEBUG qml: PASS: optional module settings, lifetime, exit, reversal, input, controls, temporary hide and reduced motion
+
+FIXTURE auth-prompt-regression.qml
+  INFO: Launching config: "/tmp/isla-neighbor-tests-yt9kfewp/bar/auth-prompt-regression.qml"
+  INFO: Shell ID: "cbe57aef329ffb7bb0bcb540d898280c" Path ID "cbe57aef329ffb7bb0bcb540d898280c"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/iti19bjpmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: auth masking, focus, Enter, double-submit, immediate retry, accounts, echoed prompt, success, reopen, close, Escape, sudo and reduced motion
+
+FIXTURE lockscreen-input-regression.qml
+Traceback (most recent call last):
+  File "<string>", line 5, in <module>
+    print("FIXTURE",f,flush=True); r=subprocess.run(["timeout","20s","qs","-p",str(p/"bar"/f)],env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True); print(r.stdout); assert r.returncode==0,(f,r.returncode); assert "PASS:" in r.stdout and "FAIL:" not in r.stdout,f
+                                                                                                                                                                                           ^^^^^^^^^^^^^^^
+AssertionError: ('lockscreen-input-regression.qml', 255)
+Could not open config file at "/tmp/isla-neighbor-tests-yt9kfewp/bar/lockscreen-input-regression.qml"
+

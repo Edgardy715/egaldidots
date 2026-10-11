@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/media-layout-regression.qml"
+  INFO: Shell ID: "1495e0eebd0778e044624434385ccc17" Path ID "1495e0eebd0778e044624434385ccc17"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/z2ly4ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: full-width seek, identity/control bounds, font scales and square/wide artwork
+[codex-output: log=/home/zdito/.cache/codex-economy/output-33bld73v.log exit=0]

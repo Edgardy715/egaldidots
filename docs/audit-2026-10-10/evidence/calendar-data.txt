@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/calendar-data-regression.qml"
+  INFO: Shell ID: "64bf5894f2fa6cb7d58214b6cf4dc112" Path ID "64bf5894f2fa6cb7d58214b6cf4dc112"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/2tkr4ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: calendar leap/year/scaled grid and injected weather parsing/forecast/error/closing without network
+[codex-output: log=/home/zdito/.cache/codex-economy/output-815blnjx.log exit=0]

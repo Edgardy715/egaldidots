@@ -1,0 +1,9 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/lyrics-controller-regression.qml"
+  INFO: Shell ID: "59f95b080d180acaf663fe1d50b658f8" Path ID "59f95b080d180acaf663fe1d50b658f8"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/dpp59ipmt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: on-demand lyrics, cached reopen, plain/empty/error/instrumental, stale track and close cancellation
+[codex-output: log=/home/zdito/.cache/codex-economy/output-n5sq1mie.log exit=0]

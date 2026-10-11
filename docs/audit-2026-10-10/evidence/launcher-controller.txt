@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/launcher-controller-regression.qml"
+  INFO: Shell ID: "7f38e4e6771896cbeb03ee0afd0b340f" Path ID "7f38e4e6771896cbeb03ee0afd0b340f"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/vxkt4ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: launcher search debounce, calculator and close cancellation
+[codex-output: log=/home/zdito/.cache/codex-economy/output-una_0ui0.log exit=0]

@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/pill-geometry-regression.qml"
+  INFO: Shell ID: "584b008303abdc49b005201f4fc53362" Path ID "584b008303abdc49b005201f4fc53362"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/blkm4ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: rest, auth, launcher, media and notification geometry
+[codex-output: log=/home/zdito/.cache/codex-economy/output-f7pd9mxz.log exit=0]

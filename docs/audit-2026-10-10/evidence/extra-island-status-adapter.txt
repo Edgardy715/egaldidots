@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/island-status-adapter-regression.qml"
+  INFO: Shell ID: "9e4d0339e50b9d6325e7b917019d5105" Path ID "9e4d0339e50b9d6325e7b917019d5105"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/fjt8dipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: status adapter debounce, chip signals, fallback and Caps Lock API
+[codex-output: log=/home/zdito/.cache/codex-economy/output-d7qaxr9d.log exit=0]

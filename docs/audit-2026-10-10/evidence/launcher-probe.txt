@@ -1,0 +1,17 @@
+  INFO: Launching config: "/tmp/isla-audit-isolated/launcher-probe.qml"
+  INFO: Shell ID: "1e2b299521263ac4fd27727acde25162" Path ID "1e2b299521263ac4fd27727acde25162"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/elm16ipmt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ DEBUG qml: PROBE 2+2 4
+ DEBUG qml: PROBE sin(0) 0
+ DEBUG qml: PROBE asin(0) null
+ DEBUG qml: PROBE acos(1) null
+ DEBUG qml: PROBE atan(0) null
+ DEBUG qml: PROBE controller.open null
+ DEBUG qml: PROBE controller.appService.search(1) null
+ DEBUG qml: PROBE before Qt.quit
+ DEBUG qml: PROBE returned from eval; quitting requested
+[codex-output: log=/home/zdito/.cache/codex-economy/output-35f0uj_d.log exit=0]

@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/surface-data-contract-regression.qml"
+  INFO: Shell ID: "3000f2b61d8ca56f6db02f5fd059823b" Path ID "3000f2b61d8ca56f6db02f5fd059823b"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/mskq4ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: media signals/keyboard seek, overview injected previews/navigation, appearance draft/errors/asynchronous save without system writes
+[codex-output: log=/home/zdito/.cache/codex-economy/output-e0kjr7zp.log exit=0]

@@ -1,0 +1,10 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/notification-routing-regression.qml"
+  INFO: Shell ID: "bd61a96333e0a4c13db7eb7f8eb0a7ae" Path ID "bd61a96333e0a4c13db7eb7f8eb0a7ae"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/ajl55ipmt/log.qslog"
+  INFO: Configuration Loaded
+  WARN quickshell.hyprland.ipc: Got openwindow for workspace "1" which was not previously tracked.
+  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.
+  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.
+  WARN: Could not load icon "input-keyboard" at size QSize(24, 24) from request
+ DEBUG qml: PASS: notification center state survives stale loader construction/destruction
+[codex-output: log=/home/zdito/.cache/codex-economy/output-73d2fc71.log exit=0]

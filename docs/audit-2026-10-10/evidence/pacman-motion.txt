@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/pacman-motion-regression.qml"
+  INFO: Shell ID: "b862b45b83473df0872c60aba069b4a6" Path ID "b862b45b83473df0872c60aba069b4a6"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/bwmb6ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: Pac-Man mouth movement, direction, retarget, settle, reduced motion and hide
+[codex-output: log=/home/zdito/.cache/codex-economy/output-z4ur7rmb.log exit=0]

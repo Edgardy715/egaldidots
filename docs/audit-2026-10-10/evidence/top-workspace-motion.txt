@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/top-workspace-motion-regression.qml"
+  INFO: Shell ID: "a0f4c13635e527e409e18b18b4001486" Path ID "a0f4c13635e527e409e18b18b4001486"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/nsl95ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: workspace lens follows, retargets, stops, reduces motion and hides
+[codex-output: log=/home/zdito/.cache/codex-economy/output-s5klwieu.log exit=0]

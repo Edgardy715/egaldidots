@@ -1,0 +1,15 @@
+PASS native open/Escape/focus release: calendar
+PASS native open/Escape/focus release: mixer
+PASS native open/Escape/focus release: connectivity
+PASS native open/Escape/focus release: workspaces
+PASS native open/Escape/focus release: notifs
+PASS native open/Escape/focus release: utils
+PASS native open/Escape/focus release: appearance
+PASS native open/Escape/focus release: launcher
+PASS native open/Escape/focus release: media
+PASS native open/Escape/focus release: wallpaper
+PASS native open/Escape/focus release: clipboard
+PASS native open/Escape/focus release: overview
+PASS native open/Escape/focus release: session
+PASS native open/Escape/focus release: settings
+PASS: all 14 non-auth modal surfaces receive Wayland Escape and release keyboard on close

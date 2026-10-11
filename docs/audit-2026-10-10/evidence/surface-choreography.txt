@@ -1,0 +1,10 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/surface-choreography-regression.qml"
+  INFO: Shell ID: "61703adf38c7fa8dc74a423940b82c34" Path ID "61703adf38c7fa8dc74a423940b82c34"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/jokn4ipmt/log.qslog"
+  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.
+  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.
+  INFO: Configuration Loaded
+  WARN quickshell.hyprland.ipc: Got openwindow for workspace "1" which was not previously tracked.
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+ DEBUG qml: PASS: asynchronous reveal, latest swap, cancellation, stagger retarget and live reduced motion
+[codex-output: log=/home/zdito/.cache/codex-economy/output-mxgubud0.log exit=0]

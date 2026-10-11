@@ -1,0 +1,8 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/motion-regression.qml"
+  INFO: Shell ID: "16736d0777ec6b89484aad9a300e9d49" Path ID "16736d0777ec6b89484aad9a300e9d49"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/h2tucipmt/log.qslog"
+  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.
+  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: interrupted morph, content swap, reduced motion, unload
+[codex-output: log=/home/zdito/.cache/codex-economy/output-6xt8dahz.log exit=0]

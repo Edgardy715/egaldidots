@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/pill-composition-regression.qml"
+  INFO: Shell ID: "40b14f48e0dd2c8dc4a4632096eb2751" Path ID "40b14f48e0dd2c8dc4a4632096eb2751"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/xhkj4ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: injected header/calendar input, workspace width, interrupted morph, exposure, reduced motion and notification breath
+[codex-output: log=/home/zdito/.cache/codex-economy/output-ti74b82u.log exit=0]

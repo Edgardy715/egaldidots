@@ -1,0 +1,10 @@
+  INFO: Launching config: "/tmp/isla-audit-isolated/brightness-probe.qml"
+  INFO: Shell ID: "10d2d34fe5956db165f7c1aa5413b579" Path ID "10d2d34fe5956db165f7c1aa5413b579"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/59w8gipmt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ DEBUG qml: PROBE brightness right writes/value/tab/role 0 50 false 0
+ DEBUG qml: PROBE brightness mouse writes/value 1 75.6896551724138
+[codex-output: log=/home/zdito/.cache/codex-economy/output-wpr86jll.log exit=0]

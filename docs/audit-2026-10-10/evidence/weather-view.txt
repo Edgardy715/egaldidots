@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/weather-view-regression.qml"
+  INFO: Shell ID: "179febdbb799277a551ed6b5232ff0b5" Path ID "179febdbb799277a551ed6b5232ff0b5"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/1uks4ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: weather layout, refresh, loading, forecast metrics, now, stale/empty, large font and reduced motion
+[codex-output: log=/home/zdito/.cache/codex-economy/output-hygm9fey.log exit=0]

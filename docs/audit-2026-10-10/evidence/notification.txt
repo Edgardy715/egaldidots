@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/notification-regression.qml"
+  INFO: Shell ID: "3d78797e5edf660a95acd69c2a07b0a5" Path ID "3d78797e5edf660a95acd69c2a07b0a5"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/3il55ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: notification phases, queue, early expiry, surface close, late-open restoration and auth priority
+[codex-output: log=/home/zdito/.cache/codex-economy/output-ojrzsdgn.log exit=0]

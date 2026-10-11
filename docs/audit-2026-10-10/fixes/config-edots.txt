@@ -1,0 +1,8 @@
+  INFO: Launching config: "/tmp/isla-config-fix.43e9sx/bar/settings-regression.qml"
+  INFO: Shell ID: "a54e214947dcae73b18bb474d9f69269" Path ID "a54e214947dcae73b18bb474d9f69269"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/pwd1d5jpmt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: Edots global search, update, validation, discard and interrupted scene load

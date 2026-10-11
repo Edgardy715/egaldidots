@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/workspace-model-regression.qml"
+  INFO: Shell ID: "22c5460f9edd5f6e8109f5359f6757d5" Path ID "22c5460f9edd5f6e8109f5359f6757d5"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/yrl95ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: workspace monitor isolation, active/count/occupancy, fallback and visual navigation signal
+[codex-output: log=/home/zdito/.cache/codex-economy/output-a52i_1hj.log exit=0]

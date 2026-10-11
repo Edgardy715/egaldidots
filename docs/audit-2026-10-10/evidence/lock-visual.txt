@@ -1,0 +1,9 @@
+[codex-rle: v1]
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/lockscreen-entrance-regression.qml"
+  INFO: Shell ID: "7ed106b0dbba0d961adc896c1eea4fc8" Path ID "7ed106b0dbba0d961adc896c1eea4fc8"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/idwcgipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: lock entrance security gate, playing media, pause/resume interruption, auth handoff, disappearance and reduced motion
+  WARN scene: QML QQuickImage at @lockscreen/LockMedia.qml[30:9]: Cannot open: file://null
+[codex-rle: repeat 1 more]
+[codex-output: log=/home/zdito/.cache/codex-economy/output-jufb_p7d.log exit=0]

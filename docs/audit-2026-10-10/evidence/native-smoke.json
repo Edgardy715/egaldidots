@@ -1,0 +1,100 @@
+[
+  {
+    "surface": "calendar",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.047
+  },
+  {
+    "surface": "launcher",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.008
+  },
+  {
+    "surface": "mixer",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.062
+  },
+  {
+    "surface": "media",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.128
+  },
+  {
+    "surface": "workspaces",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.109
+  },
+  {
+    "surface": "notifs",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.123
+  },
+  {
+    "surface": "wallpaper",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.134
+  },
+  {
+    "surface": "clipboard",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.11
+  },
+  {
+    "surface": "utils",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.102
+  },
+  {
+    "surface": "connectivity",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.115
+  },
+  {
+    "surface": "session",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.049
+  },
+  {
+    "surface": "overview",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.15
+  },
+  {
+    "surface": "appearance",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.091
+  },
+  {
+    "surface": "settings",
+    "open_exit": 0,
+    "open": "true",
+    "escape_exit": 0,
+    "seconds": 2.152
+  }
+]

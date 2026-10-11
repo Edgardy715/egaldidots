@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/workspaces-surface-regression.qml"
+  INFO: Shell ID: "b512c3c70765a90e36daa8beab0d9858" Path ID "b512c3c70765a90e36daa8beab0d9858"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/1ol85ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: workspace panel retains ten slots, monitor data and navigation to empty slot ten
+[codex-output: log=/home/zdito/.cache/codex-economy/output-rj7vo25q.log exit=0]

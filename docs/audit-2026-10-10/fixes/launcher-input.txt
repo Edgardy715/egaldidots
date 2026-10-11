@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/launcher-input-safety-regression.qml"
+  INFO: Shell ID: "13d19c5f66b4523c97b38a42cbec19fd" Path ID "13d19c5f66b4523c97b38a42cbec19fd"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/s9e1u5jpmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: typed QML expression has no effects, inverse math and ordinary app search remain usable
+[codex-output: log=/home/zdito/.cache/codex-economy/output-lujkr0b4.log exit=0]

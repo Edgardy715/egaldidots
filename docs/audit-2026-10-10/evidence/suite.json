@@ -1,0 +1,236 @@
+[
+  {
+    "name": "interaction-surfaces",
+    "exit": 0,
+    "seconds": 2.28,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/interaction-surfaces-regression.qml\"\n  INFO: Shell ID: \"22e1dbc4820799ec1dcc0437f760b9ee\" Path ID \"22e1dbc4820799ec1dcc0437f760b9ee\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/h8ke4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.\n  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.\n  WARN: Could not load icon \"input-keyboard\" at size QSize(24, 24) from request\n DEBUG qml: [Session] singleton instanciado\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)\n DEBUG qml: PASS: all 14 surfaces load with shared interaction primitives\n[codex-output: log=/home/zdito/.cache/codex-economy/output-3k326f8m.log exit=0]\n"
+  },
+  {
+    "name": "interaction",
+    "exit": 0,
+    "seconds": 1.49,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/interaction-regression.qml\"\n  INFO: Shell ID: \"22682f350d8d6bfa33196d13c61055f2\" Path ID \"22682f350d8d6bfa33196d13c61055f2\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/2fkh4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: pointer, cancellation, keyboard, toggle, fixed hitbox, icon interruption and reduced motion\n[codex-output: log=/home/zdito/.cache/codex-economy/output-hsg2yv60.log exit=0]\n"
+  },
+  {
+    "name": "pill-interface",
+    "exit": 0,
+    "seconds": 1.18,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/pill-interface-regression.qml\"\n  INFO: Shell ID: \"000fb6240612137789c6ff51ffeb49c9\" Path ID \"000fb6240612137789c6ff51ffeb49c9\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/wgki4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: scaled reading material, opaque preference, header exposure/bounds and empty/search/calculator/closing states\n[codex-output: log=/home/zdito/.cache/codex-economy/output-_89etjaz.log exit=0]\n"
+  },
+  {
+    "name": "pill-composition",
+    "exit": 0,
+    "seconds": 2.33,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/pill-composition-regression.qml\"\n  INFO: Shell ID: \"40b14f48e0dd2c8dc4a4632096eb2751\" Path ID \"40b14f48e0dd2c8dc4a4632096eb2751\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/xhkj4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: injected header/calendar input, workspace width, interrupted morph, exposure, reduced motion and notification breath\n[codex-output: log=/home/zdito/.cache/codex-economy/output-ti74b82u.log exit=0]\n"
+  },
+  {
+    "name": "pill-geometry",
+    "exit": 0,
+    "seconds": 0.31,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/pill-geometry-regression.qml\"\n  INFO: Shell ID: \"584b008303abdc49b005201f4fc53362\" Path ID \"584b008303abdc49b005201f4fc53362\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/blkm4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: rest, auth, launcher, media and notification geometry\n[codex-output: log=/home/zdito/.cache/codex-economy/output-f7pd9mxz.log exit=0]\n"
+  },
+  {
+    "name": "overlay-input-policy",
+    "exit": 0,
+    "seconds": 0.28,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/overlay-input-policy-regression.qml\"\n  INFO: Shell ID: \"a2aa3163d45c22d58a4d911029adce04\" Path ID \"a2aa3163d45c22d58a4d911029adce04\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/2nkm4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: overlay focus, fullscreen, regions and backdrop policy\n[codex-output: log=/home/zdito/.cache/codex-economy/output-j_6eyujp.log exit=0]\n"
+  },
+  {
+    "name": "surface-router",
+    "exit": 0,
+    "seconds": 0.82,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/surface-router-regression.qml\"\n  INFO: Shell ID: \"d973747c1ac48128913a959e8321bd83\" Path ID \"d973747c1ac48128913a959e8321bd83\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/ankm4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: routing, dock cancellation, auth priority, two-phase close, interruption and reduced motion\n[codex-output: log=/home/zdito/.cache/codex-economy/output-htaso9ot.log exit=0]\n"
+  },
+  {
+    "name": "surface-choreography",
+    "exit": 0,
+    "seconds": 2.76,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/surface-choreography-regression.qml\"\n  INFO: Shell ID: \"61703adf38c7fa8dc74a423940b82c34\" Path ID \"61703adf38c7fa8dc74a423940b82c34\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/jokn4ipmt/log.qslog\"\n  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.\n  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.\n  INFO: Configuration Loaded\n  WARN quickshell.hyprland.ipc: Got openwindow for workspace \"1\" which was not previously tracked.\n DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)\n DEBUG qml: PASS: asynchronous reveal, latest swap, cancellation, stagger retarget and live reduced motion\n[codex-output: log=/home/zdito/.cache/codex-economy/output-mxgubud0.log exit=0]\n"
+  },
+  {
+    "name": "surface-data-contract",
+    "exit": 0,
+    "seconds": 0.85,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/surface-data-contract-regression.qml\"\n  INFO: Shell ID: \"3000f2b61d8ca56f6db02f5fd059823b\" Path ID \"3000f2b61d8ca56f6db02f5fd059823b\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/mskq4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: media signals/keyboard seek, overview injected previews/navigation, appearance draft/errors/asynchronous save without system writes\n[codex-output: log=/home/zdito/.cache/codex-economy/output-e0kjr7zp.log exit=0]\n"
+  },
+  {
+    "name": "calendar-data",
+    "exit": 0,
+    "seconds": 0.98,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/calendar-data-regression.qml\"\n  INFO: Shell ID: \"64bf5894f2fa6cb7d58214b6cf4dc112\" Path ID \"64bf5894f2fa6cb7d58214b6cf4dc112\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/2tkr4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: calendar leap/year/scaled grid and injected weather parsing/forecast/error/closing without network\n[codex-output: log=/home/zdito/.cache/codex-economy/output-815blnjx.log exit=0]\n"
+  },
+  {
+    "name": "weather-view",
+    "exit": 0,
+    "seconds": 1.61,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/weather-view-regression.qml\"\n  INFO: Shell ID: \"179febdbb799277a551ed6b5232ff0b5\" Path ID \"179febdbb799277a551ed6b5232ff0b5\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/1uks4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: weather layout, refresh, loading, forecast metrics, now, stale/empty, large font and reduced motion\n[codex-output: log=/home/zdito/.cache/codex-economy/output-hygm9fey.log exit=0]\n"
+  },
+  {
+    "name": "launcher-controller",
+    "exit": 0,
+    "seconds": 0.48,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/launcher-controller-regression.qml\"\n  INFO: Shell ID: \"7f38e4e6771896cbeb03ee0afd0b340f\" Path ID \"7f38e4e6771896cbeb03ee0afd0b340f\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/vxkt4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: launcher search debounce, calculator and close cancellation\n[codex-output: log=/home/zdito/.cache/codex-economy/output-una_0ui0.log exit=0]\n"
+  },
+  {
+    "name": "overview",
+    "exit": 0,
+    "seconds": 0.61,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/overview-regression.qml\"\n  INFO: Shell ID: \"a3971d7fa6601fd7065b7ebb746a7360\" Path ID \"a3971d7fa6601fd7065b7ebb746a7360\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/7yku4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: overview selection, groups, compact bounds\n[codex-output: log=/home/zdito/.cache/codex-economy/output-isdfapft.log exit=0]\n"
+  },
+  {
+    "name": "wallpaper",
+    "exit": 0,
+    "seconds": 2.64,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/wallpaper-regression.qml\"\n  INFO: Shell ID: \"8ace755ef0017af5f28cdab5e53fac46\" Path ID \"8ace755ef0017af5f28cdab5e53fac46\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/yyku4ipmt/log.qslog\"\n  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.\n  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.\n  INFO: Configuration Loaded\n DEBUG qml: PASS: wallpaper bounds, rapid navigation, aspect-fit isolation\n[codex-output: log=/home/zdito/.cache/codex-economy/output-df7z10h3.log exit=0]\n"
+  },
+  {
+    "name": "media-session",
+    "exit": 0,
+    "seconds": 0.57,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/media-session-regression.qml\"\n  INFO: Shell ID: \"4bcda41267aa0e3349bd736b762d3afa\" Path ID \"4bcda41267aa0e3349bd736b762d3afa\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/12lx4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: media session capabilities, seek, track/player interruption, repeat and clock lifecycle\n[codex-output: log=/home/zdito/.cache/codex-economy/output-qdvicrqz.log exit=0]\n"
+  },
+  {
+    "name": "media-layout",
+    "exit": 0,
+    "seconds": 1.29,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/media-layout-regression.qml\"\n  INFO: Shell ID: \"1495e0eebd0778e044624434385ccc17\" Path ID \"1495e0eebd0778e044624434385ccc17\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/z2ly4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: full-width seek, identity/control bounds, font scales and square/wide artwork\n[codex-output: log=/home/zdito/.cache/codex-economy/output-33bld73v.log exit=0]\n"
+  },
+  {
+    "name": "media-timeline",
+    "exit": 0,
+    "seconds": 1.97,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/media-timeline-regression.qml\"\n  INFO: Shell ID: \"59244384a2409ce0468be9fe50ba3ca0\" Path ID \"59244384a2409ce0468be9fe50ba3ca0\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/k3lz4ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: waveform phase, pause, immediate drag, reduced/hidden/closed and clamped seek\n[codex-output: log=/home/zdito/.cache/codex-economy/output-d3__2z_r.log exit=0]\n"
+  },
+  {
+    "name": "lyrics-controller",
+    "exit": 1,
+    "seconds": 0.98,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/lyrics-controller-regression.qml\"\n  INFO: Shell ID: \"59f95b080d180acaf663fe1d50b658f8\" Path ID \"59f95b080d180acaf663fe1d50b658f8\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/n7l15ipmt/log.qslog\"\n  INFO: Configuration Loaded\n ERROR qml: FAIL: lyrics controller Error: synced result: error\n[codex-output: log=/home/zdito/.cache/codex-economy/output-wq26i2s5.log exit=1]\n"
+  },
+  {
+    "name": "lyrics-view",
+    "exit": 0,
+    "seconds": 0.76,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/lyrics-view-regression.qml\"\n  INFO: Shell ID: \"d4005291ddb86e85cf392cad72ad9dda\" Path ID \"d4005291ddb86e85cf392cad72ad9dda\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/59l25ipmt/log.qslog\"\n  WARN scene: @components/MediaView.qml[233:21]: Unable to assign [undefined] to QString\n  WARN scene: @components/MediaView.qml[338:140]: Unable to assign [undefined] to bool\n  WARN scene: @components/MediaView.qml[354:177]: Unable to assign [undefined] to bool\n  INFO: Configuration Loaded\n DEBUG qml: PASS: lyrics toggle, timed highlight, manual browsing, plain/empty, Escape and unsupported player\n[codex-output: log=/home/zdito/.cache/codex-economy/output-s5lijix8.log exit=0]\n"
+  },
+  {
+    "name": "mixer-surface",
+    "exit": 0,
+    "seconds": 0.63,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/mixer-surface-regression.qml\"\n  INFO: Shell ID: \"1a4a685d9f68b2def7103dbab4cf38bc\" Path ID \"1a4a685d9f68b2def7103dbab4cf38bc\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/tcl35ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: mixer view renders injected audio controls and emits mock actions without mutating payloads\n[codex-output: log=/home/zdito/.cache/codex-economy/output-u_f8vwkz.log exit=0]\n"
+  },
+  {
+    "name": "connectivity-surface",
+    "exit": 0,
+    "seconds": 0.84,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/connectivity-surface-regression.qml\"\n  INFO: Shell ID: \"31516134be0e865ad28762d0e2cce2b9\" Path ID \"31516134be0e865ad28762d0e2cce2b9\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/cel35ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: connectivity view emits mocked Wi-Fi and Bluetooth actions without service changes\n[codex-output: log=/home/zdito/.cache/codex-economy/output-ecl0t1s1.log exit=0]\n"
+  },
+  {
+    "name": "notifs-surface",
+    "exit": 0,
+    "seconds": 0.6,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/notifs-surface-regression.qml\"\n  INFO: Shell ID: \"f14fb82e0b85812878449ac0c6469e22\" Path ID \"f14fb82e0b85812878449ac0c6469e22\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/wfl45ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: notification view renders injected data and emits DND/action signals without invoking native actions\n[codex-output: log=/home/zdito/.cache/codex-economy/output-usw7ojnw.log exit=0]\n"
+  },
+  {
+    "name": "notification",
+    "exit": 0,
+    "seconds": 0.8,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/notification-regression.qml\"\n  INFO: Shell ID: \"3d78797e5edf660a95acd69c2a07b0a5\" Path ID \"3d78797e5edf660a95acd69c2a07b0a5\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/3il55ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: notification phases, queue, early expiry, surface close, late-open restoration and auth priority\n[codex-output: log=/home/zdito/.cache/codex-economy/output-ojrzsdgn.log exit=0]\n"
+  },
+  {
+    "name": "notification-routing",
+    "exit": 0,
+    "seconds": 1.92,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/notification-routing-regression.qml\"\n  INFO: Shell ID: \"bd61a96333e0a4c13db7eb7f8eb0a7ae\" Path ID \"bd61a96333e0a4c13db7eb7f8eb0a7ae\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/ajl55ipmt/log.qslog\"\n  INFO: Configuration Loaded\n  WARN quickshell.hyprland.ipc: Got openwindow for workspace \"1\" which was not previously tracked.\n  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.\n  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.\n  WARN: Could not load icon \"input-keyboard\" at size QSize(24, 24) from request\n DEBUG qml: PASS: notification center state survives stale loader construction/destruction\n[codex-output: log=/home/zdito/.cache/codex-economy/output-73d2fc71.log exit=0]\n"
+  },
+  {
+    "name": "session",
+    "exit": 0,
+    "seconds": 0.39,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/session-regression.qml\"\n  INFO: Shell ID: \"89e290d51f813b21f45b56d567ece662\" Path ID \"89e290d51f813b21f45b56d567ece662\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/qml75ipmt/log.qslog\"\n  INFO: Configuration Loaded\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n DEBUG qml: PASS: session confirmation, cancellation, repeat-click isolation, reopen and fake actions\n[codex-output: log=/home/zdito/.cache/codex-economy/output-cxfw6hqt.log exit=0]\n"
+  },
+  {
+    "name": "workspaces-surface",
+    "exit": 0,
+    "seconds": 1.09,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/workspaces-surface-regression.qml\"\n  INFO: Shell ID: \"b512c3c70765a90e36daa8beab0d9858\" Path ID \"b512c3c70765a90e36daa8beab0d9858\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/1ol85ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: workspace panel retains ten slots, monitor data and navigation to empty slot ten\n[codex-output: log=/home/zdito/.cache/codex-economy/output-rj7vo25q.log exit=0]\n"
+  },
+  {
+    "name": "workspace-model",
+    "exit": 0,
+    "seconds": 0.43,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/workspace-model-regression.qml\"\n  INFO: Shell ID: \"22c5460f9edd5f6e8109f5359f6757d5\" Path ID \"22c5460f9edd5f6e8109f5359f6757d5\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/yrl95ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: workspace monitor isolation, active/count/occupancy, fallback and visual navigation signal\n[codex-output: log=/home/zdito/.cache/codex-economy/output-a52i_1hj.log exit=0]\n"
+  },
+  {
+    "name": "top-workspace-motion",
+    "exit": 0,
+    "seconds": 1.38,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/top-workspace-motion-regression.qml\"\n  INFO: Shell ID: \"a0f4c13635e527e409e18b18b4001486\" Path ID \"a0f4c13635e527e409e18b18b4001486\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/nsl95ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: workspace lens follows, retargets, stops, reduces motion and hides\n[codex-output: log=/home/zdito/.cache/codex-economy/output-s5klwieu.log exit=0]\n"
+  },
+  {
+    "name": "optional-modules",
+    "exit": 0,
+    "seconds": 9.19,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/optional-modules-regression.qml\"\n  INFO: Shell ID: \"745bb050a89ecb90cc09cec28fbb4b15\" Path ID \"745bb050a89ecb90cc09cec28fbb4b15\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/5ulb5ipmt/log.qslog\"\n  INFO: Configuration Loaded\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n  WARN quickshell.hyprland.ipc: Got openwindow for workspace \"1\" which was not previously tracked.\n DEBUG qml: PASS: optional module settings, lifetime, exit, reversal, input, controls, temporary hide and reduced motion\n[codex-output: log=/home/zdito/.cache/codex-economy/output-m_29xuf5.log exit=0]\n"
+  },
+  {
+    "name": "compact-island",
+    "exit": 0,
+    "seconds": 21.76,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/compact-island-regression.qml\"\n  INFO: Shell ID: \"d3d9c494e7833e88dc275eb1b6b18cf6\" Path ID \"d3d9c494e7833e88dc275eb1b6b18cf6\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/p2mk5ipmt/log.qslog\"\n  INFO: Configuration Loaded\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n  WARN quickshell.hyprland.ipc: Got openwindow for workspace \"1\" which was not previously tracked.\n DEBUG qml: PASS: compact unit bounds, packed clock, app overflow, narrow monitor, panels, integrated music, layout switch and reduced motion\n[codex-output: log=/home/zdito/.cache/codex-economy/output-5xbszu30.log exit=0]\n"
+  },
+  {
+    "name": "bar-layout-transition",
+    "exit": 0,
+    "seconds": 2.07,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/bar-layout-transition-regression.qml\"\n  INFO: Shell ID: \"ee43c7771958ca8a9cace4f2e8180d4f\" Path ID \"ee43c7771958ca8a9cace4f2e8180d4f\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/rpm66ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: layout exit/settle gates, reversals, reduced motion and launcher/auth header withdrawal\n[codex-output: log=/home/zdito/.cache/codex-economy/output-zymtl7mn.log exit=0]\n"
+  },
+  {
+    "name": "centered-companion",
+    "exit": 0,
+    "seconds": 0.86,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/centered-companion-regression.qml\"\n  INFO: Shell ID: \"0fa2e57fe0d764fabf9c55d79c1d3244\" Path ID \"0fa2e57fe0d764fabf9c55d79c1d3244\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/0tm86ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: centered settings birth/card/bridge/absorption, both rest widths, interrupted return and reduced motion\n[codex-output: log=/home/zdito/.cache/codex-economy/output-enzd6ft5.log exit=0]\n"
+  },
+  {
+    "name": "clock-reel",
+    "exit": 0,
+    "seconds": 2.37,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/clock-reel-regression.qml\"\n  INFO: Shell ID: \"4d37a626e1b4ee756b6988e6ee8d181e\" Path ID \"4d37a626e1b4ee756b6988e6ee8d181e\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/vtm96ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: clock downward rollover, queued interruption, stable width, unchanged minutes, reduced motion and hidden updates\n[codex-output: log=/home/zdito/.cache/codex-economy/output-5wbicnon.log exit=0]\n"
+  },
+  {
+    "name": "pacman-motion",
+    "exit": 0,
+    "seconds": 1.78,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/pacman-motion-regression.qml\"\n  INFO: Shell ID: \"b862b45b83473df0872c60aba069b4a6\" Path ID \"b862b45b83473df0872c60aba069b4a6\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/bwmb6ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: Pac-Man mouth movement, direction, retarget, settle, reduced motion and hide\n[codex-output: log=/home/zdito/.cache/codex-economy/output-z4ur7rmb.log exit=0]\n"
+  },
+  {
+    "name": "layout-routing",
+    "exit": 0,
+    "seconds": 9.63,
+    "output": "[codex-rle: v1]\n  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/layout-routing-regression.qml\"\n  INFO: Shell ID: \"3af358ba8bc28ea32edf677f92d35172\" Path ID \"3af358ba8bc28ea32edf677f92d35172\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/oxmd6ipmt/log.qslog\"\n  INFO: Configuration Loaded\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.\n  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n[codex-rle: repeat 1 more]\n DEBUG qml: PASS: split/compact media routing, open-panel layout switch, launcher/settings dock and close\n[codex-output: log=/home/zdito/.cache/codex-economy/output-4rz8p9pm.log exit=0]\n"
+  },
+  {
+    "name": "layout-motion",
+    "exit": 124,
+    "seconds": 25.11,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/layout-motion-regression.qml\"\n  INFO: Shell ID: \"96ec18836f351a75cf4e9119a3673a59\" Path ID \"96ec18836f351a75cf4e9119a3673a59\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/17nm6ipmt/log.qslog\"\n  INFO: Configuration Loaded\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.\n  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.\n  WARN: Could not load icon \"input-keyboard\" at size QSize(24, 24) from request\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n DEBUG qml: [Session] singleton instanciado\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n[codex-output: log=/home/zdito/.cache/codex-economy/output-xuy9rge_.log exit=124]\n"
+  },
+  {
+    "name": "layout-interruptions",
+    "exit": 0,
+    "seconds": 11.89,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/layout-interruptions-regression.qml\"\n  INFO: Shell ID: \"29ae6ed4461bc0f62ede85b1b07009ec\" Path ID \"29ae6ed4461bc0f62ede85b1b07009ec\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/vtnb7ipmt/log.qslog\"\n  INFO: Configuration Loaded\n  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face\n  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.\n  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.\n DEBUG qml: PASS: notification during surface/layout change, pause, media disappearance/reappearance, rapid reversal and inline OSD\n[codex-output: log=/home/zdito/.cache/codex-economy/output-tqg20zlc.log exit=0]\n"
+  },
+  {
+    "name": "input-motion",
+    "exit": 0,
+    "seconds": 1.57,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/input-motion-regression.qml\"\n  INFO: Shell ID: \"16e82f38ae57c0dfa8d0389ca38e3d5f\" Path ID \"16e82f38ae57c0dfa8d0389ca38e3d5f\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/baon7ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: launcher native typing, clear, reduced motion, reopen and optional wallpaper preview\n[codex-output: log=/home/zdito/.cache/codex-economy/output-k030gm9d.log exit=0]\n"
+  },
+  {
+    "name": "textbox-motion",
+    "exit": 0,
+    "seconds": 2.09,
+    "output": "  INFO: Launching config: \"/home/zdito/.config/quickshell/bar/textbox-motion-regression.qml\"\n  INFO: Shell ID: \"e1f63bed9766dab43a23f57e33851e2b\" Path ID \"e1f63bed9766dab43a23f57e33851e2b\"\n  INFO: Saving logs to \"/run/user/1000/quickshell/by-id/xdop7ipmt/log.qslog\"\n  INFO: Configuration Loaded\n DEBUG qml: PASS: caret geometry, typing, selection, long insertion, navigation, placeholders, masking, hidden and reduced motion\n[codex-output: log=/home/zdito/.cache/codex-economy/output-bt_o6p3u.log exit=0]\n"
+  }
+]

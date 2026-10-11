@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/input-motion-regression.qml"
+  INFO: Shell ID: "16e82f38ae57c0dfa8d0389ca38e3d5f" Path ID "16e82f38ae57c0dfa8d0389ca38e3d5f"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/baon7ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: launcher native typing, clear, reduced motion, reopen and optional wallpaper preview
+[codex-output: log=/home/zdito/.cache/codex-economy/output-k030gm9d.log exit=0]

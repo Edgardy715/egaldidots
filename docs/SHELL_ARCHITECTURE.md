@@ -66,6 +66,11 @@ Retorna `{ok, errors, effective}`. Es una previsualización de sesión; `discard
 restaura lo leído del disco. Un cambio válido externo o `reload` reemplaza esa
 previsualización. Al eliminar el archivo se restauran los defaults.
 
+Los multiplicadores `uiScale`, `topGap` y `appGap` tienen máximos 3, 4 y 4
+para mantener finita la geometría. Edots conserva el valor base de cada
+borrador: si ese campo cambia externamente, muestra el conflicto y bloquea
+Enter/Guardar hasta editarlo, restablecerlo o descartarlo.
+
 `save` retorna si la petición fue aceptada, **no una confirmación de escritura**.
 La app observa `get.saving`, `get.error` y `get.dirty` hasta terminar. Se crea el
 directorio si falta y se usa FileView con escritura atómica asíncrona; fallo de
@@ -95,7 +100,7 @@ La vigilancia requiere conectar `onFileChanged` con `reload()`. Referencia de
 
 - Exponer dimensiones como preferencias requiere validar límites y monitores.
 - Una app de ajustes puede consumir el contrato existente: consultar,
-  previsualizar, cancelar y guardar. No hay una app de ajustes incluida todavía.
+  previsualizar, cancelar y guardar. Edots implementa esa interfaz en `bar/settings/`; ver `docs/EDOTS.md`.
 - Construir la interfaz de ajustes sobre Settings/Config y su catálogo;
   la separación de las catorce surfaces, la cabecera y la política de input está completada.
 
@@ -190,14 +195,38 @@ quickshell -p "$PWD/bar" ipc call settings update '{"modules":{"workspaceRail":f
 quickshell -p "$PWD/bar" ipc call settings discard
 ```
 
-`TopBarModules` compone los laterales por monitor. `OptionalModule` retiene su
+`appearance.barLayout` elige `split` (predeterminado) o `compact`. Edots →
+Composición ofrece Separada/Compacta, también en ventanas pequeñas y búsqueda.
+Config.update/discard/save permite previsualizar, descartar o persistir.
+
+En `compact`, TopBarModules compone espacios, música, estado y perfil dentro
+de una unidad centrada por monitor. En `split` recupera las posiciones y
+materiales separados; Pill vuelve a38px y sin reserva lateral. `restLeftWidth`
+y `restRightWidth` aportan el ancho real de cada grupo a PillGeometry, sin
+reserva simétrica vacía. El reloj queda entre música y estado; el cuerpo completo
+permanece centrado. Separadores finos delimitan los grupos. IslandOverlay superpone
+los controles al único material de Pill: rail y estado usan `integrated` para
+omitir sus fondos exteriores. La altura compacta de 56 px se comparte con
+IslandReserve según barLayout; las gotas mantienen su altura propia de38px. `contentFits`
+retira input y contenido cuando el morph todavía no deja espacio para ambos
+lados. `OptionalModule` retiene su
 contenido durante una retirada corta de opacidad/traslado, libera input al
 comenzar y descarga el Loader al terminar. Una inversión parte de la exposición
 actual. Ocultación temporal por surface/fullscreen/espacio insuficiente conserva
 el módulo habilitado. `animateChanges: false` y reduceMotion resuelven la
 transición inmediatamente, incluso si está en curso. Las regiones Wayland sólo
-incluyen módulos interactivos. Los módulos habilitados conservan su posición y
-la geometría principal no depende de ellos.
+incluyen módulos interactivos. Los módulos habilitados determinan el ancho de reposo; ocultarlos temporalmente
+por una surface no elimina esa reserva. Los paneles pueden ser más estrechos
+que el reposo: PillMorphMotion calcula progreso tanto al crecer como al encoger.
+
+Música compacta: TopBarModules conecta Players a una MediaSession activa sólo
+cuando el módulo recibe interacción. CompactMediaStatus recibe datos y emite
+abrir el panel; reutiliza portada/resumen/visualizador. CAVA tiene consumidor propio
+y se libera al pausar, ocultar o volver a split. El ancho se calcula con TextMetrics de título/artista y se acota a256px;
+portada36px sin aro de progreso, metadatos13/11px. El espacio se comparte con el
+rail; en ancho reducido quedan portada accesible, sin metadatos truncados
+a unos pocos píxeles. Compacto abre MediaSurface en Pill; split conserva
+FluidMediaCompanion. IslandOverlay dirige Escape/letras al contenido correcto.
 
 `TopSystemStatus` es el adaptador de Hyprland/DesktopEntries/Pipewire/UPower/Nmcli.
 `TopAppStrip`, `TopAudioStatus`, `TopNetworkStatus` y `TopBatteryStatus` reciben
@@ -416,3 +445,39 @@ Consultar get aporta valores efectivos y estado de edición; catalog/schema
 aportan metadatos. Se mantiene update para preview de sesión, discard para
 cancelar y save para persistir. El próximo desarrollo es la interfaz de la app;
 los tres puntos de esta fase de preparación están completos.
+
+
+## Configuración integrada en Isla (2026-10-07)
+
+El catálogo incluye ahora 15 surfaces, con `settings` como gota centrada.
+SurfaceRouter posee su navegación y absorción previa de media; IslandOverlay
+conecta foco/teclado, región y cierre. FluidCompanion reutiliza su motor con
+`centered` y contenido expandido retenido; SettingsSurface adapta EdotsWindow,
+que es contenido FocusScope. Config sigue siendo el escritor único. Cerrar
+conserva borradores; ocultación, retorno y reapertura no crean otra ventana.
+Ver docs/EDOTS.md para controles, atajo y pruebas.
+
+
+### Cambio de composición y estado de notificaciones (2026-10-09)
+
+BarLayoutTransition distingue preferencia solicitada del modo committed de
+IslandOverlay. Retira módulos y cabecera, espera absorción completa de media,
+conmuta geometría/host y revela tras asentar el motor existente. No cierra la
+ruta de navegación; inversión y reduceMotion cancelan o completan la fase.
+IslandReserve sigue el modo committed de su overlay dentro del Scope por
+monitor; reservedH debe ser mutable para su Behavior. Probar la shell completa,
+no sólo el overlay, detecta errores de carga de la reserva.
+
+FluidCompanion.centered usa el centro de la pill para origen, puente y retorno;
+Settings llega al centro de pantalla sin expansión lateral de captura. Los
+companions no centrados conservan su trayectoria lateral.
+
+ShellRuntime gobierna Notifs.centerOpen con Binding a la ruta y retira toasts al
+entrar en notifs. NotifsSurface no escribe ese estado al cargar/destruirse: el
+lifetime asíncrono del Loader no representa la navegación vigente.
+
+El rail recibe `style` desde composición (`appearance.workspaceStyle`): numbers
+(default), dots, bars, capsules o pacman. Settings.js define opciones/validación;
+Apariencia expone el selector y Config conserva update/discard/save. Todos usan
+WorkspaceModel, los mismos hit targets y la trayectoria de selección existente.
+Los símbolos tienen slots más densos y Pac-Man usa Shape.CurveRenderer sin Canvas.

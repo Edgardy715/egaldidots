@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/lockscreen-motion-regression.qml"
+  INFO: Shell ID: "8d496a753c4a5f09cabd7e364b5e4ba4" Path ID "8d496a753c4a5f09cabd7e364b5e4ba4"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/iytodipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: lockscreen morph interruption, rejection, success ordering, return and reduced motion
+[codex-output: log=/home/zdito/.cache/codex-economy/output-ki08aj5z.log exit=0]

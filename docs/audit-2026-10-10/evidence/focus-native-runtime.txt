@@ -1,0 +1,9 @@
+  INFO: Launching config: "/tmp/isla-audit-isolated/focus-native.qml"
+  INFO: Shell ID: "3f213ffc5bfc467001574bc067154754" Path ID "3f213ffc5bfc467001574bc067154754"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/biubeipmt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.
+  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.
+  WARN: Could not load icon "input-keyboard" at size QSize(24, 24) from request
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)

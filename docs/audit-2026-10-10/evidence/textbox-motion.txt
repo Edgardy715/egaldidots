@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/textbox-motion-regression.qml"
+  INFO: Shell ID: "e1f63bed9766dab43a23f57e33851e2b" Path ID "e1f63bed9766dab43a23f57e33851e2b"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/xdop7ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: caret geometry, typing, selection, long insertion, navigation, placeholders, masking, hidden and reduced motion
+[codex-output: log=/home/zdito/.cache/codex-economy/output-bt_o6p3u.log exit=0]

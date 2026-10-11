@@ -1,0 +1,8 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/wallpaper-regression.qml"
+  INFO: Shell ID: "8ace755ef0017af5f28cdab5e53fac46" Path ID "8ace755ef0017af5f28cdab5e53fac46"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/yyku4ipmt/log.qslog"
+  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.
+  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: wallpaper bounds, rapid navigation, aspect-fit isolation
+[codex-output: log=/home/zdito/.cache/codex-economy/output-df7z10h3.log exit=0]

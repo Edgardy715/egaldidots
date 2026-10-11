@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/status-regression.qml"
+  INFO: Shell ID: "5c9905545624feb23b438fef3954d1fb" Path ID "5c9905545624feb23b438fef3954d1fb"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/a8tzcipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: workspace expands and returns; position updates: 0
+[codex-output: log=/home/zdito/.cache/codex-economy/output-0dw65acz.log exit=0]

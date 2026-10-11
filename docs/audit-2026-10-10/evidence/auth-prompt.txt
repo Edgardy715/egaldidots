@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/auth-prompt-regression.qml"
+  INFO: Shell ID: "6f23a8ec733b5ca363c3375a1bb7f27f" Path ID "6f23a8ec733b5ca363c3375a1bb7f27f"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/24z4kipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: auth masking, focus, Enter, double-submit, immediate retry, accounts, echoed prompt, success, reopen, close, Escape, sudo and reduced motion
+[codex-output: log=/home/zdito/.cache/codex-economy/output-frc1q1wa.log exit=0]

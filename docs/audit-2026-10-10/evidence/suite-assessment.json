@@ -1,0 +1,408 @@
+[
+  {
+    "name": "interaction-surfaces",
+    "exit": 0,
+    "seconds": 2.28,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "interaction",
+    "exit": 0,
+    "seconds": 1.49,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "pill-interface",
+    "exit": 0,
+    "seconds": 1.18,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "pill-composition",
+    "exit": 0,
+    "seconds": 2.33,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "pill-geometry",
+    "exit": 0,
+    "seconds": 0.31,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "overlay-input-policy",
+    "exit": 0,
+    "seconds": 0.28,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "surface-router",
+    "exit": 0,
+    "seconds": 0.82,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "surface-choreography",
+    "exit": 0,
+    "seconds": 2.76,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "surface-data-contract",
+    "exit": 0,
+    "seconds": 0.85,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "calendar-data",
+    "exit": 0,
+    "seconds": 0.98,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "weather-view",
+    "exit": 0,
+    "seconds": 1.61,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "launcher-controller",
+    "exit": 0,
+    "seconds": 0.48,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "overview",
+    "exit": 0,
+    "seconds": 0.61,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "wallpaper",
+    "exit": 0,
+    "seconds": 2.64,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "media-session",
+    "exit": 0,
+    "seconds": 0.57,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "media-layout",
+    "exit": 0,
+    "seconds": 1.29,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "media-timeline",
+    "exit": 0,
+    "seconds": 1.97,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "lyrics-controller",
+    "exit": 1,
+    "seconds": 0.98,
+    "pass": false,
+    "failure": true
+  },
+  {
+    "name": "lyrics-view",
+    "exit": 0,
+    "seconds": 0.76,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "mixer-surface",
+    "exit": 0,
+    "seconds": 0.63,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "connectivity-surface",
+    "exit": 0,
+    "seconds": 0.84,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "notifs-surface",
+    "exit": 0,
+    "seconds": 0.6,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "notification",
+    "exit": 0,
+    "seconds": 0.8,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "notification-routing",
+    "exit": 0,
+    "seconds": 1.92,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "session",
+    "exit": 0,
+    "seconds": 0.39,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "workspaces-surface",
+    "exit": 0,
+    "seconds": 1.09,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "workspace-model",
+    "exit": 0,
+    "seconds": 0.43,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "top-workspace-motion",
+    "exit": 0,
+    "seconds": 1.38,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "optional-modules",
+    "exit": 0,
+    "seconds": 9.19,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "compact-island",
+    "exit": 0,
+    "seconds": 21.76,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "bar-layout-transition",
+    "exit": 0,
+    "seconds": 2.07,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "centered-companion",
+    "exit": 0,
+    "seconds": 0.86,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "clock-reel",
+    "exit": 0,
+    "seconds": 2.37,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "pacman-motion",
+    "exit": 0,
+    "seconds": 1.78,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "layout-routing",
+    "exit": 0,
+    "seconds": 9.63,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "layout-motion",
+    "exit": 124,
+    "seconds": 25.11,
+    "pass": false,
+    "failure": false
+  },
+  {
+    "name": "layout-interruptions",
+    "exit": 0,
+    "seconds": 11.89,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "input-motion",
+    "exit": 0,
+    "seconds": 1.57,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "textbox-motion",
+    "exit": 0,
+    "seconds": 2.09,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "motion",
+    "exit": 0,
+    "seconds": 2.24,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "absorption",
+    "exit": 0,
+    "seconds": 1.45,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "media-motion",
+    "exit": 0,
+    "seconds": 0.68,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "status",
+    "exit": 0,
+    "seconds": 3.13,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "top-system-status",
+    "exit": 0,
+    "seconds": 6.31,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "island-status-adapter",
+    "exit": 0,
+    "seconds": 0.54,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "desktop-status-fanout",
+    "exit": 0,
+    "seconds": 0.49,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "workspaces-surface",
+    "exit": 0,
+    "seconds": 1.11,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "workspace-styles",
+    "exit": 0,
+    "seconds": 2.72,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "notification-routing",
+    "exit": 0,
+    "seconds": 2.0,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "microinteraction",
+    "exit": 0,
+    "seconds": 2.17,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "material-choreography",
+    "exit": 0,
+    "seconds": 0.63,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "launcher-controller",
+    "exit": 0,
+    "seconds": 0.58,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "config",
+    "exit": 0,
+    "seconds": 0.51,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "lockscreen-entrance",
+    "exit": 0,
+    "seconds": 5.26,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "lockscreen-motion",
+    "exit": 0,
+    "seconds": 3.59,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "lockscreen-typing",
+    "exit": 0,
+    "seconds": 2.14,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "lockscreen",
+    "exit": 0,
+    "seconds": 1.25,
+    "pass": true,
+    "failure": false
+  },
+  {
+    "name": "interaction-surfaces",
+    "exit": 0,
+    "seconds": 2.29,
+    "pass": true,
+    "failure": false
+  }
+]

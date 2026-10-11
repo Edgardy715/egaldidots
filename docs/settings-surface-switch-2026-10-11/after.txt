@@ -1,0 +1,151 @@
+  INFO: Launching config: "/tmp/isla-settings-switch-klgkaycq/bar/settings-surface-switch-regression.qml"
+  INFO: Shell ID: "a60be38ed0ff8bd3abf0c3b54260e463" Path ID "a60be38ed0ff8bd3abf0c3b54260e463"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/qllef9qmt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.
+  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.
+ DEBUG qml: MODE split false
+ DEBUG qml: SWITCH settings
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN: DelegateModel::cancel: index out range 27 0
+ DEBUG qml: PICKER_READY
+ DEBUG qml: SWITCH launcher
+ DEBUG qml: DESTINATION_FOCUS true
+ DEBUG qml: AFTER_HIDDEN_PROFILE true
+ DEBUG qml: SWITCH calendar
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH mixer
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH connectivity
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH notifs
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH appearance
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH wallpaper
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH overview
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH media
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH session
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH utils
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH workspaces
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH clipboard
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH launcher
+ DEBUG qml: FONT_PICKER_READY
+ DEBUG qml: SWITCH mixer
+ DEBUG qml: SWITCH settings
+ DEBUG qml: MODE compact false
+ DEBUG qml: SWITCH settings
+ DEBUG qml: PICKER_READY
+ DEBUG qml: SWITCH launcher
+ DEBUG qml: DESTINATION_FOCUS true
+ DEBUG qml: AFTER_HIDDEN_PROFILE true
+ DEBUG qml: SWITCH calendar
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH mixer
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH connectivity
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH notifs
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH appearance
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH wallpaper
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH overview
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH media
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH session
+ DEBUG qml: SWITCH settings
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: SWITCH utils
+ DEBUG qml: SWITCH settings
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+ DEBUG qml: SWITCH workspaces
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH clipboard
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH launcher
+ DEBUG qml: FONT_PICKER_READY
+ DEBUG qml: SWITCH mixer
+ DEBUG qml: SWITCH settings
+ DEBUG qml: MODE split true
+ DEBUG qml: SWITCH settings
+ DEBUG qml: PICKER_READY
+ DEBUG qml: SWITCH launcher
+ DEBUG qml: DESTINATION_FOCUS true
+ DEBUG qml: AFTER_HIDDEN_PROFILE true
+ DEBUG qml: SWITCH calendar
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH mixer
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH connectivity
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH notifs
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH appearance
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH wallpaper
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH overview
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH media
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH session
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH utils
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH workspaces
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH clipboard
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH launcher
+ DEBUG qml: FONT_PICKER_READY
+ DEBUG qml: SWITCH mixer
+ DEBUG qml: SWITCH settings
+ DEBUG qml: MODE compact true
+ DEBUG qml: SWITCH settings
+ DEBUG qml: PICKER_READY
+ DEBUG qml: SWITCH launcher
+  WARN: DelegateModel::cancel: index out range 17 0
+ DEBUG qml: DESTINATION_FOCUS true
+ DEBUG qml: AFTER_HIDDEN_PROFILE true
+ DEBUG qml: SWITCH calendar
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH mixer
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH connectivity
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH notifs
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH appearance
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH wallpaper
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH overview
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH media
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH session
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH utils
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH workspaces
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH clipboard
+ DEBUG qml: SWITCH settings
+ DEBUG qml: SWITCH launcher
+ DEBUG qml: FONT_PICKER_READY
+ DEBUG qml: SWITCH mixer
+ DEBUG qml: SWITCH settings
+ DEBUG qml: PASS: settings picker, hidden focus/shortcuts, destination typing, retained drafts, rapid retarget and 13 destinations in split/compact with normal/reduced motion
+

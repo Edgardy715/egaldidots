@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/config-regression.qml"
+  INFO: Shell ID: "5c8f9dc84d67ad0edf812bec3e0cba55" Path ID "5c8f9dc84d67ad0edf812bec3e0cba55"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/outidipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: config reactive update, rejection, discard and atomic async save
+[codex-output: log=/home/zdito/.cache/codex-economy/output-pfhv9q4s.log exit=0]

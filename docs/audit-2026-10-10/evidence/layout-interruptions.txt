@@ -1,0 +1,9 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/layout-interruptions-regression.qml"
+  INFO: Shell ID: "29ae6ed4461bc0f62ede85b1b07009ec" Path ID "29ae6ed4461bc0f62ede85b1b07009ec"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/vtnb7ipmt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.
+  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.
+ DEBUG qml: PASS: notification during surface/layout change, pause, media disappearance/reappearance, rapid reversal and inline OSD
+[codex-output: log=/home/zdito/.cache/codex-economy/output-tqg20zlc.log exit=0]

@@ -1,0 +1,3 @@
+node bar/tests/lyrics.cjs: PASS: lyrics timestamps, multiple tags, blank/invalid lines, seek/backtrack, plain, instrumental and bounds
+node bar/tests/media-source.cjs: PASS: music services, native players, browser fallback, exact URL hosts
+node bar/tests/surface-boundaries.cjs: PASS: 14 shell surfaces, settings editor, pill header/motion and overlay policy have audited boundaries

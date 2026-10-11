@@ -1,0 +1,13 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/layout-motion-regression.qml"
+  INFO: Shell ID: "96ec18836f351a75cf4e9119a3673a59" Path ID "96ec18836f351a75cf4e9119a3673a59"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/17nm6ipmt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN quickshell.service.notifications: Could not register notification server at org.freedesktop.Notifications, presumably because one is already registered.
+  WARN quickshell.service.notifications: Registration will be attempted again if the active service is unregistered.
+  WARN: Could not load icon "input-keyboard" at size QSize(24, 24) from request
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+ DEBUG qml: [Session] singleton instanciado
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+[codex-output: log=/home/zdito/.cache/codex-economy/output-xuy9rge_.log exit=124]

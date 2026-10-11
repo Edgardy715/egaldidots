@@ -1,0 +1,6 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/centered-companion-regression.qml"
+  INFO: Shell ID: "0fa2e57fe0d764fabf9c55d79c1d3244" Path ID "0fa2e57fe0d764fabf9c55d79c1d3244"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/0tm86ipmt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: centered settings birth/card/bridge/absorption, both rest widths, interrupted return and reduced motion
+[codex-output: log=/home/zdito/.cache/codex-economy/output-enzd6ft5.log exit=0]
