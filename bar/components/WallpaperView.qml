@@ -350,7 +350,7 @@ Item {
                     anchors.centerIn: parent
                     visible: heroImage.status === Image.Error
                     iconName: "broken_image"
-                    color: Theme.dim
+                    color: Theme.iconSecondary
                     font.pixelSize: 30 * root.s
                 }
             }
@@ -415,12 +415,13 @@ Item {
                         anchors.centerIn: parent
                         visible: thumbnail.thumbFailed
                         iconName: "broken_image"
-                        color: Theme.dim
+                        color: Theme.iconSecondary
                         font.pixelSize: 18 * root.s
                     }
                     MotionArea {
                         id: thumbMouse
-                        accessibleName: qsTr("Seleccionar fondo")
+                accessibleName: qsTr("Seleccionar fondo %1: %2").arg(thumbnail.index + 1).arg(root.displayName(thumbnail.path.split("/").pop()))
+                focusOnTab: false
                         anchors.fill: parent
                         hoverEnabled: true
                         enabled: !root.applying
@@ -636,7 +637,7 @@ Item {
             MaterialIcon {
                 anchors.centerIn: parent
                 iconName: "wallpaper"
-                color: Theme.dim
+                color: Theme.iconSecondary
                 font.pixelSize: Theme.fontSizeHero * s
             }
 
@@ -674,10 +675,10 @@ Item {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: !root.scanning
-            text: "Añade imágenes a ~/Wallpapers y se indexarán solas"
-            color: Theme.dim
+            text: qsTr("Añade imágenes a tu carpeta de fondos.")
+            color: Theme.iconSecondary
             font.family: Theme.font
-            font.pixelSize: Theme.hCaption * s
+            font.pixelSize: Theme.fontSizeSmall * s
         }
 
     }

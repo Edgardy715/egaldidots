@@ -30,14 +30,17 @@ Item {
     Accessible.role: Accessible.CheckBox
     Accessible.name: root.accessibleName
     Accessible.checked: checked
+    Accessible.checkable: true
+    Accessible.onPressAction: if (root.enabled && root.visible) root.toggled(!root.checked)
+    Accessible.onToggleAction: if (root.enabled && root.visible) root.toggled(!root.checked)
     property bool keyboardDown: false
     Keys.onPressed: event => {
-        if (event.isAutoRepeat || (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter)) return
+        if (!enabled || event.isAutoRepeat || (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter)) return
         keyboardDown = true; event.accepted = true
     }
     Keys.onReleased: event => {
         if (event.isAutoRepeat || !keyboardDown || (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter)) return
-        keyboardDown = false; toggled(!checked); event.accepted = true
+        keyboardDown = false; if (enabled) toggled(!checked); event.accepted = true
     }
     onActiveFocusChanged: if (!activeFocus) keyboardDown = false
     onEnabledChanged: if (!enabled) keyboardDown = false

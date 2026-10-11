@@ -10,6 +10,7 @@ Loader {
     property real s: 1
     readonly property bool interactive: requested && presented && status === Loader.Ready
     property real exposure: 0
+    property bool entering: false
     function retarget() {
         const destination = interactive ? 1 : 0
         reveal.stop()
@@ -17,6 +18,7 @@ Loader {
         if (!animateChanges || Flags.reduceMotion) {
             exposure = destination
         } else {
+            entering = destination === 1
             reveal.from = exposure
             reveal.to = destination
             reveal.start()
@@ -32,13 +34,16 @@ Loader {
     enabled: interactive
     visible: exposure > 0
     opacity: exposure
-    transform: Translate { y: -8 * root.s * (1 - root.exposure) }
+    scale: Flags.reduceMotion || !animateChanges ? 1 : 0.94 + 0.06 * exposure
+    transformOrigin: Item.Top
+    transform: Translate { y: Flags.reduceMotion || !root.animateChanges ? 0 : -6 * root.s * (1 - root.exposure) }
     NumberAnimation {
         id: reveal
         target: root
         property: "exposure"
         to: 0
-        easing.type: Motion.easeStandard
-        duration: Motion.standardSmall
+        easing.type: Easing.BezierSpline
+        easing.bezierCurve: root.entering ? Motion.emphasizedDecelCurve : Motion.emphasizedAccelCurve
+        duration: root.entering ? Motion.emphasized : Motion.fast
     }
 }

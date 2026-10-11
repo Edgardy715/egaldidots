@@ -32,7 +32,7 @@ Item {
             id: glyphTxt
             anchors.centerIn: parent
             text: root.glyph
-            color: Theme.dim
+            color: Theme.iconSecondary
             font.family: Theme.fontMono
             font.pixelSize: Theme.fontSizeSmall * root.s
             font.capitalization: Font.AllUppercase
@@ -45,9 +45,8 @@ Item {
         anchors.leftMargin: 4 * root.s
         anchors.verticalCenter: parent.verticalCenter
         text: root.label
-        color: Theme.dim
+        color: Theme.iconSecondary
         font.family: Theme.font
         font.pixelSize: Theme.fontSizeSmall * root.s
-        opacity: 0.85
     }
 }

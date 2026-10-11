@@ -193,7 +193,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: "Cargando historial…"
-                color: Theme.dim
+                color: Theme.iconSecondary
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
             }

@@ -39,13 +39,24 @@ PillSurface {
     property string weatherFeels: ""
     property string weatherHumidity: ""
     property string weatherWind: ""
+    property string weatherError: ""
+    property string weatherLocation: ""
+    property string weatherUpdated: ""
+    signal refreshWeatherRequested()
     property var forecast: []
+    property bool hasMedia: false
+    property string mediaTitle: ""
+    property string mediaArtist: ""
+    property string mediaArtUrl: ""
+    signal mediaRequested()
+    onForecastChanged: if (weatherView >= forecast.length || weatherTarget >= forecast.length) { weatherSwap.stop(); weatherView = -1; weatherTarget = -1; weatherHeroOpacity = 1 }
     property int weatherView: -1
     property int weatherTarget: -1
     property real weatherHeroOpacity: 1
     readonly property var selectedForecast: weatherView >= 0 && weatherView < forecast.length ? forecast[weatherView] : null
 
     function selectForecast(index) {
+        index = index >= 0 && index < forecast.length ? index : -1
         if (index === weatherTarget) return
         weatherTarget = index
         if (Flags.reduceMotion) { weatherView = index; weatherHeroOpacity = 1; return }
@@ -57,7 +68,7 @@ PillSurface {
         interval: Motion.fast
         onTriggered: { root.weatherView = root.weatherTarget; root.weatherHeroOpacity = 1 }
     }
-    onClosingChanged: if (closing) { weatherSwap.stop(); weatherHeroOpacity = 1 }
+    onClosingChanged: if (closing) { weatherSwap.stop(); weatherTarget = weatherView; weatherHeroOpacity = 1 }
 
     function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate() }
     function firstOffset(y, m) { return new Date(y, m, 1).getDay() }  // 0=domingo
@@ -410,124 +421,185 @@ PillSurface {
         }
 
         ColumnLayout {
+            Layout.preferredWidth: 220 * root.s
+            Layout.minimumWidth: 180 * root.s
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: Theme.spacingMd * root.s
+            spacing: root.hasMedia ? 8 * root.s : 0
 
-            Text {
-                text: root.selectedForecast ? root.locale.dayName(new Date(root.selectedForecast.date + "T12:00:00").getDay()) : qsTr("Ahora mismo")
-                color: Theme.iconSecondary
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeCaption * root.s
-                font.weight: Font.DemiBold
+            Flickable {
+                id: weatherScroll
+                objectName: "calendarWeather"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                contentWidth: width
+                contentHeight: weatherColumn.implicitHeight
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                ColumnLayout {
+                id: weatherColumn
+                width: weatherScroll.width
+                spacing: 10 * root.s
+                RowLayout {
+                    Layout.fillWidth: true
+                    Text {
+                        Layout.fillWidth: true
+                        text: qsTr("Clima")
+                        color: Theme.foreground
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSizeBodyLg * root.s
+                        font.weight: Font.DemiBold
+                    }
+                    Rectangle {
+                        visible: !!root.selectedForecast
+                        Layout.preferredWidth: 48 * root.s; Layout.preferredHeight: 28 * root.s
+                        radius: Theme.radiusSm * root.s
+                        color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
+                        Text { anchors.centerIn: parent; text: qsTr("Ahora"); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
+                        MotionArea { objectName: "weatherCurrent"; anchors.fill: parent; accessibleName: qsTr("Volver al clima actual"); onClicked: root.selectForecast(-1) }
+                    }
+                    Rectangle {
+                        Layout.preferredWidth: 28 * root.s; Layout.preferredHeight: 28 * root.s
+                        radius: height / 2
+                        color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
+                        MaterialIcon { anchors.centerIn: parent; iconName: "refresh"; color: Theme.iconSecondary; font.pixelSize: 17 * root.s; opacity: root.weatherLoading ? 0.4 : 1 }
+                        MotionArea { objectName: "weatherRefresh"; anchors.fill: parent; enabled: !root.weatherLoading; accessibleName: qsTr("Actualizar clima"); onClicked: root.refreshWeatherRequested() }
+                    }
+                }
+                Text {
+                    Layout.fillWidth: true
+                    text: root.weatherLocation || qsTr("Ubicación aproximada")
+                    color: Theme.iconSecondary; font.family: Theme.font
+                    font.pixelSize: Theme.fontSizeCaption * root.s; elide: Text.ElideRight
+                }
+                Text {
+                    objectName: "weatherStatus"
+                    Layout.fillWidth: true
+                    text: root.weatherLoading ? qsTr("Actualizando…") : root.weatherError ? (root.weatherTemp ? qsTr("Sin actualizar · datos anteriores") : root.weatherError) : (root.weatherUpdated ? qsTr("wttr.in · Actualizado %1").arg(root.weatherUpdated) : "wttr.in")
+                    color: root.weatherError ? Theme.accent : Theme.iconSecondary
+                    font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; wrapMode: Text.WordWrap
+                    Accessible.role: Accessible.StaticText
+                    Accessible.name: text
+                }
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 4 * root.s
+                    opacity: root.weatherHeroOpacity
+                    Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
+                    Text {
+                        Layout.fillWidth: true
+                        text: root.selectedForecast ? root.locale.dayName(new Date(root.selectedForecast.date + "T12:00:00").getDay()) : qsTr("Ahora mismo")
+                        color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; elide: Text.ElideRight
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 12 * root.s
+                        Text {
+                            objectName: "weatherTemperature"
+                            Layout.fillWidth: true
+                            text: root.selectedForecast ? root.selectedForecast.high : (root.weatherTemp || "—")
+                            color: Theme.foreground; font.family: Theme.fontDisplay
+                            font.pixelSize: 46 * root.s * Math.min(Flags.fontScale, 1.2); font.weight: Font.Medium
+                            Accessible.role: Accessible.StaticText
+                            Accessible.name: root.selectedForecast ? qsTr("Máxima %1 Celsius").arg(text) : qsTr("Temperatura %1 Celsius").arg(text)
+                        }
+                        MaterialIcon { iconName: root.selectedForecast ? root.selectedForecast.icon : root.weatherIcon; color: Theme.accent; font.pixelSize: 40 * root.s; opacity: root.weatherTemp ? 1 : 0.4 }
+                    }
+                    Text {
+                        Layout.fillWidth: true
+                        text: root.selectedForecast ? root.selectedForecast.label : (root.weatherDesc || (root.weatherLoading ? qsTr("Consultando clima…") : qsTr("Clima no disponible")))
+                        color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * root.s; wrapMode: Text.WordWrap
+                    }
+                    Text {
+                        Layout.fillWidth: true
+                        text: root.selectedForecast ? qsTr("Máx. %1 · Mín. %2").arg(root.selectedForecast.high).arg(root.selectedForecast.low) : (root.weatherFeels ? qsTr("Sensación %1").arg(root.weatherFeels) : "")
+                        visible: text.length > 0
+                        color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; wrapMode: Text.WordWrap
+                    }
+                }
+                Rectangle { Layout.fillWidth: true; Layout.preferredHeight: Theme.borderHairline; color: Theme.border }
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 12 * root.s
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Text { text: qsTr("Humedad"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
+                        Text { objectName: "weatherHumidityValue"; text: (root.selectedForecast ? root.selectedForecast.humidity : root.weatherHumidity) || "—"; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s }
+                    }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        Text { text: qsTr("Viento"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
+                        Text { objectName: "weatherWindValue"; text: (root.selectedForecast ? root.selectedForecast.wind : root.weatherWind) || "—"; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s }
+                    }
+                }
+                Text { text: qsTr("Pronóstico"); visible: root.forecast.length > 0; color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; font.weight: Font.DemiBold }
+                Repeater {
+                    model: root.forecast
+                    delegate: Rectangle {
+                        id: forecastRow
+                        required property var modelData
+                        required property int index
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 36 * root.s
+                        radius: Theme.radiusSm * root.s
+                        color: root.weatherView === index ? Qt.alpha(Theme.accent, Theme.alphaGlow) : "transparent"
+                        Behavior on color { enabled: !Flags.reduceMotion; ColorAnimation { duration: Motion.fast } }
+                        RowLayout {
+                            anchors.fill: parent; anchors.margins: 6 * root.s
+                            spacing: 8 * root.s
+                            Text { Layout.fillWidth: true; text: root.locale.dayName(new Date(forecastRow.modelData.date + "T12:00:00").getDay()).slice(0, 3); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; elide: Text.ElideRight }
+                            MaterialIcon { iconName: forecastRow.modelData.icon; color: Theme.accent; font.pixelSize: 18 * root.s }
+                            Text { text: forecastRow.modelData.high; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; font.weight: Font.DemiBold }
+                            Text { text: forecastRow.modelData.low; color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
+                        }
+                        MotionArea {
+                            anchors.fill: parent; feedbackRadius: forecastRow.radius; hoverWash: false
+                            accessibleName: qsTr("%1: %2, máxima %3, mínima %4").arg(forecastRow.modelData.date).arg(forecastRow.modelData.label).arg(forecastRow.modelData.high).arg(forecastRow.modelData.low)
+                            onClicked: root.selectForecast(root.weatherView === forecastRow.index ? -1 : forecastRow.index)
+                        }
+                    }
+                }
+
+                }
             }
 
             Item {
+                id: mediaFooter
+                objectName: "calendarMediaFooter"
+                visible: root.hasMedia
                 Layout.fillWidth: true
-                Layout.preferredHeight: 132 * root.s
-                opacity: root.weatherHeroOpacity
-                Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
-                MaterialIcon {
+                Layout.preferredHeight: visible
+                    ? Math.max(44, (Theme.fontSizeBody + Theme.fontSizeCaption) * 1.4 + 8) * root.s : 0
+
+                Rectangle {
                     anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    iconName: root.selectedForecast ? root.selectedForecast.icon : root.weatherIcon
-                    color: Theme.accent
-                    font.pixelSize: 72 * root.s
-                    opacity: root.weatherTemp.length ? 1 : 0.4
-                    Behavior on opacity { Anim { type: Anim.DefaultEffects } }
-                }
-                Text {
                     anchors.right: parent.right
+                    anchors.top: parent.top
+                    height: Theme.borderHairline
+                    color: Qt.alpha(Theme.foreground, Theme.alphaHair)
+                }
+                IslandMediaSummary {
+                    objectName: "calendarMediaSummary"
                     anchors.verticalCenter: parent.verticalCenter
-                    text: root.selectedForecast ? root.selectedForecast.high : (root.weatherTemp || "—°")
-                    color: Theme.foreground
-                    font.family: Theme.fontDisplay
-                    font.pixelSize: 60 * root.s
-                    font.weight: Font.Light
-                    Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+                    anchors.left: parent.left
+                    s: root.s
+                    coverDiameter: 36 * root.s
+                    spacing: 12 * root.s
+                    textWidth: Math.max(0, mediaFooter.width - 48 * root.s)
+                    titlePixelSize: Theme.fontSizeBody * root.s
+                    artistPixelSize: Theme.fontSizeCaption * root.s
+                    artUrl: root.mediaArtUrl
+                    title: root.mediaTitle
+                    artist: root.mediaArtist
+                    showArtist: root.mediaArtist.length > 0
+                }
+                MotionArea {
+                    objectName: "calendarMediaOpen"
+                    anchors.fill: parent
+                    accessibleName: qsTr("Abrir música: %1 · %2").arg(root.mediaTitle).arg(root.mediaArtist)
+                    onClicked: root.mediaRequested()
                 }
             }
-
-            Text {
-                Layout.fillWidth: true
-                text: root.selectedForecast ? root.selectedForecast.label : (root.weatherDesc || (root.weatherLoading ? qsTr("Consultando clima…") : qsTr("Clima no disponible")))
-                color: Theme.foreground
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeTitle * root.s
-                font.weight: Font.Medium
-                elide: Text.ElideRight
-            }
-
-            Text {
-                text: root.selectedForecast ? qsTr("Mínima %1").arg(root.selectedForecast.low) : (root.weatherFeels.length ? qsTr("Sensación térmica %1").arg(root.weatherFeels) : qsTr("Datos del tiempo actual"))
-                color: Theme.iconSecondary
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeCaption * root.s
-            }
-
-            Rectangle { Layout.fillWidth: true; Layout.preferredHeight: Theme.borderHairline; color: Theme.border }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Theme.spacingMd * root.s
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    Text { text: qsTr("Humedad"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
-                    Text { text: root.weatherHumidity || "—"; color: Theme.foreground; font.family: Theme.fontDisplay; font.pixelSize: Theme.fontSizeBodyLg * root.s }
-                }
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    Text { text: qsTr("Viento"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
-                    Text { text: root.weatherWind || "—"; color: Theme.foreground; font.family: Theme.fontDisplay; font.pixelSize: Theme.fontSizeBodyLg * root.s }
-                }
-            }
-
-            Text {
-                text: qsTr("Próximos días")
-                color: Theme.iconSecondary
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeCaption * root.s
-                font.weight: Font.DemiBold
-            }
-
-            Repeater {
-                model: root.forecast
-                delegate: Item {
-                    id: forecastRow
-                    required property var modelData
-                    required property int index
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 28 * root.s
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.radiusSm * root.s
-                        color: root.weatherView === forecastRow.index ? Qt.alpha(Theme.accent, Theme.alphaGlow) : "transparent"
-                        Behavior on color { ColorAnimation { duration: Motion.fast } }
-                    }
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 5 * root.s
-                        anchors.rightMargin: 5 * root.s
-                        Text {
-                            Layout.preferredWidth: 58 * root.s
-                            text: root.locale.dayName(new Date(forecastRow.modelData.date + "T12:00:00").getDay()).slice(0, 3)
-                            color: Theme.foreground
-                            font.family: Theme.font
-                            font.pixelSize: Theme.fontSizeBody * root.s
-                        }
-                        MaterialIcon { iconName: forecastRow.modelData.icon; color: Theme.accent; font.pixelSize: Theme.fontSizeBodyLg * root.s }
-                        Item { Layout.fillWidth: true }
-                        Text { text: forecastRow.modelData.high + "  " + forecastRow.modelData.low; color: Theme.foreground; font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeCaption * root.s }
-                    }
-                    MotionArea {
-                        anchors.fill: parent
-                        accessibleName: qsTr("Ver pronóstico de %1").arg(forecastRow.modelData.date)
-                        hoverWash: false
-                        onClicked: root.selectForecast(root.weatherView === forecastRow.index ? -1 : forecastRow.index)
-                    }
-                }
-            }
-            Item { Layout.fillHeight: true }
         }
     }
 }

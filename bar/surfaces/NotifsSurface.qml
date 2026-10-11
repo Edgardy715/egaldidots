@@ -8,12 +8,6 @@ PillSurface {
     id: root
     mTop: Theme.marginLg; mLeft: Theme.marginLg; mRight: Theme.marginLg; mBottom: Theme.marginLg
 
-    Component.onCompleted: {
-        Notifs.centerOpen = true
-        Notifs.clearToasts()
-    }
-    Component.onDestruction: Notifs.centerOpen = false
-
     function resolveIconPath(md) {
         if (!md) return ""
         if (md.appIcon && md.appIcon.length) {

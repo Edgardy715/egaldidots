@@ -23,6 +23,9 @@ ShellRoot {
             controller.query = "2+2"
             test.check(controller.showCalculator && controller.calcResult === "4", "calculator result")
             test.check(controller.evaluateMath("alert(1)") === null, "invalid expression rejected")
+            test.check(controller.evaluateMath("Qt.quit()") === null, "QML calls rejected without effects")
+            for (const expression of ["asin(0)", "acos(1)", "atan(0)"])
+                test.check(controller.evaluateMath(expression) === "0", "inverse function: " + expression)
             searched.start()
         }
     }

@@ -7,6 +7,11 @@ Item {
     id: root
     property real s: 1
     property real coreH: 38
+    property bool layoutChanging: false
+    readonly property real restOpacity: restContent.opacity
+    property real restWidth: 0
+    property real restLeftWidth: 0
+    property real restRightWidth: 0
     property string surface: ""
     property bool surfaceOpen: false
     property bool launcherReturning: false
@@ -44,7 +49,9 @@ Item {
         x: root.surface === "auth" ? 18 * root.s
             : root.launcherHeaderVisible && root.hasMedia
                 ? parent.width - implicitWidth - 26 * root.s
-                : (parent.width - implicitWidth) / 2
+                : root.restLeftWidth > 0 || root.restRightWidth > 0
+                    ? 18 * root.s + root.restLeftWidth + (root.restLeftWidth > 0 ? 18 * root.s : 0)
+                    : (parent.width - implicitWidth) / 2
         // spacing 0 a propósito: el gap wsFlash↔reloj vive DENTRO del chip
         // (chipW, que anima y arrastra el ancho de la pill vía este implicitWidth). Un
         // spacing >0 haría que el Row sumara el gap al instante al flipear
@@ -53,11 +60,13 @@ Item {
         // el reloj se desliza PURAMENTE siguiendo el width animado del chip.
         spacing: 0
         z: 3
-        opacity: root.launcherHeaderVisible ? 1 : root.surface === "auth" ? 1
+        opacity: root.layoutChanging ? 0 : root.launcherHeaderVisible ? 1 : root.surface === "auth" ? 1
             : ((root.surfaceOpen && !root.launcherReturning) || (root.hasNotification && root.notifAnimating)) ? 0
             : Math.pow(root.morphCloseness, 1.2)
+                * (root.width >= root.restWidth - 1 ? 1 : 0)
         visible: opacity > 0.01
-        Behavior on opacity { NumberAnimation { duration: root.surfaceOpen ? Motion.fast : Motion.standard; easing.type: Motion.easeStandard } }
+        enabled: !root.layoutChanging
+        Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: root.surfaceOpen ? Motion.fast : Motion.standard; easing.type: Motion.easeStandard } }
 
         IslandRestStatus {
             id: restStatus

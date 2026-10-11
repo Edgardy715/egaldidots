@@ -37,7 +37,7 @@ Item {
             width: (shell.width - 4 * root.s) * root.charge
             height: shell.height - 4 * root.s
             radius: Math.min(2 * root.s, width / 2)
-            color: root.tint
+            color: Theme.accent
             visible: root.charge > 0
             Behavior on width { Anim { type: Anim.DefaultEffects } }
         }

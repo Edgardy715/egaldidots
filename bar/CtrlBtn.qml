@@ -22,15 +22,16 @@ Item {
     activeFocusOnTab: !dim
     Accessible.role: Accessible.Button
     Accessible.name: root.accessibleName
+    Accessible.onPressAction: if (root.enabled && root.visible) root.clicked()
     property bool keyboardDown: false
     enabled: !dim
     Keys.onPressed: event => {
-        if (event.isAutoRepeat || (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter)) return
+        if (!enabled || event.isAutoRepeat || (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter)) return
         keyboardDown = true; event.accepted = true
     }
     Keys.onReleased: event => {
         if (event.isAutoRepeat || !keyboardDown || (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter)) return
-        keyboardDown = false; root.clicked(); event.accepted = true
+        keyboardDown = false; if (enabled) root.clicked(); event.accepted = true
     }
     onActiveFocusChanged: if (!activeFocus) keyboardDown = false
     onEnabledChanged: if (!enabled) keyboardDown = false

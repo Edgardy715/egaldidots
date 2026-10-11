@@ -38,8 +38,11 @@ Item {
     property var searchResults: []
     property var calcResult: null
     property bool showCalculator: false
+    property bool searching: false
     readonly property int resultsCount: searchResults ? searchResults.length : 0
     readonly property bool resultsVisible: !closing && query.trim().length > 0 && resultsCount > 0
+    readonly property bool emptyResultsVisible: !closing && !searching && !showCalculator
+        && query.trim().length > 0 && resultsCount === 0
     readonly property int maxVisibleResults: 6
     signal requestClose()
     signal launchRequested(var app)
@@ -149,7 +152,7 @@ Item {
                 MaterialIcon {
                     anchors.centerIn: parent
                     iconName: Icons.iClose
-                    color: Theme.dim
+                    color: Theme.iconSecondary
                     font.pixelSize: Theme.fontSizeBodyLg * root.s
                     hovered: clearHit.containsMouse
                     scale: clearHit.motion.visualScale
@@ -162,6 +165,21 @@ Item {
                 }
             }
 
+        }
+
+        Text {
+            objectName: "launcherEmptyResults"
+            width: parent.width
+            height: root.emptyResultsVisible ? 34 * root.s : 0
+            visible: root.emptyResultsVisible
+            text: qsTr("Sin resultados. Prueba con otro nombre.")
+            color: Theme.iconSecondary
+            font.family: Theme.font
+            font.pixelSize: Theme.fontSizeBodyLg * root.s
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
+            Accessible.role: Accessible.StaticText
+            Accessible.name: text
         }
 
         // ---- calculator result (when math expression is detected) ----

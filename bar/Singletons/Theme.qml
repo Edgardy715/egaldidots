@@ -64,6 +64,8 @@ Singleton {
     readonly property color dim: IslaPalette.ready ? IslaPalette.dim : "#5d5b6f"                   // color8
     readonly property color foreground: IslaPalette.ready ? IslaPalette.foreground : "#c2c2c6"
     readonly property color background: IslaPalette.ready ? IslaPalette.background : "#0e0c1b"
+    readonly property color error: (0.2126 * background.r + 0.7152 * background.g + 0.0722 * background.b) > 0.5
+        ? "#b3261e" : "#ffb4ab"
 
     // ── Iconos (Material 3) ────────────────────────────────────────────────
     // `dim` es demasiado oscuro para iconos (contraste 2.9:1). Material 3 separa:

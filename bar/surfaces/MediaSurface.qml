@@ -4,6 +4,11 @@ import "../Singletons"
 
 MediaView {
     id: root
+    lyricsSupported: Players.has && Players.sourceInfo.icon === "spotify"
+    lyricsStatus: lyricSession.status
+    lyricsSynced: lyricSession.synced
+    lyricLines: lyricSession.lines
+    onLyricsRetryRequested: lyricSession.retry()
     musicPresentation: Players.isMusicSource
     artUrl: Players.artUrl
     serviceIcon: Players.serviceIcon
@@ -46,6 +51,15 @@ MediaView {
         player: Players.active
         trackKey: Players.trackKey
         active: root.open
+    }
+
+    LyricsController {
+        id: lyricSession
+        active: root.open && root.lyricsOpen && root.lyricsSupported
+        title: session.title
+        artist: session.artist
+        album: session.album
+        duration: session.player ? session.player.length : 0
     }
 
     function syncCava() {

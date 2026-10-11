@@ -103,7 +103,7 @@ Item {
         iconName: root.displayedIcon
         color: root.color
         visible: root.vectorIcon
-        hovered: root.hovered
+        hovered: root.hovered || (root.interaction && root.interaction.engaged)
         pressed: root.pressed
         reveal: root.swapProgress
     }

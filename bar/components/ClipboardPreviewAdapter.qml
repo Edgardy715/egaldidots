@@ -20,7 +20,7 @@ Item {
             "clipboard-preview", root.entryId,
             root.previewDir + "/" + root.entryId + (root.selectedPreview ? "-preview.png" : ".png")]
         onExited: code => {
-            if (code === 0) root.imageSource = "file://" + root.previewDir + "/" + root.entryId
+            if (root.requested && code === 0) root.imageSource = "file://" + root.previewDir + "/" + root.entryId
                 + (root.selectedPreview ? "-preview.png" : ".png")
             else if (root.requested) root.failed = true
         }

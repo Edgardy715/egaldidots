@@ -126,6 +126,7 @@ Item {
                     readonly property var choice: root.choices[modelData]
                     readonly property color tint: modelData === 4 ? "#98baff" : modelData === 3 ? "#ff8395" : modelData === 1 ? "#ffbd80" : Theme.foreground
                     readonly property bool selected: root.focused === modelData || root.pending === modelData
+                    highlighted: selected
                     Layout.fillWidth: true
                     Layout.minimumWidth: 0
                     Layout.preferredHeight: 108 * root.s
@@ -184,7 +185,7 @@ Item {
                 Text {
                     text: qsTr("← → Elegir · Esc Cerrar")
                     font.family: Theme.fontMedia; font.pixelSize: 10 * Flags.fontScale * root.s
-                    color: Qt.alpha(Theme.foreground, 0.5)
+                    color: Theme.iconSecondary
                 }
             }
             RowLayout {
@@ -212,7 +213,7 @@ Item {
                         value: root.displayedPending >= 0 ? root.choices[root.displayedPending].detail : ""
                         wrapMode: Text.WordWrap
                         font.family: Theme.fontMedia; font.pixelSize: 10 * Flags.fontScale * root.s
-                        color: Qt.alpha(Theme.foreground, 0.6)
+                        color: Theme.iconSecondary
                     }
                 }
                 FooterButton { text: qsTr("Cancelar"); onClicked: root.cancel() }

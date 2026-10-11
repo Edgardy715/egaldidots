@@ -22,6 +22,7 @@ ShellRoot {
         onTriggered: {
             test.check(policy.maskMode === "pill" && !policy.modal && !policy.kbFocusWanted,
                 "rest captures only pill")
+            test.check(policy.sideModulesPresented, "idle bar is visible")
             test.check(policy.maskX === 90 && policy.maskW === 150 && policy.maskH === 40,
                 "morph target stays inside input region")
             test.check(policy.outsideBodies(95, 20) && !policy.outsideBodies(110, 20),
@@ -33,10 +34,26 @@ ShellRoot {
             test.check(policy.maskX === 40 && policy.maskW === 260 && !policy.outsideBodies(260, 25)
                 && !policy.outsideBodies(50, 25), "both companions extend capture")
             policy.surface = "calendar"
-            test.check(policy.maskMode === "full" && policy.kbFocusWanted && !policy.exclusiveFocus,
-                "ordinary surface uses on-demand focus")
+            test.check(policy.maskMode === "full" && policy.kbFocusWanted && policy.exclusiveFocus,
+                "ordinary modal surface grabs keyboard for Escape and navigation")
+            for (const name of ["mixer", "connectivity", "workspaces", "notifs", "utils", "appearance"]) {
+                policy.surface = name
+                test.check(policy.exclusiveFocus && policy.escapeShortcutEnabled, name + " receives modal keyboard")
+            }
+            test.check(!policy.sideModulesPresented, "ordinary surfaces hide lateral modules")
+            policy.surface = "media"
+            test.check(policy.exclusiveFocus && policy.escapeShortcutEnabled, "media lyrics and controls grab keyboard")
             policy.surface = "launcher"
             test.check(policy.exclusiveFocus && policy.escapeShortcutEnabled, "launcher grabs keyboard")
+            policy.surface = "settings"
+            test.check(policy.sideModulesPresented, "settings keeps live bar visible")
+            policy.settingsActive = true
+            policy.settingsX = 400; policy.settingsY = 200
+            policy.settingsW = 800; policy.settingsH = 650
+            test.check(policy.exclusiveFocus && !policy.outsideBodies(500, 400)
+                && policy.outsideBodies(1300, 400), "settings focus and card hit region")
+            policy.settingsActive = false
+            policy.surface = "launcher"
             policy.launcherClosing = true
             test.check(policy.maskMode === "pill" && !policy.kbFocusWanted && !policy.exclusiveFocus,
                 "launcher close releases modal focus")
@@ -45,8 +62,9 @@ ShellRoot {
             test.check(policy.authFocusGrab && policy.exclusiveFocus && !policy.escapeShortcutEnabled,
                 "auth focus and close policy")
             policy.monitors = [{name: "DP-1", activeWorkspace: {lastIpcObject: {hasfullscreen: true}}}]
-            test.check(policy.monFullscreen && policy.maskMode === "hidden" && !policy.kbFocusWanted,
+            test.check(policy.monFullscreen && policy.maskMode === "hidden" && !policy.kbFocusWanted && !policy.exclusiveFocus,
                 "fullscreen is click-through")
+            test.check(!policy.sideModulesPresented, "fullscreen still hides lateral modules")
             policy.focusedMonitorName = "DP-2"
             test.check(!policy.monitorIsFocused, "focus follows monitor")
             console.log("PASS: overlay focus, fullscreen, regions and backdrop policy")

@@ -19,7 +19,10 @@ Item {
     property string promptText: qsTr("Contraseña")
     property string errorText: ""
     property string displayName: Config.profile.displayName.trim() || username
-    property url avatarSource: "file://" + Config.userAvatar
+    property url avatarSource: Config.userAvatarUrl
+    property var player: null
+    property string artUrl: ""
+    property string trackKey: ""
     property bool preview: false
     signal unlockRequested(string secret)
     signal powerRequested(string action)
@@ -27,10 +30,14 @@ Item {
 
     readonly property real unit: Math.max(0.45, Math.min(1.2, height / 900, width / 560))
     readonly property real textScale: unit * Flags.fontScale
-    readonly property color ink: "#f8f8fa"
-    readonly property color secondary: "#bdffffff"
+    readonly property color ink: Theme.foreground
+    readonly property color secondary: Theme.iconSecondary
     property date now: new Date()
     property bool entered: false
+    property real entrance: entered ? 1 : 0
+    property real restingMedia: player?.isPlaying && !authActive && !authenticated ? 1 : 0
+    Behavior on entrance { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.morph; easing.type: Easing.OutCubic } }
+    Behavior on restingMedia { SmoothedAnimation { duration: Flags.reduceMotion ? 0 : Motion.standard; velocity: -1 } }
     property bool authActive: false
     property string pendingPower: ""
     property bool retiring: false
@@ -46,6 +53,7 @@ Item {
     readonly property real contentOpacity: contentExposure * retirementOpacity
     readonly property real contextOpacity: smoothReveal(travel, 0.92) * retirementOpacity
     readonly property real mediaOpacity: smoothReveal(expansion, 0.94) * retirementOpacity
+    readonly property bool wideRest: width >= 1040 * unit && Flags.fontScale <= 1.3
     readonly property real wingWidth: 230 * unit
     readonly property bool canShowWings: width >= access.width + 2 * wingWidth + 40 * unit
     property real authProgress: entered && authActive ? 1 : 0
@@ -151,11 +159,12 @@ Item {
     }
     Timer { interval: 1000; repeat: true; running: root.visible; onTriggered: root.now = new Date() }
     Timer { id: confirmation; interval: 3500; onTriggered: root.pendingPower = "" }
-    Rectangle { anchors.fill: parent; color: "#151822" }
+    Rectangle { anchors.fill: parent; color: Theme.background }
     Item {
         id: wallpaperBackdrop
         anchors.fill: parent
         clip: true
+        scale: 1 + 0.025 * (1 - root.entrance)
         Image {
             id: wallpaperImage
             anchors.fill: parent
@@ -177,11 +186,13 @@ Item {
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
-            GradientStop { position: 0; color: "#30060a12" }
-            GradientStop { position: 0.5; color: "#20060a12" }
-            GradientStop { position: 1; color: "#60060a12" }
+            GradientStop { position: 0; color: Qt.alpha(Theme.background, Theme.alphaSubtle) }
+            GradientStop { position: 0.5; color: Qt.alpha(Theme.background, Theme.alphaHairline) }
+            GradientStop { position: 1; color: Qt.alpha(Theme.background, Theme.alphaStrong) }
         }
     }
+    // The lock surface stays opaque while its wallpaper and content enter.
+    Rectangle { anchors.fill: parent; color: Theme.background; opacity: 1 - root.entrance }
     MouseArea {
         anchors.fill: parent
         enabled: root.secured && !root.authActive && !root.authenticated
@@ -189,7 +200,9 @@ Item {
     }
     LockGlass {
         id: lockBody
+        unit: root.unit
         objectName: "lockBody"
+        opacity: root.entrance
         wallpaperItem: wallpaperBackdrop
         sampleX: x
         sampleY: y
@@ -207,7 +220,7 @@ Item {
         height: lockBody.height
         clip: true
         opacity: root.wingProgress * root.retirementOpacity
-        Rectangle { anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; width: 1; height: parent.height - 48 * root.unit; color: "#28ffffff" }
+        Rectangle { anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; width: 1; height: parent.height - 48 * root.unit; color: Theme.hair }
         Column {
             x: 24 * root.unit; y: 22 * root.unit
             width: root.wingWidth - 48 * root.unit
@@ -221,7 +234,7 @@ Item {
             }
             Text { visible: !root.weather.temp; text: Qt.formatDate(root.now, "dd MMM"); color: root.ink; font.family: Theme.fontMedia; font.pixelSize: 34 * root.textScale; font.weight: Font.Medium }
             Text { width: parent.width; text: root.weather.temp ? root.weatherLabel(root.weather.code) : qsTr("Clima no disponible"); elide: Text.ElideRight; color: root.ink; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale }
-            Rectangle { width: parent.width; height: 1; color: "#28ffffff" }
+            Rectangle { width: parent.width; height: 1; color: Theme.hair }
             Text { text: root.weather.feels ? qsTr("Sensación %1  ·  Humedad %2").arg(root.weather.feels).arg(root.weather.humidity) : Qt.locale().toString(root.now, "dddd, d MMMM"); color: root.secondary; font.family: Theme.fontMedia; font.pixelSize: 11 * root.textScale }
         }
     }
@@ -233,22 +246,21 @@ Item {
         height: lockBody.height
         clip: true
         opacity: root.wingProgress * root.retirementOpacity
-        Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 1; height: parent.height - 48 * root.unit; color: "#28ffffff" }
+        Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 1; height: parent.height - 48 * root.unit; color: Theme.hair }
         Column {
             x: 20 * root.unit; y: 22 * root.unit
             width: root.wingWidth - 40 * root.unit
             spacing: 12 * root.unit
-            Text { text: qsTr("REPRODUCIENDO"); color: root.secondary; font.family: Theme.fontMedia; font.pixelSize: 10 * root.textScale; font.letterSpacing: 1.4 * root.unit }
             LockMedia {
                 width: parent.width; height: implicitHeight
                 unit: root.unit
                 wallpaperItem: wallpaperBackdrop
                 sampleX: mediaWing.x + x; sampleY: mediaWing.y + y
-                player: Players.active; artUrl: Players.artUrl; trackKey: Players.trackKey
+                player: root.player; artUrl: root.artUrl; trackKey: root.trackKey
                 embedded: true
                 visible: hasPlayer
             }
-            Text { visible: !Players.active; width: parent.width; wrapMode: Text.WordWrap; text: qsTr("Nada reproduciéndose"); color: root.ink; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale }
+            Text { visible: !root.player; width: parent.width; wrapMode: Text.WordWrap; text: qsTr("Nada reproduciéndose"); color: root.ink; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale }
         }
     }
     Row {
@@ -256,7 +268,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: lockBody.y + (lockBody.height - height) / 2
         spacing: 12 * root.unit
-        opacity: 1 - root.smoothReveal(Math.min(1, root.presentation / 0.18), 0)
+        opacity: root.entrance * (1 - root.smoothReveal(Math.min(1, root.presentation / 0.18), 0))
         MaterialIcon { iconName: root.authenticated ? "lock_open" : "lock"; font.pixelSize: 20 * root.unit; color: root.ink }
         Text { text: Qt.formatTime(root.now, "HH:mm"); font.family: Theme.fontMedia; font.pixelSize: 14 * root.textScale; color: root.ink }
     }
@@ -271,28 +283,54 @@ Item {
     }
     Column {
         id: clock
-        opacity: (root.entered ? 1 : 0) * (1 - root.authProgress) * root.retirementOpacity
+        objectName: "lockRestClock"
+        width: Math.min(Math.max(clockTime.implicitWidth, clockDate.implicitWidth), root.width - 48 * root.unit)
+        x: (root.width - width) / 2 + (root.wideRest ? (80 * root.unit - (root.width - width) / 2) * root.restingMedia : 0)
+        y: (root.height - height) / 2 - (root.wideRest ? 0 : 120 * root.unit * root.restingMedia)
+        opacity: root.entrance * (1 - root.authProgress) * root.retirementOpacity
+        transform: Translate { y: 18 * root.unit * (1 - root.entrance) }
         layer.enabled: true
         layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#65000000"; shadowBlur: 0.35; shadowVerticalOffset: 1 }
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: (116 - 24 * root.authProgress) * root.unit
         spacing: 8 * root.unit
         Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: Qt.locale().toString(root.now, "dddd, d MMMM")
+            id: clockTime
+            width: parent.width
+            horizontalAlignment: Text.AlignLeft
+            text: Flags.time12h ? Qt.formatTime(root.now, "h:mm AP").replace(/\s*[AP]M$/, "") : Qt.formatTime(root.now, "HH:mm")
             font.family: Theme.fontMedia
-            font.pixelSize: 20 * root.textScale
-            font.weight: Font.Medium
+            font.pixelSize: 124 * root.unit
+            font.weight: Font.Light
+            font.letterSpacing: -3 * root.unit
             color: root.ink
         }
         Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: Flags.time12h ? Qt.formatTime(root.now, "h:mm AP").replace(/\s*[AP]M$/, "") : Qt.formatTime(root.now, "HH:mm")
+            id: clockDate
+            width: parent.width
+            horizontalAlignment: Text.AlignLeft
+            text: Qt.locale().toString(root.now, "dddd, d MMMM")
+            elide: Text.ElideRight
             font.family: Theme.fontMedia
-            font.pixelSize: 104 * root.unit
-            font.weight: Font.Medium
-            font.letterSpacing: -3 * root.unit
-            color: root.ink
+            font.pixelSize: 18 * root.textScale
+            color: root.secondary
+        }
+    }
+
+    Loader {
+        id: restingPlayer
+        objectName: "lockRestingPlayer"
+        x: root.wideRest ? root.width - width - 80 * root.unit : (root.width - width) / 2
+        y: (root.wideRest ? (root.height - height) / 2 : clock.y + clock.height + 32 * root.unit) + 12 * root.unit * (1 - root.restingMedia)
+        width: root.wideRest ? Math.min(600 * root.unit, root.width * 0.46) : Math.min(360 * root.unit * Math.max(1, Flags.fontScale * 0.8), root.width - 48)
+        height: item ? item.implicitHeight : 344 * root.unit
+        opacity: root.entrance * root.restingMedia * (1 - root.authProgress) * root.retirementOpacity
+        visible: opacity > 0.001
+        enabled: root.secured && !root.authActive && !root.authenticated && root.restingMedia > 0.99
+        active: root.restingMedia > 0 || !!root.player?.isPlaying && !root.authActive
+        sourceComponent: LockMedia {
+            unit: root.unit
+            wallpaperItem: wallpaperBackdrop
+            sampleX: restingPlayer.x; sampleY: restingPlayer.y
+            player: root.player; artUrl: root.artUrl; trackKey: root.trackKey
         }
     }
 
@@ -364,10 +402,10 @@ Item {
             transform: Translate { x: root.fieldOffset }
             Behavior on width { SmoothedAnimation { duration: Flags.reduceMotion ? 0 : Motion.standard; velocity: -1 } }
             radius: 15 * root.unit
-            color: root.authenticated ? "#3839b67a" : root.errorText ? "#28d84962" : "#1cffffff"
+            color: root.authenticated ? "#3839b67a" : root.errorText ? "#28d84962" : Qt.alpha(Theme.foreground, Theme.alphaSoft)
             Behavior on color { ColorAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast } }
             Behavior on border.color { ColorAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast } }
-            border.color: root.authenticated ? "#a6efd0" : root.errorText ? "#ffb4bc" : password.activeFocus ? "#70ffffff" : "#25ffffff"
+            border.color: root.authenticated ? "#a6efd0" : root.errorText ? "#ffb4bc" : password.activeFocus ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Theme.border
             TextField {
                 id: password
                 objectName: "lockPassword"
@@ -419,7 +457,7 @@ Item {
                     x: passwordDots.x + first * field.dotStep - 2 * root.unit
                     width: Math.max(0, (last - first) * field.dotStep - 2 * root.unit)
                     height: 24 * root.unit; radius: 4 * root.unit
-                    color: "#a6d9f4"
+                    color: Theme.accent
                     opacity: last > first ? 0.28 : 0
                     Behavior on x { NumberAnimation { duration: Flags.reduceMotion ? 0 : 80; easing.type: Easing.OutQuad } }
                     Behavior on width { NumberAnimation { duration: Flags.reduceMotion ? 0 : 80; easing.type: Easing.OutQuad } }
@@ -464,7 +502,7 @@ Item {
                             anchors.centerIn: parent
                             width: field.dotSize; height: width
                             radius: Math.round(width * 0.24)
-                            color: dotSlot.index >= password.selectionStart && dotSlot.index < password.selectionEnd ? "#a6d9f4" : root.ink
+                            color: dotSlot.index >= password.selectionStart && dotSlot.index < password.selectionEnd ? Theme.accent : root.ink
                         }
                     }
                 }
@@ -510,10 +548,11 @@ Item {
         wallpaperItem: wallpaperBackdrop
         sampleX: x
         sampleY: y
-        player: Players.active
-        artUrl: Players.artUrl
-        trackKey: Players.trackKey
-        visible: hasPlayer && root.height >= 540 && root.mediaOpacity > 0 && root.wingProgress < 1
+        objectName: "lockAccessPlayer"
+        player: root.player
+        artUrl: root.artUrl
+        trackKey: root.trackKey
+        visible: hasPlayer && y + height + 16 * root.unit <= root.height && root.mediaOpacity > 0 && root.wingProgress < 1
         opacity: root.mediaOpacity * (1 - root.wingProgress)
     }
     LockButton {
@@ -531,7 +570,7 @@ Item {
         y: power.y - height - 12 * root.unit
         width: 230 * root.unit
         padding: 12 * root.unit
-        background: Rectangle { radius: 24 * root.unit; color: "#ed20232c"; border.color: "#45ffffff" }
+        background: LockGlass { radius: 24 * root.unit; unit: root.unit; wallpaperItem: wallpaperBackdrop; sampleX: powerMenu.x; sampleY: powerMenu.y }
         contentItem: Column {
             spacing: 6 * root.unit
             Repeater {
@@ -549,7 +588,7 @@ Item {
                     }
                     background: Rectangle {
                         radius: 12 * root.unit
-                        color: parent.hovered || parent.activeFocus ? "#30ffffff" : "transparent"
+                        color: parent.hovered || parent.activeFocus ? Qt.alpha(Theme.foreground, Theme.alphaWash) : "transparent"
                         Behavior on color { ColorAnimation { duration: Motion.hover } }
                     }
                     onClicked: root.choosePower(modelData.action)

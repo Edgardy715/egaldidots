@@ -5,6 +5,39 @@
 // Los nombres Material equivalentes comparten piezas (por ejemplo, power y
 // power_settings_new); cada nodo SVG se conserva como un path independiente.
 var _catalog = {
+    // Edots additions: original paths, animated by the shared stroke engine.
+    "palette": [
+        { path: "M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4c-1-1 0-3 2-3h2c4 0 4-11-6-11Z", role: "draw" },
+        { path: "M7 10h.01M10 7h.01M15 7h.01M7 15h.01", role: "wave" }
+    ],
+    "dashboard": [
+        { path: "M3 3h7v7H3Z", role: "draw" },
+        { path: "M14 3h7v7h-7Z", role: "draw" },
+        { path: "M3 14h7v7H3Z", role: "draw" },
+        { path: "M14 14h7v7h-7Z", role: "draw" }
+    ],
+    "animation": [
+        { path: "M13 3a8 8 0 1 1-8 8", role: "rotate" },
+        { path: "M3 3h6v6H3Z", role: "draw" },
+        { path: "M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0", role: "wave" }
+    ],
+    "text_fields": [
+        { path: "M3 5h12M9 5v15M6 20h6", role: "draw" },
+        { path: "M15 11h7M18.5 11v9M16 20h5", role: "stem" }
+    ],
+    "expand_more": [{ path: "m6 9 6 6 6-6", role: "draw" }],
+    "tune": [
+        { path: "M4 3v5M4 12v9M12 3v9M12 16v5M20 3v3M20 10v11", role: "draw" },
+        { path: "M2 8h4v4H2ZM10 12h4v4h-4ZM18 6h4v4h-4Z", role: "stem" }
+    ],
+    "apps": [
+        { path: "M3 3h6v6H3ZM15 3h6v6h-6Z", role: "draw" },
+        { path: "M3 15h6v6H3ZM15 15h6v6h-6Z", role: "draw" }
+    ],
+    "visibility": [
+        { path: "M2 12Q12-3 22 12Q12 27 2 12Z", role: "draw" },
+        { path: "M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0", role: "wave" }
+    ],
     "add": [
         { path: "M5 12h14", role: "draw" },
         { path: "M12 5v14", role: "draw" },

@@ -9,7 +9,7 @@ Button {
     hoverEnabled: true
     InteractionMotion {
         id: response
-        hovered: root.hovered; pressed: root.down; focused: root.activeFocus
+        hovered: root.hovered; pressed: root.down; focused: root.activeFocus || root.highlighted
         enabled: root.enabled; expressive: root.expressive
         extent: Math.min(root.width, root.height)
     }

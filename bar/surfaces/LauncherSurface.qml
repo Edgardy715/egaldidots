@@ -11,6 +11,7 @@ PillSurface {
     readonly property var searchResults: controller.searchResults
     readonly property int resultsCount: view.resultsCount
     readonly property bool resultsVisible: view.resultsVisible
+    readonly property bool emptyResultsVisible: view.emptyResultsVisible
     readonly property int maxVisibleResults: view.maxVisibleResults
     readonly property var calcResult: controller.calcResult
     readonly property bool showCalculator: controller.showCalculator
@@ -30,6 +31,7 @@ PillSurface {
         searchResults: controller.searchResults
         calcResult: controller.calcResult
         showCalculator: controller.showCalculator
+        searching: controller.searching
         onRequestClose: root.requestClose()
         onLaunchRequested: app => controller.launch(app)
         onCopyResultRequested: value => controller.copyResult(value)

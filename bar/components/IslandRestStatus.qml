@@ -100,30 +100,50 @@ Row {
         width: clockText.implicitWidth
         height: root.coreH
 
-        Text {
+        Row {
             id: clockText
             scale: clockHit.motion.visualScale
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 1.5 * root.s
             height: root.coreH
-            verticalAlignment: Text.AlignVCenter
-            color: Theme.foreground
-            font.family: Theme.fontDisplay
-            font.pixelSize: Theme.fontSizeHeadline * root.s
-            font.weight: Font.DemiBold
-            textFormat: Text.RichText
-            text: {
-                const hour = root.now.getHours() % 12 || 12
-                return "<span style='color:" + ("" + Theme.foreground) + "'>"
-                    + hour + ":" + Qt.formatDateTime(root.now, "mm")
-                    + "</span> <span style='color:" + ("" + Theme.dim) + "; font-size:"
-                    + Math.round(12 * root.s) + "px'>"
-                    + Qt.formatDateTime(root.now, "ap").toUpperCase() + "</span>"
+            property font clockFont: Qt.font({family: Theme.fontDisplay, pixelSize: Theme.fontSizeHeadline * root.s, weight: Font.DemiBold, underline: clockHit.activeFocus})
+            ClockReel {
+                objectName: "clockHours"
+                width: implicitWidth; height: root.coreH
+                font: clockText.clockFont
+                text: String(root.now.getHours() % 12 || 12)
             }
-
+            Text {
+                height: root.coreH
+                verticalAlignment: Text.AlignVCenter
+                text: ":"; font: clockText.clockFont; color: Theme.foreground
+            }
+            ClockReel {
+                objectName: "clockMinutes"
+                width: implicitWidth; height: root.coreH
+                font: clockText.clockFont
+                text: Qt.formatDateTime(root.now, "mm")
+            }
+            TextMetrics { id: amMetrics; font: periodText.font; text: "AM" }
+            TextMetrics { id: pmMetrics; font: periodText.font; text: "PM" }
+            Text {
+                id: periodText
+                width: Math.max(amMetrics.advanceWidth, pmMetrics.advanceWidth) + 4 * root.s
+                height: root.coreH
+                leftPadding: 4 * root.s
+                verticalAlignment: Text.AlignVCenter
+                text: Qt.formatDateTime(root.now, "ap").toUpperCase()
+                color: Theme.iconSecondary
+                font.family: Theme.fontDisplay
+                font.pixelSize: 12 * root.s
+                font.weight: Font.DemiBold
+                font.underline: clockHit.activeFocus
+            }
         }
         MotionArea {
             id: clockHit
+            objectName: "clockCalendarHit"
+            feedbackEnabled: false
             accessibleName: qsTr("Abrir calendario")
             anchors.fill: parent
             anchors.margins: -6 * root.s

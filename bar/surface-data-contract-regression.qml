@@ -33,6 +33,8 @@ ShellRoot {
         }
         SignalSpy { id: toggle; target: media; signalName: "togglePlayingRequested" }
         SignalSpy { id: seek; target: media; signalName: "seekRequested" }
+        SignalSpy { id: dragStart; target: media; signalName: "dragStarted" }
+        SignalSpy { id: dragCommit; target: media; signalName: "dragCommitted" }
         OverviewView {
             id: overview
             visible: false
@@ -69,6 +71,12 @@ ShellRoot {
                 compare(seek.signalArguments[0][0], 35)
                 keyClick(Qt.Key_End)
                 compare(seek.signalArguments[1][0], 120)
+                mousePress(scrubber, scrubber.width * 0.25, scrubber.height / 2)
+                mouseRelease(scrubber, scrubber.width * 0.75, scrubber.height / 2)
+                compare(dragStart.count, 1)
+                compare(dragCommit.count, 1)
+                verify(dragStart.signalArguments[0][0] < 0.3)
+                verify(dragCommit.signalArguments[0][0] > 0.7)
                 media.visible = false
                 overview.visible = true
                 overview.goIndex(3)

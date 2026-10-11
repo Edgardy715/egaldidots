@@ -15,6 +15,8 @@ Item {
     property bool keepAwakeEnabled: false
     property string keepAwakeElapsedTime: "--:--"
     property string activeProfile: "balanced"
+    property bool profileBusy: false
+    property string profileError: ""
     property var profiles: ["performance", "balanced", "power-saver"]
 
     signal requestPage(string name)
@@ -207,7 +209,24 @@ Item {
                         height_: 6
                         knob: true
                         s: root.s
+                        enabled: root.showBrightness
+                        activeFocusOnTab: enabled
+                        Accessible.role: Accessible.Slider
+                        Accessible.name: qsTr("Brillo")
+                        Accessible.description: Math.round(root.brightnessPercent) + "%"
+                        Accessible.onIncreaseAction: if (enabled && visible) root.brightnessStepRequested(5)
+                        Accessible.onDecreaseAction: if (enabled && visible) root.brightnessStepRequested(-5)
+                        Keys.onLeftPressed: if (enabled && visible) root.brightnessStepRequested(-5)
+                        Keys.onRightPressed: if (enabled && visible) root.brightnessStepRequested(5)
                         onSliderLiveChanged: (v) => root.brightnessSetPercent(v * 100)
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: height / 2
+                            color: "transparent"
+                            border.color: Theme.accent
+                            border.width: parent.activeFocus ? Theme.borderHairline : 0
+                            Accessible.ignored: true
+                        }
                     }
 
                     RowLayout {
@@ -327,10 +346,19 @@ Item {
                                     if (root.activeProfile === "performance") return "Máximo rendimiento · más consumo"
                                     if (root.activeProfile === "balanced") return "Equilibrio · recomendado"
                                     if (root.activeProfile === "power-saver") return "Máximo ahorro · menos consumo"
-                                    return ""
+                                    return qsTr("Perfil no disponible")
                                 }
                                 color: Theme.iconSecondary
                                 font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s
+                            }
+                            Text {
+                                objectName: "powerProfileError"
+                                visible: root.profileError.length > 0
+                                text: root.profileError
+                                color: Theme.accentStrong
+                                font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s
+                                Layout.fillWidth: true
+                                wrapMode: Text.WordWrap
                             }
                         }
                     }
@@ -351,6 +379,7 @@ Item {
                         // píldora que se desliza entre opciones
                         Rectangle {
                             readonly property real segW: segSelector.width / 3
+                            visible: root.profileIndex() >= 0
                             width: segW - 4 * root.s
                             height: segSelector.height - 4 * root.s
                             y: 2 * root.s
@@ -386,6 +415,7 @@ Item {
                                         accessibleName: qsTr("Perfil de energía: %1").arg(profileLabel.text)
                                         Accessible.role: Accessible.RadioButton
                                         Accessible.checked: root.activeProfile === profileOption.modelData
+                                        enabled: !root.profileBusy
                                         hoverWash: false
                                         onClicked: root.profileSelected(profileOption.modelData)
                                     }

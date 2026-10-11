@@ -39,6 +39,9 @@ ShellRoot {
         geometry.surface = "launcher"
         test.equal(geometry.launcherH, 158, "launcher unloaded")
         geometry.contentLoaded = true
+        geometry.emptyResultsVisible = true
+        test.equal(geometry.launcherH, 202, "launcher empty results")
+        geometry.emptyResultsVisible = false
         geometry.showCalculator = true
         test.equal(geometry.launcherH, 212, "launcher calculator")
         geometry.resultsVisible = true
@@ -77,6 +80,14 @@ ShellRoot {
         geometry.notifState = "return"
         test.equal(geometry.targetW, 156, "notification return width")
         test.equal(geometry.targetRadius, 19, "notification return radius")
+        geometry.restLeftWidth = 280
+        geometry.restRightWidth = 150
+        geometry.restHeight = 56
+        test.equal(geometry.targetW, geometry.restW, "notification returns to full compact width")
+        test.equal(geometry.targetH, 56, "notification returns to compact height")
+        geometry.restLeftWidth = 0
+        geometry.restRightWidth = 0
+        geometry.restHeight = 38
 
         geometry.hasNotification = false
         geometry.notifAnimating = false

@@ -1,6 +1,7 @@
 {
   "version": 1,
   "appearance": {
+    "barLayout": "split",
     "glassAlpha": 0.34,
     "pillBlur": false,
     "topGap": 1.0,

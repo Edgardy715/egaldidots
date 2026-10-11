@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import Qt5Compat.GraphicalEffects
@@ -17,6 +18,7 @@ Item {
     property real materialPulse: 0
     property real materialSweep: -0.55
     property string surface: ""
+    property string artUrl: ""
     property string mode: "rest"
     property real notifBreathGlow: 0
     property string notifState: "idle"
@@ -25,24 +27,24 @@ Item {
     property real captureLeftExtra: 0
 
     readonly property real bodyRadius: root.morphRadius + root.notifBreathRadius
+    // A light compact tint grows gently for reading, keeping the backdrop visible.
+    readonly property real readingExposure: Math.max(0, Math.min(1, (height / s - 38) / 58))
+    readonly property real bodyAlpha: Flags.glassAlpha + (1 - Flags.glassAlpha) * (0.15 + 0.25 * readingExposure)
 
     anchors.fill: parent
 
     Rectangle {
         id: bodyShadow
+        objectName: "pillMaterialShadow"
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.leftMargin: -2 * root.s - root.captureLeftExtra
-        anchors.topMargin: -2 * root.s
-        anchors.bottomMargin: -2 * root.s
-        width: parent.width + root.captureExtra + root.captureLeftExtra + 4 * root.s
-        radius: root.bodyRadius + 2 * root.s
-        color: "transparent"
-        border.width: Theme.borderHairlineSoft * root.s
-        border.color: Qt.alpha(root.materialAccent,
-                               root.materialAwake ? Theme.alphaMid : Theme.alphaHair)
-        opacity: root.surface === "auth" || root.suppressEdge ? 0 : root.materialAwake ? 0.9 : 0.58
+        anchors.leftMargin: -root.captureLeftExtra
+        width: parent.width + root.captureExtra + root.captureLeftExtra
+        radius: root.bodyRadius
+        color: Theme.cardBot
+        // Compact shadows otherwise make compositor blur sample the app outside the glass.
+        opacity: root.surface === "auth" || root.suppressEdge ? 0 : 0.32 * root.readingExposure
         layer.enabled: true
         layer.effect: MultiEffect {
             shadowEnabled: true
@@ -68,7 +70,7 @@ Item {
         border.width: Math.max(1, Theme.borderHairline * root.s)
         border.color: Qt.alpha(root.materialAccent, 0.32)
         opacity: root.surface === "auth" || root.suppressEdge ? 0
-            : (root.materialAwake ? 0.16 : 0) + root.materialPulse * 0.34
+            : ((root.materialAwake && root.mode !== "hover" ? 0.16 : 0) + root.materialPulse * 0.34) * (1 - root.readingExposure)
         scale: 1 + root.materialPulse * 0.028
         layer.enabled: opacity > 0.01
         layer.effect: MultiEffect {
@@ -86,7 +88,7 @@ Item {
         anchors.fill: parent
         radius: root.bodyRadius
         color: "transparent"
-        visible: root.surface === "media" && Players.artUrl.length > 0
+        visible: root.surface === "media" && root.artUrl.length > 0
         z: 1
         clip: true
 
@@ -97,7 +99,7 @@ Item {
             Image {
                 anchors.fill: parent
                 anchors.margins: -80
-                source: root.surface === "media" ? Players.artUrl : ""
+                source: root.surface === "media" ? root.artUrl : ""
                 fillMode: Image.PreserveAspectCrop
                 opacity: 0.12
                 smooth: true
@@ -146,16 +148,16 @@ Item {
         Rectangle {
             anchors.fill: parent
             gradient: Gradient {
-                GradientStop { position: 0; color: Qt.alpha(Theme.cardTop, Math.min(0.95, Flags.glassAlpha + 0.12)) }
-                GradientStop { position: 0.46; color: Qt.alpha(Theme.cardBot, Flags.glassAlpha) }
-                GradientStop { position: 1; color: Qt.alpha(Qt.darker(Theme.cardBot, 1.16), Math.min(0.95, Flags.glassAlpha + 0.08)) }
+                GradientStop { position: 0; color: Qt.alpha(Theme.cardTop, Math.min(1, root.bodyAlpha + 0.08 * root.readingExposure)) }
+                GradientStop { position: 0.46; color: Qt.alpha(Theme.cardBot, root.bodyAlpha) }
+                GradientStop { position: 1; color: Qt.alpha(Qt.darker(Theme.cardBot, 1 + 0.16 * root.readingExposure), Math.min(1, root.bodyAlpha + 0.04 * root.readingExposure)) }
             }
         }
 
         InnerGlow {
             anchors.fill: parent
             glowColor: root.materialAccent
-            focusX: root.mode === "status" ? 0.76 : root.mode === "rest" ? 0.5 : 0.26
+            focusX: root.mode === "status" ? 0.76 : root.mode === "rest" || root.mode === "hover" ? 0.5 : 0.26
             opacity: root.mode === "lateral" || root.width >= 300 * root.s || root.height > 80 * root.s ? 0
                 : root.materialAwake ? 0.48 : root.mode === "rest" ? 0.34 : root.mode === "status" ? 0.38 : 0
             Behavior on opacity { Anim { type: Anim.DefaultEffects } }
@@ -170,7 +172,7 @@ Item {
                 GradientStop { position: 0; color: Qt.alpha(root.materialAccent, root.materialAwake ? 0.075 : 0.028) }
                 GradientStop { position: 1; color: "transparent" }
             }
-            opacity: root.materialAwake ? 0.88 : 0.62
+            opacity: (root.materialAwake ? 0.88 : 0.62) * (1 - root.readingExposure * 0.65)
             Behavior on opacity { Anim { type: Anim.DefaultEffects } }
         }
 
@@ -217,6 +219,7 @@ Item {
             radius: height / 2
             color: Theme.sheen
             visible: !root.suppressEdge
+            opacity: 1 - root.readingExposure
         }
 
         Rectangle {

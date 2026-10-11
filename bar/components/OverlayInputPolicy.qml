@@ -24,6 +24,11 @@ QtObject {
     property real sessionY: 0
     property real sessionW: 0
     property real sessionH: 0
+    property bool settingsActive: false
+    property real settingsX: 0
+    property real settingsY: 0
+    property real settingsW: 0
+    property real settingsH: 0
 
     readonly property bool surfaceOpen: surface.length > 0
     readonly property bool monitorIsFocused: focusedMonitorName === monitorName
@@ -38,10 +43,9 @@ QtObject {
         return false
     }
     readonly property bool kbFocusWanted: surfaceOpen && !monFullscreen && !launcherClosing
+    readonly property bool sideModulesPresented: (!surfaceOpen || surface === "settings") && !monFullscreen
     readonly property bool modal: surfaceOpen && !launcherClosing
-    readonly property bool exclusiveFocus: (surface === "launcher" && !launcherClosing)
-        || surface === "wallpaper" || surface === "overview" || surface === "clipboard"
-        || surface === "session" || surface === "auth"
+    readonly property bool exclusiveFocus: kbFocusWanted
     readonly property bool authFocusGrab: surface === "auth" && surfaceOpen
     readonly property bool escapeShortcutEnabled: surfaceOpen && surface !== "session" && surface !== "auth"
     readonly property string maskMode: monFullscreen ? "hidden" : modal ? "full" : "pill"
@@ -49,13 +53,16 @@ QtObject {
     readonly property real baseW: Math.max(pillWidth, pillTargetW)
     readonly property real baseH: Math.max(pillHeight, pillTargetH)
     readonly property real maskX: Math.min(pillX + (pillWidth - baseW) / 2,
-        sessionActive ? sessionX : pillX)
-    readonly property real maskY: Math.min(pillY, mediaActive ? mediaY : pillY)
+        sessionActive ? sessionX : pillX, settingsActive ? settingsX : pillX)
+    readonly property real maskY: Math.min(pillY, mediaActive ? mediaY : pillY,
+        settingsActive ? settingsY : pillY)
     readonly property real maskW: Math.max(pillX + baseW,
-        mediaActive ? mediaX + mediaW : pillX + baseW) - maskX
+        mediaActive ? mediaX + mediaW : pillX + baseW,
+        settingsActive ? settingsX + settingsW : pillX + baseW) - maskX
     readonly property real maskH: Math.max(pillY + baseH,
         mediaActive ? mediaY + mediaH : pillY + baseH,
-        sessionActive ? sessionY + sessionH : pillY + baseH) - maskY
+        sessionActive ? sessionY + sessionH : pillY + baseH,
+        settingsActive ? settingsY + settingsH : pillY + baseH) - maskY
 
     function outsideBodies(x, y) {
         var inPill = x >= pillX && x <= pillX + baseW
@@ -64,6 +71,8 @@ QtObject {
             && y >= mediaY && y <= mediaY + mediaH
         var inSession = sessionActive && x >= sessionX && x <= sessionX + sessionW
             && y >= sessionY && y <= sessionY + sessionH
-        return !inPill && !inMedia && !inSession
+        var inSettings = settingsActive && x >= settingsX && x <= settingsX + settingsW
+            && y >= settingsY && y <= settingsY + settingsH
+        return !inPill && !inMedia && !inSession && !inSettings
     }
 }

@@ -55,7 +55,7 @@ PillSurface {
 
     // ---- navegación por teclado ----
     // El overview selecciona WORKSPACES (los tabs de arriba + tiles), no ventanas:
-    //   Tab/→/↓ = siguiente ws, Shift+Tab/←/↑ = anterior, Enter/Space = ir a ese ws.
+    //   Tab recorre controles; →/↓ = siguiente ws, ←/↑ = anterior, Enter/Space = ir a ese ws.
     // Las previews de ventanas dan contexto, pero la acción es cambiar de workspace.
     // (El viejo comportamiento enfocaba una VENTANA y fallaba cuando flatWins estaba
     // vacío por la carga async de WinMap — por eso "Enter no llevaba a la pestaña".)
@@ -282,6 +282,7 @@ PillSurface {
                         MotionArea {
                             anchors.fill: parent
                             accessibleName: qsTr("Ir al escritorio %1").arg(tile.wsId)
+                            focusOnTab: false
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onPositionChanged: { root._mouseMove(); root._hoverSelect(tile.wsId) }

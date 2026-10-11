@@ -42,7 +42,23 @@ ShellRoot {
                 const right = modules.statusModule
                 check(left.status === Loader.Ready && right.status === Loader.Ready, "both modules load")
                 check(left.exposure === 1 && right.exposure === 1, "both modules reveal")
+                const user = modules.userModule
+                check(user.exposure === 1 && user.item, "user avatar reveals with bar")
+                const avatarPath = Quickshell.env("ISLA_TEST_AVATAR") || decodeURIComponent(String(Qt.resolvedUrl("settings/assets/edots.png")).slice(7))
+                patch({paths: {userAvatar: avatarPath}, profile: {displayName: "Avatar QA"}})
+                wait(80)
+                check(String(user.item.avatarSource) === "file://" + avatarPath && user.item.userName === "Avatar QA", "avatar follows configured path and name live")
+                mouseClick(user.item, user.item.width / 2, user.item.height / 2)
+                check(requests.count === 1 && requests.signalArguments[0][0] === "profile", "avatar opens profile settings")
+                requests.clear()
                 shot("shown")
+                const withAvatarMargin = right.anchors.rightMargin
+                patch({modules: {userAvatar: false}})
+                wait(250)
+                check(!user.active && !user.visible && right.anchors.rightMargin < withAvatarMargin, "avatar hides and releases space")
+                patch({modules: {userAvatar: true}})
+                wait(450)
+                check(user.visible && user.exposure === 1, "avatar restores independently")
                 patch({modules: {workspaceRail: false, systemStatus: false}})
                 check(!left.interactive && !right.interactive, "exit releases input immediately")
                 wait(65)
@@ -71,16 +87,16 @@ ShellRoot {
                 check(status.width < initialWidth && status.width > 0, "individual controls contract the container")
                 check(!findChild(status, "statusApps"), "disabled apps unload")
                 shot("network-only")
-                modules.availableWidth = 90
+                modules.availableWidth = 140
                 wait(250)
-                check(right.visible && right.interactive && status.width <= 90, "single control fits narrow monitor")
+                check(right.visible && right.interactive && status.width <= 90, "single control and avatar fit narrow monitor")
                 modules.availableWidth = 360
                 patch({modules: {audio: true}})
                 wait(65)
                 check(audio.exposure === 0 || audio.parent.x + audio.x >= 9 * modules.s,
                     "new control waits for available glass")
-                wait(600)
-                check(audio.interactive && audio.exposure === 1, "new audio control reveals after expansion")
+                tryVerify(() => audio.exposure === 1, 1500)
+                check(audio.interactive && audio.exposure === 1, "new audio control reveals after expansion: " + audio.exposure + "/" + audio.interactive + "/" + status.width + "/" + status.controlsWidth)
                 patch({modules: {apps: false, audio: false, network: false, battery: false}})
                 wait(650)
                 check(!right.active && !right.item, "empty status container unloads")
@@ -94,7 +110,7 @@ ShellRoot {
                 wait(650)
                 modules.presented = false
                 wait(650)
-                check(left.active && left.item && !left.visible, "temporary hiding retains enabled module")
+                check(left.active && left.item && !left.visible && !user.visible, "temporary hiding retains enabled module and hides avatar")
                 modules.presented = true
                 wait(650)
                 patch({modules: {workspaceRail: false}})

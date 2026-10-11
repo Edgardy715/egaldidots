@@ -15,11 +15,15 @@ Item {
     property real s: 1
     property string screenName: ""
     property bool leftSide: false
+    property bool centered: false
     property string surfaceName: "media"
     property size surfaceSize: IslandGeometry.mediaSurface
     property Component compactContent
+    property Component expandedContent
+    property bool retainExpandedContent: false
+    property bool hasExpanded: false
     property real compactWidth: collapsedW
-    readonly property var surfaceItem: surfaceHost.loadedItem
+    readonly property var surfaceItem: expandedContent ? expandedLoader.item : surfaceHost.loadedItem
     readonly property real visualX: leftSide ? 2 * bodyX + bodyW - xPos - wPos : xPos
     readonly property real visualCapX: leftSide ? bodyX - captureExtra + bodyRadius : capX
     readonly property bool pressed: compactHit.enabled && compactHit.pressed && compactHit.containsMouse
@@ -33,13 +37,15 @@ Item {
     readonly property real moduleW: 218 * s
     readonly property real moduleH: IslandGeometry.restHeight * s
     readonly property real collapsedW: 42 * s
-    readonly property real cardW: Math.max(280 * s,
-        Math.min(surfaceSize.width * s, (leftSide ? bodyX - gap : width - cardX) - 12 * s))
-    readonly property real cardH: surfaceSize.height * s
+    readonly property real cardW: centered ? Math.min(surfaceSize.width * s, width - 32 * s)
+        : Math.max(280 * s, Math.min(surfaceSize.width * s,
+            (leftSide ? bodyX - gap : width - cardX) - 12 * s))
+    readonly property real cardH: centered ? Math.min(surfaceSize.height * s, height - 48 * s)
+        : surfaceSize.height * s
     readonly property real gap: 12 * s
-    readonly property real cardX: bodyX + bodyW + gap
-    readonly property real cardY: bodyY
-    readonly property real capX: bodyX + bodyW + captureExtra - bodyRadius
+    readonly property real cardX: centered ? (width - cardW) / 2 : bodyX + bodyW + gap
+    readonly property real cardY: centered ? (height - cardH) / 2 : bodyY
+    readonly property real capX: centered ? bodyX + bodyW / 2 : bodyX + bodyW + captureExtra - bodyRadius
     readonly property real capY: bodyY + bodyRadius
 
     property string phase: "idle"
@@ -112,7 +118,7 @@ Item {
     function start(): void {
         captureExtra = expanded || Flags.reduceMotion ? 0 : 6 * s
         captureTarget = 0; captureV = 0
-        xPos = bodyX + bodyW - 18 * s
+        xPos = centered ? bodyX + (bodyW - 34 * s) / 2 : bodyX + bodyW - 18 * s
         yPos = bodyY + (bodyH - 34 * s) / 2
         wPos = 34 * s; hPos = 34 * s
         vx = 0; vy = 0; vw = 0; vh = 0
@@ -127,7 +133,7 @@ Item {
     function close(): void {
         if (phase === "idle" || phase === "retornando" || phase === "absorbiendo") return
         captureTarget = 0
-        retarget("retornando", bodyX + bodyW - 20 * s,
+        retarget("retornando", centered ? bodyX + (bodyW - moduleH) / 2 : bodyX + bodyW - 20 * s,
                  bodyY + (bodyH - IslandGeometry.restHeight * s) / 2,
                  IslandGeometry.restHeight * s, IslandGeometry.restHeight * s)
     }
@@ -168,7 +174,8 @@ Item {
         })
         else if (open && phase === "retornando")
             retarget(expanded ? "media" : "companion",
-                     bodyX + bodyW + gap, bodyY,
+                     expanded ? cardX : bodyX + bodyW + gap,
+                     expanded ? cardY : bodyY,
                      expanded ? cardW : compactWidth,
                      expanded ? cardH : moduleH)
         else if (open) syncHoverSize()
@@ -177,11 +184,15 @@ Item {
     Component.onCompleted: {
         if (open && phase === "idle") start()
     }
-    onExpandedChanged: if (open) syncHoverSize()
+    onExpandedChanged: {
+        if (expanded) hasExpanded = true
+        if (open) syncHoverSize()
+    }
     onWidthChanged: if (expanded) syncHoverSize()
+    onHeightChanged: if (centered && expanded) syncHoverSize()
     function followBody(): void {
         if (phase === "retornando") {
-            targetX = bodyX + bodyW - 20 * s
+            targetX = centered ? bodyX + (bodyW - moduleH) / 2 : bodyX + bodyW - 20 * s
             targetY = bodyY + (bodyH - moduleH) / 2
         } else if (phase === "companion" || phase === "media") syncHoverSize()
     }
@@ -220,7 +231,7 @@ Item {
         next = root.spring(root.wPos, root.vw, root.targetW, dt); root.wPos = next[0]; root.vw = next[1]
         next = root.spring(root.hPos, root.vh, root.targetH, dt); root.hPos = next[0]; root.vh = next[1]
         root.updateBond()
-        if (root.phase === "retornando" && root.stretch < 1.10) root.captureTarget = 20 * root.s
+        if (!root.centered && root.phase === "retornando" && root.stretch < 1.10) root.captureTarget = 20 * root.s
         next = root.spring(root.captureExtra, root.captureV, root.captureTarget, dt)
         root.captureExtra = next[0]; root.captureV = next[1]
         if (root.phase === "separando" && root.settled) {
@@ -257,7 +268,7 @@ Item {
             materialAwake: true
             materialAccent: Theme.accent
             mode: root.surfaceName
-            suppressEdge: root.joined || root.contentExposure < 0.3
+            suppressEdge: root.joined || (!root.centered && root.contentExposure < 0.3)
         }
 
         Loader {
@@ -268,8 +279,8 @@ Item {
         PillSurfaceHost {
             id: surfaceHost
             z: 2
-            open: root.expanded
-            surface: root.expanded ? root.surfaceName : ""
+            open: root.expanded && !root.expandedContent
+            surface: root.expanded && !root.expandedContent ? root.surfaceName : ""
             scaleFactor: root.s
             morphCloseness: root.cardContentProgress
             morphRadius: root.cardRadius
@@ -277,6 +288,22 @@ Item {
             screenName: root.screenName
             bgColor: "transparent"
             onRequestClose: root.requestToggle()
+        }
+
+        ClippingRectangle {
+            anchors.fill: parent
+            z: 2
+            radius: root.cardRadius
+            color: "transparent"
+            visible: root.expandedContent && root.active && root.cardContentProgress > 0.01
+            enabled: visible && root.expanded && root.cardContentProgress > 0.9
+            opacity: root.cardContentProgress
+            Loader {
+                id: expandedLoader
+                anchors.fill: parent
+                active: !!root.expandedContent && (root.expanded || (root.retainExpandedContent && root.hasExpanded))
+                sourceComponent: root.expandedContent
+            }
         }
 
         MotionArea {

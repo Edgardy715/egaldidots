@@ -5,10 +5,11 @@ import Quickshell
 /** Base geometry for the island. Values are unscaled; consumers apply their s. */
 Singleton {
     readonly property real restHeight: 38
+    readonly property real compactRestHeight: 56
     readonly property size fallbackSurface: Qt.size(320, 300)
 
     readonly property size mixerSurface: Qt.size(340, 380)
-    readonly property size mediaSurface: Qt.size(640, 300)
+    readonly property size mediaSurface: Qt.size(640, 360 + Math.max(0, Flags.fontScale - 1.2) * 120)
     readonly property size calendarSurface: Qt.size(660, 470)
     readonly property size workspacesSurface: Qt.size(360, 200)
     readonly property size notificationsSurface: Qt.size(380, 540)
@@ -21,6 +22,7 @@ Singleton {
     readonly property size overviewSurface: Qt.size(1000, 340)
     readonly property size connectivitySurface: Qt.size(360, 400)
     readonly property size clipboardSurface: Qt.size(580, 480)
+    readonly property size settingsSurface: Qt.size(1000, 700)
 
     readonly property var surfaceSizes: ({
         mixer: mixerSurface,
@@ -36,6 +38,7 @@ Singleton {
         auth: authSurface,
         overview: overviewSurface,
         connectivity: connectivitySurface,
-        clipboard: clipboardSurface
+        clipboard: clipboardSurface,
+        settings: settingsSurface
     })
 }

@@ -23,6 +23,7 @@ Item {
 
     Component.onDestruction: if (previewDir.length) Quickshell.execDetached(["rm", "-rf", "--", previewDir])
     Process {
+        id: previewDirProcess
         command: ["mktemp", "-d", (Quickshell.env("XDG_RUNTIME_DIR") || "/tmp") + "/isla-clipboard.XXXXXX"]
         running: true
         stdout: StdioCollector { onStreamFinished: root.previewDir = text.trim() }
@@ -35,13 +36,14 @@ Item {
             entryId: previewJobs.get(index).entryId
             selectedPreview: previewJobs.get(index).selectedPreview
             previewDir: root.previewDir
+            requested: !root.clearing
             onImageSourceChanged: if (imageSource.length) root.setPreview(entryId, selectedPreview, imageSource, false)
             onFailedChanged: if (failed) root.setPreview(entryId, selectedPreview, "", true)
         }
     }
     function previewKey(id, selected) { return id + (selected ? "|full" : "|thumb") }
     function requestPreview(id, selected) {
-        if (!/^\d+$/.test(id)) return
+        if (clearing || clearPending || !/^\d+$/.test(id)) return
         var key = previewKey(id, selected)
         if (previewSources[key] || previewFailures[key]) return
         for (var i = 0; i < previewJobs.count; i++) {
@@ -51,6 +53,7 @@ Item {
         previewJobs.append({entryId: id, selectedPreview: selected})
     }
     function setPreview(id, selected, source, failed) {
+        if (clearing || clearPending) return
         var key = previewKey(id, selected)
         if (source.length) {
             var sources = Object.assign({}, previewSources)
@@ -157,6 +160,13 @@ Item {
     function finishClear() {
         if (!clearPending) return
         clearPending = false
+        previewJobs.clear()
+        previewSources = ({})
+        previewFailures = ({})
+        const oldDir = previewDir
+        previewDir = ""
+        if (oldDir.length) Quickshell.execDetached(["rm", "-rf", "--", oldDir])
+        previewDirProcess.running = true
         entries = []
         resetQueryRequested()
         filterEntries()

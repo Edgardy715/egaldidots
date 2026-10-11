@@ -165,10 +165,13 @@ ShellRoot {
 
         surface: Component {
             WlSessionLockSurface {
-                color: "#090b11"
+                color: Theme.background
 
                 LockSurface {
                     anchors.fill: parent
+                    player: Players.active
+                    artUrl: Players.artUrl
+                    trackKey: Players.trackKey
                     username: root.username
                     wallpaper: root.wallpaper
                     palette: root.palette
@@ -193,7 +196,7 @@ ShellRoot {
         width: Number(Quickshell.env("QS_LOCK_PREVIEW_WIDTH")) || 1440
         height: Number(Quickshell.env("QS_LOCK_PREVIEW_HEIGHT")) || 900
         title: "Isla · Vista previa del bloqueo"
-        color: "#090b11"
+        color: Theme.background
 
         Loader {
             id: previewLoader
@@ -201,6 +204,9 @@ ShellRoot {
             active: root.preview
             sourceComponent: Component {
                 LockSurface {
+                    player: Players.active
+                    artUrl: Players.artUrl
+                    trackKey: Players.trackKey
                     username: root.username
                     wallpaper: root.wallpaper
                     palette: root.palette

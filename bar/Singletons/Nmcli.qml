@@ -200,7 +200,11 @@ Singleton {
             connectionCheckTimer.stop()
             immediateCheckTimer.stop()
             immediateCheckTimer.checkCount = 0
-            createConnectionWithPassword(ssid, bssid.toUpperCase(), password, callback)
+            executeCommand(["device", "wifi", "connect", ssid, "password", password,
+                            "bssid", bssid.toUpperCase()], result => {
+                if (result.success) loadSavedConnections(() => {})
+                if (callback) callback(result)
+            })
             return
         }
 
@@ -262,50 +266,6 @@ Singleton {
         executeCommand(cmd, result => {
             if (result.needsPassword && callback) { if (callback) callback(result); return }
             if (!result.success && root.pendingConnection) { /* los timers gestionan el estado */ }
-        })
-    }
-
-    function createConnectionWithPassword(ssid: string, bssidUpper: string, password: string, callback: var): void {
-        checkAndDeleteConnection(ssid, () => {
-            const cmd = ["connection", "add", "type", "wifi", "con-name", ssid, "ifname", "*",
-                         "ssid", ssid, "802-11-wireless.bssid", bssidUpper,
-                         "802-11-wireless-security.key-mgmt", "wpa-psk",
-                         "802-11-wireless-security.psk", password]
-            executeCommand(cmd, result => {
-                if (result.success) {
-                    loadSavedConnections(() => {})
-                    activateConnection(ssid, callback)
-                } else {
-                    const dup = result.error && (result.error.includes("another connection with the name") || result.error.includes("Reference the connection by its uuid"))
-                    if (dup || (result.exitCode > 0 && result.exitCode < 10)) {
-                        loadSavedConnections(() => {})
-                        activateConnection(ssid, callback)
-                    } else {
-                        const fallbackCmd = ["device", "wifi", "connect", ssid, "password", password]
-                        executeCommand(fallbackCmd, fallbackResult => {
-                            if (callback) callback(fallbackResult)
-                        })
-                    }
-                }
-            })
-        })
-    }
-
-    function checkAndDeleteConnection(ssid: string, callback: var): void {
-        executeCommand(["connection", "show", ssid], result => {
-            if (result.success) {
-                executeCommand(["connection", "delete", ssid], deleteResult => {
-                    Qt.callLater(() => { if (callback) callback() }, 300)
-                })
-            } else {
-                if (callback) callback()
-            }
-        })
-    }
-
-    function activateConnection(connectionName: string, callback: var): void {
-        executeCommand(["connection", "up", connectionName], result => {
-            if (callback) callback(result)
         })
     }
 

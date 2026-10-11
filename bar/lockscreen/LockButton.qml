@@ -16,15 +16,15 @@ MotionButton {
         interaction: root.interaction
         iconName: root.iconName
         font.pixelSize: 23 * root.unit
-        color: "#f8f8fa"
+        color: Theme.iconPrimary
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         opacity: root.enabled ? 1 : 0.4
     }
     background: Rectangle {
         radius: height / 2
-        color: root.down ? "#55ffffff" : root.hovered ? "#38ffffff" : root.flatStyle ? "transparent" : "#20ffffff"
-        border.color: root.activeFocus ? "#eeffffff" : root.flatStyle ? "transparent" : "#30ffffff"
+        color: root.down ? Qt.alpha(Theme.foreground, Theme.alphaWashStrong) : root.hovered ? Qt.alpha(Theme.foreground, Theme.alphaWash) : root.flatStyle ? "transparent" : Qt.alpha(Theme.foreground, Theme.alphaSoft)
+        border.color: root.activeFocus ? Theme.accent : root.flatStyle ? "transparent" : Theme.border
         Behavior on color { ColorAnimation { duration: Motion.hover } }
     }
 }

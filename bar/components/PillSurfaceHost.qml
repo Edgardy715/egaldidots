@@ -73,7 +73,10 @@ ClippingRectangle {
         }
     }
     onMorphClosenessChanged: {
-        if (!open && morphCloseness <= 0.01) displayedSurface = ""
+        // Unload after geometry evaluation; loader teardown changes target height.
+        if (!open && morphCloseness <= 0.01) Qt.callLater(() => {
+            if (!root.open && root.morphCloseness <= 0.01) root.displayedSurface = ""
+        })
     }
 
     Connections {

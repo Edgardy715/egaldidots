@@ -8,8 +8,8 @@ ClippingRectangle {
     property string name: ""
     property url source
     radius: width / 2
-    color: Qt.alpha(Theme.accent, 0.24)
-    border.color: "#60ffffff"
+    color: Qt.alpha(Theme.accent, 0.10)
+    border.color: Qt.alpha(Theme.foreground, 0.18)
     border.width: 1
     Accessible.name: name
     Text {
@@ -21,14 +21,24 @@ ClippingRectangle {
         color: "#f8f8fa"
         visible: photo.status !== Image.Ready
     }
-    Image {
-        id: photo
+    ClippingRectangle {
         anchors.fill: parent
-        anchors.margins: 3
-        source: root.source
-        sourceSize: Qt.size(256, 256)
-        asynchronous: true
-        fillMode: Image.PreserveAspectCrop
-        visible: status === Image.Ready
+        anchors.margins: 2
+        radius: width / 2
+        color: "transparent"
+        Image {
+            id: photo
+            anchors.fill: parent
+            source: root.source
+            sourceSize: Qt.size(256, 256)
+            asynchronous: true
+            fillMode: Image.PreserveAspectCrop
+            opacity: status === Image.Ready ? 1 : 0
+            visible: opacity > 0
+            Behavior on opacity {
+                enabled: root.visible && !Flags.reduceMotion
+                NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard }
+            }
+        }
     }
 }

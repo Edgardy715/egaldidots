@@ -73,6 +73,8 @@ Singleton {
     property bool centerOpen: false
     /** flag "ready" tras carga/restauración, para no persistir antes de leer disco. */
     property bool loaded: false
+    property bool stateReady: false
+    property bool pendingSave: false
 
     /** bump de versión para que notClosed/popups re-filtren al togglear items. */
     property int listVersion: 0
@@ -114,21 +116,25 @@ Singleton {
         for (var i = 0; i < root.list.length; i++) root.list[i].popup = false
     }
 
-    onListChanged: if (root.loaded) saveTimer.restart()
-    onDndChanged: if (root.loaded) saveTimer.restart()
+    onListChanged: if (root.loaded) _persistSoon()
+    onDndChanged: if (root.loaded) _persistSoon()
 
     // ---- persistencia ----
-    function _persistSoon() { saveTimer.restart() }
+    function _persistSoon() {
+        root.pendingSave = true
+        if (root.stateReady) saveTimer.restart()
+    }
     Timer {
         id: saveTimer
         interval: 1000
         repeat: false
         onTriggered: {
-            if (!root.loaded) return
+            if (!root.loaded || !root.stateReady || !root.pendingSave) return
             storage.setText(JSON.stringify({
                 dnd: root.dnd,
                 notifs: root.notClosed.map(function(n) { return n._serialize() })
             }))
+            root.pendingSave = false
         }
     }
 
@@ -198,14 +204,17 @@ Singleton {
                     rebuilt.push(notifComp.createObject(root, props))
                 }
                 rebuilt.sort(function(a, b) { return b.time.getTime() - a.time.getTime() })
-                root.list = rebuilt
+                const live = root.list.filter(n => n.notification !== null)
+                root.list = live.concat(rebuilt)
+                if (live.length) root._persistSoon()
             } catch (e) { /* archivo corrupto→ arrancar vacío */ }
             root.loaded = true
         }
         onLoadFailed: function(err) {
-            root.loaded = true
-            if (err === FileViewError.FileNotFound)
-                storage.setText(JSON.stringify({ dnd: false, notifs: [] }))
+            if (err === FileViewError.FileNotFound) {
+                root.loaded = true
+                root._persistSoon()
+            }
         }
         function _restoreActionsText(a) {
             if (!a) return []
@@ -217,6 +226,10 @@ Singleton {
     Process {
         running: true
         command: ["mkdir", "-p", root.stateDir]
+        onExited: code => {
+            root.stateReady = code === 0
+            if (root.stateReady && root.pendingSave) saveTimer.restart()
+        }
     }
 
     // ---- IPC para scripting (reemplaza swaync-client) ----

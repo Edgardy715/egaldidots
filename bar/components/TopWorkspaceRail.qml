@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
+import QtQuick.Shapes
 import "../Singletons"
 
 Item {
@@ -9,6 +10,8 @@ Item {
     property int count: 5
     property var occupied: ({})
     property real s: 1
+    property bool integrated: false
+    property string style: "numbers"
     property real availableWidth: 320
     property int hoverId: 0
     onVisibleChanged: if (!visible) {
@@ -19,8 +22,8 @@ Item {
     signal requestWorkspaces()
     signal workspaceRequested(int id)
     onActiveIdChanged: hoverId = 0
-    readonly property real navWidth: 68 * s
-    readonly property real slot: Math.min(38 * s, Math.max(19 * s, (availableWidth - navWidth - 8 * s) / count))
+    readonly property real navWidth: (integrated ? 40 : 68) * s
+    readonly property real slot: Math.min((style === "numbers" ? (integrated ? 28 : 38) : (integrated ? 22 : 24)) * s, Math.max(19 * s, (availableWidth - navWidth - 8 * s) / count))
     readonly property real inset: 4 * s
     readonly property bool fits: count > 0 && width <= availableWidth
     width: navWidth + count * slot + inset * 2
@@ -32,17 +35,18 @@ Item {
         y: 5 * root.s
         width: root.width - x
         height: 38 * root.s
-        PillMaterial { s: root.s; morphRadius: parent.height / 2; mode: "lateral" }
+        PillMaterial { visible: !root.integrated; s: root.s; morphRadius: parent.height / 2; mode: "lateral" }
     }
 
     Item {
         x: 0
         anchors.verticalCenter: parent.verticalCenter
-        width: 44 * root.s
-        height: 44 * root.s
-        PillMaterial { s: root.s; morphRadius: parent.height / 2; mode: "lateral" }
+        width: (root.integrated ? 36 : 44) * root.s
+        height: width
+        PillMaterial { visible: !root.integrated; s: root.s; morphRadius: parent.height / 2; mode: "lateral" }
         Rectangle {
             anchors.fill: parent
+            visible: !root.integrated || navHit.containsMouse
             radius: height / 2
             gradient: Gradient {
                 GradientStop { position: 0; color: Qt.alpha(Theme.accent, 0.05) }
@@ -68,10 +72,11 @@ Item {
     }
     Rectangle {
         id: lens
+        visible: root.style === "numbers"
         objectName: "workspaceLens"
         readonly property int destination: root.hoverId > 0 ? root.hoverId : Math.max(1, root.activeId)
         readonly property real targetX: root.navWidth + root.inset + (destination - 1) * root.slot
-            + (root.slot - 46 * root.s) / 2
+            + (root.slot - lens.width) / 2
         property real lensX: targetX
         property real velocityX: 0
         readonly property real distance: Math.abs(targetX - lensX)
@@ -83,9 +88,9 @@ Item {
             velocityX = 0
         }
         x: lensX
-        y: 1 * root.s
-        width: 46 * root.s
-        height: 46 * root.s
+        y: (root.height - height) / 2
+        width: (root.style === "numbers" ? (root.integrated ? 28 : 46) : 20) * root.s
+        height: width
         radius: height / 2
         transform: Scale {
             origin.x: lens.width / 2; origin.y: lens.height / 2
@@ -94,20 +99,21 @@ Item {
         }
         layer.enabled: true
         layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowColor: Qt.alpha(Theme.accent, 0.78)
+            shadowEnabled: !root.integrated
+            shadowColor: Qt.alpha(Theme.accent, 0.12)
             shadowBlur: 0.45
             shadowVerticalOffset: 2 * root.s
         }
         gradient: Gradient {
-            GradientStop { position: 0; color: Qt.alpha(Theme.cardTop, 0.92) }
-            GradientStop { position: 0.28; color: Qt.alpha(Theme.accent, 0.40) }
-            GradientStop { position: 0.76; color: Qt.alpha(Theme.accent, 0.85) }
-            GradientStop { position: 1; color: Qt.alpha(Theme.accent, 0.36) }
+            GradientStop { position: 0; color: Qt.alpha(Theme.cardTop, root.integrated ? 0.35 : 0.92) }
+            GradientStop { position: 0.28; color: Qt.alpha(Theme.accent, root.integrated ? 0.18 : 0.40) }
+            GradientStop { position: 0.76; color: Qt.alpha(Theme.accent, root.integrated ? 0.34 : 0.85) }
+            GradientStop { position: 1; color: Qt.alpha(Theme.accent, root.integrated ? 0.18 : 0.36) }
         }
         border.width: Theme.borderHairline
-        border.color: Qt.alpha(Theme.accent, 0.70)
+        border.color: Qt.alpha(Theme.accent, root.integrated ? 0.26 : 0.70)
         FrameAnimation {
+            id: lensMotion
             running: root.visible && !Flags.reduceMotion
                 && (lens.distance > 0.5 || Math.abs(lens.velocityX) > 10)
             onTriggered: {
@@ -123,6 +129,10 @@ Item {
                     + (speed + damping * omega * offset) / damped * Math.sin(phase))
                 lens.velocityX = decay * (speed * Math.cos(phase)
                     - (omega * omega * offset + damping * omega * speed) / damped * Math.sin(phase))
+                if (root.style === "pacman") {
+                    pacman.chewPhase = (pacman.chewPhase + dt / 0.24) % 1
+                    if (Math.abs(lens.velocityX) > 10) pacman.facingLeft = lens.velocityX < 0
+                }
                 if (lens.distance < 0.5 && Math.abs(lens.velocityX) < 10) {
                     lens.lensX = lens.targetX
                     lens.velocityX = 0
@@ -137,6 +147,32 @@ Item {
                     lens.velocityX = 0
                 }
             }
+        }
+    }
+
+    Shape {
+        id: pacman
+        objectName: "workspacePacman"
+        property real chewPhase: 0
+        property bool facingLeft: false
+        readonly property bool chewing: visible && lensMotion.running
+        property real mouthAngle: chewing ? 4 + 40 * (0.5 + 0.5 * Math.cos(chewPhase * 2 * Math.PI)) : 18
+        Behavior on mouthAngle {
+            enabled: !pacman.chewing && pacman.visible && !Flags.reduceMotion
+            NumberAnimation { duration: 90 * Motion.mult; easing.type: Easing.OutCubic }
+        }
+        transform: Scale { origin.x: pacman.width / 2; xScale: pacman.facingLeft ? -1 : 1 }
+        visible: root.style === "pacman"
+        x: lens.x + (lens.width - width) / 2
+        y: (root.height - height) / 2
+        width: 20 * root.s; height: width
+        preferredRendererType: Shape.CurveRenderer
+        ShapePath {
+            strokeWidth: 0
+            fillColor: Theme.accent
+            PathAngleArc { centerX: 10 * root.s; centerY: 10 * root.s; radiusX: 9 * root.s; radiusY: 9 * root.s; startAngle: pacman.mouthAngle; sweepAngle: 360 - 2 * pacman.mouthAngle; moveToStart: true }
+            PathLine { x: 10 * root.s; y: 10 * root.s }
+            PathLine { x: (10 + 9 * Math.cos(pacman.mouthAngle * Math.PI / 180)) * root.s; y: (10 + 9 * Math.sin(pacman.mouthAngle * Math.PI / 180)) * root.s }
         }
     }
 
@@ -159,6 +195,7 @@ Item {
                 height: root.height
 
                 Text {
+                    visible: root.style === "numbers"
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     text: cell.wsId
@@ -174,7 +211,19 @@ Item {
                     Behavior on scale { NumberAnimation { duration: Motion.fast } }
                 }
                 Rectangle {
+                    objectName: "workspaceMark-" + cell.wsId
+                    visible: root.style !== "numbers"
+                    anchors.centerIn: parent
+                    width: (root.style === "bars" ? 4 : root.style === "capsules" ? 6 + 14 * cell.highlight : root.style === "pacman" ? 4 : 6 + 4 * cell.highlight) * root.s
+                    height: (root.style === "bars" ? 7 + 13 * cell.highlight : root.style === "capsules" ? 6 : root.style === "pacman" ? 4 : 6 + 4 * cell.highlight) * root.s
+                    radius: Math.min(width, height) / 2
+                    color: cell.workspaceState.urgent || cell.highlight > 0.5 ? Theme.accent : Theme.foreground
+                    opacity: root.style === "pacman" ? (1 - cell.highlight) * (cell.workspaceState.occupied ? 0.8 : 0.35)
+                        : hit.containsMouse || cell.workspaceState.urgent ? 1 : Math.max(cell.workspaceState.occupied ? 0.65 : 0.25, cell.highlight)
+                }
+                Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
+                    visible: root.style === "numbers"
                     y: 33 * root.s
                     width: 3 * root.s
                     height: width
@@ -187,6 +236,7 @@ Item {
                     anchors.fill: parent
                     feedbackEnabled: false
                     accessibleName: qsTr("Ir al escritorio %1").arg(cell.wsId)
+                    onActiveFocusChanged: { if (activeFocus) root.hoverId = cell.wsId; else if (root.hoverId === cell.wsId) root.hoverId = 0 }
                     onEntered: root.hoverId = cell.wsId
                     onExited: if (root.hoverId === cell.wsId) root.hoverId = 0
                     onClicked: root.workspaceRequested(cell.wsId)

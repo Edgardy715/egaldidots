@@ -5,6 +5,7 @@ import Quickshell.Hyprland
 import "../"
 import "../components"
 import "../Singletons"
+import "../surfaces"
 
 PanelWindow {
     id: overlay
@@ -12,14 +13,33 @@ PanelWindow {
     required property var modelData
     readonly property real s: modelData ? (modelData.height / 1080) * Flags.uiScale : 1
     readonly property real topGap: 8 * Flags.topGap * s
-    readonly property real lateralAvailable: Math.max(0, (width - Math.max(pill.width, pill.targetW)) / 2 - 48 * s)
+    readonly property bool compact: layoutTransition.compact
+    readonly property bool layoutChanging: layoutTransition.active
+    readonly property int layoutPhase: layoutTransition.phase
+    readonly property bool layoutContentWithdrawn: sideModules.withdrawn && pill.restHeaderOpacity < 0.01
+    BarLayoutTransition {
+        id: layoutTransition
+        requestedCompact: Config.appearance.barLayout === "compact"
+        exitReady: overlay.layoutContentWithdrawn
+            && fluidCompanion.phase === "idle"
+            && (!overlay.mediaOpen || !pill.surfaceOpen && pill.morphCloseness > 0.999)
+        settleReady: pill.morphCloseness > 0.999
+    }
+    readonly property var mediaSurfaceItem: compact ? pill.surfaceItem : fluidCompanion.surfaceItem
+    readonly property real lateralAvailable: Math.max(0, compact ? Math.min(500 * s, (width - pill.restCenterWidth - 72 * s) / 2)
+        : (width - Math.max(pill.width, pill.targetW)) / 2 - 48 * s)
     readonly property string surface: router.openMon === modelData.name ? router.openSurface : ""
     readonly property bool surfaceOpen: surface.length > 0
     readonly property bool overviewOpen: surface === "overview"
     readonly property bool mediaOpen: surface === "media"
+    readonly property bool settingsOpen: surface === "settings"
+    readonly property bool settingsReturning: !settingsOpen && settingsCompanion.active && surface !== "auth"
+    property int profileRequest: 0
+    readonly property bool settingsPickerOpen: settingsOpen && settingsCompanion.surfaceItem && settingsCompanion.surfaceItem.pathPickerOpen
     readonly property bool sessionOpen: surface === "session"
     readonly property bool wallpaperOpen: surface === "wallpaper"
     readonly property bool mediaPanelOpen: wallpaperOpen || overviewOpen
+        || (surface === "calendar" && !settingsReturning)
     property bool mediaPanelReturning: false
     onMediaPanelOpenChanged: {
         mediaPanelReturnTimer.stop()
@@ -45,12 +65,15 @@ PanelWindow {
         pillX: pill.x; pillY: pill.y
         pillWidth: pill.width; pillHeight: pill.height
         pillTargetW: pill.targetW; pillTargetH: pill.targetH
-        mediaActive: fluidCompanion.active
+        mediaActive: !overlay.compact && fluidCompanion.active
         mediaX: fluidCompanion.xPos; mediaY: fluidCompanion.yPos
         mediaW: fluidCompanion.wPos; mediaH: fluidCompanion.hPos
         sessionActive: sessionCompanion.active
         sessionX: sessionCompanion.visualX; sessionY: sessionCompanion.yPos
         sessionW: sessionCompanion.wPos; sessionH: sessionCompanion.hPos
+        settingsActive: overlay.settingsOpen && settingsCompanion.active
+        settingsX: settingsCompanion.visualX; settingsY: settingsCompanion.yPos
+        settingsW: settingsCompanion.wPos; settingsH: settingsCompanion.hPos
     }
     /** Este monitor es el que tiene foco (para que el overview/wallpaper sólo
      *  robe teclado en él y las flechas/Tab operen en la pantalla correcta). */
@@ -85,12 +108,9 @@ PanelWindow {
     screen: modelData
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
-    // Spotlight necesita poseer el teclado de forma determinista. El modo
-    // OnDemand (usado por `focusable`) depende de la ventana previa y a
-    // veces no recibe ni texto ni Escape en Hyprland.
+    // Every modal surface must receive keyboard input without a preliminary click.
     WlrLayershell.keyboardFocus: inputPolicy.exclusiveFocus
         ? WlrKeyboardFocus.Exclusive
-        : overlay.kbFocusWanted ? WlrKeyboardFocus.OnDemand
         : WlrKeyboardFocus.None
     WlrLayershell.layer: WlrLayer.Overlay
     // Foco de teclado SOLO mientras el overview está abierto en este
@@ -118,14 +138,24 @@ PanelWindow {
         onWidthChanged: changed()
         onHeightChanged: changed()
         Region {
-            x: sideModules.workspaceModule.x; y: sideModules.workspaceModule.y
+            x: sideModules.x + sideModules.workspaceModule.x; y: sideModules.y + sideModules.workspaceModule.y
             width: sideModules.workspaceModule.interactive ? sideModules.workspaceModule.width : 0
             height: sideModules.workspaceModule.interactive ? sideModules.workspaceModule.height : 0
         }
         Region {
-            x: sideModules.statusModule.x; y: sideModules.statusModule.y
+            x: sideModules.x + sideModules.userModule.x; y: sideModules.y + sideModules.userModule.y
+            width: sideModules.userModule.interactive ? sideModules.userModule.width : 0
+            height: sideModules.userModule.interactive ? sideModules.userModule.height : 0
+        }
+        Region {
+            x: sideModules.x + sideModules.statusModule.x; y: sideModules.y + sideModules.statusModule.y
             width: sideModules.statusModule.interactive ? sideModules.statusModule.width : 0
             height: sideModules.statusModule.interactive ? sideModules.statusModule.height : 0
+        }
+        Region {
+            x: sideModules.x + sideModules.mediaModule.x; y: sideModules.y + sideModules.mediaModule.y
+            width: sideModules.mediaModule.interactive ? sideModules.mediaModule.width : 0
+            height: sideModules.mediaModule.interactive ? sideModules.mediaModule.height : 0
         }
     }
     Region {
@@ -152,7 +182,7 @@ PanelWindow {
     // enabled sigue a modal (= surfaceOpen): reposo/peek nunca capturan.
     MouseArea {
         anchors.fill: parent
-        enabled: overlay.surfaceOpen
+        enabled: overlay.surfaceOpen && !overlay.settingsPickerOpen
         acceptedButtons: Qt.AllButtons
         z: 0
         onPressed: (mouse) => {
@@ -172,19 +202,29 @@ PanelWindow {
         windows: [overlay]
     }
 
+    function dismissSurface() {
+        if (overlay.mediaOpen && overlay.mediaSurfaceItem && overlay.mediaSurfaceItem.lyricsOpen)
+            overlay.mediaSurfaceItem.lyricsOpen = false
+        else router.close()
+    }
+
     // Atajo de respaldo a nivel de ventana: también cierra cuando una
     // surface (por ejemplo el TextInput del launcher) tiene el foco.
     Shortcut {
         sequence: "Escape"
-        enabled: inputPolicy.escapeShortcutEnabled
+        enabled: inputPolicy.escapeShortcutEnabled && !overlay.settingsPickerOpen
+        onActivated: overlay.dismissSurface()
+    }
+    Shortcut {
+        sequence: "Meta+I"
+        enabled: overlay.settingsOpen && !overlay.settingsPickerOpen
         onActivated: router.close()
     }
 
     FocusScope {
         id: focusScope
         anchors.fill: parent
-        // cobra activeFocus cuando el overview pide teclado (Exclusive en la
-        // capa); en reposo/surfaces normales focus=false ⇒ no roba.
+        // Closed surfaces release keyboard input to the desktop.
         focus: overlay.kbFocusWanted
         onFocusChanged: if (focus) focusScope.forceActiveFocus()
         // re-grab de foco al asentar el morph: el primer forceActiveFocus()
@@ -194,7 +234,11 @@ PanelWindow {
             running: overlay.kbFocusWanted && overlay.surface !== "auth"
             interval: Motion.morph + 40
             repeat: false
-            onTriggered: if (overlay.kbFocusWanted) focusScope.forceActiveFocus()
+            onTriggered: if (overlay.kbFocusWanted) {
+                if (!focusScope.activeFocus) focusScope.forceActiveFocus()
+                if (overlay.settingsOpen && settingsCompanion.surfaceItem)
+                    settingsCompanion.surfaceItem.activate()
+            }
         }
 
         HoverHandler {
@@ -204,24 +248,39 @@ PanelWindow {
 
         TopBarModules {
             id: sideModules
-            anchors.fill: parent
-            z: 1
+            objectName: "islandModules"
+            x: overlay.compact ? pill.x : 0
+            y: overlay.compact ? pill.y : 0
+            width: overlay.compact ? pill.width : overlay.width
+            height: overlay.compact ? pill.height : overlay.height
+            z: overlay.compact ? 3 : 1
+            compact: overlay.compact
+            topGap: overlay.compact ? (height - 48 * overlay.s) / 2 : overlay.topGap
+            opacity: !overlay.compact ? 1 : pill.opacity * ((!pill.surfaceOpen || pill.launcherReturning)
+                && !pill.notifAnimating ? Math.pow(pill.morphCloseness, 1.2)
+                    * Math.max(0, Math.min(1, (pill.width - pill.restW + 40 * overlay.s) / (40 * overlay.s))) : 0)
             s: overlay.s
             screenName: overlay.modelData.name
-            topGap: overlay.topGap
             availableWidth: overlay.lateralAvailable
-            presented: !overlay.surfaceOpen && !overlay.monFullscreen
-            onRequestSurface: name => router.toggleSurface(overlay.modelData.name, name)
+            centerWidth: pill.restCenterWidth
+            presented: !overlay.layoutChanging && inputPolicy.sideModulesPresented && (!overlay.compact || !pill.notifAnimating)
+            onRequestSurface: name => {
+                if (name === "profile") {
+                    overlay.profileRequest++
+                    if (!overlay.settingsOpen && router.mediaDockPendingSurface !== "settings")
+                        router.toggleSurface(overlay.modelData.name, "settings")
+                } else router.toggleSurface(overlay.modelData.name, name)
+            }
         }
 
         // ---- navegación de teclado del overview ----
-        // Tab/→/↓ = siguiente ws · Shift+Tab/←/↑ = anterior
+        // Tab recorre controles; →/↓ = siguiente ws · ←/↑ = anterior
         // h/l = izq/der · j/k = abajo/arriba (filas)
         // 1-9,0 = saltar al ws de la posición N del grupo
         // Enter/Space = ir al ws seleccionado · Esc = cerrar
         // Super+Tab = cerrar (toggle off, mismo bind que abrió)
         Keys.onPressed: (event) => {
-            if (!overlay.surfaceOpen) return
+            if (!overlay.surfaceOpen || overlay.settingsPickerOpen) return
             var it = overlay.sessionOpen ? sessionCompanion.surfaceItem : pill.surfaceItem
             if (overlay.surface === "session" && it && it.handleKey) {
                 it.handleKey(event)
@@ -232,11 +291,12 @@ PanelWindow {
             }
             // ESC cierra cualquier surface abierta (notifs, calendar, mixer…)
             if (event.key === Qt.Key_Escape) {
-                router.close(); event.accepted = true; return
+                overlay.dismissSurface(); event.accepted = true; return
             }
             // La navegación por teclado (Tab/flechas/hjkl/números/Enter) solo
             // aplica al overview y al wallpaper picker.
             if (!overlay.overviewOpen && !overlay.wallpaperOpen) return
+            if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) return
             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
                 if (it && it.commitSelection) it.commitSelection()
                 event.accepted = true; return
@@ -247,8 +307,7 @@ PanelWindow {
                 event.accepted = true; return
             }
             var dir = 0
-            if (event.key === Qt.Key_Tab) dir = (event.modifiers & Qt.ShiftModifier) ? -1 : 1
-            else if (event.key === Qt.Key_Right || event.key === Qt.Key_Down || event.key === Qt.Key_L || event.key === Qt.Key_J) dir = 1
+            if (event.key === Qt.Key_Right || event.key === Qt.Key_Down || event.key === Qt.Key_L || event.key === Qt.Key_J) dir = 1
             else if (event.key === Qt.Key_Left || event.key === Qt.Key_Up || event.key === Qt.Key_H || event.key === Qt.Key_K) dir = -1
             if (dir !== 0) {
                 // j/k (vertical) mueven por filas, h/l y flechas por columnas
@@ -272,7 +331,8 @@ PanelWindow {
 
     Pill {
             id: pill
-            z: 2
+            objectName: "islandPill"
+            z: overlay.surface === "auth" ? 5 : 2
             anchors.top: parent.top
             // El launcher es "spotlight-style" → se centra verticalmente en
             // la pantalla (no top, como el resto de surfaces). Las notifs/
@@ -298,13 +358,18 @@ PanelWindow {
             }
             s: overlay.s
             screenName: overlay.modelData.name
-            surface: overlay.mediaOpen || overlay.sessionOpen ? "" : overlay.surface
+            layoutChanging: overlay.layoutChanging
+            restHeight: overlay.compact ? IslandGeometry.compactRestHeight : IslandGeometry.restHeight
+            restLeftWidth: overlay.compact ? sideModules.leftWidth : 0
+            restRightWidth: overlay.compact ? sideModules.rightWidth : 0
+            surface: (overlay.mediaOpen && (!overlay.compact || overlay.layoutChanging)) || overlay.sessionOpen || overlay.settingsOpen || overlay.settingsReturning ? "" : overlay.surface
             launcherClosing: overlay.launcherClosing
             launcherClosePhase: router.launcherClosePhase
             forcePinned: router.peekMon === overlay.modelData.name
-            fluidJoined: ((!overlay.surfaceOpen || overlay.sessionOpen) && fluidCompanion.joined)
-                || sessionCompanion.joined
-            fluidCaptureExtra: overlay.surfaceOpen && !overlay.sessionOpen ? 0 : fluidCompanion.captureExtra
+            fluidJoined: (!overlay.compact && (!overlay.surfaceOpen || overlay.sessionOpen) && fluidCompanion.joined)
+                || sessionCompanion.joined || settingsCompanion.joined
+            fluidCaptureExtra: settingsCompanion.active ? settingsCompanion.captureExtra
+                : overlay.compact || overlay.surfaceOpen && !overlay.sessionOpen ? 0 : fluidCompanion.captureExtra
             fluidCaptureLeftExtra: sessionCompanion.captureExtra
             opacity: overlay.monFullscreen ? 0 : 1
             Behavior on opacity {
@@ -342,8 +407,8 @@ PanelWindow {
             leftSide: true
             surfaceName: "session"
             surfaceSize: IslandGeometry.sessionSurface
-            open: overlay.sessionOpen
-            expanded: overlay.sessionOpen
+            open: overlay.sessionOpen && !overlay.settingsReturning
+            expanded: overlay.sessionOpen && !overlay.settingsReturning
             bodyBusy: pill.surfaceOpen || pill.notifAnimating
             s: overlay.s
             screenName: overlay.modelData.name
@@ -351,13 +416,42 @@ PanelWindow {
             onRequestToggle: { if (overlay.sessionOpen) router.close() }
         }
 
+        FluidCompanion {
+            id: settingsCompanion
+            anchors.fill: parent
+            z: 4
+            body: pill
+            centered: true
+            surfaceName: "settings"
+            surfaceSize: IslandGeometry.settingsSurface
+            expandedContent: Component {
+                SettingsSurface {
+                    profileRequest: overlay.profileRequest
+                    s: overlay.s
+                    open: overlay.settingsOpen || (settingsCompanion.active && settingsCompanion.cardContentProgress > 0.01)
+                    closing: !overlay.settingsOpen
+                    morphCloseness: settingsCompanion.cardContentProgress
+                    onRequestClose: router.close()
+                }
+            }
+            retainExpandedContent: true
+            open: overlay.settingsOpen
+            expanded: overlay.settingsOpen
+            bodyBusy: pill.surfaceOpen || pill.notifAnimating
+            s: overlay.s
+            screenName: overlay.modelData.name
+            opacity: overlay.monFullscreen ? 0 : 1
+            onRequestToggle: { if (overlay.settingsOpen) router.close() }
+        }
+
         FluidMediaCompanion {
             id: fluidCompanion
+            objectName: "islandMediaCompanion"
             z: fluidCompanion.cardFraction > 0.05 ? 3 : 1
-            opacity: overlay.monFullscreen ? 0 : 1
+            opacity: overlay.monFullscreen || overlay.compact ? 0 : 1
             anchors.fill: parent
             body: pill
-            open: (Players.has || overlay.mediaOpen) && !overlay.launcherOpen && !overlay.mediaPanelOpen
+            open: !overlay.layoutChanging && !overlay.compact && (Players.has || overlay.mediaOpen) && !overlay.launcherOpen && !overlay.mediaPanelOpen
                 && !overlay.mediaPanelReturning && !overlay.mediaDocking
             onPhaseChanged: if (phase === "idle" && overlay.mediaDocking)
                 Qt.callLater(() => router.finishMediaDock(overlay.modelData.name))
@@ -368,7 +462,7 @@ PanelWindow {
                         Qt.callLater(() => router.finishMediaDock(overlay.modelData.name))
                 }
             }
-            expanded: overlay.mediaOpen && !overlay.mediaDocking
+            expanded: !overlay.layoutChanging && !overlay.compact && overlay.mediaOpen && !overlay.mediaDocking && !overlay.settingsReturning
             bodyBusy: overlay.surfaceOpen && !overlay.mediaOpen && !overlay.sessionOpen || pill.notifAnimating
             s: overlay.s
             screenName: overlay.modelData.name

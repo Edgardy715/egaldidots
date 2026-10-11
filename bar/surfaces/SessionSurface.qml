@@ -29,7 +29,7 @@ PillSurface {
         s: root.s
         open: root.open
         userName: Config.profile.displayName.trim() || Quickshell.env("USER") || qsTr("Usuario")
-        avatarSource: "file://" + Config.userAvatar
+        avatarSource: Config.userAvatarUrl
         onActionRequested: action => {
             if (root.actions && typeof root.actions[action] === "function") root.actions[action]()
         }

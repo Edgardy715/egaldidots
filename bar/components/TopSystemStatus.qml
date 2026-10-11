@@ -11,6 +11,7 @@ Item {
     id: root
     required property string screenName
     property real s: 1
+    property bool integrated: false
     property real availableWidth: 360
     property bool showApps: true
     property bool showAudio: true
@@ -70,7 +71,7 @@ Item {
 
     PwObjectTracker { objects: root.showAudio && root.sink ? [root.sink] : [] }
 
-    PillMaterial { s: root.s; morphRadius: root.height / 2; mode: "status" }
+    PillMaterial { visible: !root.integrated; s: root.s; morphRadius: root.height / 2; mode: "status" }
 
     Row {
         id: status

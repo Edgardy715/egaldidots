@@ -17,6 +17,12 @@ Item {
 
     // ---- API pública (host svg) ----
     property real s: 1
+    property bool layoutChanging: false
+    readonly property real restHeaderOpacity: header.restOpacity
+    property real restLeftWidth: 0
+    property real restRightWidth: 0
+    property real restHeight: IslandGeometry.restHeight
+    readonly property real restCenterWidth: header.restContentWidth
     property string screenName: ""
     property color bgColor: "transparent"
     property string surface: ""            // nombre de surface activa
@@ -41,7 +47,9 @@ Item {
         launcherClosing: pill.launcherClosing
         launcherClosePhase: pill.launcherClosePhase
         restContentWidth: header.restContentWidth
-        restHeight: IslandGeometry.restHeight
+        restLeftWidth: pill.restLeftWidth
+        restRightWidth: pill.restRightWidth
+        restHeight: pill.restHeight
         surfaceSizes: pill.surfaceSize
         fallbackSurface: IslandGeometry.fallbackSurface
         mediaSurface: IslandGeometry.mediaSurface
@@ -56,6 +64,7 @@ Item {
         contentLoaded: !!pill.surfaceItem
         contentClosing: !!(pill.surfaceItem && pill.surfaceItem.closing)
         resultsVisible: !!(pill.surfaceItem && pill.surfaceItem.resultsVisible)
+        emptyResultsVisible: !!(pill.surfaceItem && pill.surfaceItem.emptyResultsVisible)
         showCalculator: !!(pill.surfaceItem && pill.surfaceItem.showCalculator)
         resultsCount: pill.surfaceItem ? pill.surfaceItem.resultsCount : 0
         maxVisibleResults: pill.surfaceItem ? pill.surfaceItem.maxVisibleResults : undefined
@@ -154,6 +163,7 @@ Item {
 
     NotificationChoreography {
         id: notificationMotion
+        objectName: "pillNotificationMotion"
         blocked: pill.surface === "auth"
         popup: pill.notificationsEnabled ? Notifs.activePopup : null
         surfaceOpen: pill.surfaceOpen
@@ -197,6 +207,7 @@ Item {
         materialSweep: pill.materialSweep
         surface: pill.surface
         mode: pill.mode
+        artUrl: contentAdapter.artUrl
         notifBreathGlow: pill.notifBreathGlow
         notifState: pill.notifState
         suppressEdge: pill.fluidJoined
@@ -215,6 +226,10 @@ Item {
             z: 3
             s: pill.s
             coreH: pill.coreH
+            layoutChanging: pill.layoutChanging
+            restWidth: pill.restW
+            restLeftWidth: pill.restLeftWidth
+            restRightWidth: pill.restRightWidth
             surface: pill.surface
             surfaceOpen: pill.surfaceOpen
             launcherReturning: pill.launcherReturning

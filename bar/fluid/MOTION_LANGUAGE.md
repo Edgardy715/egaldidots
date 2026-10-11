@@ -142,3 +142,58 @@ sin giro ni rebote; los rangos de borrado se acotan al modelo y se conserva
 
 Referencia API: https://doc.qt.io/qt-6.10/qml-qtquick-textinput.html#cursorDelegate-prop
 Qt posiciona el delegate según cursorRectangle; no asignar x/y desde otro motor.
+
+
+## Composición compacta (2026-10-09)
+
+Un cuerpo central de56px reúne espacios/música/reloj/estado/perfil. El ancho
+suma los grupos reales, padding y separaciones; el reloj queda entre música
+y estado, y el cuerpo completo permanece centrado. Las gotas conservan38px. Los
+módulos comparten el material exterior y se retiran cuando el ancho real del
+morph no deja espacio al reloj. El ancho disponible para estado reserva avatar
+por lifetime, sin depender de su exposición visual. Los paneles pueden encoger
+el cuerpo: exposición usa progreso con signo tanto para ancho como altura.
+Retorno de notificación restaura todo el ancho de reposo. Composición densa ajustada a la referencia del usuario; pruebas y límites en TASK_STATE.md.
+
+
+### Dos composiciones y música integrada (2026-10-09)
+
+barLayout compact mantiene música dentro del cuerpo (portada, resumen acotado,
+visualizador, sin botones de transporte); split conserva laterales y gota. Ambos usan los mismos
+servicios y MediaSurface. Cambiar diseño conserva la ruta abierta; la reserva
+vertical sigue la composición. El host difiere la descarga tras evaluar progreso
+de morph para evitar que destruir una surface cambie su altura dentro del binding.
+La reapertura cancela esa descarga mediante comprobación del estado actual.
+
+
+### Propuesta de acabado compacto (2026-10-09)
+Ancho natural de metadatos, portada36 sin aro y título/artista13/11. Selección
+de workspace integrada más tenue,28px sin sombra; split conserva su diseño.
+En ancho insuficiente, portada accesible sin fragmento de título. Propuesta
+pendiente de valoración del usuario, no diseño aprobado.
+
+
+### Transiciones de composición y origen de Configuración (2026-10-09)
+Retirada de contenido → commit de modo → morph existente → revelado cuando
+la geometría se asienta. Esperar absorción de media incluso si Escape cambia
+la ruta durante la retirada; el estado de navegación se conserva. Reloj de
+launcher/auth también se retira antes del commit. Inversión retargetea desde
+el estado actual y reduceMotion resuelve sin espera.
+Configuración nace en el centro de la pill y viaja al centro de pantalla;
+puente y absorción comparten ese eje. No hereda captura del borde derecho.
+
+### Configuración y contexto musical (2026-10-11)
+Configuración conserva la gota musical en split y el resumen de reposo en compact.
+No necesita absorber media antes de abrir. Al salir hacia otra tarjeta, termina
+su absorción con la pill en reposo antes de desplegar el destino; reabrir retargetea
+el mismo companion. Reduced motion resuelve directamente. Auth tiene prioridad
+inmediata y se dibuja por encima del retorno. Calendario integra un resumen
+musical fijo bajo el clima y absorbe la gota externa al desplegarse, evitando
+duplicar el contexto. Su resumen abre la surface media.
+
+### Iconos y navegación alternativa (2026-10-11)
+El gesto de icono combina hover y engagement del control: foco por Tab y
+selección semántica por flechas reciben la misma respuesta finita. MotionButton
+incluye highlighted en InteractionMotion.focused; Session enlaza su selección
+a highlighted. Bindings locales de hover no excluyen el foco del control.
+Movimiento reducido y controles deshabilitados mantienen sus límites existentes.

@@ -28,6 +28,11 @@ ShellRoot {
             check(calendar.viewMonth === 0 && calendar.viewYear === 2025, "year boundary")
             check(calendar.cellSize > 0, "scaled grid fits")
             check(weather.mapWeather(113, true) === "dark_mode" && weather.mapWeather(296, false) === "rainy", "WWO mapping")
+            weather.parseWeather("invalid json")
+            check(weather.weatherError.length > 0 && weather.weatherTemp === "", "first error is explicit")
+            weather.parseWeather(JSON.stringify({current_condition:[{temp_C:"27"}],weather:[{}]}))
+            check(weather.weatherFeels === "" && weather.weatherHumidity === "" && weather.forecast.length === 0, "partial data has no undefined units")
+            check(weather.weatherLabel(0) === "Sin descripción", "unknown condition is not rain")
             const fixture = {current_condition:[{temp_C:"27", weatherCode:"113", FeelsLikeC:"29", humidity:"60", windspeedKmph:"10"}],
                 weather:[{date:"2024-02-29", maxtempC:"28", mintempC:"20", hourly:[{weatherCode:"296"}]},
                     {date:"2024-03-01", maxtempC:"29", mintempC:"21", hourly:[{weatherCode:"116"}]}]}
@@ -36,7 +41,11 @@ ShellRoot {
             check(calendar.forecast.length === 2 && calendar.forecast[0].icon === "rainy", "forecast projection")
             weather.weatherLoading = true
             weather.parseWeather("invalid json")
-            check(!weather.weatherLoading && weather.weatherTemp === "27°", "parse failure retains last data")
+            check(!weather.weatherLoading && weather.weatherTemp === "27°" && weather.weatherError.length > 0 && weather.weatherUpdated.length > 0, "failure retains explicitly stale data")
+            calendar.selectForecast(1)
+            calendar.closing = true
+            check(calendar.weatherTarget === calendar.weatherView, "interrupted selection settles target")
+            calendar.closing = false
             calendar.selectForecast(1)
             finish.start()
         }

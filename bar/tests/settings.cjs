@@ -7,6 +7,17 @@ vm.runInContext(fs.readFileSync(__dirname + '/../Singletons/Settings.js', 'utf8'
 const context = { home: '/home/test', configHome: '/config', cacheHome: '/cache' };
 const validate = doc => settings.validate(doc, context);
 assert.equal(validate({}).effective.appearance.glassAlpha, 0.34);
+assert.equal(validate({}).effective.appearance.barLayout, 'split');
+assert.equal(validate({}).effective.appearance.workspaceStyle, 'numbers');
+for (const workspaceStyle of ['numbers', 'dots', 'bars', 'capsules', 'pacman'])
+    assert.equal(validate({ appearance: { workspaceStyle } }).effective.appearance.workspaceStyle, workspaceStyle);
+assert.equal(validate({ appearance: { workspaceStyle: 'other' } }).ok, false);
+assert.equal(validate({ appearance: { barLayout: 'compact' } }).effective.appearance.barLayout, 'compact');
+for (const [key, maximum] of [['uiScale', 3], ['topGap', 4], ['appGap', 4]]) {
+    assert.equal(validate({ appearance: { [key]: maximum } }).ok, true);
+    assert.equal(validate({ appearance: { [key]: maximum + 0.01 } }).ok, false);
+    assert.equal(validate({ appearance: { [key]: 1e308 } }).ok, false);
+}
 assert.equal(validate({}).effective.paths.walColorsFile, '/cache/wal/colors.json');
 assert.equal(validate({ paths: { wallpaperDir: '~/Pictures' } }).effective.paths.wallpaperDir, '/home/test/Pictures');
 assert.equal(validate(JSON.parse(fs.readFileSync(__dirname + '/../shell.json.example'))).ok, true);
@@ -14,6 +25,7 @@ for (const doc of [null, [], 'text', { version: 2 }, { appearance: [] }, { appea
     { appearance: { glassAlpha: -1 } }, { appearance: { motionScale: 100 } },
     { appearance: { fontScale: NaN } }, { appearance: { uiScale: Infinity } },
     { appearance: { reduceMotion: 'true' } }, { appearance: { fontFamily: '' } },
+    { appearance: { barLayout: 'wide' } }, { appearance: { barLayout: true } },
     { paths: { wallpaperDir: 'relative' } }, { paths: { wallpaperDir: '/bad\0path' } }]) {
     assert.equal(validate(doc).ok, false, JSON.stringify(doc));
 }
@@ -28,6 +40,9 @@ assert.equal(validate(next).ok, true);
 assert.throws(() => settings.merge(original, JSON.parse('{"__proto__":{"polluted":true}}')));
 assert.throws(() => settings.merge(original, { appearance: JSON.parse('{"__proto__":{}}') }));
 const schema = settings.schema(context);
+assert.deepEqual(Array.from(schema.sections.appearance.barLayout.options), ['split', 'compact']);
+assert.deepEqual(Array.from(schema.sections.appearance.barLayout.optionLabels), ['Separada', 'Compacta']);
+assert.equal(schema.sections.appearance.barLayout.control, 'choice');
 assert.equal(schema.sections.appearance.fontScale.minimum, 0.75);
 assert.equal(schema.sections.paths.wallpaperDir.default, '/home/test/Wallpapers');
 assert.equal(schema.sections.appearance.fontScale.label, 'Tamaño de texto');
@@ -59,15 +74,15 @@ assert.equal(catalog.requiredModules[0].id, 'pill');
 assert.equal(catalog.requiredModules[0].configurable, false);
 assert.deepEqual(Array.from(catalog.optionalModules, item => item.setting), [
     'modules.workspaceRail', 'modules.systemStatus', 'modules.apps',
-    'modules.audio', 'modules.network', 'modules.battery'
+    'modules.audio', 'modules.network', 'modules.userAvatar', 'modules.battery'
 ]);
-assert.equal(catalog.surfaces.length, 14);
+assert.equal(catalog.surfaces.length, 15);
 assert.deepEqual(Array.from(catalog.surfaces, item => item.id).sort(),
     fs.readdirSync(__dirname + '/../surfaces').filter(file => file.endsWith('Surface.qml'))
         .map(file => file.slice(0, -11).toLowerCase()).sort(), 'catalog covers every routed surface');
 assert.deepEqual(Array.from(catalog.surfaces, item => item.id), [
     'appearance', 'auth', 'calendar', 'clipboard', 'connectivity', 'launcher',
-    'media', 'mixer', 'notifs', 'overview', 'session', 'utils', 'wallpaper', 'workspaces'
+    'media', 'mixer', 'notifs', 'overview', 'session', 'settings', 'utils', 'wallpaper', 'workspaces'
 ]);
 assert.ok(catalog.surfaces.every(surface => surface.availability === 'routed'
     && Array.isArray(surface.dependsOn) && Array.isArray(surface.optionalDependsOn)));

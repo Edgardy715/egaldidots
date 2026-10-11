@@ -12,6 +12,7 @@ MouseArea {
     activeFocusOnTab: focusOnTab && accessibleName.length > 0
     Accessible.role: Accessible.Button
     Accessible.name: accessibleName
+    Accessible.onPressAction: if (root.enabled && root.visible) root.clicked(null)
     Keys.onPressed: event => {
         if (!enabled || event.isAutoRepeat || (event.key !== Qt.Key_Space && event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter)) return
         keyboardDown = true

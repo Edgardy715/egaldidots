@@ -44,8 +44,8 @@ Item {
     onTargetWChanged: if (surfaceOpen) lastSurfaceW = targetW
     onTargetHChanged: if (surfaceOpen) lastSurfaceH = targetH
     readonly property real surfaceGrowth: Math.max(0, Math.min(1, Math.min(
-        (width - restW) / Math.max(1, lastSurfaceW - restW),
-        (height - coreH) / Math.max(1, lastSurfaceH - coreH))))
+        Math.abs(lastSurfaceW - restW) < 1 ? 1 : (width - restW) / (lastSurfaceW - restW),
+        Math.abs(lastSurfaceH - coreH) < 1 ? 1 : (height - coreH) / (lastSurfaceH - coreH))))
     readonly property real contentProgress: Math.max(0, Math.min(1,
         (surfaceGrowth - 0.45) / 0.35))
 

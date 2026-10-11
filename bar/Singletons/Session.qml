@@ -22,7 +22,8 @@ Singleton {
     Component.onCompleted: console.log("[Session] singleton instanciado")
 
     // Comandos (override via Flags en el futuro — por ahora valores seguros)
-    readonly property string lockCmd: "~/.local/share/quickshell-lockscreen/lock.sh"
+    readonly property string lockCmd: (Quickshell.env("XDG_DATA_HOME")
+        || Quickshell.env("HOME") + "/.local/share") + "/quickshell-lockscreen/lock.sh"
     readonly property string logoutCmd: "hyprctl dispatch exit 0"
     readonly property string shutdownCmd: "systemctl poweroff"
     readonly property string rebootCmd: "systemctl reboot"
@@ -34,7 +35,7 @@ Singleton {
         try { Quickshell.execDetached(["sh", "-c", cmd]) } catch (e) {}
     }
 
-    function lock(): void { _run(lockCmd) }
+    function lock(): void { Quickshell.execDetached([lockCmd]) }
     function logout(): void { _run(logoutCmd) }
     function shutdown(): void { _run(shutdownCmd) }
     function reboot(): void { _run(rebootCmd) }

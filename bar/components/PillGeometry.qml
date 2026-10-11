@@ -8,10 +8,12 @@ QtObject {
     property bool launcherClosing: false
     property int launcherClosePhase: 0
     property real restContentWidth: 0
+    property real restLeftWidth: 0
+    property real restRightWidth: 0
     property real restHeight: 38
     property var surfaceSizes: ({})
     property size fallbackSurface: Qt.size(320, 300)
-    property size mediaSurface: Qt.size(640, 300)
+    property size mediaSurface: IslandGeometry.mediaSurface
     property real marginMd: 0
     property real fontSizeBodyLg: 0
     property real fontSizeLabel: 0
@@ -25,6 +27,7 @@ QtObject {
     property bool contentLoaded: false
     property bool contentClosing: false
     property bool resultsVisible: false
+    property bool emptyResultsVisible: false
     property bool showCalculator: false
     property var resultsCount: 0
     property var maxVisibleResults: undefined
@@ -45,7 +48,8 @@ QtObject {
     readonly property real launcherSearchH: (44 + marginMd * 2) * s
     readonly property real launcherHeaderH: 78 * s
     readonly property bool launcherHeaderVisible: surface === "launcher" && !launcherClosing
-    readonly property real restW: restContentWidth + padH * 2
+    readonly property real restW: restContentWidth + padH * 2 + restLeftWidth + restRightWidth
+        + (restLeftWidth > 0 ? 18 * s : 0) + (restRightWidth > 0 ? 18 * s : 0)
 
     readonly property real launcherH: {
         var sb = 44 * s
@@ -55,7 +59,7 @@ QtObject {
         if (!contentLoaded) return headerH + sb + padTop + padBot
         if (contentClosing || !resultsVisible) {
             var calcH = showCalculator ? (44 * s + 10 * s) : 0
-            return headerH + sb + padTop + padBot + calcH
+            return headerH + sb + padTop + padBot + calcH + (emptyResultsVisible ? 44 * s : 0)
         }
         var itemH = 72 * s
         var sp = 4 * s
@@ -81,7 +85,7 @@ QtObject {
         if (!hasNotification) return NaN
         if (notifAnimating && (notifState === "collapse-in" || notifState === "collapse-out")) return notifCircleD
         if (notifAnimating && (notifState === "expand" || notifState === "hold")) return notifPillW
-        if (notifAnimating && notifState === "return") return Math.max(restContentWidth, 120 * s) + padH * 2
+        if (notifAnimating && notifState === "return") return Math.max(restW, 120 * s + padH * 2)
         return NaN
     }
     readonly property real _notifTargetH: {

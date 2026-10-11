@@ -6,11 +6,13 @@
 var version = 1
 var fields = {
     appearance: {
+        barLayout: { type: "string", default: "split", options: ["split", "compact"], optionLabels: ["Separada", "Compacta"], label: "Diseño de la barra", control: "choice", description: "Elige la barra separada o la Isla compacta centrada." },
+        workspaceStyle: { type: "string", default: "numbers", options: ["numbers", "dots", "bars", "capsules", "pacman"], optionLabels: ["Números", "Puntos", "Barras", "Cápsulas", "Pac-Man"], label: "Estilo de espacios de trabajo", control: "choice", description: "Representación visual de los escritorios, compartida por ambos diseños de barra." },
         glassAlpha: { type: "number", default: 0.34, minimum: 0.15, maximum: 1, label: "Opacidad del vidrio", control: "number", description: "Ajusta la opacidad del material de vidrio." },
         pillBlur: { type: "boolean", default: false, label: "Desenfoque de la pill", control: "toggle", options: [false, true], availability: "inactive", description: "Se conserva en la configuración, pero no tiene consumidor activo." },
-        topGap: { type: "number", default: 1, minimum: 0, label: "Separación superior", control: "number", description: "Multiplicador del espacio entre Isla y el borde superior." },
-        appGap: { type: "number", default: 1, minimum: 0, label: "Separación del área de aplicaciones", control: "number", description: "Multiplicador del espacio reservado junto a la barra de aplicaciones." },
-        uiScale: { type: "number", default: 1, minimum: 0.25, label: "Escala de interfaz", control: "number", description: "Escala la interfaz respecto a la altura del monitor." },
+        topGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación superior", control: "number", description: "Multiplicador del espacio entre Isla y el borde superior." },
+        appGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación del área de aplicaciones", control: "number", description: "Multiplicador del espacio reservado junto a la barra de aplicaciones." },
+        uiScale: { type: "number", default: 1, minimum: 0.25, maximum: 3, label: "Escala de interfaz", control: "number", description: "Escala la interfaz respecto a la altura del monitor." },
         fontScale: { type: "number", default: 1, minimum: 0.75, maximum: 1.75, label: "Tamaño de texto", control: "number", description: "Escala los tamaños tipográficos del shell." },
         spacingScale: { type: "number", default: 1, minimum: 0.75, maximum: 1.5, label: "Escala de espaciado", control: "number", description: "Escala los espacios y márgenes del tema." },
         radiusScale: { type: "number", default: 1, minimum: 0.75, maximum: 1.5, label: "Escala de redondez", control: "number", description: "Escala los radios del tema." },
@@ -31,6 +33,7 @@ var fields = {
         audio: { type: "boolean", default: true, label: "Audio", control: "toggle", options: [false, true], description: "Muestra el acceso al mezclador; sin salida PipeWire presenta el estado sin audio." },
         network: { type: "boolean", default: true, label: "Red", control: "toggle", options: [false, true], description: "Muestra el indicador Wi-Fi conectado o desconectado." },
         battery: { type: "boolean", default: true, label: "Batería", control: "toggle", options: [false, true], availability: "conditional", description: "Solo se muestra cuando UPower informa una batería de laptop presente." },
+        userAvatar: { type: "boolean", default: true, label: "Avatar en la barra", control: "toggle", options: [false, true], description: "Muestra el avatar del perfil arriba a la derecha; el avatar de Configuración permanece disponible." },
         animateChanges: { type: "boolean", default: true, label: "Animar cambios de módulos", control: "toggle", options: [false, true], description: "Anima la entrada y retirada de módulos; no desactiva el resto de animaciones." }
     },
     profile: {
@@ -39,8 +42,8 @@ var fields = {
     paths: {
         userAvatar: { type: "string", path: true, base: "home", suffix: "/.face", label: "Avatar", control: "path", description: "Ruta de la imagen de usuario para sesión y bloqueo." },
         walColorsFile: { type: "string", path: true, base: "cacheHome", suffix: "/wal/colors.json", label: "Archivo de colores", control: "path", description: "Archivo de colores que consume la paleta de Isla." },
-        wallpaperDir: { type: "string", path: true, base: "home", suffix: "/Wallpapers", label: "Carpeta de wallpapers", control: "path", description: "Carpeta de origen del selector de wallpapers." },
-        wallpaperCacheDir: { type: "string", path: true, base: "cacheHome", suffix: "/quickshell/wallpapers", label: "Caché de wallpapers", control: "path", description: "Carpeta para miniaturas generadas por el selector." },
+        wallpaperDir: { type: "string", path: true, picker: "folder", base: "home", suffix: "/Wallpapers", label: "Carpeta de wallpapers", control: "path", description: "Carpeta de origen del selector de wallpapers." },
+        wallpaperCacheDir: { type: "string", path: true, picker: "folder", base: "cacheHome", suffix: "/quickshell/wallpapers", label: "Caché de wallpapers", control: "path", description: "Carpeta para miniaturas generadas por el selector." },
         wallpaperApplyScript: { type: "string", path: true, base: "configHome", suffix: "/hypr/scripts/apply-wallpaper.sh", label: "Script de wallpaper", control: "path", description: "Script ejecutado para aplicar el wallpaper seleccionado." }
     }
 }
@@ -102,6 +105,8 @@ var optionalModules = [
       configurable: true, parentModule: "systemStatus", availability: "supported-with-fallback", dependsOn: ["pipewire.defaultAudioSink"] },
     { id: "network", setting: "modules.network", label: "Red",
       configurable: true, parentModule: "systemStatus", availability: "supported-with-fallback", dependsOn: ["nmcli.wifi"] },
+    { id: "userAvatar", setting: "modules.userAvatar", label: "Avatar en la barra",
+      configurable: true, availability: "supported-with-fallback", dependsOn: [] },
     { id: "battery", setting: "modules.battery", label: "Batería",
       configurable: true, parentModule: "systemStatus", availability: "when-present", dependsOn: ["upower.laptopBattery"] }
 ]
@@ -121,6 +126,7 @@ var surfaces = [
     { id: "notifs", label: "Notificaciones", availability: "routed", dependsOn: ["quickshell.notification-server"], optionalDependsOn: [] },
     { id: "overview", label: "Vista general", availability: "routed", dependsOn: ["hyprland.monitors", "hyprland.workspaces", "hyprland.toplevels"], optionalDependsOn: [] },
     { id: "session", label: "Sesión y energía", availability: "routed", dependsOn: ["island.session"], optionalDependsOn: ["island.lockscreen", "hyprctl", "systemctl"] },
+    { id: "settings", label: "Ajustes Edots", availability: "routed", dependsOn: ["settings.config"], optionalDependsOn: [] },
     { id: "utils", label: "Controles rápidos", availability: "routed", dependsOn: [], optionalDependsOn: ["systemd-inhibit", "sysfs.backlight", "powerprofilesctl"] },
     { id: "wallpaper", label: "Wallpapers", availability: "routed", dependsOn: ["wallpaper.directory"], optionalDependsOn: ["wallpaper.apply-script", "magick", "mpris.players"] },
     { id: "workspaces", label: "Espacios de trabajo", availability: "routed", dependsOn: ["hyprland.workspaces"], optionalDependsOn: [] }
@@ -216,6 +222,10 @@ function validate(document, context) {
             }
             if (rule.type === "string" && ((value.trim().length < (rule.minLength === undefined ? 1 : rule.minLength)) || value.indexOf("\u0000") !== -1)) {
                 errors.push(name + " has an invalid length or contains NUL")
+                return
+            }
+            if (rule.options && rule.options.indexOf(value) === -1) {
+                errors.push(name + " must be one of: " + rule.options.join(", "))
                 return
             }
             if (rule.path) {

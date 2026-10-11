@@ -15,6 +15,7 @@ Item {
     Binding { target: root.router; property: "reduceMotion"; value: Flags.reduceMotion }
     Binding { target: root.router; property: "resultsDuration"; value: Motion.standard }
     Binding { target: root.router; property: "morphDuration"; value: Motion.morph }
+    Binding { target: Notifs; property: "centerOpen"; value: root.router.openSurface === "notifs" }
 
     Connections {
         target: root.router
@@ -25,7 +26,7 @@ Item {
         function onOpenSurfaceChanged() {
             WinMap.active = root.router.openSurface === "overview"
             if (WinMap.active) WinMap.updateAll()
-            Notifs.centerOpen = root.router.openSurface === "notifs"
+            if (root.router.openSurface === "notifs") Notifs.clearToasts()
         }
     }
 

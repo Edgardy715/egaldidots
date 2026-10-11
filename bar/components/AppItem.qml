@@ -147,7 +147,7 @@ Item {
                     text: root.modelData
                         ? (root.modelData.comment || root.modelData.genericName || "")
                         : ""
-                    color: root.selected ? Qt.alpha(Theme.foreground, Theme.alphaIconSec) : Theme.dim
+                    color: Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeSmall * root.s
                     elide: Text.ElideRight
@@ -184,14 +184,13 @@ Item {
                 border.color: root.selected
                     ? Qt.alpha(Theme.foreground, Theme.alphaSoft)
                     : Qt.alpha(Theme.foreground, Theme.alphaHair)
-                opacity: root.selected ? 0.9 : 0.72
                 Behavior on color { ColorAnimation { duration: Motion.fast } }
                 Behavior on border.color { ColorAnimation { duration: Motion.fast } }
 
                 Text {
                     anchors.centerIn: parent
                     text: String(root.resultIndex)
-                    color: root.selected ? Theme.foreground : Theme.dim
+                    color: root.selected ? Theme.background : Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeSmall * root.s
                     font.weight: Font.DemiBold

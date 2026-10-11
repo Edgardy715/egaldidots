@@ -42,6 +42,7 @@ ShellRoot {
 
     IpcHandler {
         target: "island"
+        function settings(): bool { navigation.toggleSurface("", "settings"); return true; }
         function clock(mon: string): bool     { navigation.toggleSurface(mon, "calendar"); return true; }
         function calendar(mon: string): bool   { navigation.toggleSurface(mon, "calendar"); return true; }
         function mixer(mon: string): bool      { navigation.toggleSurface(mon, "mixer"); return true; }
@@ -76,18 +77,14 @@ ShellRoot {
         function reload(): bool { Quickshell.reload(false); return true; }
     }
 
-    // ---- reserve (struts, click-through) ----
+    // Reserve follows the layout committed by this monitor's overlay.
     Variants {
         model: Quickshell.screens
-
-        IslandReserve {  }
+        Scope {
+            id: monitor
+            required property var modelData
+            IslandReserve { modelData: monitor.modelData; compact: monitorOverlay.compact }
+            IslandOverlay { id: monitorOverlay; modelData: monitor.modelData; router: navigation }
+        }
     }
-
-    // ---- overlay (Pill + mask tri-estado) ----
-    Variants {
-        model: Quickshell.screens
-
-        IslandOverlay { router: navigation }
-    }
-
 }

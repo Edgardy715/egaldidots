@@ -5,6 +5,7 @@ import "components"
 import "Singletons"
 
 ShellRoot {
+    settings.watchFiles: false
     Window {
         id: window
         visible: true; width: 520; height: 220
@@ -79,7 +80,28 @@ ShellRoot {
                 mousePress(target, 40, 30)
                 equal(hit.motion.visualScale, 1)
                 mouseRelease(target, 40, 30)
-                console.log("PASS: pointer, cancellation, keyboard, toggle, fixed hitbox, icon interruption and reduced motion")
+                const beforeAccessible = clicks
+                hit.Accessible.pressAction()
+                equal(clicks, beforeAccessible + 1)
+                media.Accessible.pressAction()
+                equal(clicks, beforeAccessible + 2)
+                toggle.Accessible.pressAction()
+                equal(toggle.checked, false)
+                toggle.Accessible.toggleAction()
+                equal(toggle.checked, true)
+                hit.enabled = false
+                media.enabled = false
+                toggle.enabled = false
+                hit.Accessible.pressAction()
+                media.Accessible.pressAction()
+                toggle.Accessible.pressAction()
+                toggle.Accessible.toggleAction()
+                equal(clicks, beforeAccessible + 2)
+                equal(toggle.checked, true)
+                hit.enabled = true
+                media.enabled = true
+                toggle.enabled = true
+                console.log("PASS: pointer, cancellation, keyboard, accessible activation/disabled, toggle, fixed hitbox, icon interruption and reduced motion")
                 finished = true
             }
         }

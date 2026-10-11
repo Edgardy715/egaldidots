@@ -9,6 +9,7 @@ Item {
     property real sampleX: 0
     property real sampleY: 0
     property real radius: 30
+    property real unit: 1
     ShaderEffectSource {
         id: sample
         width: root.width
@@ -31,13 +32,8 @@ Item {
             saturation: -0.15
         }
     }
-    Rectangle {
-        anchors.fill: parent
-        radius: root.radius
-        gradient: Gradient {
-            GradientStop { position: 0; color: "#18ffffff" }
-            GradientStop { position: 1; color: "#38000000" }
-        }
+    PillMaterial {
+        s: root.unit
+        morphRadius: root.radius
     }
-    GlassCard { anchors.fill: parent; radius_: root.radius; borderColor: "#28ffffff" }
 }

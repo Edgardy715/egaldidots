@@ -72,6 +72,21 @@ ShellRoot {
                     compare(motion.lastSurfaceW, 320)
                     compare(motion.lastSurfaceH, 180)
 
+                    // Compact rest is wider than mixer/connectivity surfaces.
+                    motion.surfaceOpen = false
+                    motion.reduceMotion = true
+                    motion.restW = 760
+                    motion.coreH = 56
+                    motion.targetW = 760
+                    motion.targetH = 56
+                    motion.surfaceOpen = true
+                    motion.reduceMotion = false
+                    motion.targetW = 340
+                    motion.targetH = 380
+                    wait(500)
+                    verify(motion.contentProgress > 0.99, "narrow surface reveals from wide rest")
+                    motion.restW = 100
+                    motion.coreH = 38
                     motion.surfaceOpen = false
                     motion.workspaceAnimating = true
                     motion.targetW = 144

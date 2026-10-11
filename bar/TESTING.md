@@ -397,3 +397,179 @@ físicas, reglas/defaults sin cambios, referencias de dependencias y módulos.
 configuración temporal, además de edición, rechazo, cancelación y persistencia.
 `config-regression.qml` comprueba consumidores reactivos y guardado atómico.
 El catálogo declara disponibilidad, no efectúa detección actual de capacidades.
+
+## Edots
+
+`ISLA_CONFIG=/tmp/edots-check.json QT_QPA_PLATFORM=offscreen quickshell -p bar/settings-regression.qml`
+comprueba búsqueda global, validación, borradores ocultos, descarte y carga de
+escenas interrumpidas. Ver `docs/EDOTS.md` para preview y QA Wayland.
+
+`ISLA_CONFIG=/tmp/edots-motion.json QT_QPA_PLATFORM=offscreen quickshell -p bar/settings-motion-regression.qml`
+comprueba continuidad de retarget, último destino y resolución reduced/hidden.
+
+
+Edots integrada como gota (2026-10-07): `settings-companion-regression.qml`
+verifica centrado, retorno/revelado, retención y reapertura; router y política
+incluyen settings. Ejecutar con ISLA_CONFIG temporal como las demás fixtures.
+`module-composer-regression.qml` cubre alternancia de padre/hijos y estados
+nativos; `settings-controls-regression.qml` requiere Wayland y envía eventos de
+Qt a combo, campos, botones, interruptor y slider. Comprueba selección con ratón,
+flechas/Enter, Escape, Tab, fuente manual, límites del popup, ocultación y reduced
+motion. Exigir PASS y ausencia de FAIL incluso con exit 0 de QtTest embebido.
+La prueba de edición también comprueba geometría animada de todos los iconos y
+resolución al ocultar o reducir movimiento. QA de captura 1000×700/760×560;
+no equivale a medición de FPS o interacción física.
+
+### Selector con layer-shell real
+
+`ISLA_CONFIG=/tmp/isla-layer-picker.json quickshell -p bar/settings-layer-picker-regression.qml`
+abre la surface real en el monitor actual. Target IPC `pickerLayerTest`: `open
+userAvatar` o `open wallpaperDir`, `state` y `quit`. Mientras selector esté abierto
+`picker=true, focus=true` (Popup.Item integrado); al cancelar/aceptar `picker=false, settings=true,
+focus=true`. Selector permanece dentro del overlay con foco modal. `preview /ruta/imagen.png`
+simula clic Qt en la galería y devuelve true cuando Image.Ready. Usar configuración temporal, no guardar preferencias personales.
+
+### Material y estados de lectura de la pill
+
+`ISLA_CONFIG=/tmp/isla-interface-test.json QT_QPA_PLATFORM=offscreen qs -p bar/pill-interface-regression.qml`
+comprueba material compacto/expandido a dos escalas, preferencia opaca,
+cabecera controlada por entered y límites, y estados del launcher sin resultados,
+debounce, calculadora y cierre. Se puede ejecutar también con Wayland.
+No sustituye la inspección nativa: ver docs/PILL_INTERFACE_AUDIT.md.
+
+### Deriva del glow interior
+
+`ISLA_CONFIG=/tmp/isla-glow-test.json qs -p bar/inner-glow-regression.qml`
+comprueba movimiento acotado, pausa oculto, movimiento reducido y reanudación
+sin reiniciar fase. Revisar en barra real: solo la luz interior se desplaza,
+sin mover bordes o texto. No equivale a medición de FPS/GPU.
+
+### Clima en calendario
+
+`ISLA_CONFIG=/tmp/isla-calendar-test.json qs -p bar/calendar-data-regression.qml`
+valida datos parciales/error/retención señalada, códigos y cierre interrumpido.
+`ISLA_CONFIG=/tmp/isla-weather-view-test.json qs -p bar/weather-view-regression.qml`
+valida layout, actualizar/carga, selección/métricas/Ahora, aviso visible sin
+scroll, vacío y fuente grande/movimiento reducido, sin llamadas de red.
+QA shell: calendario con ubicación/temperatura wttr.in; comprobar actualización,
+pronóstico y aviso arriba si falla. Ubicación aproximada por IP.
+
+### Unidad compacta centrada
+
+`ISLA_CONFIG=/tmp/isla-compact-check.json QT_QPA_PLATFORM=offscreen quickshell -p bar/compact-island-regression.qml`
+comprueba límites de los módulos dentro del cuerpo, separación del reloj,
+overflow de 14 apps, ancho de 620 px, apertura de paneles más estrechos
+y movimiento reducido. Exigir la línea `PASS: compact unit bounds`:
+QtTest puede terminar con código 0 después de un fallo. Complementar con
+`optional-modules-regression.qml` y `pill-composition-regression.qml`.
+QA Wayland: abrir volumen/calendario y regresar; revisar que el cuerpo único
+conserve los grupos juntos, sin reserva vacía ni controles sobre los paneles.
+La fixture exige ancho natural exacto, retorno sin solapamiento y reloj solo
+sin reservar espacio para módulos desactivados.
+
+
+La fixture compacta también inyecta un reproductor mock, comprueba pausa,
+reanudación, capacidad de control, CAVA, música en620px y cambio de composición.
+No cambia la reproducción real. Verifica también que títulos cortos liberen ancho;
+en anchos mínimos, portada sin fragmentos de título poco legibles.
+
+`ISLA_CONFIG=/tmp/isla-layout-routing-check.json QT_QPA_PLATFORM=wayland quickshell -p bar/layout-routing-regression.qml`
+comprueba el IslandOverlay real: media abierta al cambiar split↔compact,
+dock de launcher/ajustes y cierre. Es una ventana temporal en la sesión Wayland.
+Exigir PASS sin avisos Binding loop.
+
+`module-composer-regression.qml` prueba selector, búsqueda, ventana pequeña y
+discard; settings.cjs/settings-integration.py cubren enum/persistencia temporal.
+
+
+### Transiciones animadas de ambas composiciones
+
+Usar ISLA_CONFIG temporal y exigir PASS explícito (QtTest puede salir0 sin PASS).
+`layout-motion-regression.qml` en Wayland incluye IslandReserve y prueba ambos
+sentidos,11 surfaces sin acciones destructivas, media abierta, inversiones y
+reduceMotion. `layout-interruptions-regression.qml` añade gota split simulada,
+notificación concurrente con calendar/cambio de modo, pause, desaparición de
+media y OSD; no cambia reproducción ni notificaciones reales.
+`bar-layout-transition-regression.qml` comprueba gates exit/settle y retirada
+de cabeceras launcher/auth. `centered-companion-regression.qml` verifica origen,
+puente, destino, absorción centrados a ambos anchos y conserva velocidad al
+reabrir. `notification-routing-regression.qml` exige que constructor/destructor
+de NotifsSurface no sobrescriban el estado de ruta vigente.
+
+La carga `quickshell -p bar` más IPC/log es obligatoria para validar también
+Scope/reserva/ShellRuntime. qmllint puede pasar aun cuando un Behavior sobre
+una propiedad readonly impide cargar la shell: probar arranque real.
+QA nativa con grim registra tiempos start/end; es muestreo irregular, no todos
+los frames ni FPS medido. Comparar reposo, media y Configuración, interrumpir
+Notifs↔media y close/reopen, y restaurar Config tras la prueba.
+
+Entrada y media del bloqueo (2026-10-09): `lockscreen-entrance-regression.qml`
+comprueba espera de `secured`, exposición intermedia, tarjeta al reproducir,
+pausa/reanudación durante salida, retirada antes del formulario, desaparición
+con Loader retenido, retorno, ancho estrecho y movimiento reducido. Ejecutar
+con `ISLA_CONFIG` temporal y `QT_QPA_PLATFORM=wayland` para QA nativa; opcional
+`ISLA_LOCK_CAPTURE_DIR` y `ISLA_LOCK_WALLPAPER` para capturas. La fixture y
+`QS_LOCK_PREVIEW=1 quickshell -p bar/lockscreen.qml` nunca adquieren el bloqueo
+ni autentican. Complementar con motion/typing y tests/lockscreen-launcher.py.
+
+Reloj en reposo: `clock-reel-regression.qml` con ISLA_CONFIG temporal comprueba
+11:59→12:00, cambio rápido al minuto siguiente, anchura estable, horas/minutos
+independientes, reducedMotion y actualizaciones ocultas sin replay. Wayland y
+`ISLA_CLOCK_CAPTURE_DIR` permiten capturar muestras del desplazamiento vertical.
+Complementar con status-regression y pill-interface-regression (calendario/foco).
+
+Representaciones de workspaces: `workspace-styles-regression.qml` renderiza
+numbers/dots/bars/capsules/pacman en rail separado e integrado; prueba opciones
+SettingsPage, validación, discard y save/reload con ISLA_CONFIG temporal.
+`ISLA_WORKSPACE_CAPTURE_DIR` permite capturar las cinco filas en Wayland.
+Complementar con top-workspace-motion-regression, workspace-model-regression,
+module-composer-regression y tests/settings.cjs. Nunca usar configuración personal
+para save/reload de esta fixture.
+
+Correcciones de auditoría (2026-10-10): desde la raíz del proyecto,
+`sh bar/tests/verify-config.sh` incluye el parser matemático sin evaluación de
+código. `launcher-input-safety-regression.qml` escribe en el campo real con
+QtTest y exige que `Qt.quit()` sea texto sin efectos. `interaction-regression.qml`
+comprueba acciones Accessible y controles deshabilitados; `overlay-input-policy-regression.qml`
+comprueba la política modal. `python bar/tests/overlay-native-input.py` usa una
+copia temporal y wtype en Wayland para abrir/cerrar las 14 superficies sin Auth,
+y verifica la liberación del teclado. No activa acciones de sistema.
+
+`python bar/tests/settings-integration.py` comprueba IPC, escritura atómica,
+watcher y conflicto de borrador mediante QtTest y reemplazo externo real.
+Usa offscreen por defecto; `QT_QPA_PLATFORM=wayland` permite entrada/render nativos.
+`ISLA_DRAFT_CAPTURE_DIR` guarda el aviso sobre fondo opaco. Ejecutar sobre una
+copia temporal de `bar/` mientras se edita el repositorio evita autorrecargas
+que interrumpan la fixture. Comandos y resultados de servicios con HOME/XDG/PATH
+temporales están en `docs/audit-2026-10-10/fixes/`; nunca sustituir sus comandos
+falsos por acciones reales de red, energía o bloqueo para una prueba de regresión.
+
+`python bar/tests/settings-surface-switch.py` ejecuta una copia temporal en
+Wayland: Configuración↔13 destinos, selector de archivos/fuentes abierto,
+borrador retenido, peticiones de perfil mientras el editor está oculto,
+escritura y Ctrl+S en launcher, callback de foco tardío y retarget rápido.
+Cubre split/compact y movimiento normal/reducido. `ISLA_SWITCH_CAPTURE_DIR`
+permite capturas del contenido QML; el Popup separado del selector no forma
+parte del subárbol capturado. No activa acciones de sistema ni guarda ajustes
+personales. Complementar con overlay-native-input para Escape entregado por wtype.
+
+`python bar/tests/settings-media-routing.py` usa una copia temporal con un
+reproductor MPRIS simulado: Configuración conserva música, retorno antes de
+calendar/media/session, interrupción de retorno, prioridad visual Auth sin PAM,
+acceso musical desde calendario, pausa/remoción en split/compact y normal/reduced.
+`ISLA_MEDIA_CAPTURE_DIR` guarda capturas Wayland de la composición.
+`calendar-media-regression.qml` prueba además el pie fijo al desplazar clima,
+metadatos largos y fontScale 1.75. Usar ISLA_CONFIG temporal.
+
+`python bar/tests/settings-ux.py` usa copia temporal de bar en Wayland y verifica
+las seis páginas a 1000×700 y 640×560, fontScale1/1.75, targets de navegación,
+texto de Guardar dentro del botón, estado de guardado, foco/error inline visible,
+búsqueda vacía, selector compacto y contraste con dos paletas de prueba. No toca
+la configuración ni la paleta personal. `ISLA_SETTINGS_UX_CAPTURE_DIR` guarda
+capturas QML asentadas; el selector se captura como contenido sobre transparencia.
+
+`keyboard-icon-regression.qml` comprueba Session con flechas y controles con
+Tab/Shift+Tab: gesto activo aun con binding explícito de hover, movimiento
+reducido y cero acciones de energía. Ejecutar en Wayland con ISLA_CONFIG temporal
+que contenga `{}`. Complementa `interaction-regression.qml` (puntero, presión,
+foco, Accessible, interrupción y disabled).

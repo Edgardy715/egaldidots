@@ -42,7 +42,7 @@ PillSurface {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             text: qsTr("Espacio %1").arg(root.activeId)
-            color: Theme.dim
+            color: Theme.iconSecondary
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeCaption * root.s
         }
@@ -164,7 +164,7 @@ PillSurface {
                         anchors.left: parent.left
                         anchors.margins: 8 * root.s
                         text: workspace.wsId
-                        color: workspace.active ? Theme.foreground : (workspace.occupied ? Theme.foreground : Theme.dim)
+                        color: workspace.active || workspace.occupied ? Theme.foreground : Theme.iconSecondary
                         font.family: Theme.fontDisplay
                         font.pixelSize: Theme.fontSizeBodyLg * root.s
                         font.weight: workspace.active ? Font.DemiBold : Font.Medium
@@ -205,7 +205,7 @@ PillSurface {
                         anchors.bottomMargin: 7 * root.s
                         visible: workspace.windowCount > 0
                         text: workspace.windowCount
-                        color: workspace.active ? Qt.alpha(Theme.foreground, 0.74) : Theme.dim
+                        color: Theme.iconSecondary
                         font.family: Theme.fontMono
                         font.pixelSize: Theme.fontSizeCaption * root.s
                         font.weight: Font.DemiBold
