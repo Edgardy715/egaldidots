@@ -1,4 +1,0 @@
-PASS: settings defaults, legacy format, validation, paths, patch isolation, extension preservation
-PASS: 14 shell surfaces, settings editor, pill header/motion and overlay policy have audited boundaries
-PASS: calculator arithmetic, inverse functions, precedence, bounds and rejection of QML/JavaScript input
-Isla configuration checks passed.

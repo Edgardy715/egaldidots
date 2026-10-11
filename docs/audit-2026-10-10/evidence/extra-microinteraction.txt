@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/microinteraction-regression.qml"
-  INFO: Shell ID: "575f83e89f2a381d3b9528a115bb3765" Path ID "575f83e89f2a381d3b9528a115bb3765"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/jqtfdipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: content interruption, text retarget, native remove/displacement and reduced motion
-[codex-output: log=/home/zdito/.cache/codex-economy/output-sqovs9az.log exit=0]

@@ -1,8 +1,0 @@
-SVC01 PASS: failed fake connect returned false; no saved profile delete/add; calls=monitor | radio wifi | -g ACTIVE,SIGNAL,FREQ,SSID,BSSID,SECURITY d w | device wifi connect Casa password incorrecta bssid AA:BB:CC:DD:EE:FF | -t -f NAME,TYPE connection show
-SVC01 PASS: successful fake connect kept SSID/password as single argv elements, normalized BSSID, callback once, saved refresh
-SVC02 PASS: Session.lock executed only temporary XDG_DATA_HOME wrapper
-SVC02 PASS: absent XDG_DATA_HOME uses temporary HOME fallback
-SVC04 PASS: fake wipe success; PNG count while surface alive=0
-SVC04 PASS: fake wipe failure; PNG count while surface alive=1
-SVC04 PASS: fake wipe slow; PNG count while surface alive=0
-All cases used a temporary bar copy and HOME/XDG/PATH; no real service was called.

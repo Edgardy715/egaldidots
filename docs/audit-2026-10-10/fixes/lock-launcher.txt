@@ -1,1 +1,0 @@
-PASS: lock installer backup/XDG and launcher preview guard, repository entry, failure fallback

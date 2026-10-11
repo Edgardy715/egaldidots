@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/interaction-regression.qml"
-  INFO: Shell ID: "22682f350d8d6bfa33196d13c61055f2" Path ID "22682f350d8d6bfa33196d13c61055f2"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/7cd1p4jpmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: pointer, cancellation, keyboard, accessible activation/disabled, toggle, fixed hitbox, icon interruption and reduced motion
-[codex-output: log=/home/zdito/.cache/codex-economy/output-78csggs_.log exit=0]

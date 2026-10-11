@@ -1,6 +1,0 @@
-SVC-01 PASS: fake nmcli order show → delete → add(fail) → fallback(fail); callback false
-SVC-01 calls: connection show Casa | connection delete Casa | connection add type wifi con-name Casa ifname * ssid Casa 802-11-wireless.bssid AA:BB:CC:DD:EE:FF 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk incorrecta | device wifi connect Casa password incorrecta
-SVC-02 PASS: Session.lock() invoked -c ~/.local/share/quickshell-lockscreen/lock.sh ; XDG launcher exists but was not invoked; fixed HOME path absent
-SVC-04 PASS: cliphist wipe completed (entries=0), PNG remained while surface alive: ['2.png']
-SVC-05 PASS: real QtTest click selected performance, fake set failed, service get remained balanced; calls: get | set performance | get
-All reproductions used temporary HOME/XDG/PATH, fake nmcli/cliphist/powerprofilesctl, and an offscreen Quickshell copy.

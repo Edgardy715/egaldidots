@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/connectivity-surface-regression.qml"
-  INFO: Shell ID: "31516134be0e865ad28762d0e2cce2b9" Path ID "31516134be0e865ad28762d0e2cce2b9"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/cel35ipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: connectivity view emits mocked Wi-Fi and Bluetooth actions without service changes
-[codex-output: log=/home/zdito/.cache/codex-economy/output-ecl0t1s1.log exit=0]

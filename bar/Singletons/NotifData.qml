@@ -2,18 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
 
-/**
- * Isla · NotifData. Envoltorio por-notificación (molde caelestia NotifData.qml,
- * sin su infra Colours/Tokens). Espeja lo que NotifCard lee; mantiene un
- * expireTimer que OCULTA el toast (popup=false) sin tocar el historial, y
- * close() lo saca de Notifs.list + dismiss del objeto vivo. timeStr relativo
- * ("ahora"/"5m"/"2h"/"2d"). Para notifs restaurados de disco, notification=null
- * (display-only — las acciones no invocan, queda el texto). Cero springs, cero
- * CPU en reposo (timer parado cuando closed).
- *
- * Locks: una notif puede estar a la vez en el toast (popup) y en el centro
- * (historial) → dos delegates la miran. close() no destruye hasta que suelte el
- * último, para no descuartizar un delegate vivo.
+/** Modelo por notificación, basado en caelestia NotifData.qml. La caducidad oculta el toast; las restauradas son sólo de lectura.
+ * close() espera que los delegates visibles liberen sus locks antes de quitar la entrada.
  */
 QtObject {
     id: notif

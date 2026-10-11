@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/desktop-status-fanout-regression.qml"
-  INFO: Shell ID: "bad58f978e4e161330267a1b2f7efb95" Path ID "bad58f978e4e161330267a1b2f7efb95"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/6kt9dipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: shared status events fan out to two adapters; per-adapter debounce, fallback scale and isolated Caps Lock
-[codex-output: log=/home/zdito/.cache/codex-economy/output-6tbp0ukc.log exit=0]

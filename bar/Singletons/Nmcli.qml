@@ -367,10 +367,7 @@ Singleton {
         return root.savedConnectionSsids.some(saved => saved && saved.toLowerCase().trim() === ssidLower)
     }
 
-    // ── Orquestación de conexión (fusionado desde NetworkConnection.qml) ─────
-    // Flujo completo: desconexión previa si hace falta, perfil guardado, y
-    // solicitud de password cuando la red es segura. Reemplaza el singleton
-    // intermedio que antes orquestaba estas llamadas.
+    // Flujo de conexión: desconexión previa, perfil guardado y solicitud de password.
     function handleConnect(network, session, onPasswordNeeded): void {
         if (!network) return
 

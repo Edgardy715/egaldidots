@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/pill-interface-regression.qml"
-  INFO: Shell ID: "000fb6240612137789c6ff51ffeb49c9" Path ID "000fb6240612137789c6ff51ffeb49c9"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/wgki4ipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: scaled reading material, opaque preference, header exposure/bounds and empty/search/calculator/closing states
-[codex-output: log=/home/zdito/.cache/codex-economy/output-_89etjaz.log exit=0]

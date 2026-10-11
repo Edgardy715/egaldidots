@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/overlay-input-policy-regression.qml"
-  INFO: Shell ID: "a2aa3163d45c22d58a4d911029adce04" Path ID "a2aa3163d45c22d58a4d911029adce04"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/2nkm4ipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: overlay focus, fullscreen, regions and backdrop policy
-[codex-output: log=/home/zdito/.cache/codex-economy/output-j_6eyujp.log exit=0]

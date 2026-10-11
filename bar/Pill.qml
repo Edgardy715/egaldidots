@@ -2,15 +2,8 @@ import QtQuick
 import "Singletons"
 import "components"
 
-/**
- * Isla · Pill. El corazón: una píldora de vidrio oscura top-centre que morpha
- * (Behavior width/height/morphRadius · continuous retargeting). Molde
- * Ricelin Pill.qml — vidrio = gradiente cardTop→cardBot + borde 1px + sheen
- * (catch-light) + MultiEffect SÓLO sombra + inner-glow del acento que respira
- * (el "lo vivo respira" del waybar). Blur real = compositor (layerrule).
- *
- * Rest: reloj central (tap→calendar); la gota multimedia vive a su derecha
- * en FluidMediaCompanion. Surfaces via Loader. Wheel = volumen.
+/** Pill principal: expone estado al shell y coordina geometría, surfaces y morphs de notificación.
+ * Inspirada en Ricelin Pill.qml.
  */
 Item {
     id: pill

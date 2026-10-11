@@ -4,12 +4,8 @@ import Quickshell
 import Quickshell.Services.Mpris
 import "MediaSource.js" as MediaSource
 
-/**
- * Isla · Players. Wrapper lean de Quickshell.Services.Mpris (molde Ricelin
- * Players.qml): descarta playerctld (proxy) y reproductores detenidos, elige
- * primero el que suena y después uno pausado, y expone: title/artist/
- * artUrl/playing/trackKey. `active` es por-objeto para sobrevivir churn de
- * metadata y caer cuando el proceso muere.
+/** Adaptador Mpris: filtra playerctld y reproductores detenidos, prioriza la reproducción y mantiene el player activo al cambiar metadata.
+ * Basado en Ricelin Players.qml.
  */
 Singleton {
     id: root

@@ -5,18 +5,7 @@ import Quickshell.Widgets
 import "../"
 import "../Singletons"
 
-/**
- * Isla · NotifCard. Delegate de vidrio compartido por el centro (NotifsSurface,
- * compact:false) y el toast (Toast.qml, compact:true). Mismo cuerpo que la pill:
- * gradiente cardTop→cardBot + borde + sheen + sombra separada del contenido.
- *
- * Iconos: prioriza image (preview de la notif, ej. artwork de Spotify), luego
- * appIcon (icono de la app via Quickshell.iconPath), luego image://icon/ (icono
- * temático via IconImage del NotificationServer), y si nada → glyph por appName.
- *
- * Urgencia Critical → borde accent y luz interior; el borde respira.
- * Hover wash + click del compact oculta el toast (popup=false). Actions (full)
- * en fila con wash/escala. Cero springs.
+/** Tarjeta compartida por historial y toast; los iconos usan fallback de imagen, app, tema y glifo genérico.
  */
 Item {
     id: card

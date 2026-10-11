@@ -51,12 +51,3 @@ tests establish installer control flow, backup behavior and failure propagation;
 they do not establish that current Arch/AUR packages build successfully or that
 the desktop renders on physical hardware. Full end-to-end validation requires
 a clean Arch/CachyOS VM and a graphical session.
-
-## Integration validation (2026-10-11)
-
-The integration into main passed all 14 recovery tests, shell syntax checks,
-the Isla configuration/architecture/calculator gate, lockscreen launcher checks
-and Starship palette tests. Tests include a checkout at ~/.config/quickshell and
-backup of dangling Wpscan links. Independent review confirmed the installer
-fixes and built the plugin with Qt 6.11.2; QML import and a real installation
-on a clean system were not verified.

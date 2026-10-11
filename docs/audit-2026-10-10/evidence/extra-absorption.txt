@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/absorption-regression.qml"
-  INFO: Shell ID: "3f32ca47e87ddbee3d236b7d581f39e6" Path ID "3f32ca47e87ddbee3d236b7d581f39e6"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/n6txcipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: continuous capture at 30/60/144/240 Hz, compact/playing/hover/card, coverage and return
-[codex-output: log=/home/zdito/.cache/codex-economy/output-0fodip4u.log exit=0]

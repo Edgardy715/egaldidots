@@ -1,1 +1,0 @@
-PASS: clipboard async load, previews, exact copy, clear success/error and duplicate guard

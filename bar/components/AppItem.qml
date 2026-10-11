@@ -4,14 +4,8 @@ import Quickshell.Widgets
 import "../Singletons"
 import "../"
 
-/**
- * Isla · AppItem. Delegate del LauncherSurface. Molde caelestia AppItem.qml
- * adaptado a la Isla: icon (IconImage) + name + comment, con highlight/press
- * heredado del ListView (sin separar StateLayer para no añadir dependencias).
- *
- * Item de 64px (escalado por s del surface), fills width del listado. Mostrar
- * icono "favorite" a la derecha si el app.id matchea la lista favouriteApps.
- * Click = Apps.launch(modelData) + cierra el surface.
+/** Delegate de la lista del launcher con icono, nombre, descripción y favorito.
+ * Basado en caelestia AppItem.qml.
  */
 Item {
     id: root

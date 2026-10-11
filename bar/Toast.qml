@@ -5,18 +5,8 @@ import Quickshell.Hyprland
 import "Singletons"
 import "components"
 
-/**
- * Isla · Toast. Ventana popup top-centre — lo EFÍMERO de la notif (NO morfea la
- * pill: el morph es un panel único atado al click/foco; toasts son múltiples y
- * deben poder caer sin robarle la pill). Per-screen via Variants en shell.qml.
- * Sólo el monitor con foco lo muestra (resto visible:false). capa Overlay,
- * namespace quickshell.notiftoast (blurreado en windowRules.conf).
- *
- * Repeater de NotifCard compact dentro de Column. Las transiciones add/remove
- * se manejan vía Behavior on opacity/y del delegate (cero springs, morphCurve).
- * Máscara de input = sólo el bounding de las cards (resto click-through → no
- * bloquea la pill ni ventanas). visible: focused → aunque vacío, sigue dibujado
- * transparente con máscara vacía (cero captura, cero CPU en reposo).
+/** Overlay de notificaciones por pantalla; sólo aparece en el monitor enfocado.
+ * Las tarjetas dejan pasar los clics fuera de sus límites y la pill conserva su morph de notificación.
  */
 PanelWindow {
     id: win

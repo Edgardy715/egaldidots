@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/mixer-surface-regression.qml"
-  INFO: Shell ID: "1a4a685d9f68b2def7103dbab4cf38bc" Path ID "1a4a685d9f68b2def7103dbab4cf38bc"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/tcl35ipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: mixer view renders injected audio controls and emits mock actions without mutating payloads
-[codex-output: log=/home/zdito/.cache/codex-economy/output-u_f8vwkz.log exit=0]

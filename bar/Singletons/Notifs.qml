@@ -4,23 +4,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
 
-/**
- * Isla · Notifs. Reemplaza total swaync. Posee el bus org.freedesktop.Notifications
- * via NotificationServer (antes lo evitábamos por conflicto D-Bus con swaync — swaync
- * mascarado+detenido ahora libera el nombre). Molde caelestia services/Notifs.qml:
- *
- *  - list[] de NotifData (vivos del server + restaurados de disco). notClosed y
- *    popups se re-filtran al cambiar listVersion (bumped por NotifData en popup/closed
- *    toggle — QML no re-evalúa bindings por cambios en items, hay que avisarle).
- *  - shouldShowPopup(): !dnd && !centerOpen. El centro abierto ahoga toasts (no
- *    duplicar), DND ahoga todos.
- *  - Persistencia a ~/.local/state/quickshell/notifs.json ({dnd, notifs:[]}) via
- *    FileView, debounced 1s al cambiar list. Restaura al cargar (popup:false — no
- *    re-toastea).
- *  - IpcHandler "notifctl" para scripting (reemplaza swaync-client -d/-C).
- *
- * Cero springs. Cero CPU en reposo (sin timers del servicio; cada NotifData tiene
- * el suyo sólo mientras viva).
+/** Adaptador de NotificationServer para notificaciones, cola de popups, persistencia e IPC "notifctl".
+ * Inspirado en caelestia services/Notifs.qml.
  */
 Singleton {
     id: root
@@ -76,7 +61,7 @@ Singleton {
     property bool stateReady: false
     property bool pendingSave: false
 
-    /** bump de versión para que notClosed/popups re-filtren al togglear items. */
+    /** Fuerza el re-filtrado: QML no observa cambios de propiedades dentro de los objetos de list. */
     property int listVersion: 0
     function _bump() {
         root.listVersion++

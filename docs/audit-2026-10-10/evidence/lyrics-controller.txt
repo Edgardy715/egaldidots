@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/lyrics-controller-regression.qml"
-  INFO: Shell ID: "59f95b080d180acaf663fe1d50b658f8" Path ID "59f95b080d180acaf663fe1d50b658f8"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/n7l15ipmt/log.qslog"
-  INFO: Configuration Loaded
- ERROR qml: FAIL: lyrics controller Error: synced result: error
-[codex-output: log=/home/zdito/.cache/codex-economy/output-wq26i2s5.log exit=1]

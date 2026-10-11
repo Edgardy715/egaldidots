@@ -6,15 +6,8 @@ import "../"
 import "../Singletons"
 import "../components"
 
-/**
- * Isla · NotifsSurface. El CENTRO de notificaciones — surface que morfea la pill
- * (como calendar/mixer). Lista historial (NotifCard full), header con count chip
- * + toggle DND + Limpiar. Al abrir: Notifs.centerOpen=true + clearToasts() (oculta
- * popups en pantalla, no los borra del historial) — el lifecycle de centerOpen lo
- * gobierna ShellRuntime desde la ruta vigente, igual que WinMap.active.
- * Empty state "Todo al día" cuando no hay notClosed. Cero springs.
- *
- * v2: header con SurfaceHeader + Toggle unificado, stagger de entrada de la lista.
+/** Surface del historial; ShellRuntime controla el ciclo de centerOpen.
+ * Al abrirla, oculta los toasts visibles sin quitarlos del historial.
  */
 Item {
     id: root

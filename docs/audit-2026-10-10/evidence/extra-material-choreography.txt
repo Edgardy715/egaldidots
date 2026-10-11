@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/material-choreography-regression.qml"
-  INFO: Shell ID: "a25d86d748bab129810b72ded642cb82" Path ID "a25d86d748bab129810b72ded642cb82"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/5tthdipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: material entrance, restart, completion and reduced motion
-[codex-output: log=/home/zdito/.cache/codex-economy/output-__4hpom8.log exit=0]

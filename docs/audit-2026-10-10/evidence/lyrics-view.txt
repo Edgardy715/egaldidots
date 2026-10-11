@@ -1,9 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/lyrics-view-regression.qml"
-  INFO: Shell ID: "d4005291ddb86e85cf392cad72ad9dda" Path ID "d4005291ddb86e85cf392cad72ad9dda"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/59l25ipmt/log.qslog"
-  WARN scene: @components/MediaView.qml[233:21]: Unable to assign [undefined] to QString
-  WARN scene: @components/MediaView.qml[338:140]: Unable to assign [undefined] to bool
-  WARN scene: @components/MediaView.qml[354:177]: Unable to assign [undefined] to bool
-  INFO: Configuration Loaded
- DEBUG qml: PASS: lyrics toggle, timed highlight, manual browsing, plain/empty, Escape and unsupported player
-[codex-output: log=/home/zdito/.cache/codex-economy/output-s5lijix8.log exit=0]

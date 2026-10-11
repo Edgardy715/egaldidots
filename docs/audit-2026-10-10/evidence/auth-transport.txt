@@ -1,2 +1,0 @@
-PASS Auth transport: startup and four reloads deliver askpass responses
-[codex-output: log=/home/zdito/.cache/codex-economy/output-vqkjjey7.log exit=0]

@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/surface-router-regression.qml"
-  INFO: Shell ID: "d973747c1ac48128913a959e8321bd83" Path ID "d973747c1ac48128913a959e8321bd83"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/ankm4ipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: routing, dock cancellation, auth priority, two-phase close, interruption and reduced motion
-[codex-output: log=/home/zdito/.cache/codex-economy/output-htaso9ot.log exit=0]

@@ -3,20 +3,8 @@ import QtQuick
 import QtQuick.Window
 import Quickshell
 
-/**
- * Isla · Motion system. Molde de Ricelin (pill/Singletons/Motion.qml) + curvas
- * emphasized de Material 3 / Apple. Curvas para coreografía; retorno físico breve para controles.
- * `mult` reduce duraciones si el usuario pide reduce-motion.
- *
- * Sistema de tokens (igual que caelestia Anim.qml / Material motion):
- *   · Entrada  → curva DECELERADA asimétrica (acelera rápido, decelera largo):
- *     emphasizedDecel = cubic-bezier(0.05, 0.7, 0.1, 1.0) — el sello Apple/Material.
- *   · Salida   → curva ACELERADA (larga, para que no se "arrastre" al salir):
- *     emphasizedAccel = cubic-bezier(0.3, 0.0, 0.8, 0.15).
- *   · Standard → decel/accel "limpios" (sin enfásis) para micro-interacciones.
- *
- * `stagger` base: las surfaces escalonan la entrada de sus filas/items con
- * `Motion.staggerIndex(i)` → delay por elemento. Todo multiplicado por mult.
+/** Tokens de duración y easing basados en Ricelin y las curvas de Material 3/Apple.
+ * `mult` aplica reduce-motion; `staggerIndex(i)` escalona las entradas de listas.
  */
 Singleton {
     id: root

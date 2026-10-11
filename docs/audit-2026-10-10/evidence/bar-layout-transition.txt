@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/bar-layout-transition-regression.qml"
-  INFO: Shell ID: "ee43c7771958ca8a9cace4f2e8180d4f" Path ID "ee43c7771958ca8a9cace4f2e8180d4f"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/rpm66ipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: layout exit/settle gates, reversals, reduced motion and launcher/auth header withdrawal
-[codex-output: log=/home/zdito/.cache/codex-economy/output-zymtl7mn.log exit=0]

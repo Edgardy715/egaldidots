@@ -1,7 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/top-system-status-regression.qml"
-  INFO: Shell ID: "933cdb3895619ca27aff85fab31eaef0" Path ID "933cdb3895619ca27aff85fab31eaef0"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/1ct2dipmt/log.qslog"
-  INFO: Configuration Loaded
-  WARN quickshell.hyprland.ipc: Got openwindow for workspace "1" which was not previously tracked.
- DEBUG qml: PASS: status app identity, entry/exit, interruption, compact width, single intro/hover, multiple icons, reduced motion and hide
-[codex-output: log=/home/zdito/.cache/codex-economy/output-t3gmrxk1.log exit=0]

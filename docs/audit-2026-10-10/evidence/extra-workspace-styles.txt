@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/workspace-styles-regression.qml"
-  INFO: Shell ID: "171b505121f6dfb9e5f0f9216bf6242a" Path ID "171b505121f6dfb9e5f0f9216bf6242a"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/ultadipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: five workspace representations, both layouts, setting choices, validation and discard
-[codex-output: log=/home/zdito/.cache/codex-economy/output-l3xbk3nn.log exit=0]

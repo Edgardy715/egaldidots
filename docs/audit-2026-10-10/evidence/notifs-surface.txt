@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/notifs-surface-regression.qml"
-  INFO: Shell ID: "f14fb82e0b85812878449ac0c6469e22" Path ID "f14fb82e0b85812878449ac0c6469e22"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/wfl45ipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: notification view renders injected data and emits DND/action signals without invoking native actions
-[codex-output: log=/home/zdito/.cache/codex-economy/output-usw7ojnw.log exit=0]

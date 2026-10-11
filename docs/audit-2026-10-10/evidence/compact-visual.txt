@@ -1,8 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/compact-island-regression.qml"
-  INFO: Shell ID: "d3d9c494e7833e88dc275eb1b6b18cf6" Path ID "d3d9c494e7833e88dc275eb1b6b18cf6"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/awvufipmt/log.qslog"
-  INFO: Configuration Loaded
-  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
-  WARN quickshell.hyprland.ipc: Got openwindow for workspace "1" which was not previously tracked.
- DEBUG qml: PASS: compact unit bounds, packed clock, app overflow, narrow monitor, panels, integrated music, layout switch and reduced motion
-[codex-output: log=/home/zdito/.cache/codex-economy/output-4spx10yu.log exit=0]

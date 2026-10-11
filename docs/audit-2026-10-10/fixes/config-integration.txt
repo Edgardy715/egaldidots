@@ -1,2 +1,0 @@
-PASS: settings IPC, missing directory, atomic save, file watch, invalid retention, discard, unknown keys, deletion
-PASS: real editor, external reload conflict, save, discard and unknown key

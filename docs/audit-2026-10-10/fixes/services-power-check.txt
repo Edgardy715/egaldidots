@@ -1,4 +1,0 @@
-PASS: failed click, actual=balanced, UI=balanced, service calls=get | set performance | get
-PASS: success click, actual=performance, UI=performance, service calls=get | set performance | get
-PASS: external/read-recovery initial=balanced, actual=power-saver, UI=power-saver, error=''
-PASS: external/read-recovery initial=None, actual=balanced, UI=balanced, error=''

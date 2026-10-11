@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/lockscreen-regression.qml"
-  INFO: Shell ID: "79c1b6669888cfb352f6a1a7e692b676" Path ID "79c1b6669888cfb352f6a1a7e692b676"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/14uudipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: lockscreen input guards, secret clearing, power confirmation and reduced motion loaded
-[codex-output: log=/home/zdito/.cache/codex-economy/output-s2ofnq3k.log exit=0]

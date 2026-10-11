@@ -1,8 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/optional-modules-regression.qml"
-  INFO: Shell ID: "745bb050a89ecb90cc09cec28fbb4b15" Path ID "745bb050a89ecb90cc09cec28fbb4b15"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/5ulb5ipmt/log.qslog"
-  INFO: Configuration Loaded
-  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
-  WARN quickshell.hyprland.ipc: Got openwindow for workspace "1" which was not previously tracked.
- DEBUG qml: PASS: optional module settings, lifetime, exit, reversal, input, controls, temporary hide and reduced motion
-[codex-output: log=/home/zdito/.cache/codex-economy/output-m_29xuf5.log exit=0]

@@ -1,6 +1,0 @@
-  INFO: Launching config: "/home/zdito/.config/quickshell/bar/lockscreen-typing-regression.qml"
-  INFO: Shell ID: "6a5ae040c36003fe2866532c6669b427" Path ID "6a5ae040c36003fe2866532c6669b427"
-  INFO: Saving logs to "/run/user/1000/quickshell/by-id/h1usdipmt/log.qslog"
-  INFO: Configuration Loaded
- DEBUG qml: PASS: lockscreen rapid edits, selection, visibility, reduced motion and visual model privacy
-[codex-output: log=/home/zdito/.cache/codex-economy/output-66iipgrl.log exit=0]
