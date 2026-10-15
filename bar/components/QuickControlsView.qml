@@ -405,7 +405,7 @@ Item {
                                         text: profileOption.modelData === "performance" ? "Rendimiento"
                                             : profileOption.modelData === "balanced" ? "Balanceado"
                                             : profileOption.modelData === "power-saver" ? "Ahorro" : profileOption.modelData
-                                        color: root.activeProfile === profileOption.modelData ? Theme.background : Theme.foreground
+                                        color: root.activeProfile === profileOption.modelData ? Theme.primaryContent : Theme.foreground
                                         font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; font.weight: Font.Medium
                                         Behavior on color { ColorAnimation { duration: Motion.fast } }
                                     }

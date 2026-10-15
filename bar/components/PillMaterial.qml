@@ -23,6 +23,7 @@ Item {
     property real notifBreathGlow: 0
     property string notifState: "idle"
     property bool suppressEdge: false
+    property real edgeExposure: suppressEdge ? 0 : 1
     property real captureExtra: 0
     property real captureLeftExtra: 0
 
@@ -44,7 +45,7 @@ Item {
         radius: root.bodyRadius
         color: Theme.cardBot
         // Compact shadows otherwise make compositor blur sample the app outside the glass.
-        opacity: root.surface === "auth" || root.suppressEdge ? 0 : 0.32 * root.readingExposure
+        opacity: root.surface === "auth" ? 0 : 0.32 * root.readingExposure * root.edgeExposure
         layer.enabled: true
         layer.effect: MultiEffect {
             shadowEnabled: true
@@ -53,7 +54,7 @@ Item {
             shadowVerticalOffset: 7 * root.s
         }
         z: 0
-        Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+        Behavior on opacity { enabled: !root.suppressEdge; Anim { type: Anim.DefaultEffects } }
     }
 
     Rectangle {
@@ -69,8 +70,8 @@ Item {
         color: "transparent"
         border.width: Math.max(1, Theme.borderHairline * root.s)
         border.color: Qt.alpha(root.materialAccent, 0.32)
-        opacity: root.surface === "auth" || root.suppressEdge ? 0
-            : ((root.materialAwake && root.mode !== "hover" ? 0.16 : 0) + root.materialPulse * 0.34) * (1 - root.readingExposure)
+        opacity: root.surface === "auth" ? 0
+            : ((root.materialAwake && root.mode !== "hover" ? 0.16 : 0) + root.materialPulse * 0.34) * (1 - root.readingExposure) * root.edgeExposure
         scale: 1 + root.materialPulse * 0.028
         layer.enabled: opacity > 0.01
         layer.effect: MultiEffect {
@@ -79,7 +80,7 @@ Item {
             shadowBlur: 1.0
         }
         z: 1
-        Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+        Behavior on opacity { enabled: !root.suppressEdge; Anim { type: Anim.DefaultEffects } }
         Behavior on scale { Anim { type: Anim.FastEffects } }
     }
 
@@ -139,8 +140,8 @@ Item {
         width: parent.width + root.captureExtra + root.captureLeftExtra
         radius: root.bodyRadius
         border.width: root.surface === "auth" ? 1 : Theme.borderHairline
-        border.color: root.suppressEdge ? "transparent" : Qt.alpha(Theme.foreground,
-                                root.surface === "auth" ? 0.18 : root.materialAwake ? Theme.alphaHairline : Theme.alphaHair)
+        border.color: Qt.alpha(Theme.foreground, root.edgeExposure
+            * (root.surface === "auth" ? 0.18 : root.materialAwake ? Theme.alphaHairline : Theme.alphaHair))
         color: "transparent"
         contentUnderBorder: true
         z: 2
@@ -218,8 +219,8 @@ Item {
             height: 1.5 * root.s
             radius: height / 2
             color: Theme.sheen
-            visible: !root.suppressEdge
-            opacity: 1 - root.readingExposure
+            visible: root.edgeExposure > 0
+            opacity: (1 - root.readingExposure) * root.edgeExposure
         }
 
         Rectangle {

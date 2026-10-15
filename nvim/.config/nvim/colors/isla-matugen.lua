@@ -1,0 +1,27 @@
+vim.cmd("highlight clear")
+vim.g.colors_name = "isla-matugen"
+local c = require("config.isla_palette").colors()
+local hl = vim.api.nvim_set_hl
+hl(0, "Normal", { fg = c.on_surface, bg = "NONE" })
+hl(0, "NormalNC", { fg = c.on_surface, bg = "NONE" })
+hl(0, "NormalFloat", { fg = c.on_surface, bg = "NONE" })
+hl(0, "NeoTreeNormal", { bg = "NONE" })
+hl(0, "NeoTreeNormalNC", { bg = "NONE" })
+hl(0, "FloatBorder", { fg = c.outline, bg = "NONE" })
+hl(0, "Comment", { fg = c.on_surface_variant, italic = true })
+hl(0, "String", { fg = c.secondary })
+hl(0, "Number", { fg = c.tertiary })
+hl(0, "Boolean", { fg = c.tertiary })
+hl(0, "Identifier", { fg = c.on_surface })
+hl(0, "Function", { fg = c.primary, bold = true })
+hl(0, "Keyword", { fg = c.primary, bold = true })
+hl(0, "Type", { fg = c.tertiary })
+hl(0, "Constant", { fg = c.secondary })
+hl(0, "Search", { fg = c.on_primary, bg = c.primary })
+hl(0, "Visual", { bg = c.surface_variant })
+hl(0, "DiagnosticError", { fg = c.error })
+hl(0, "DiagnosticWarn", { fg = c.tertiary })
+hl(0, "DiagnosticInfo", { fg = c.primary })
+hl(0, "DiagnosticHint", { fg = c.secondary })
+vim.g.terminal_color_0 = c.background
+vim.g.terminal_color_7 = c.on_surface

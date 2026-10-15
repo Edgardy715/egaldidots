@@ -85,7 +85,7 @@ Popup {
     }
     background: Rectangle {
         radius: 24
-        color: Qt.lighter(Theme.background, 1.25)
+        color: Theme.surfaceContainer
         border.width: 1
         border.color: Qt.alpha(Theme.foreground, 0.18)
     }

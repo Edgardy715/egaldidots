@@ -10,14 +10,15 @@ Shape {
 
     anchors.fill: parent
     preferredRendererType: Shape.CurveRenderer
-    asynchronous: true
+    // The neck must use the same geometry frame as its moving bodies.
+    asynchronous: false
 
     readonly property real d: Math.hypot(x2 - x1, y2 - y1)
     readonly property bool valid: d > Math.abs(r1 - r2) + 0.5 && d < (r1 + r2) * 1.6
     readonly property real angle: Math.atan2(y2 - y1, x2 - x1)
-    readonly property real u1: d < r1 + r2 ? Math.acos((r1 * r1 + d * d - r2 * r2) / (2 * r1 * d)) : 0
-    readonly property real u2: d < r1 + r2 ? Math.acos((r2 * r2 + d * d - r1 * r1) / (2 * r2 * d)) : 0
-    readonly property real spread: Math.acos(Math.max(-1, Math.min(1, (r1 - r2) / d)))
+    readonly property real u1: valid && d < r1 + r2 ? Math.acos(Math.max(-1, Math.min(1, (r1 * r1 + d * d - r2 * r2) / (2 * r1 * d)))) : 0
+    readonly property real u2: valid && d < r1 + r2 ? Math.acos(Math.max(-1, Math.min(1, (r2 * r2 + d * d - r1 * r1) / (2 * r2 * d)))) : 0
+    readonly property real spread: Math.acos(Math.max(-1, Math.min(1, (r1 - r2) / Math.max(0.0001, d))))
     readonly property real a1: angle + u1 + (spread - u1) * waist
     readonly property real a2: angle - u1 - (spread - u1) * waist
     readonly property real a3: angle + Math.PI - u2 - (Math.PI - u2 - spread) * waist

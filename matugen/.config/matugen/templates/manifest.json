@@ -1,0 +1,22 @@
+[
+  {
+    "input": "colors-hyprland.conf",
+    "output": "colors-hyprland.conf"
+  },
+  {
+    "input": "colors-hyprlock.conf",
+    "output": "colors-hyprlock.conf"
+  },
+  {
+    "input": "colors-kitty.conf",
+    "output": "colors-kitty.conf"
+  },
+  {
+    "input": "colors.css",
+    "output": "colors.css"
+  },
+  {
+    "input": "colors.fish",
+    "output": "colors.fish"
+  }
+]

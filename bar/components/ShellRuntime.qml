@@ -33,6 +33,7 @@ Item {
     Component.onCompleted: {
         // Hyprland loads its models on connection; an initial refresh can race it.
         Config.loaded
+        HyprlandSettings.initialize()
         Brightness.available
         Session.lockCmd
         Auth.active

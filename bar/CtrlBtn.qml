@@ -49,7 +49,7 @@ Item {
         width: root.diam
         height: root.diam
         radius: height / 2
-        color: root.primary ? Qt.alpha(Theme.foreground, hover.containsMouse ? 1 : 0.90) : root.active
+        color: root.primary ? Theme.accent : root.active
                ? Qt.alpha(Theme.accent, hover.containsMouse ? 0.88 : 0.72)
                : (hover.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaGlow) : "transparent")
         border.color: root.active ? Qt.alpha(Theme.accentSoft, Theme.alphaCritical)
@@ -77,7 +77,7 @@ Item {
             interaction: response
             hovered: response.engaged
             pressed: response.pressed
-            color: root.primary ? Theme.background : root.active ? Theme.iconOnAccent
+            color: root.primary ? Theme.primaryContent : root.active ? Theme.iconOnAccent
                                : (hover.containsMouse ? Theme.foreground : Qt.alpha(Theme.foreground, Theme.alphaIconSec))
             font.pixelSize: root.iconSize * root.s
             Behavior on color { ColorAnimation { duration: Motion.fast } }
@@ -86,7 +86,7 @@ Item {
             anchors.centerIn: parent
             text: root.glyph
             visible: root.iconName.length === 0
-            color: root.primary ? Theme.background : root.active ? Theme.iconOnAccent
+            color: root.primary ? Theme.primaryContent : root.active ? Theme.iconOnAccent
                                : (hover.containsMouse ? Theme.foreground : Qt.alpha(Theme.foreground, Theme.alphaIconSec))
             font.family: Theme.fontMono
             font.pixelSize: root.iconSize * root.s

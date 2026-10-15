@@ -2,20 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-/**
- * Isla · Theme. Mapea la paleta pywal viva (IslaPalette singleton) → los tokens de
- * vidrio de Ricelin (cardTop/cardBot/border/sheen/shadow/accent). Sin inventar
- * colores: cardTop = lift sutil del fondo (dimensión vertical del gradiente),
- * border/sheen toman los exactos del waybar del usuario (foreground @0.08/0.06)
- * para coherencia total. Los acentos vienen directo de pywal.
- *
- * Además de los colores, expone un sistema de tokens numéricos (Spacing / Radius
- * / FontSize / Border / Alpha / SurfaceMargin) que centraliza los valores
- * mágicos repetidos por las 12 surfaces — antes había un caos de `10*s`, `12*s`,
- * `8*s` y `Qt.alpha(..., 0.06)` regados por todos lados; ahora los surfaces los
- * toman de aquí (los valores se siguen multiplicando por `s` en el sitio de uso
- * para respetar el escalado).
- */
+/** Semantic Material You roles from Matugen, composed with Isla glass/motion. */
 Singleton {
     // ORDEN DE DECLARACIÓN IMPORTA: las properties aquí abajo que referencian
     // tokens (Theme.alpha.X, Theme.spacing.X) deben declararse DESPUÉS de los
@@ -44,38 +31,41 @@ Singleton {
     readonly property real alphaIconSec:    0.70   // icon secondary (legible)
     readonly property real alphaIconOnAcc:  0.85   // icono sobre accent
 
-    // ---- vidrio (puente Ricelin ↔ waybar) ----
-    // La guarda `IslaPalette.ready ? ... : "#literal"` elimina la race de creación
-    // de singleton (ver IslaPalette.qml). Qt.lighter/Qt.alpha de un color válido
-    // nunca dan undefined, así que esos tokens no la necesitan.
-    readonly property color cardTop: Qt.lighter(IslaPalette.ready ? IslaPalette.background : "#0e0c1b", 1.18)
-    readonly property color cardBot: IslaPalette.ready ? IslaPalette.background : "#0e0c1b"
-    readonly property color border:  Qt.alpha(IslaPalette.ready ? IslaPalette.foreground : "#c2c2c6", alphaHair)       // == waybar island
-    readonly property color sheen:   Qt.alpha(IslaPalette.ready ? IslaPalette.foreground : "#c2c2c6", alphaFaint)      // == waybar catch-light
-    readonly property color hair:    Qt.alpha(IslaPalette.ready ? IslaPalette.foreground : "#c2c2c6", alphaHairline)   // idéntico a waybar foreground @ 0.13
+    // Neutral tonal elevation keeps the glass coherent across wallpaper changes.
+    readonly property color cardTop: IslaPalette.colors.surface_container_high
+    readonly property color cardBot: IslaPalette.colors.surface_container_low
+    readonly property color border: Qt.alpha(IslaPalette.colors.outline_variant, 0.55)
+    readonly property color sheen: Qt.alpha(IslaPalette.foreground, alphaFaint)
+    readonly property color hair: Qt.alpha(IslaPalette.colors.outline, 0.3)
     readonly property color glassShadow: Qt.rgba(0, 0, 0, alphaCritical)
 
-    // ---- acentos vivos (pywal) ----
-    readonly property color accent: IslaPalette.ready ? IslaPalette.accent : "#D3A3A0"            // color4
-    readonly property color accentStrong: IslaPalette.ready ? IslaPalette.accentStrong : "#B66B67" // color1
-    readonly property color accentSoft: IslaPalette.ready ? IslaPalette.accentSoft : "#E5BAB7"   // color5
-    readonly property color accentAlt: IslaPalette.ready ? IslaPalette.accentAlt : "#E7C1BD"       // color6
-    readonly property color onGlow: IslaPalette.ready ? IslaPalette.accent : "#D3A3A0"            // respiración
-    readonly property color dim: IslaPalette.ready ? IslaPalette.dim : "#5d5b6f"                   // color8
-    readonly property color foreground: IslaPalette.ready ? IslaPalette.foreground : "#c2c2c6"
-    readonly property color background: IslaPalette.ready ? IslaPalette.background : "#0e0c1b"
-    readonly property color error: (0.2126 * background.r + 0.7152 * background.g + 0.0722 * background.b) > 0.5
-        ? "#b3261e" : "#ffb4ab"
-
-    // ── Iconos (Material 3) ────────────────────────────────────────────────
-    // `dim` es demasiado oscuro para iconos (contraste 2.9:1). Material 3 separa:
-    //   · onSurface      → iconos primarios/activos   (fg completo)
-    //   · onSurfaceVariant → iconos secundarios        (fg ~70%, legible)
-    //   · outline         → SOLO bordes, nunca contenido
+    readonly property color accent: IslaPalette.accent
+    readonly property color accentStrong: IslaPalette.accentStrong
+    readonly property color accentSoft: IslaPalette.accentSoft
+    readonly property color accentAlt: IslaPalette.accentAlt
+    readonly property color onGlow: accent
+    readonly property color dim: IslaPalette.dim
+    readonly property color foreground: IslaPalette.foreground
+    readonly property color background: IslaPalette.background
+    readonly property color error: IslaPalette.colors.error
+    readonly property color errorContent: IslaPalette.colors.on_error
+    readonly property color errorContainer: IslaPalette.colors.error_container
+    readonly property color errorContainerContent: IslaPalette.colors.on_error_container
+    readonly property color primaryContent: IslaPalette.colors.on_primary
+    readonly property color accentContainer: IslaPalette.colors.primary_container
+    readonly property color accentContainerContent: IslaPalette.colors.on_primary_container
+    readonly property color secondaryContainer: IslaPalette.colors.secondary_container
+    readonly property color secondaryContainerContent: IslaPalette.colors.on_secondary_container
+    readonly property color tertiaryContainer: IslaPalette.colors.tertiary_container
+    readonly property color tertiaryContainerContent: IslaPalette.colors.on_tertiary_container
+    readonly property color surface: IslaPalette.colors.surface
+    readonly property color surfaceContainer: IslaPalette.colors.surface_container
+    readonly property color surfaceContainerHighest: IslaPalette.colors.surface_container_highest
+    readonly property color outline: IslaPalette.colors.outline
     readonly property color iconPrimary: foreground
-    readonly property color iconSecondary: Qt.alpha(foreground, alphaIconSec)    // 5.75:1
-    readonly property color iconMuted: Qt.alpha(foreground, alphaDisabled)        // 3.4:1 (deshabilitado)
-    readonly property color iconOnAccent: Qt.rgba(0, 0, 0, alphaIconOnAcc)        // sobre chips accent
+    readonly property color iconSecondary: IslaPalette.colors.on_surface_variant
+    readonly property color iconMuted: Qt.alpha(iconSecondary, alphaDisabled)
+    readonly property color iconOnAccent: primaryContent
 
     readonly property real shadowOpacity: 0.55
     readonly property real rSmall: Motion.rSmall * Flags.radiusScale

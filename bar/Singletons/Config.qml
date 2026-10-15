@@ -23,7 +23,7 @@ Singleton {
     readonly property string userAvatar: _effective.paths.userAvatar
     readonly property url userAvatarUrl: "file://" + userAvatar.split("/").map(part => encodeURIComponent(part)).join("/")
     readonly property var appearance: _effective.appearance
-    readonly property string walColorsFile: _effective.paths.walColorsFile
+    readonly property string paletteFile: _effective.paths.paletteFile
     readonly property string wallpaperDir: _effective.paths.wallpaperDir
     readonly property string wallpaperCacheDir: _effective.paths.wallpaperCacheDir
     readonly property string wallpaperApplyScript: _effective.paths.wallpaperApplyScript

@@ -18,7 +18,7 @@ for (const [key, maximum] of [['uiScale', 3], ['topGap', 4], ['appGap', 4]]) {
     assert.equal(validate({ appearance: { [key]: maximum + 0.01 } }).ok, false);
     assert.equal(validate({ appearance: { [key]: 1e308 } }).ok, false);
 }
-assert.equal(validate({}).effective.paths.walColorsFile, '/cache/wal/colors.json');
+assert.equal(validate({}).effective.paths.paletteFile, '/cache/matugen/palette.json');
 assert.equal(validate({ paths: { wallpaperDir: '~/Pictures' } }).effective.paths.wallpaperDir, '/home/test/Pictures');
 assert.equal(validate(JSON.parse(fs.readFileSync(__dirname + '/../shell.json.example'))).ok, true);
 for (const doc of [null, [], 'text', { version: 2 }, { appearance: [] }, { appearance: null },

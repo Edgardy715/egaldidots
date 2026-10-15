@@ -81,7 +81,7 @@ ShellRoot {
                 prompt.closing = true
                 window.expanded = false
                 wait(100)
-                check(input.text === "" && !prompt.canRespond, "closing during geometry clears input")
+                check(input.text === "" && !prompt.canRespond && !cancel.enabled, "closing during geometry clears input and disables hidden controls")
                 shot("closing")
                 window.expanded = true
                 prompt.closing = false
@@ -109,7 +109,7 @@ ShellRoot {
                 fake.rejectNext = true
                 input.text = "fixture-rejected"
                 prompt.submitResponse()
-                check(fake.submissions === 0 && input.text === "fixture-rejected" && prompt.sendRejected, "backend rejection retains editable response")
+                check(fake.submissions === 0 && input.text === "fixture-rejected" && prompt.sendRejected && prompt.errorState, "backend rejection retains editable response and error styling")
                 input.text = "fixture-response"
                 keyPress(Qt.Key_Return); keyRelease(Qt.Key_Return)
                 check(fake.submissions === 1 && input.text === "" && prompt.verifying && input.readOnly, "submit once and erase secret")
@@ -136,6 +136,11 @@ ShellRoot {
                 flow.responseVisible = true
                 check(input.echoMode === TextInput.Normal, "backend can request visible non-password response")
                 flow.responseVisible = false
+                flow.isResponseRequired = false
+                flow.isResponseRequired = true
+                fake.polkitError = true
+                check(!prompt.editing && prompt.hasError, "new challenge restores error feedback after editing")
+                fake.polkitError = false
                 input.text = "fixture-response"
                 prompt.submitResponse()
                 fake.polkitSubmitting = false

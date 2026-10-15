@@ -45,7 +45,7 @@ Item {
         const field = config.schema.sections[sectionName][key]
         const path = effective[sectionName][key]
         pathPicker.start(qsTr("Seleccionar %1").arg(field.label), path, field.picker === "folder",
-            key === "userAvatar" ? "image" : key === "walColorsFile" ? "json" : "all")
+            key === "userAvatar" ? "image" : key === "paletteFile" ? "json" : "all")
     }
 
     function acceptPath(url) {
@@ -75,7 +75,7 @@ Item {
         const appearance = config.appearance
         const modules = config.modules
         const profile = config.profile
-        const paths = [config.userAvatar, config.walColorsFile, config.wallpaperDir,
+        const paths = [config.userAvatar, config.paletteFile, config.wallpaperDir,
                        config.wallpaperCacheDir, config.wallpaperApplyScript]
         return config.snapshot().effective
     }

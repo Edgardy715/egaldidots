@@ -23,7 +23,7 @@
   "paths": {
     "wallpaperDir": "~/Wallpapers",
     "wallpaperCacheDir": "~/.cache/quickshell/wallpapers",
-    "walColorsFile": "~/.cache/wal/colors.json",
+    "paletteFile": "~/.cache/matugen/palette.json",
     "wallpaperApplyScript": "~/.config/hypr/scripts/apply-wallpaper.sh",
     "userAvatar": "~/.face"
   },

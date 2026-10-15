@@ -125,7 +125,7 @@ ShellRoot {
                     editor.page = 0
                     for (const palette of [{name:"dark", bg:"#101213", fg:"#c2c2c6", accent:"#ac5b4f"},
                                            {name:"light", bg:"#f4f6f8", fg:"#1b1f24", accent:"#2563eb"}]) {
-                        IslaPalette.background = palette.bg; IslaPalette.foreground = palette.fg; IslaPalette.accent = palette.accent
+                        IslaPalette.colors = Object.assign({}, IslaPalette.colors, {surface:palette.bg, on_surface:palette.fg, primary:palette.accent, on_surface_variant:palette.fg, error:palette.name === "dark" ? "#ffb4ab" : "#ba1a1a"})
                         wait(1400)
                         const fg = Theme.foreground, bg = Theme.background
                         const secondary = Qt.rgba(fg.r*0.72+bg.r*0.28, fg.g*0.72+bg.g*0.28, fg.b*0.72+bg.b*0.28,1)

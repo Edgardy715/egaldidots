@@ -44,8 +44,10 @@ PillSurface {
         : !sudoMode && flow && flow.supplementaryMessage && !flow.supplementaryIsError
             ? flow.supplementaryMessage : requestMessage
     readonly property bool lightMaterial: Theme.background.r * 0.2126 + Theme.background.g * 0.7152 + Theme.background.b * 0.0722 > 0.5
-    readonly property color stateColor: hasError ? (lightMaterial ? "#b83249" : "#ff8896")
-        : successState ? (lightMaterial ? "#1b7852" : "#8ce5b6") : Theme.foreground
+    readonly property bool errorState: hasError || sendRejected
+    readonly property color stateColor: errorState ? (lightMaterial ? "#b83249" : "#ff8896")
+        : successState ? (lightMaterial ? "#1b7852" : "#8ce5b6")
+        : capsLockOn && !responseVisible ? (lightMaterial ? "#875a12" : "#f3ce80") : Theme.accent
     readonly property real exposure: Math.max(0, Math.min(1,
         (morphCloseness - 0.72) / 0.28,
         (width - contextWidth - 376 * s) / (24 * s)))
@@ -64,7 +66,12 @@ PillSurface {
         errorOffset = 0
         accounts.popup.close()
     }
-    function responseRequirementChanged() { password.clear(); Qt.callLater(root.focusInput) }
+    function responseRequirementChanged() {
+        password.clear()
+        editing = false
+        sendRejected = false
+        Qt.callLater(root.focusInput)
+    }
     function focusInput() {
         if (canRespond && visible) password.forceActiveFocus(Qt.OtherFocusReason)
     }
@@ -75,6 +82,7 @@ PillSurface {
         responseRequested(secret, sudoMode, accepted => {
             if (!accepted) {
                 sendRejected = true
+                if (root.active && root.visible && !Flags.reduceMotion) rejection.restart()
                 if (canRespond) password.text = secret
                 Qt.callLater(root.focusInput)
                 return
@@ -134,6 +142,8 @@ PillSurface {
         width: Math.min(parent.width, 400 * root.s)
         height: root.fieldHeight + 3 * root.s + root.detailHeight
         opacity: root.exposure
+        enabled: root.active && root.exposure > 0.95
+        onEnabledChanged: if (enabled) Qt.callLater(root.focusInput)
         transform: Translate { y: Flags.reduceMotion ? 0 : (1 - root.exposure) * 3 * root.s }
         Rectangle {
             x: -12 * root.s; y: 8 * root.s
@@ -146,9 +156,9 @@ PillSurface {
             transform: Translate { x: root.errorOffset }
             Rectangle {
                 anchors.fill: parent; radius: 16 * root.s
-                color: Qt.alpha(root.stateColor, root.hasError ? 0.07 : 0.035)
+                color: Qt.alpha(root.stateColor, root.errorState || root.successState ? 0.09 : password.activeFocus ? 0.065 : 0.035)
                 border.width: Theme.borderHairline
-                border.color: Qt.alpha(root.stateColor, root.hasError || root.successState ? 0.35 : password.activeFocus ? 0.19 : 0.07)
+                border.color: Qt.alpha(root.stateColor, root.errorState || root.successState ? 0.45 : password.activeFocus ? 0.55 : 0.14)
                 Behavior on color { enabled: root.active && root.visible && root.exposure > 0 && !Flags.reduceMotion; ColorAnimation { id: fieldColor; duration: Motion.fast } }
                 Behavior on border.color { enabled: root.active && root.visible && root.exposure > 0 && !Flags.reduceMotion; ColorAnimation { id: fieldBorder; duration: Motion.fast } }
             }
@@ -161,7 +171,7 @@ PillSurface {
             TextField {
                 id: password
                 objectName: "authPassword"
-                cursorDelegate: InputCaret { input: password; color: Theme.foreground; motionActive: root.active && root.exposure > 0 }
+                cursorDelegate: InputCaret { input: password; color: root.stateColor; motionActive: root.active && root.exposure > 0 }
                 x: 40 * root.s; width: Math.max(1, parent.width - 92 * root.s); height: parent.height
                 leftPadding: 0; rightPadding: 0; topPadding: 0; bottomPadding: 0
                 echoMode: root.responseVisible ? TextInput.Normal : TextInput.Password
@@ -170,6 +180,8 @@ PillSurface {
                 placeholderTextColor: "transparent"
                 InputPlaceholder { input: password; color: root.successState ? root.stateColor : Theme.iconSecondary; motionActive: root.active && root.exposure > 0 }
                 color: Theme.foreground; font.family: Theme.font; font.pixelSize: (Theme.fontSizeBodyLg + Flags.fontScale) * root.s
+                selectionColor: Qt.alpha(Theme.accent, 0.3)
+                selectedTextColor: Theme.foreground
                 selectByMouse: true
                 readOnly: !root.canRespond
                 activeFocusOnTab: true
@@ -194,9 +206,11 @@ PillSurface {
                 width: 34 * root.s; height: width
                 enabled: root.canRespond && root.response.length > 0
                 Accessible.name: qsTr("Autorizar")
+                ToolTip.visible: hovered
+                ToolTip.text: root.verifying ? qsTr("Verificando…") : qsTr("Autorizar · Enter")
                 background: Rectangle {
                     radius: 12 * root.s
-                    color: root.successState ? Qt.alpha(root.stateColor, 0.13) : submit.enabled ? Qt.alpha(Theme.foreground, 0.14 + 0.06 * submit.interaction.presence) : "transparent"
+                    color: root.successState ? Qt.alpha(root.stateColor, 0.13) : submit.enabled ? Qt.alpha(Theme.accent, 0.22 + 0.12 * submit.interaction.presence) : "transparent"
                 }
                 contentItem: Item {
                     MaterialIcon {
@@ -205,13 +219,13 @@ PillSurface {
                         iconName: root.successState ? "check" : root.verifying ? "hourglass_top" : "arrow_forward"
                         visible: !root.verifying || Flags.reduceMotion
                         font.pixelSize: 20 * root.s
-                        color: root.successState ? root.stateColor : Theme.foreground
+                        color: root.stateColor
                         opacity: submit.enabled || root.verifying || root.successState ? 1 : 0.4
                     }
                     BusyIndicator {
                         anchors.centerIn: parent
                         width: 24 * root.s; height: width; padding: 0
-                        palette.dark: Theme.foreground
+                        palette.dark: root.stateColor
                         visible: root.verifying && !Flags.reduceMotion
                         running: visible && root.visible && root.exposure > 0 && (!Window.window || Window.window.visible)
                     }
@@ -228,7 +242,7 @@ PillSurface {
             width: 30 * root.s; height: width
             enabled: root.active
             Accessible.name: qsTr("Cancelar autorización")
-            background: Rectangle { radius: 12 * root.s; color: Qt.alpha(Theme.foreground, dismiss.hovered ? 0.09 : 0) }
+            background: Rectangle { radius: 12 * root.s; color: Qt.alpha(Theme.foreground, 0.09 * dismiss.interaction.presence) }
             contentItem: MaterialIcon { iconName: "close"; interaction: dismiss.interaction; color: Theme.iconSecondary; font.pixelSize: 17 * root.s }
             onClicked: root.cancel()
             KeyNavigation.tab: password
@@ -260,10 +274,17 @@ PillSurface {
                 KeyNavigation.backtab: submit.enabled ? submit : password
                 onActivated: index => root.selectIdentity(index)
             }
+            MaterialIcon {
+                Layout.preferredWidth: 14 * root.s
+                iconName: root.errorState ? "error_outline" : root.successState ? "check_circle" : root.verifying ? "hourglass_top" : root.capsLockOn && !root.responseVisible ? "keyboard_capslock" : "shield"
+                font.pixelSize: 14 * root.s
+                color: root.stateColor
+                Accessible.ignored: true
+            }
             Text {
                 Layout.fillWidth: true
                 text: root.detail; elide: Text.ElideRight
-                color: root.hasError || root.successState ? root.stateColor : root.capsLockOn ? Theme.foreground : Theme.iconSecondary
+                color: root.errorState || root.successState || root.capsLockOn && !root.responseVisible ? root.stateColor : Theme.iconSecondary
                 font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s
                 textFormat: Text.PlainText
                 Accessible.name: root.detail

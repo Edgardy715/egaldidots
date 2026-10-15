@@ -2,6 +2,12 @@
 
 ## October 2026
 
+- Migrated wallpaper and application colors to Matugen semantic palettes.
+- Added Hyprland settings, smoother panel transitions and lockscreen power controls.
+- Refined wallpaper browsing, apply feedback and thumbnail cache recovery.
+- Matched the media timeline to Android 16 SystemUI motion and geometry.
+- Removed legacy rofi, Waybar, swaync, wlogout, pywal and wpgtk configurations.
+
 - Added Edots settings, split/compact bar layouts and workspace styles.
 - Updated the calendar, media timeline, lyrics and lockscreen.
 - Fixed configuration conflicts, launcher input, focus and desktop services.

@@ -15,10 +15,13 @@ Singleton {
     readonly property int count: list.length
     property bool scanning: false
     property bool applying: false
+    property string applyPhase: ""
     property string applyingPath: ""
+    property string lastAttemptPath: ""
     property string applyError: ""
     property var pendingThumbs: ({})
     property var colorIndex: ({})
+    property bool appliedInSession: false
 
     readonly property string applyScript: Config.wallpaperApplyScript
 
@@ -29,6 +32,12 @@ Singleton {
     signal thumbUpdated(string path, string thumbSource, int cacheRevision)
     signal thumbFailed(string path)
     signal applyFinished(string path, bool success)
+    signal transitionHandoff()
+
+    function fileSource(path, revision) {
+        const source = "file://" + String(path).split("/").map(encodeURIComponent).join("/")
+        return revision ? source + "?v=" + revision : source
+    }
 
     function accentFor(path, fallback) {
         const name = String(path).split("/").pop()
@@ -42,9 +51,14 @@ Singleton {
     function setWallpaper(path): bool {
         if (!path || applying) return false
         applyingPath = String(path)
+        lastAttemptPath = applyingPath
         applyError = ""
+        feedbackHold.stop()
+        applyPhase = "preparing"
         applying = true
-        applyProc.exec(["bash", applyScript, applyingPath])
+        const command = ["bash", applyScript, applyingPath, "--isla-feedback"]
+        if (Flags.reduceMotion) command.push("--reduce-motion")
+        applyProc.exec(command)
         return true
     }
 
@@ -54,11 +68,12 @@ Singleton {
     }
 
     function requestThumbnail(path, thumbPath): void {
-        if (pendingThumbs[path]) return
+        var item = null
         for (var i = 0; i < list.length; i++) {
-            if (list[i].path === path && list[i].thumbReady) return
+            if (list[i].path === path) { item = list[i]; break }
         }
-        pendingThumbs[path] = true
+        if (!item || item.thumbReady || item.thumb !== thumbPath || pendingThumbs[path] === thumbPath) return
+        pendingThumbs[path] = thumbPath
         scanner.generateThumb(path, thumbPath, thumbW, thumbH, thumbQ)
     }
 
@@ -69,16 +84,35 @@ Singleton {
             const success = exitCode === 0
             root.applying = false
             root.applyingPath = ""
-            if (success || exitCode === 3) root.current = path
+            if (success || exitCode === 3) {
+                root.appliedInSession = true
+                root.current = path
+            }
             if (exitCode === 3) root.applyError = "El fondo cambió, pero no se actualizaron los colores."
-            else if (!success) root.applyError = "No se pudo aplicar el fondo. Comprueba awww."
+            else if (!success) root.applyError = "No se pudo aplicar el fondo. Comprueba Matugen y awww."
+            root.applyPhase = success ? "done" : "error"
+            feedbackHold.restart()
             root.applyFinished(path, success)
+        }
+        stdout: SplitParser {
+            onRead: line => {
+                if (line.trim() === "ISLA_WALLPAPER_HANDOFF" && root.applying) {
+                    root.applyPhase = "transition"
+                    root.transitionHandoff()
+                }
+            }
         }
         stderr: StdioCollector {
             id: applyStderr
             onStreamFinished: if (applyStderr.text.length > 0)
                 console.warn("[Wallpapers] " + applyStderr.text.trim())
         }
+    }
+
+    Timer {
+        id: feedbackHold
+        interval: root.applyPhase === "error" ? 3500 : 2000
+        onTriggered: root.applyPhase = ""
     }
 
     FileView {
@@ -101,16 +135,21 @@ Singleton {
 
         onScanDone: function(items) {
             var parsed = []
+            var previousByPath = ({})
+            for (var j = 0; j < list.length; j++) previousByPath[list[j].path] = list[j]
             for (var i = 0; i < items.length; i++) {
                 var w = items[i]
+                var previous = previousByPath[w.path]
+                if (previous && previous.thumb !== w.thumb) previous = null
+                var revision = previous ? previous.cacheRevision : 0
                 parsed.push({
                     path: w.path,
                     name: w.name,
                     baseName: w.baseName,
                     thumb: w.thumb,
                     thumbReady: w.thumbReady === true,
-                    thumbSource: w.thumbReady ? ("file://" + encodeURI(w.thumb)) : "",
-                    cacheRevision: 0
+                    thumbSource: w.thumbReady ? root.fileSource(w.thumb, revision) : "",
+                    cacheRevision: revision
                 })
             }
             list = parsed
@@ -121,21 +160,25 @@ Singleton {
         }
 
         onThumbReady: function(sourcePath, cachePath, cacheAvailable, updated, errorString) {
+            if (root.pendingThumbs[sourcePath] !== cachePath) return
             delete root.pendingThumbs[sourcePath]
+            var item = null
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].path === sourcePath && list[i].thumb === cachePath) {
+                    item = list[i]
+                    break
+                }
+            }
+            if (!item) return
             if (!cacheAvailable) {
                 root.thumbFailed(sourcePath)
                 return
             }
-            for (var i = 0; i < list.length; i++) {
-                if (list[i].path === sourcePath) {
-                    var rev = list[i].cacheRevision + 1
-                    list[i].thumbReady = true
-                    list[i].thumbSource = "file://" + encodeURI(cachePath) + "?v=" + rev
-                    list[i].cacheRevision = rev
-                    root.thumbUpdated(sourcePath, list[i].thumbSource, rev)
-                    break
-                }
-            }
+            var rev = item.cacheRevision + 1
+            item.thumbReady = true
+            item.thumbSource = root.fileSource(cachePath, rev)
+            item.cacheRevision = rev
+            root.thumbUpdated(sourcePath, item.thumbSource, rev)
         }
 
         Component.onCompleted: {
@@ -145,14 +188,13 @@ Singleton {
 
     Process {
         id: currentProc
-        command: ["bash", "-c",
-            "readlink -f ~/.cache/wal/current-wallpaper 2>/dev/null || true"]
+        command: ["readlink", "-f", Config.cacheHome + "/matugen/current-wallpaper"]
         running: true
         stdout: StdioCollector {
             id: currentCollector
             onStreamFinished: {
                 var v = (currentCollector.text || "").trim()
-                if (v.length > 0 && !root.applying) current = v
+                if (v.length > 0 && !root.applying && !root.appliedInSession) current = v
             }
         }
     }

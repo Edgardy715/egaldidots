@@ -62,7 +62,7 @@ ShellRoot {
 
     FileView {
         id: paletteFile
-        path: Config.walColorsFile
+        path: Config.paletteFile
         watchChanges: true
         printErrors: false
         onFileChanged: reload()

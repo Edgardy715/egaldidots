@@ -6,9 +6,6 @@ import "../Singletons"
 
 Item {
     id: root
-    required property Item wallpaperItem
-    property real sampleX: 0
-    property real sampleY: 0
     property real unit: 1
     property var player: null
     property string artUrl: ""
@@ -56,13 +53,13 @@ Item {
             width: parent.width; text: session.title
             maximumLineCount: 2; wrapMode: Text.Wrap; elide: Text.ElideRight
             horizontalAlignment: root.landscape ? Text.AlignLeft : Text.AlignHCenter
-            color: Theme.foreground; font.family: Theme.fontMedia
+            color: Theme.foreground; font.family: Theme.font
             font.pixelSize: (root.embedded ? 15 : 24) * root.unit * Flags.fontScale; font.weight: Font.Medium
         }
         Text {
             width: parent.width; text: session.artist; elide: Text.ElideRight
             horizontalAlignment: root.landscape ? Text.AlignLeft : Text.AlignHCenter
-            color: Theme.iconSecondary; font.family: Theme.fontMedia
+            color: Qt.alpha(Theme.foreground, 0.9); font.family: Theme.font
             font.pixelSize: (root.embedded ? 13 : 16) * root.unit * Flags.fontScale
         }
     }
@@ -106,8 +103,8 @@ Item {
         }
         Item {
             width: parent.width; height: 18 * root.unit * Flags.fontScale
-            Text { text: session.formatTime(session.displayPosition); color: Theme.iconSecondary; font.family: Theme.fontMedia; font.pixelSize: 11 * root.unit * Flags.fontScale }
-            Text { anchors.right: parent.right; text: session.formatTime(root.player?.length || 0); color: Theme.iconSecondary; font.family: Theme.fontMedia; font.pixelSize: 11 * root.unit * Flags.fontScale }
+            Text { text: session.formatTime(session.displayPosition); color: Theme.foreground; font.family: Theme.font; font.pixelSize: 11 * root.unit * Flags.fontScale }
+            Text { anchors.right: parent.right; text: session.formatTime(root.player?.length || 0); color: Theme.foreground; font.family: Theme.font; font.pixelSize: 11 * root.unit * Flags.fontScale }
         }
     }
     Row {

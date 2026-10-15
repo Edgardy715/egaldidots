@@ -63,7 +63,13 @@ Item {
         if (closing) {
             focusTimer.stop()
             retryFocusTimer.stop()
-        } else if (open) focusTimer.restart()
+        } else if (open) {
+            // The host can reopen the retained surface without changing open.
+            query = ""
+            searchInput.text = ""
+            listView.currentIndex = 0
+            focusTimer.restart()
+        }
     }
 
     // ── logical layout ────────────────────────────────────────────────

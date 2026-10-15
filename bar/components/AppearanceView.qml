@@ -192,7 +192,7 @@ PillSurface {
                 text: qsTr("Guardar")
                 onClicked: root.save()
                 background: Rectangle { radius: Theme.radiusMd * root.s; color: Theme.accent }
-                contentItem: Text { text: saveButton.text; color: Theme.background; font.family: Theme.font; font.weight: Font.DemiBold; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                contentItem: Text { text: saveButton.text; color: Theme.primaryContent; font.family: Theme.font; font.weight: Font.DemiBold; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
             }
         }
     }

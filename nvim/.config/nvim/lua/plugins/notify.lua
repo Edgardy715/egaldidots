@@ -3,23 +3,14 @@ return {
     "rcarriga/nvim-notify",
     event = "VeryLazy",
     config = function()
-      local wal = {}
-      local f = io.open(os.getenv("HOME") .. "/.cache/wal/colors", "r")
-      if f then
-        local i = 0
-        for line in f:lines() do
-          wal[i] = line
-          i = i + 1
-        end
-        f:close()
-      end
+      local colors = require("config.isla_palette").colors()
 
-      local bg = wal[8] or "#3b4252"
-      local fg = "#e5e9f0"
-      local info = wal[4] or "#81a1c1"
-      local warn = wal[3] or "#ebcb8b"
-      local err = wal[1] or "#bf616a"
-      local ok = wal[2] or "#a3be8c"
+      local bg = colors.surface_variant or "#3b4252"
+      local fg = colors.on_surface
+      local info = colors.primary or "#81a1c1"
+      local warn = colors.tertiary or "#ebcb8b"
+      local err = colors.error or "#bf616a"
+      local ok = colors.secondary or "#a3be8c"
 
       vim.api.nvim_set_hl(0, "NotifyBackground", { bg = "NONE" })
 

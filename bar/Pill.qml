@@ -26,6 +26,7 @@ Item {
     // El motor Fluid puede extender visualmente el casquete derecho sin cambiar
     // el layout ni el contenido de reposo de la pill.
     property bool fluidJoined: false
+    property real fluidEdgeExposure: fluidJoined ? 0 : 1
     property real fluidCaptureExtra: 0
     property real fluidCaptureLeftExtra: 0
     readonly property bool pinned: hovered || forcePinned
@@ -204,6 +205,7 @@ Item {
         notifBreathGlow: pill.notifBreathGlow
         notifState: pill.notifState
         suppressEdge: pill.fluidJoined
+        edgeExposure: pill.fluidEdgeExposure
         captureExtra: pill.fluidCaptureExtra
         captureLeftExtra: pill.fluidCaptureLeftExtra
     }

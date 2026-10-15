@@ -30,17 +30,13 @@ if name=='sudo':
     if args==['-v']: sys.exit(0)
     os.execvp(args[0],args)
 if name=='pacman':
-    if args and args[0]=='-Si' and args[1] in ('python-pywal16','wpgtk','ttf-google-sans-flex'): sys.exit(1)
+    if args and args[0]=='-Si' and args[1] in ('ttf-google-sans-flex',): sys.exit(1)
 elif name=='git' and args[0]=='clone':
     dest=Path(args[-1]); dest.mkdir(parents=True)
-    if 'wpgtk-templates' in args[-2]:
-        for rel in ('gtk-2.0/gtkrc','gtk-3.0/gtk.css','gtk-3.20/gtk.css'):
-            f=dest/'FlatColor'/rel;f.parent.mkdir(parents=True,exist_ok=True)
-            f.write_text('theme\n');Path(str(f)+'.base').write_text('template\n')
 elif name=='makepkg':
     f=root/'bin/yay'; f.symlink_to(root/'fake')
 elif name=='fc-match': print('Google Sans Flex')
-elif name=='quickshell' and 'authDebug' in args: print('registered=true active=false')
+elif name in ('quickshell', 'qs') and 'authDebug' in args: print('registered=true active=false')
 elif name=='curl': Path(args[args.index('-o')+1]).write_text('# simulated fisher download\n')
 elif name=='fish' and any('fisher install' in arg for arg in args):
     functions=home/'.config/fish/functions';functions.mkdir(parents=True,exist_ok=True)
@@ -50,13 +46,17 @@ elif name=='fish' and any('fisher install' in arg for arg in args):
 elif name=='cmake' and '-B' in args:
     module=Path(args[args.index('-B')+1])/'Wpscan';module.mkdir()
     (module/'qmldir').write_text('module Wpscan\nplugin wpscanpluginplugin\n')
-elif name=='wal':
-    cache=home/'.cache/wal';cache.mkdir(parents=True,exist_ok=True)
-    palette={'background':'#1e1e2e','foreground':'#cdd6f4',**{f'color{i}':'#89b4fa' for i in range(16)}}
-    (cache/'colors.sh').write_text('\n'.join(f"{k}='{v}'" for k,v in palette.items()))
-    (cache/'colors.json').write_text(json.dumps({'special':{'background':'#1e1e2e','foreground':'#cdd6f4'},'colors':{f'color{i}':'#89b4fa' for i in range(16)}}))
-    (cache/'wal').write_text(args[args.index('-i')+1])
-elif name=='wpg' and '-l' in args: print('')
+elif name=='matugen':
+    import tomllib,re,importlib.util
+    spec=importlib.util.spec_from_file_location('generator',home/'.config/matugen/generate.py')
+    generator=importlib.util.module_from_spec(spec);spec.loader.exec_module(generator)
+    roles={key:{mode:{'color':('#17191c' if key in ('background','surface') else '#d0d4d8')} for mode in ('dark','light','default')} for key in generator.ROLES}
+    base={f'base{i:02x}':{mode:{'color':'#aabbcc'} for mode in ('dark','light','default')} for i in range(16)}
+    config=tomllib.loads(Path(args[args.index('-c')+1]).read_text())
+    for template in config.get('templates',{}).values():
+        target=Path(template['output_path']);target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_text(re.sub(r'{{.*?}}','#aabbcc',Path(template['input_path']).read_text()))
+    print(json.dumps({'colors':roles,'base16':base}))
 elif name=='fish' and any('type -q fisher' in arg for arg in args):
     sys.exit(0 if (home/'.config/fish/functions/fzf_configure_bindings.fish').exists() else 1)
 '''
@@ -79,7 +79,7 @@ class Recovery(unittest.TestCase):
         installer.write_text(installer.read_text().replace('/etc/os-release', str(os_release)).replace('/etc/pam.d/hyprlock', str(pam)))
         self.bin = self.root / 'bin'; self.bin.mkdir()
         fake = self.root / 'fake'; fake.write_text(FAKE); fake.chmod(0o755)
-        commands = ('Hyprland hyprctl hypridle hyprlock quickshell qs fish starship kitty nvim micro fastfetch bat eza zoxide fzf fd rg lazygit jq playerctl wl-copy wl-paste cliphist wl-clip-persist brightnessctl hyprshot notify-send pavucontrol thunar magick awww wal wpg cmake curl nmcli wpctl pactl cava gsettings fc-cache fc-match gh ruff shfmt node npm sudo pacman yay systemctl chsh git makepkg').split()
+        commands = ('Hyprland hyprctl hypridle hyprlock quickshell qs fish starship kitty nvim micro fastfetch bat eza zoxide fzf fd rg lazygit jq playerctl wl-copy wl-paste cliphist wl-clip-persist brightnessctl powerprofilesctl hyprshot notify-send pavucontrol thunar magick awww matugen cmake curl nmcli wpctl pactl cava gsettings fc-cache fc-match gh ruff shfmt node npm sudo pacman yay systemctl chsh git makepkg').split()
         # rg is real: the wallpaper name matching is part of the tested flow.
         commands.remove('rg')
         for name in commands: (self.bin / name).symlink_to(fake)
@@ -98,15 +98,14 @@ class Recovery(unittest.TestCase):
         return [json.loads(line) for line in (self.root/'commands.jsonl').read_text().splitlines()]
 
     def test_fresh_restore_and_repeat(self):
-        original = self.repo/'rofi/.config/rofi/themes/wallpaper-picker.rasi'
-        original_text = original.read_text()
         manifest = self.repo/'fish/.config/fish/fish_plugins'
         manifest_text = manifest.read_text()
         self.run_install()
         self.assertTrue((self.home/'.config/quickshell/bar').is_symlink())
         self.assertTrue((self.home/'.local/bin/isla').is_symlink())
-        self.assertTrue((self.home/'.cache/wal/current-wallpaper').is_symlink())
-        self.assertEqual(original.read_text(), original_text, 'generated theme changed source checkout')
+        subprocess.run([str(self.home/'.local/bin/isla'), '--verbose'], env=self.env, check=True)
+        self.assertIn(['qs', '-c', 'bar', '--no-duplicate', '--verbose'], self.commands())
+        self.assertTrue((self.home/'.cache/matugen/current-wallpaper').is_symlink())
         self.assertEqual(manifest.read_text(), manifest_text, 'Fisher changed source manifest')
         self.assertIn('monitor=,preferred,auto,1', (self.home/'.config/hypr/modules/monitors.conf').read_text())
         hardware = self.home/'.config/hypr/local.hardware.conf'
@@ -115,6 +114,8 @@ class Recovery(unittest.TestCase):
         self.assertEqual(hardware.read_text(), '# personal override\n')
         self.run_install('--check')
         calls = self.commands()
+        retired = {'rofi', 'waybar', 'swaync', 'wlogout', 'python-pywal16', 'wpgtk'}
+        self.assertFalse(any(retired.intersection(c[1:]) for c in calls if c[0] in ('pacman', 'yay', 'stow')))
         self.assertTrue(any(c[:2] == ['pacman', '-Syu'] for c in calls))
         self.assertFalse(any(c[:2] == ['pacman', '-Sy'] for c in calls))
         self.assertTrue(any(c[:2] == ['yay', '-S'] for c in calls))
@@ -131,6 +132,26 @@ class Recovery(unittest.TestCase):
         after = {str(p.relative_to(bar)): p.read_bytes() for p in bar.rglob('*') if p.is_file()}
         self.assertEqual(original, after)
         self.run_install('--check')
+
+    def test_retired_stow_links_are_backed_up_without_removing_personal_files(self):
+        config = self.home / '.config'
+        config.mkdir()
+        folded = config / 'waybar'
+        folded.symlink_to(self.repo / 'waybar/.config/waybar')
+        rofi = config / 'rofi'
+        rofi.mkdir()
+        old = rofi / 'launcher.rasi'
+        old.symlink_to(self.repo / 'rofi/.config/rofi/launcher.rasi')
+        (rofi / 'personal.rasi').write_text('keep personal config')
+        foreign = rofi / 'foreign.rasi'
+        foreign.symlink_to(self.root / 'unrelated-theme')
+        self.run_install('--stow-only', '--keep-shell')
+        self.assertFalse(folded.is_symlink())
+        self.assertFalse(old.is_symlink())
+        self.assertEqual((rofi / 'personal.rasi').read_text(), 'keep personal config')
+        self.assertTrue(foreign.is_symlink())
+        self.assertEqual(len(list(self.home.glob('.egaldidots-backup-*/.config/waybar'))), 1)
+        self.assertEqual(len(list(self.home.glob('.egaldidots-backup-*/.config/rofi/launcher.rasi'))), 1)
 
     def test_existing_config_backup(self):
         config = self.home/'.config/fish'; config.mkdir(parents=True)
@@ -176,7 +197,7 @@ class Recovery(unittest.TestCase):
         self.assertIn('monitor=eDP-1, disable', (self.home/'.config/hypr/local.hardware.conf').read_text())
 
     def test_palette_failure_cannot_report_success(self):
-        self.env['FAIL_COMMAND'] = 'wal'
+        self.env['FAIL_COMMAND'] = 'matugen'
         result = self.run_install('--stow-only', success=False)
         self.assertNotIn('Completed successfully', result.stdout)
 

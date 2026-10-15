@@ -197,3 +197,51 @@ selección semántica por flechas reciben la misma respuesta finita. MotionButto
 incluye highlighted en InteractionMotion.focused; Session enlaza su selección
 a highlighted. Bindings locales de hover no excluyen el foco del control.
 Movimiento reducido y controles deshabilitados mantienen sus límites existentes.
+
+
+## Continuidad de expulsión y captura (2026-10-12)
+
+FluidCompanion integra el resorte amortiguado con su solución exacta y el tiempo
+real del frame, conservando los parámetros y velocidades existentes. Reposo
+requiere posición y velocidad asentadas; reabrir durante absorción retargetea
+sin reiniciar nacimiento. Activar reduceMotion durante el viaje resuelve destino.
+
+El cuello se pinza por smoothstep entre stretch1.02 y1.30 hasta grosor cero;
+al retornar nace en1.30 y crece hacia1.02. Borde/brillo de ambos cuerpos siguen
+ese mismo progreso. El puente procesa su geometría síncronamente para acompañar
+los cuerpos en el mismo frame y evita acos fuera de dominio. La ocultación exige
+contención en la cápsula completa con tolerancia0.08·s, no margen visible de3·s.
+
+Regresión: companion-continuity, absorption, centered/session/settings-companion.
+Capturas nativas y límites de medición: informe shell-smooth de2026-10-12.
+
+### Configuración: carga y contracción sin reflow (2026-10-12)
+El editor retenido se prepara asíncronamente en reposo; sólo se expone una
+instancia Ready. Conserva su tamaño de tarjeta y escala uniforme dentro del
+recorte durante el morph: los controles no reorganizan filas por fotograma.
+Radio de tarjeta limitado a24·s y a media dimensión, sin inflar esquinas a
+mitad de la absorción. El resorte y el retarget conservan sus tiempos/velocidades.
+El contenido escalado acompaña el tamaño hasta fracción0.06 (exposición completa
+a0.70), evitando un rectángulo vacío durante la mayor parte de la contracción.
+Las surfaces que hacen layout dinámico conservan su ventana anterior0.45–0.80.
+
+
+## Captura de panel centrado (2026-10-12)
+
+El editor vuelve como cápsula inscrita en la pill receptora, limitada al ancho
+de la tarjeta: no forzar38×38 antes de ocultarlo. Seguir ancho y alto derivados
+al cambiar layout sin reiniciar velocidades. Al contacto, recortar del módulo
+la región recibida por la pill; apilar vidrios translúcidos no oculta ese contenido.
+El recorte se activa sólo durante retorno unido y se retira al retargetear.
+
+## Bloqueo: lectura y coste de composición (2026-10-13)
+
+La pill de estado se convierte en una tarjeta de acceso centrada sin alas.
+El contenido espera espacio suficiente; error, éxito, retirada e inversión
+conservan el motor existente. Música en reposo acompaña el reloj; al escribir
+se retira y sólo reaparece debajo del acceso cuando cabe completa.
+El fondo usa la imagen y un velo estático: no animar blur a pantalla completa
+ni volver a muestrear el wallpaper bajo cada tarjeta. LockGlass conserva
+PillMaterial como material único; tipografía desde Theme y fecha en español.
+Movimiento reducido resuelve geometría y elimina el recoil de rechazo.
+Pruebas: bar/lockscreen-entrance-regression.qml y bar/lockscreen-motion-regression.qml; no sustituyen PAM real ni pruebas físicas.

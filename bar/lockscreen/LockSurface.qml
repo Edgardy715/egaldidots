@@ -54,31 +54,11 @@ Item {
     readonly property real contextOpacity: smoothReveal(travel, 0.92) * retirementOpacity
     readonly property real mediaOpacity: smoothReveal(expansion, 0.94) * retirementOpacity
     readonly property bool wideRest: width >= 1040 * unit && Flags.fontScale <= 1.3
-    readonly property real wingWidth: 230 * unit
-    readonly property bool canShowWings: width >= access.width + 2 * wingWidth + 40 * unit
+    readonly property bool canPlaceAccessMedia: accessMedia.hasPlayer && height >= access.height + accessMediaPanel.height + 120 * unit
     property real authProgress: entered && authActive ? 1 : 0
-    readonly property real wingProgress: canShowWings ? smoothReveal(expansion, 0.9) : 0
     function smoothReveal(value, start) {
         const t = Math.max(0, Math.min(1, (value - start) / (1 - start)))
         return t * t * (3 - 2 * t)
-    }
-    function weatherIcon(code) {
-        if ([200, 386, 389, 392, 395].includes(code)) return "thunderstorm"
-        if ([179, 182, 185, 227, 230, 281, 284, 311, 314, 317, 320, 323, 326, 329, 332, 335, 338, 350, 362, 365, 368, 371, 374, 377].includes(code)) return "ac_unit"
-        if ([176, 263, 266, 293, 296, 299, 302, 305, 308, 353, 356, 359].includes(code)) return "rainy"
-        if ([143, 248, 260].includes(code)) return "foggy"
-        if (code === 113) return "sunny"
-        if (code === 116) return "partly_cloudy_day"
-        return "cloud"
-    }
-    function weatherLabel(code) {
-        if (code === 113) return qsTr("Despejado")
-        if (code === 116) return qsTr("Parcialmente nublado")
-        if ([119, 122].includes(code)) return qsTr("Nublado")
-        if ([143, 248, 260].includes(code)) return qsTr("Niebla")
-        if (weatherIcon(code) === "thunderstorm") return qsTr("Tormenta")
-        if (weatherIcon(code) === "ac_unit") return qsTr("Nieve")
-        return qsTr("Lluvia")
     }
     property real presentation: entered && authActive && !departing ? 1 : 0
     Behavior on authProgress { SmoothedAnimation { duration: Flags.reduceMotion ? 0 : Motion.standard; velocity: -1 } }
@@ -173,22 +153,15 @@ Item {
             sourceSize: Qt.size(root.width + 128, root.height + 128)
             asynchronous: true
             fillMode: Image.PreserveAspectCrop
-            visible: false
-        }
-        MultiEffect {
-            anchors.fill: wallpaperImage
-            source: wallpaperImage
-            blurEnabled: true
-            blurMax: 48
-            blur: 0.15 + 0.5 * root.presentation
+            visible: true
         }
     }
     Rectangle {
         anchors.fill: parent
         gradient: Gradient {
-            GradientStop { position: 0; color: Qt.alpha(Theme.background, Theme.alphaSubtle) }
-            GradientStop { position: 0.5; color: Qt.alpha(Theme.background, Theme.alphaHairline) }
-            GradientStop { position: 1; color: Qt.alpha(Theme.background, Theme.alphaStrong) }
+            GradientStop { position: 0; color: Qt.alpha(Theme.background, 0.68) }
+            GradientStop { position: 0.5; color: Qt.alpha(Theme.background, 0.78) }
+            GradientStop { position: 1; color: Qt.alpha(Theme.background, 0.82) }
         }
     }
     // The lock surface stays opaque while its wallpaper and content enter.
@@ -203,65 +176,11 @@ Item {
         unit: root.unit
         objectName: "lockBody"
         opacity: root.entrance
-        wallpaperItem: wallpaperBackdrop
-        sampleX: x
-        sampleY: y
-        width: 190 * root.unit + (access.width - 190 * root.unit) * root.expansion + 2 * root.wingWidth * root.wingProgress
+        width: 190 * root.unit + (access.width - 190 * root.unit) * root.expansion
         height: IslandGeometry.restHeight * root.unit + (access.height - IslandGeometry.restHeight * root.unit) * root.expansion
         x: (root.width - width) / 2
         y: 26 * root.unit + (access.y - 26 * root.unit) * root.travel
         radius: (IslandGeometry.restHeight / 2 + (34 - IslandGeometry.restHeight / 2) * root.expansion) * root.unit
-    }
-    Item {
-        id: weatherWing
-        x: lockBody.x
-        y: lockBody.y
-        width: root.wingWidth * root.wingProgress
-        height: lockBody.height
-        clip: true
-        opacity: root.wingProgress * root.retirementOpacity
-        Rectangle { anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; width: 1; height: parent.height - 48 * root.unit; color: Theme.hair }
-        Column {
-            x: 24 * root.unit; y: 22 * root.unit
-            width: root.wingWidth - 48 * root.unit
-            spacing: 10 * root.unit
-            Text { text: qsTr("AHORA"); color: root.secondary; font.family: Theme.fontMedia; font.pixelSize: 10 * root.textScale; font.letterSpacing: 1.4 * root.unit }
-            Row {
-                visible: !!root.weather.temp
-                spacing: 10 * root.unit
-                MaterialIcon { iconName: root.weatherIcon(root.weather.code); color: root.ink; font.pixelSize: 40 * root.unit }
-                Text { text: root.weather.temp || ""; color: root.ink; font.family: Theme.fontMedia; font.pixelSize: 42 * root.textScale; font.weight: Font.Medium }
-            }
-            Text { visible: !root.weather.temp; text: Qt.formatDate(root.now, "dd MMM"); color: root.ink; font.family: Theme.fontMedia; font.pixelSize: 34 * root.textScale; font.weight: Font.Medium }
-            Text { width: parent.width; text: root.weather.temp ? root.weatherLabel(root.weather.code) : qsTr("Clima no disponible"); elide: Text.ElideRight; color: root.ink; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale }
-            Rectangle { width: parent.width; height: 1; color: Theme.hair }
-            Text { text: root.weather.feels ? qsTr("Sensación %1  ·  Humedad %2").arg(root.weather.feels).arg(root.weather.humidity) : Qt.locale().toString(root.now, "dddd, d MMMM"); color: root.secondary; font.family: Theme.fontMedia; font.pixelSize: 11 * root.textScale }
-        }
-    }
-    Item {
-        id: mediaWing
-        x: lockBody.x + lockBody.width - width
-        y: lockBody.y
-        width: root.wingWidth * root.wingProgress
-        height: lockBody.height
-        clip: true
-        opacity: root.wingProgress * root.retirementOpacity
-        Rectangle { anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; width: 1; height: parent.height - 48 * root.unit; color: Theme.hair }
-        Column {
-            x: 20 * root.unit; y: 22 * root.unit
-            width: root.wingWidth - 40 * root.unit
-            spacing: 12 * root.unit
-            LockMedia {
-                width: parent.width; height: implicitHeight
-                unit: root.unit
-                wallpaperItem: wallpaperBackdrop
-                sampleX: mediaWing.x + x; sampleY: mediaWing.y + y
-                player: root.player; artUrl: root.artUrl; trackKey: root.trackKey
-                embedded: true
-                visible: hasPlayer
-            }
-            Text { visible: !root.player; width: parent.width; wrapMode: Text.WordWrap; text: qsTr("Nada reproduciéndose"); color: root.ink; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale }
-        }
     }
     Row {
         id: statusRow
@@ -270,21 +189,22 @@ Item {
         spacing: 12 * root.unit
         opacity: root.entrance * (1 - root.smoothReveal(Math.min(1, root.presentation / 0.18), 0))
         MaterialIcon { iconName: root.authenticated ? "lock_open" : "lock"; font.pixelSize: 20 * root.unit; color: root.ink }
-        Text { text: Qt.formatTime(root.now, "HH:mm"); font.family: Theme.fontMedia; font.pixelSize: 14 * root.textScale; color: root.ink }
+        Text { text: qsTr("Bloqueado"); font.family: Theme.font; font.pixelSize: 13 * root.textScale; color: root.ink }
     }
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
         y: 34 * root.unit
-        spacing: 10 * root.unit
+        spacing: 12 * root.unit
         opacity: root.contextOpacity
         MaterialIcon { iconName: "lock"; font.pixelSize: 18 * root.unit; color: root.secondary }
-        Text { visible: UPower.displayDevice.isLaptopBattery; text: Math.round(UPower.displayDevice.percentage * 100) + "%"; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale; color: root.secondary }
-        Text { visible: root.preview; text: qsTr("Vista previa"); font.family: Theme.fontMedia; font.pixelSize: 12 * root.textScale; color: root.secondary }
+        Text { visible: !!root.weather.temp; text: root.weather.temp || ""; font.family: Theme.font; font.pixelSize: 13 * root.textScale; color: root.secondary }
+        Text { visible: UPower.displayDevice.isLaptopBattery; text: Math.round(UPower.displayDevice.percentage * 100) + "%"; font.family: Theme.font; font.pixelSize: 13 * root.textScale; color: root.secondary }
+        Text { visible: root.preview; text: qsTr("Vista previa"); font.family: Theme.font; font.pixelSize: 12 * root.textScale; color: root.secondary }
     }
     Column {
         id: clock
         objectName: "lockRestClock"
-        width: Math.min(Math.max(clockTime.implicitWidth, clockDate.implicitWidth), root.width - 48 * root.unit)
+        width: Math.min(Math.max(clockTime.implicitWidth, clockDate.implicitWidth, clockHint.implicitWidth), root.width - 48 * root.unit)
         x: (root.width - width) / 2 + (root.wideRest ? (80 * root.unit - (root.width - width) / 2) * root.restingMedia : 0)
         y: (root.height - height) / 2 - (root.wideRest ? 0 : 120 * root.unit * root.restingMedia)
         opacity: root.entrance * (1 - root.authProgress) * root.retirementOpacity
@@ -297,7 +217,7 @@ Item {
             width: parent.width
             horizontalAlignment: Text.AlignLeft
             text: Flags.time12h ? Qt.formatTime(root.now, "h:mm AP").replace(/\s*[AP]M$/, "") : Qt.formatTime(root.now, "HH:mm")
-            font.family: Theme.fontMedia
+            font.family: Theme.fontDisplay
             font.pixelSize: 124 * root.unit
             font.weight: Font.Light
             font.letterSpacing: -3 * root.unit
@@ -307,11 +227,20 @@ Item {
             id: clockDate
             width: parent.width
             horizontalAlignment: Text.AlignLeft
-            text: Qt.locale().toString(root.now, "dddd, d MMMM")
+            text: Qt.locale("es_DO").toString(root.now, "dddd, d 'de' MMMM")
             elide: Text.ElideRight
-            font.family: Theme.fontMedia
+            font.family: Theme.font
             font.pixelSize: 18 * root.textScale
-            color: root.secondary
+            color: root.ink
+        }
+        Text {
+            id: clockHint
+            visible: root.secured
+            width: parent.width
+            text: qsTr("Escribe para desbloquear")
+            font.family: Theme.font
+            font.pixelSize: 14 * root.textScale
+            color: root.ink
         }
     }
 
@@ -328,8 +257,6 @@ Item {
         active: root.restingMedia > 0 || !!root.player?.isPlaying && !root.authActive
         sourceComponent: LockMedia {
             unit: root.unit
-            wallpaperItem: wallpaperBackdrop
-            sampleX: restingPlayer.x; sampleY: restingPlayer.y
             player: root.player; artUrl: root.artUrl; trackKey: root.trackKey
         }
     }
@@ -337,9 +264,9 @@ Item {
     Item {
         id: access
         anchors.horizontalCenter: parent.horizontalCenter
-        y: 330 * root.unit
+        y: Math.max(48 * root.unit, (root.height - height - (root.canPlaceAccessMedia ? accessMediaPanel.height + 20 * root.unit : 0)) / 2)
         width: Math.min(324 * root.unit * Math.max(1, Flags.fontScale * 0.8), root.width - 32)
-        height: 286 * root.unit
+        height: Math.max(286 * root.unit, feedback.y + feedback.implicitHeight + 22 * root.unit)
         transform: Translate { y: lockBody.y - access.y }
         opacity: root.retirementOpacity
         enabled: !root.retiring
@@ -353,14 +280,14 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 84 * root.unit; height: width
                 name: root.displayName; source: root.avatarSource
-                fontFamily: Theme.fontMedia
+                fontFamily: Theme.font
             }
             Text {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 text: root.displayName
                 elide: Text.ElideRight
-                font.family: Theme.fontMedia; font.weight: Font.DemiBold
+                font.family: Theme.font; font.weight: Font.DemiBold
                 font.pixelSize: 17 * root.textScale; color: root.ink
             }
         }
@@ -424,7 +351,7 @@ Item {
                     motionActive: root.authActive && root.contentOpacity > 0.01 && !root.retiring
                 }
                 placeholderText: root.promptText
-                font.family: Theme.fontMedia; font.pixelSize: 15 * root.textScale
+                font.family: Theme.font; font.pixelSize: 15 * root.textScale
                 horizontalAlignment: TextInput.AlignHCenter
                 echoMode: root.responseVisible ? TextInput.Normal : TextInput.Password
                 passwordMaskDelay: 0
@@ -445,10 +372,11 @@ Item {
             }
             Item {
                 id: dotViewport
+                objectName: "lockPasswordDotViewport"
                 x: password.x; y: password.y
                 width: password.width; height: password.height
                 clip: true
-                visible: !root.responseVisible && root.successProgress < 0.25
+                visible: !root.responseVisible && password.length > 0 && root.successProgress < 0.25
                 onWidthChanged: Qt.callLater(field.updateDotOffset)
                 Rectangle {
                     readonly property int first: Math.min(password.selectionStart, password.selectionEnd)
@@ -527,9 +455,11 @@ Item {
             opacity: root.contentExposure * Math.max(0, (root.successProgress - 0.25) / 0.75)
             scale: 0.85 + 0.15 * root.successProgress
             MaterialIcon { iconName: "check_circle"; font.pixelSize: 24 * root.unit; color: "#b8f7d8" }
-            Text { text: qsTr("Listo"); font.family: Theme.fontMedia; font.pixelSize: 16 * root.textScale; color: root.ink }
+            Text { text: qsTr("Listo"); font.family: Theme.font; font.pixelSize: 16 * root.textScale; color: root.ink }
         }
         Text {
+            id: feedback
+            objectName: "lockFeedback"
             opacity: root.contentExposure
             x: 22 * root.unit; y: 243 * root.unit
             width: parent.width - 44 * root.unit
@@ -537,64 +467,146 @@ Item {
             text: root.authenticated ? qsTr("Bienvenido") : root.errorText || (!root.secured ? qsTr("Protegiendo sesión…") : root.busy ? qsTr("Verificando…") : "")
             wrapMode: Text.WordWrap
             color: root.errorText ? "#ffc0c6" : root.secondary
-            font.family: Theme.fontMedia; font.pixelSize: 11 * root.textScale
+            font.family: Theme.font; font.pixelSize: 11 * root.textScale
         }
     }
-    LockMedia {
+    Item {
+        id: accessMediaPanel
         anchors.horizontalCenter: parent.horizontalCenter
-        y: 634 * root.unit
-        width: access.width; height: implicitHeight
-        unit: root.unit
-        wallpaperItem: wallpaperBackdrop
-        sampleX: x
-        sampleY: y
-        objectName: "lockAccessPlayer"
-        player: root.player
-        artUrl: root.artUrl
-        trackKey: root.trackKey
-        visible: hasPlayer && y + height + 16 * root.unit <= root.height && root.mediaOpacity > 0 && root.wingProgress < 1
-        opacity: root.mediaOpacity * (1 - root.wingProgress)
+        y: access.y + access.height + 20 * root.unit
+        width: access.width + 32 * root.unit
+        height: accessMedia.implicitHeight + 32 * root.unit
+        visible: root.canPlaceAccessMedia && root.mediaOpacity > 0
+        opacity: root.mediaOpacity
+        LockGlass { anchors.fill: parent; radius: 28 * root.unit; unit: root.unit }
+        LockMedia {
+            id: accessMedia
+            x: 16 * root.unit; y: 16 * root.unit
+            width: parent.width - 32 * root.unit; height: implicitHeight
+            unit: root.unit
+            objectName: "lockAccessPlayer"
+            player: root.player
+            artUrl: root.artUrl
+            trackKey: root.trackKey
+        }
     }
     LockButton {
         id: power
+        objectName: "lockPowerButton"
         opacity: root.contentOpacity
         enabled: !root.authenticated
+        expressive: true
+        highlighted: powerMenu.opened
         anchors.right: parent.right; anchors.bottom: parent.bottom
         anchors.margins: 26 * root.unit
         unit: root.unit; iconName: "power_settings_new"; text: qsTr("Opciones de energía")
-        onClicked: { root.pendingPower = ""; powerMenu.open() }
+        onClicked: {
+            if (powerMenu.visible) powerMenu.close()
+            else { root.pendingPower = ""; powerMenu.open() }
+        }
     }
     Popup {
         id: powerMenu
+        objectName: "lockPowerMenu"
+        property real reveal: 0
         x: root.width - width - 26 * root.unit
         y: power.y - height - 12 * root.unit
-        width: 230 * root.unit
+        width: Math.min(root.width - 32 * root.unit, 280 * root.unit * Math.max(1, Flags.fontScale))
         padding: 12 * root.unit
-        background: LockGlass { radius: 24 * root.unit; unit: root.unit; wallpaperItem: wallpaperBackdrop; sampleX: powerMenu.x; sampleY: powerMenu.y }
+        focus: true
+        opacity: reveal
+        scale: 0.94 + 0.06 * reveal
+        transformOrigin: Popup.BottomRight
+        enter: Transition {
+            NumberAnimation { target: powerMenu; property: "reveal"; to: 1; duration: Flags.reduceMotion ? 0 : Motion.emphasized; easing.type: Easing.BezierSpline; easing.bezierCurve: Motion.softFluid }
+        }
+        exit: Transition {
+            NumberAnimation { target: powerMenu; property: "reveal"; to: 0; duration: Flags.reduceMotion ? 0 : Motion.fast; easing.type: Easing.InCubic }
+        }
+        background: Rectangle {
+            radius: 24 * root.unit
+            color: Qt.alpha(Theme.background, 0.94)
+            LockGlass { anchors.fill: parent; radius: 24 * root.unit; unit: root.unit }
+        }
         contentItem: Column {
             spacing: 6 * root.unit
+            Text {
+                width: parent.width
+                height: 32 * root.textScale
+                leftPadding: 12 * root.unit
+                text: qsTr("Energía")
+                color: root.secondary
+                font.family: Theme.font
+                font.pixelSize: 11 * root.textScale
+                font.weight: Font.Medium
+                verticalAlignment: Text.AlignVCenter
+            }
             Repeater {
-                model: [ {label: qsTr("Suspender"), action: "suspend"}, {label: qsTr("Reiniciar"), action: "reboot"}, {label: qsTr("Apagar"), action: "poweroff"} ]
+                model: [
+                    {label: qsTr("Suspender"), hint: qsTr("Conservar tu sesión"), action: "suspend", icon: "dark_mode"},
+                    {label: qsTr("Reiniciar"), hint: qsTr("Volver a iniciar el equipo"), action: "reboot", icon: "restart_alt"},
+                    {label: qsTr("Apagar"), hint: qsTr("Finalizar y apagar el equipo"), action: "poweroff", icon: "power_settings_new"}
+                ]
                 delegate: MotionButton {
                     id: powerOption
                     required property var modelData
-                    width: parent.width; height: 44 * root.unit
-                    text: root.pendingPower === modelData.action ? qsTr("Confirmar %1").arg(modelData.label) : modelData.label
-                    contentItem: Text {
-                        transform: Translate { y: -Motion.labelTravel * powerOption.interaction.presence }
-                        text: powerOption.text; color: root.ink
-                        font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale
-                        verticalAlignment: Text.AlignVCenter; horizontalAlignment: Text.AlignHCenter
+                    required property int index
+                    readonly property bool confirming: root.pendingPower === modelData.action
+                    readonly property real exposure: Flags.reduceMotion ? 1 : root.smoothReveal(powerMenu.reveal, 0.12 + index * 0.13)
+                    objectName: "lockPowerOption_" + modelData.action
+                    width: parent.width; height: 62 * root.textScale
+                    padding: 12 * root.unit
+                    expressive: true
+                    enabled: !root.authenticated && powerMenu.opened
+                    opacity: exposure
+                    transform: Translate { y: 8 * root.unit * (1 - powerOption.exposure) }
+                    text: confirming ? qsTr("Confirmar %1").arg(modelData.label) : modelData.label
+                    Accessible.name: text
+                    contentItem: Item {
+                        MaterialIcon {
+                            id: optionIcon
+                            width: 32 * root.unit; height: parent.height
+                            interaction: powerOption.interaction
+                            iconName: powerOption.confirming ? "check_circle" : powerOption.modelData.icon
+                            font.pixelSize: 23 * root.unit
+                            color: powerOption.confirming ? Theme.accent : root.ink
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        Column {
+                            anchors.left: optionIcon.right; anchors.leftMargin: 10 * root.unit
+                            anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
+                            spacing: 3 * root.unit
+                            Text {
+                                width: parent.width
+                                text: powerOption.text
+                                color: powerOption.confirming ? Theme.accent : root.ink
+                                font.family: Theme.font; font.pixelSize: 13 * root.textScale
+                                font.weight: Font.Medium
+                                elide: Text.ElideRight
+                            }
+                            Text {
+                                width: parent.width
+                                text: powerOption.confirming ? qsTr("Pulsa de nuevo para confirmar") : powerOption.modelData.hint
+                                color: root.secondary
+                                font.family: Theme.font; font.pixelSize: 10 * root.textScale
+                                elide: Text.ElideRight
+                            }
+                        }
                     }
                     background: Rectangle {
-                        radius: 12 * root.unit
-                        color: parent.hovered || parent.activeFocus ? Qt.alpha(Theme.foreground, Theme.alphaWash) : "transparent"
-                        Behavior on color { ColorAnimation { duration: Motion.hover } }
+                        radius: 15 * root.unit
+                        color: powerOption.confirming ? Qt.alpha(Theme.accent, Theme.alphaWash) : powerOption.hovered || powerOption.activeFocus ? Qt.alpha(Theme.foreground, Theme.alphaWash) : "transparent"
+                        border.color: powerOption.activeFocus ? Qt.alpha(Theme.accent, 0.55) : "transparent"
+                        Behavior on color { ColorAnimation { duration: Flags.reduceMotion ? 0 : Motion.hover } }
                     }
                     onClicked: root.choosePower(modelData.action)
                 }
             }
         }
-        onClosed: if (root.authActive) password.forceActiveFocus(); else root.forceActiveFocus()
+        onClosed: {
+            confirmation.stop()
+            root.pendingPower = ""
+            if (root.authActive) password.forceActiveFocus(); else root.forceActiveFocus()
+        }
     }
 }

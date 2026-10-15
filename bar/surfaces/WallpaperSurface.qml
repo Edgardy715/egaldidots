@@ -36,6 +36,7 @@ PillSurface {
         closing: root.closing
         wallpaperModel: controller.wallpaperModel
         applying: controller.applying
+        applyPhase: Wallpapers.applyPhase
         scanning: controller.scanning
         applyError: controller.applyError
         feedback: controller.feedback

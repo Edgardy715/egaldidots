@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2022 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * Adapted for Isla/QML from Android 16 SystemUI: SquigglyProgress.kt
+ * and SeekBarObserver.kt (android16-release, frameworks/base/packages/SystemUI).
+ * Changes: QML geometry/animation, desktop input, Theme roles and MPRIS integration.
+ * License: docs/pixel-media-timeline-2026-10-14/LICENSE-AOSP.txt.
+ */
+
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Shapes
@@ -20,29 +40,82 @@ Item {
     signal dragCanceled()
 
     readonly property real boundedProgress: isFinite(progress) ? Math.max(0, Math.min(1, progress)) : 0
-    property real displayedProgress: boundedProgress
+    property real displayedProgress: 0
     readonly property real trackInset: 7 * s
     readonly property real trackWidth: Math.max(1, width - 2 * trackInset)
     readonly property real cursorX: trackInset + trackWidth * displayedProgress
-    readonly property real wavelength: 36 * s
-    readonly property bool moving: active && visible && playing && !dragging
-        && !Flags.reduceMotion && boundedProgress > 0 && boundedProgress < 1
+    // Android 16 SystemUI SquigglyProgress / SeekBarObserver (seekable track).
+    readonly property real wavelength: 20 * s
+    readonly property real amplitude: 1.5 * s
+    readonly property real strokeWidth: 2 * s
+    readonly property real phaseSpeed: 8 * s
+    readonly property bool motionAllowed: active && visible && !Flags.reduceMotion
+    readonly property bool moving: motionAllowed && playing && !dragging
     property real waveOffset: 0
-    property real waveAmount: active && playing && !dragging && !Flags.reduceMotion ? 1 : 0
+    property real waveAmount: 0
     function fractionAt(x) { return Math.max(0, Math.min(1, (x - trackInset) / trackWidth)) }
-
-    Behavior on displayedProgress {
-        enabled: !root.dragging && !Flags.reduceMotion
-            && Math.abs(root.boundedProgress - root.displayedProgress) < 0.02
-        SmoothedAnimation { duration: Motion.fast; velocity: -1; reversingMode: SmoothedAnimation.Immediate }
+    function updateProgress() {
+        if (dragging || !motionAllowed || length <= 0) {
+            progressReset.stop()
+            displayedProgress = boundedProgress
+        } else if (boundedProgress * length <= 0.25 && displayedProgress * length > 0.25) {
+            progressReset.stop()
+            progressReset.from = displayedProgress
+            progressReset.to = Math.min(1, boundedProgress + 0.75 / length)
+            progressReset.start()
+        } else if (!progressReset.running) displayedProgress = boundedProgress
     }
-    Behavior on waveAmount {
-        enabled: root.visible && !Flags.reduceMotion
-        NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard }
+    onBoundedProgressChanged: {
+        if (dragging || !motionAllowed) updateProgress()
+        // MPRIS commits update dragging and position in the same event turn.
+        else Qt.callLater(updateProgress)
+    }
+    onDraggingChanged: {
+        progressReset.stop()
+        displayedProgress = boundedProgress
+    }
+    NumberAnimation {
+        id: progressReset
+        target: root
+        property: "displayedProgress"
+        duration: 750
+        easing.type: Easing.BezierSpline
+        easing.bezierCurve: [0.05, 0, 0.133333, 0.06, 0.166666, 0.4,
+            0.208333, 0.82, 0.25, 1, 1, 1]
+        onFinished: root.displayedProgress = root.boundedProgress
+    }
+
+    function updateWave() {
+        amplitudeDelay.stop()
+        amplitudeAnimation.stop()
+        if (!motionAllowed) waveAmount = 0
+        else if (moving) amplitudeDelay.start()
+        else animateAmplitude()
+    }
+    function animateAmplitude() {
+        amplitudeAnimation.from = waveAmount
+        amplitudeAnimation.to = moving ? 1 : 0
+        amplitudeAnimation.duration = moving ? 800 : 550
+        amplitudeAnimation.easing.bezierCurve = moving ? Motion.emphasizedDecelCurve : Motion.standardDecelCurve
+        amplitudeAnimation.start()
+    }
+    onMovingChanged: updateWave()
+    onMotionAllowedChanged: if (!motionAllowed) { updateWave(); updateProgress() }
+    Component.onCompleted: { displayedProgress = boundedProgress; updateWave() }
+    Timer {
+        id: amplitudeDelay
+        interval: 60
+        onTriggered: root.animateAmplitude()
+    }
+    NumberAnimation {
+        id: amplitudeAnimation
+        target: root
+        property: "waveAmount"
+        easing.type: Easing.BezierSpline
     }
     FrameAnimation {
         running: root.moving
-        onTriggered: root.waveOffset = (root.waveOffset + frameTime * 18 * root.s) % root.wavelength
+        onTriggered: root.waveOffset = (root.waveOffset + frameTime * root.phaseSpeed) % root.wavelength
     }
     Rectangle {
         anchors.fill: parent
@@ -52,52 +125,42 @@ Item {
         border.color: Theme.accent
     }
     Rectangle {
-        x: root.cursorX + 8 * root.s
+        x: root.cursorX
         anchors.verticalCenter: parent.verticalCenter
         width: Math.max(0, root.width - root.trackInset - x)
-        height: 3 * root.s
+        height: root.strokeWidth
         radius: height / 2
-        color: Qt.alpha(Theme.foreground, Theme.alphaSubtle)
+        color: Qt.alpha(Theme.accent, 77 / 255)
     }
     Item {
         x: root.trackInset
-        width: Math.max(0, root.cursorX - x - 8 * root.s)
+        width: Math.max(0, root.cursorX - x)
         height: parent.height
         clip: true
-        Rectangle {
-            anchors.verticalCenter: parent.verticalCenter
-            width: parent.width
-            height: 3 * root.s
-            radius: height / 2
-            color: Theme.accent
-            opacity: 1 - root.waveAmount
-        }
         Shape {
             y: parent.height / 2
-            width: root.trackWidth + root.wavelength
+            width: root.trackWidth + 1.5 * root.wavelength
             height: 1
-            opacity: root.waveAmount
             preferredRendererType: Shape.CurveRenderer
-            transform: [
-                Translate { x: -root.waveOffset },
-                Scale { yScale: root.waveAmount }
-            ]
+            transform: Translate { x: -root.waveOffset - root.wavelength / 2 }
             ShapePath {
                 fillColor: "transparent"
                 strokeColor: Theme.accent
-                strokeWidth: 3 * root.s
+                strokeWidth: root.strokeWidth
                 capStyle: ShapePath.RoundCap
                 PathSvg {
-                    // Static geometry; only translation and amplitude change per frame.
+                    // Geometry changes only while amplitude settles; phase uses translation.
                     path: {
                         const wave = root.wavelength
-                        const amplitude = 5 * root.s
+                        const amplitude = root.amplitude * root.waveAmount
                         let result = "M 0 0"
-                        for (let x = 0; x < root.trackWidth + wave; x += wave) {
-                            result += " C " + (x + wave / 4) + " " + -amplitude
-                                + " " + (x + wave / 4) + " " + -amplitude + " " + (x + wave / 2) + " 0"
-                                + " C " + (x + wave * 3 / 4) + " " + amplitude
-                                + " " + (x + wave * 3 / 4) + " " + amplitude + " " + (x + wave) + " 0"
+                        let currentAmp = amplitude
+                        for (let x = 0; x < root.trackWidth + 1.5 * wave; x += wave / 2) {
+                            const nextAmp = -currentAmp
+                            const mid = x + wave / 4
+                            result += " C " + mid + " " + currentAmp
+                                + " " + mid + " " + nextAmp + " " + (x + wave / 2) + " " + nextAmp
+                            currentAmp = nextAmp
                         }
                         return result
                     }
@@ -106,13 +169,22 @@ Item {
         }
     }
     Rectangle {
+        // Restore the rounded start cap removed by the progress clip, as in AOSP.
+        x: root.trackInset - width / 2
+        y: root.height / 2 + Math.cos((root.waveOffset + root.wavelength / 2)
+            / root.wavelength * Math.PI * 2) * root.amplitude * root.waveAmount - height / 2
+        width: root.strokeWidth
+        height: width
+        radius: width / 2
+        color: Theme.accent
+    }
+    Rectangle {
         x: root.cursorX - width / 2
         anchors.verticalCenter: parent.verticalCenter
-        width: 6 * root.s
-        height: (root.dragging || input.containsMouse || input.activeFocus ? 20 : 16) * root.s
+        width: 4 * root.s
+        height: 16 * root.s
         radius: width / 2
         color: Theme.foreground
-        Behavior on height { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
     }
     MouseArea {
         id: input

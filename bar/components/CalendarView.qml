@@ -376,7 +376,7 @@ PillSurface {
                                 transform: Translate { y: -Motion.labelTravel * cellMa.motion.presence }
                                 anchors.centerIn: parent
                                 text: cell.inMonth ? cell.dayNum : ""
-                                color: cell.isToday ? Theme.background
+                                color: cell.isToday ? Theme.primaryContent
                                               : cell.selected ? Theme.accent
                                                          : (cellMa.containsMouse && cell.inMonth ? Theme.foreground
                                                                                              : (cell.weekend && cell.inMonth ? Qt.alpha(Theme.foreground, Theme.alphaIconSec) : Theme.foreground))

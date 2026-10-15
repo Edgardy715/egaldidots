@@ -151,7 +151,7 @@ ComboBox {
         }
         background: Rectangle {
             radius: 15
-            color: Qt.lighter(Theme.background, 1.35)
+            color: Theme.surfaceContainer
             border.width: 1; border.color: Qt.alpha(Theme.foreground, 0.18)
         }
         enter: Transition {

@@ -1,0 +1,6 @@
+# Isla's runtime pipeline renders templates from templates/manifest.json with
+# a temporary Matugen configuration, then publishes a complete palette atomically.
+[config]
+reload_apps = false
+
+[templates]

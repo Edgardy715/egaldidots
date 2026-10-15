@@ -2,73 +2,53 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "Palette.js" as Palette
 
 Singleton {
     id: root
-
     property var raw: ({})
-
-    property color background: "#0e0c1b"
-    property color foreground: "#c2c2c6"
-    property color cursor: "#c2c2c6"
-    property color accent: "#D3A3A0"
-    property color accentSoft: "#E5BAB7"
-    property color accentStrong: "#B66B67"
-    property color accentAlt: "#E7C1BD"
-    property color dim: "#5d5b6f"
-
-    property var colors: ({})
-
+    property var colors: Palette.fallback
+    readonly property bool ready: true
+    property bool loaded: false
+    property string error: ""
     property string wallpaper: ""
-
-    property bool ready: false
-    Component.onCompleted: {
-        root.ready = true
-        rlProc.running = true
-    }
-
+    property string mode: "dark"
+    readonly property color background: colors.surface
+    readonly property color foreground: colors.on_surface
+    readonly property color cursor: colors.on_surface
+    readonly property color accent: colors.primary
+    readonly property color accentSoft: colors.secondary
+    readonly property color accentStrong: colors.primary
+    readonly property color accentAlt: colors.tertiary
+    readonly property color dim: colors.outline
     property string _lastText: ""
 
-    function _apply(txt): void {
-        if (!txt || txt.length < 10) return
-        if (txt === root._lastText) return
-        root._lastText = txt
+    function _apply(text): bool {
+        if (text === _lastText && loaded) return true
         try {
-            var j = JSON.parse(txt)
-            root.raw = j
-            root.background = j.special.background
-            root.foreground = j.special.foreground
-            root.cursor = j.special.cursor
-            var c = j.colors
-            root.colors = c
-            root.accent = c.color4
-            root.accentSoft = c.color5
-            root.accentStrong = c.color1
-            root.accentAlt = c.color6
-            root.dim = c.color8
-            root.wallpaper = j.wallpaper || ""
-        } catch (e) { }
-    }
-
-    /** Invocado por el IpcHandler "island.reloadColors" tras un cambio de wallpaper. */
-    function forceReload(): void {
-        rlProc.running = true
-    }
-
-    Connections {
-        target: Config
-        function onWalColorsFileChanged() { root.forceReload() }
-    }
-
-    Process {
-        id: rlProc
-        command: ["cat", Config.walColorsFile]
-        running: false
-        stdout: StdioCollector {
-            id: rlCollector
-            onStreamFinished: {
-                root._apply(rlCollector.text)
-            }
+            const next = Palette.parse(text)
+            raw = next
+            colors = next.colors
+            wallpaper = next.wallpaper
+            mode = next.mode
+            _lastText = text
+            loaded = true
+            error = ""
+            return true
+        } catch (exception) {
+            error = String(exception)
+            console.warn("[Isla Matugen] " + error + "; keeping the last valid palette")
+            return false
         }
+    }
+    function forceReload(): void { paletteFile.reload() }
+    FileView {
+        id: paletteFile
+        path: Config.paletteFile
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: root._apply(text())
+        onLoadFailed: root.error = "Matugen palette unavailable; using the last valid palette"
     }
 }

@@ -3,18 +3,8 @@ return {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
     config = function()
-      local function get_wal()
-        local wal = {}
-        local f = io.open(os.getenv("HOME") .. "/.cache/wal/colors", "r")
-        if f then
-          local i = 0
-          for line in f:lines() do
-            wal[i] = line
-            i = i + 1
-          end
-          f:close()
-        end
-        return wal
+      local function get_colors()
+        return require("config.isla_palette").colors()
       end
 
       local function is_dashboard()
@@ -26,39 +16,39 @@ return {
       end
 
       local function build_theme()
-        local wal = get_wal()
-        local soft = wal[8] or "#4c566a"
+        local colors = get_colors()
+        local soft = colors.surface_variant or "#4c566a"
 
         return {
           normal = {
-            a = { fg = "#ffffff", bg = wal[1], gui = "bold" },
-            b = { fg = "#f5f5f5", bg = soft },
-            c = { fg = "#e8e8e8", bg = "none" },
+            a = { fg = colors.on_primary, bg = colors.primary, gui = "bold" },
+            b = { fg = colors.on_surface, bg = soft },
+            c = { fg = colors.on_surface, bg = "none" },
           },
           insert = {
-            a = { fg = "#ffffff", bg = wal[2], gui = "bold" },
-            b = { fg = "#f5f5f5", bg = soft },
-            c = { fg = "#e8e8e8", bg = "none" },
+            a = { fg = colors.on_secondary, bg = colors.secondary, gui = "bold" },
+            b = { fg = colors.on_surface, bg = soft },
+            c = { fg = colors.on_surface, bg = "none" },
           },
           visual = {
-            a = { fg = "#ffffff", bg = wal[3], gui = "bold" },
-            b = { fg = "#f5f5f5", bg = soft },
-            c = { fg = "#e8e8e8", bg = "none" },
+            a = { fg = colors.on_tertiary, bg = colors.tertiary, gui = "bold" },
+            b = { fg = colors.on_surface, bg = soft },
+            c = { fg = colors.on_surface, bg = "none" },
           },
           replace = {
-            a = { fg = "#ffffff", bg = wal[4], gui = "bold" },
-            b = { fg = "#f5f5f5", bg = soft },
-            c = { fg = "#e8e8e8", bg = "none" },
+            a = { fg = colors.on_error, bg = colors.error, gui = "bold" },
+            b = { fg = colors.on_surface, bg = soft },
+            c = { fg = colors.on_surface, bg = "none" },
           },
           command = {
-            a = { fg = "#ffffff", bg = wal[5], gui = "bold" },
-            b = { fg = "#f5f5f5", bg = soft },
-            c = { fg = "#e8e8e8", bg = "none" },
+            a = { fg = colors.on_tertiary, bg = colors.tertiary, gui = "bold" },
+            b = { fg = colors.on_surface, bg = soft },
+            c = { fg = colors.on_surface, bg = "none" },
           },
           inactive = {
-            a = { fg = "#aaaaaa", bg = "none" },
-            b = { fg = "#aaaaaa", bg = "none" },
-            c = { fg = "#aaaaaa", bg = "none" },
+            a = { fg = colors.on_surface_variant, bg = "none" },
+            b = { fg = colors.on_surface_variant, bg = "none" },
+            c = { fg = colors.on_surface_variant, bg = "none" },
           },
         }
       end

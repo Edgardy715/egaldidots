@@ -47,6 +47,16 @@ ShellRoot {
                 compare(controller.calcResult, "5")
                 type(input, "buscar aplicacion")
                 verify(!controller.showCalculator)
+                view.closing = true
+                compare(input.text, "buscar aplicacion")
+                view.closing = false
+                compare(input.text, "")
+                compare(view.query, "")
+                type(input, "firefox")
+                view.open = false
+                view.open = true
+                compare(input.text, "")
+                compare(view.query, "")
                 console.log("PASS: typed QML expression has no effects, inverse math and ordinary app search remain usable")
                 finished = true
             }

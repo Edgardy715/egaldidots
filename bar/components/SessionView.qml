@@ -241,7 +241,7 @@ Item {
             font.family: Theme.fontMedia; font.pixelSize: Theme.fontSizeBody * root.s
             font.weight: Font.Medium
             horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
-            color: control.prominent ? Theme.background : Theme.foreground
+            color: control.prominent ? Theme.primaryContent : Theme.foreground
         }
     }
 }

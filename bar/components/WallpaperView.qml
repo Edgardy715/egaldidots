@@ -11,6 +11,7 @@ Item {
     property bool closing: false
     property var wallpaperModel: null
     property bool applying: false
+    property string applyPhase: ""
     property bool scanning: false
     property string applyError: ""
     property string feedback: ""
@@ -26,11 +27,33 @@ Item {
     property real wheelTravel: 0
     property url previousPreview: ""
     property url readyPreview: ""
-    readonly property var sel: wallpaperModel && wallpaperModel.count > 0
-        ? wallpaperModel.get(Math.max(0, Math.min(pathView.currentIndex, wallpaperModel.count - 1))) : null
+    property url previewSource: ""
+    readonly property url desiredPreview: sel ? "file://" + sel.path.split("/").map(encodeURIComponent).join("/") + "?v=" + (sel.cacheRevision || 0) : ""
+    function updatePreview() {
+        if (active && !heroReveal.running && previewSource !== desiredPreview) previewSource = desiredPreview
+    }
+    onDesiredPreviewChanged: Qt.callLater(root.updatePreview)
+    readonly property int count: wallpaperModel ? wallpaperModel.count : 0
+    readonly property bool active: open && !closing
+    readonly property bool compact: width < 720 * s || Flags.fontScale > 1.25
+    property var sel: null
+    function refreshSelection() {
+        if (!wallpaperModel || wallpaperModel.count === 0) { sel = null; return }
+        const item = wallpaperModel.get(Math.max(0, Math.min(pathView.currentIndex, wallpaperModel.count - 1)))
+        sel = {path: item.path, baseName: item.baseName, thumbSource: item.thumbSource,
+               applied: item.applied, cacheRevision: item.cacheRevision}
+    }
+    onWallpaperModelChanged: Qt.callLater(root.refreshSelection)
+    onCountChanged: Qt.callLater(root.refreshSelection)
+    Connections {
+        target: root.wallpaperModel
+        function onDataChanged() { Qt.callLater(root.refreshSelection) }
+    }
     readonly property string selName: sel ? displayName(sel.baseName || "") : ""
     readonly property bool selApplied: sel ? sel.applied === true : false
-    readonly property color onPreviewAccent: (0.2126 * previewAccent.r + 0.7152 * previewAccent.g + 0.0722 * previewAccent.b) > 0.52 ? "#101116" : "#ffffff"
+    function linearChannel(value) { return value <= 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4) }
+    readonly property real previewLuminance: 0.2126 * linearChannel(previewAccent.r) + 0.7152 * linearChannel(previewAccent.g) + 0.0722 * linearChannel(previewAccent.b)
+    readonly property color onPreviewAccent: previewLuminance > 0.179 ? "#000000" : "#ffffff"
     readonly property int currentIndex: pathView.currentIndex
     signal requestClose()
     signal selectionChanged(int index)
@@ -43,7 +66,8 @@ Item {
         return name.replace(/[_-]+/g, " ")
     }
     function selectIndex(index) {
-        if (!wallpaperModel || wallpaperModel.count === 0 || applying) return
+        if (!active || !wallpaperModel || wallpaperModel.count === 0 || applying) return
+        closeTimer.stop()
         navigating = true
         navigateTimer.restart()
         pathView.currentIndex = ((index % wallpaperModel.count) + wallpaperModel.count) % wallpaperModel.count
@@ -54,20 +78,31 @@ Item {
         var idx = num === 0 ? 9 : num - 1
         if (idx >= 0 && idx < wallpaperModel.count) selectIndex(idx)
     }
-    function commitSelection() { commitRequested(pathView.currentIndex) }
+    function commitSelection() { if (active && count > 0 && !applying && (!selApplied || feedback === "error")) commitRequested(pathView.currentIndex) }
     function applyPath(path) { applyPathRequested(path) }
-    function applied() { applyBurst.burst(); closeTimer.restart() }
-    onOpenChanged: if (open) { navigating = false; footerEntered = false }
+    function applied() { if (active) closeTimer.restart() }
+    onActiveChanged: {
+        closeTimer.stop()
+        wheelTravel = 0
+        if (active) { navigating = false; footerEntered = false; updatePreview() }
+        else { navigateTimer.stop(); navigating = false; heroReveal.complete() }
+    }
+    Connections {
+        target: Flags
+        function onReduceMotionChanged() {
+            if (Flags.reduceMotion) heroReveal.complete()
+        }
+    }
     Timer { id: navigateTimer; interval: 2000; onTriggered: root.navigating = false }
     Timer {
         interval: Motion.stagger(6)
-        running: root.open && !root.footerEntered
+        running: root.active && !root.footerEntered
         onTriggered: root.footerEntered = true
     }
     Timer {
         id: closeTimer
-        interval: Math.max(500, Math.round(760 * Motion.mult))
-        onTriggered: root.requestClose()
+        interval: Math.max(900, Math.round(1100 * Motion.mult))
+        onTriggered: if (root.active) root.requestClose()
     }
     Item {
         id: header
@@ -75,13 +110,13 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: 64 * s
+        height: 72 * s
         z: 10
         opacity: root.footerEntered ? 1 : 0
 
         Rectangle {
             x: 23 * s
-            y: 16 * s
+            y: 19 * s
             width: 34 * s
             height: width
             radius: Theme.radiusLg * s
@@ -99,22 +134,25 @@ Item {
 
         Column {
             x: 68 * s
-            y: 13 * s
-            spacing: 1 * s
+            y: 16 * s
+            width: Math.min(root.mediaHas && root.width > 1000 * root.s && !root.compact ? 300 * root.s : root.width, Math.max(0, refreshButton.x - x - 78 * root.s))
+            spacing: 3 * s
 
             Text {
-                text: "Fondos de pantalla"
+                width: parent.width
+                elide: Text.ElideRight
+                text: qsTr("Fondos de pantalla")
                 color: Theme.foreground
                 font.family: Theme.font
-                font.pixelSize: 18 * s
+                font.pixelSize: Theme.fontSizeHead * s
                 font.weight: Font.DemiBold
             }
 
             Text {
-                text: qsTr("%1 fondos disponibles").arg(root.wallpaperModel.count)
+                text: qsTr("%1 fondos disponibles").arg(root.count)
                 color: Qt.alpha(Theme.foreground, Theme.alphaIconSec)
                 font.family: Theme.font
-                font.pixelSize: 11 * s
+                font.pixelSize: Theme.fontSizeSmall * s
             }
 
         }
@@ -125,7 +163,7 @@ Item {
             anchors.right: parent.right
             anchors.rightMargin: 22 * s
             y: 18 * s
-            width: 30 * s
+            width: 36 * s
             height: width
             radius: Theme.radiusSm * s
             color: closeMouse.containsMouse ? Qt.alpha(Theme.foreground, 0.13) : Qt.alpha(Theme.foreground, 0.06)
@@ -165,7 +203,7 @@ Item {
             anchors.right: closeButton.left
             anchors.rightMargin: 8 * s
             y: 18 * s
-            width: 30 * s
+            width: 36 * s
             height: width
             radius: Theme.radiusSm * s
             color: refreshMouse.containsMouse ? Qt.alpha(Theme.foreground, 0.13) : Qt.alpha(Theme.foreground, 0.06)
@@ -175,7 +213,7 @@ Item {
                 accessibleName: qsTr("Actualizar fondos")
 
                 anchors.fill: parent
-                enabled: !root.applying
+                enabled: root.active && !root.applying
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.refreshRequested()
@@ -202,7 +240,7 @@ Item {
                     to: 360
                     duration: 900
                     loops: Animation.Infinite
-                    running: root.scanning && root.open && !Flags.reduceMotion
+                    running: root.scanning && root.active && !Flags.reduceMotion
                 }
 
             }
@@ -214,7 +252,7 @@ Item {
             anchors.rightMargin: 116 * root.s
             anchors.verticalCenter: refreshButton.verticalCenter
             spacing: 10 * root.s
-            visible: root.mediaHas
+            visible: root.mediaHas && root.width > 1000 * root.s && !root.compact
 
             IslandMediaSummary {
                 s: root.s
@@ -237,7 +275,7 @@ Item {
             anchors.right: refreshButton.left
             anchors.rightMargin: 16 * s
             anchors.verticalCenter: refreshButton.verticalCenter
-            text: root.wallpaperModel.count > 0 ? (pathView.currentIndex + 1) + " / " + root.wallpaperModel.count : "—"
+            text: root.count > 0 ? (pathView.currentIndex + 1) + " / " + root.count : "—"
             color: root.previewAccent
             font.family: Theme.fontMono
             font.pixelSize: 12 * s
@@ -259,7 +297,7 @@ Item {
         anchors.right: parent.right
         anchors.bottom: footer.top
         anchors.margins: 12 * root.s
-        visible: root.wallpaperModel.count > 0
+        visible: root.count > 0
 
         Item {
             id: previewArea
@@ -284,7 +322,7 @@ Item {
                     anchors.fill: parent
                     objectName: "previewThumbnail"
                     source: root.sel ? root.sel.thumbSource : ""
-                    opacity: root.previousPreview.toString().length > 0 ? 0 : 1 - heroImage.opacity
+                    opacity: heroImage.status === Image.Error ? 1 : root.previousPreview.toString().length > 0 ? 0 : 1 - heroImage.opacity
                     sourceSize: Qt.size(960, 540)
                     fillMode: Image.PreserveAspectFit
                     asynchronous: true
@@ -293,7 +331,7 @@ Item {
                     anchors.fill: parent
                     objectName: "previousPreview"
                     source: root.previousPreview
-                    opacity: 1 - heroImage.opacity
+                    opacity: heroImage.status === Image.Error ? 0 : 1 - heroImage.opacity
                     sourceSize: Qt.size(1280, 720)
                     fillMode: Image.PreserveAspectFit
                     asynchronous: true
@@ -302,7 +340,7 @@ Item {
                     id: heroImage
                     objectName: "heroImage"
                     anchors.fill: parent
-                    source: root.sel ? "file://" + encodeURI(root.sel.path) : ""
+                    source: root.previewSource
                     sourceSize: Qt.size(1280, 720)
                     fillMode: Image.PreserveAspectFit
                     asynchronous: true
@@ -325,8 +363,26 @@ Item {
                         from: 0; to: 1
                         duration: Flags.reduceMotion ? 0 : Motion.standard
                         easing.type: Easing.InOutQuad
-                        onFinished: if (heroImage.status === Image.Ready) root.readyPreview = heroImage.source
+                        onFinished: {
+                            if (heroImage.status === Image.Ready) root.readyPreview = heroImage.source
+                            Qt.callLater(root.updatePreview)
+                        }
                     }
+                }
+                Rectangle {
+                    anchors.fill: parent
+                    z: 2
+                    color: Theme.background
+                    opacity: root.active && (root.applying || root.feedback === "done") ? 0.86 : 0
+                    Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.standardSmall; easing.type: Motion.easeStandard } }
+                }
+                WallpaperApplyFeedback {
+                    objectName: "wallpaperInlineConfirmation"
+                    anchors.centerIn: parent
+                    z: 3
+                    s: root.s
+                    phase: !root.active ? "" : root.applying ? (root.applyPhase || "preparing") : root.feedback === "done" ? "done" : ""
+                    allowed: root.active
                 }
                 Rectangle {
                     anchors.top: parent.top
@@ -356,13 +412,43 @@ Item {
             }
         }
 
+        Repeater {
+            model: ["chevron_left", "chevron_right"]
+            delegate: Rectangle {
+                required property int index
+                required property string modelData
+                x: index === 0 ? pathView.x - 46 * root.s : pathView.x + pathView.width + 10 * root.s
+                anchors.verticalCenter: pathView.verticalCenter
+                width: 36 * root.s; height: 44 * root.s
+                radius: Theme.radiusLg * root.s
+                color: Qt.alpha(Theme.foreground, railMouse.containsMouse ? 0.11 : 0.04)
+                opacity: railMouse.enabled ? 1 : 0.4
+                Behavior on color { ColorAnimation { duration: Motion.fast } }
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    iconName: modelData
+                    interaction: railMouse.motion
+                    hovered: railMouse.containsMouse
+                    color: Theme.foreground
+                    font.pixelSize: 24 * root.s
+                }
+                MotionArea {
+                    id: railMouse
+                    anchors.fill: parent
+                    accessibleName: index === 0 ? qsTr("Fondo anterior") : qsTr("Fondo siguiente")
+                    enabled: root.active && !root.applying && root.count > 1
+                    onClicked: root.cycle(index === 0 ? -1 : 1)
+                }
+            }
+        }
+
         ListView {
             id: pathView
             objectName: "wallpaperThumbnails"
-            anchors.left: parent.left
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
-            height: 66 * root.s
+            width: Math.min(Math.max(0, parent.width - 92 * root.s), root.count * 112 * root.s + Math.max(0, root.count - 1) * spacing)
+            height: 82 * root.s
             orientation: ListView.Horizontal
             spacing: 10 * root.s
             model: root.wallpaperModel
@@ -370,13 +456,28 @@ Item {
             interactive: !root.applying
             boundsBehavior: Flickable.StopAtBounds
             highlightRangeMode: ListView.ApplyRange
-            preferredHighlightBegin: width / 2 - 48 * root.s
-            preferredHighlightEnd: width / 2 + 48 * root.s
-            highlightMoveDuration: Flags.reduceMotion ? 0 : Motion.morph
-            onCurrentIndexChanged: root.selectionChanged(currentIndex)
+            preferredHighlightBegin: width / 2 - 56 * root.s
+            preferredHighlightEnd: width / 2 + 56 * root.s
+            highlightMoveDuration: Flags.reduceMotion ? 0 : Motion.standard
+            highlightResizeDuration: 0
+            cacheBuffer: 320 * root.s
+            highlight: Item {
+                z: 2
+                Rectangle {
+                    anchors.centerIn: parent
+                    anchors.verticalCenterOffset: Flags.reduceMotion ? 0 : -3 * root.s
+                    width: parent.width; height: 63 * root.s
+                    radius: 8 * root.s
+                    color: "transparent"
+                    border.width: 2 * root.s
+                    border.color: root.previewAccent
+                }
+            }
+            onCurrentIndexChanged: { Qt.callLater(root.refreshSelection); root.selectionChanged(currentIndex) }
 
             delegate: Item {
                 id: thumbnail
+                objectName: "wallpaperThumbnail"
                 required property int index
                 required property string thumbSource
                 required property string path
@@ -388,25 +489,44 @@ Item {
                 Component.onCompleted: {
                     if (!thumbReady && !thumbFailed) root.thumbnailRequested(path, thumb)
                 }
-                width: 96 * root.s
+                width: 112 * root.s
                 height: pathView.height
-                ClippingRectangle {
+                Rectangle {
                     anchors.centerIn: parent
                     width: parent.width
-                    height: 54 * root.s
+                    height: 63 * root.s
+                    transform: Translate {
+                        y: Flags.reduceMotion ? 0 : thumbnail.selected ? -3 * root.s : -Motion.iconLift * thumbMouse.motion.presence
+                        Behavior on y { enabled: root.active && !Flags.reduceMotion; SmoothedAnimation { duration: Motion.standardSmall; velocity: -1 } }
+                    }
+                    scale: thumbMouse.motion.visualScale
                     radius: 8 * root.s
                     color: Theme.cardBot
-                    border.width: thumbnail.selected ? 2 * root.s : Theme.borderHairline
-                    border.color: thumbnail.selected ? root.previewAccent : Theme.border
-                    opacity: thumbnail.selected || thumbMouse.containsMouse ? 1 : 0.72
+                    border.width: Theme.borderHairline
+                    border.color: Theme.border
+                    opacity: thumbnail.selected || thumbMouse.containsMouse ? 1 : 0.86
                     Behavior on opacity { Anim { type: Anim.FastEffects } }
                     Image {
                         anchors.fill: parent
                         anchors.margins: 3 * root.s
+                        objectName: "wallpaperThumbnailImage"
                         source: thumbnail.thumbSource
                         sourceSize: Qt.size(192, 108)
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true
+                    }
+                    Rectangle {
+                        anchors.right: parent.right; anchors.bottom: parent.bottom
+                        anchors.margins: 5 * root.s
+                        width: 18 * root.s; height: width; radius: width / 2
+                        color: Theme.background
+                        visible: thumbnail.applied
+                        MaterialIcon {
+                            anchors.centerIn: parent
+                            iconName: Icons.iCheck
+                            color: Theme.foreground
+                            font.pixelSize: 13 * root.s
+                        }
                     }
                     MaterialIcon {
                         interaction: thumbMouse.motion
@@ -418,17 +538,18 @@ Item {
                         color: Theme.iconSecondary
                         font.pixelSize: 18 * root.s
                     }
-                    MotionArea {
-                        id: thumbMouse
-                accessibleName: qsTr("Seleccionar fondo %1: %2").arg(thumbnail.index + 1).arg(root.displayName(thumbnail.path.split("/").pop()))
-                focusOnTab: false
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        enabled: !root.applying
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.selectIndex(thumbnail.index)
-                        onDoubleClicked: root.applyPath(thumbnail.path)
-                    }
+
+                }
+                MotionArea {
+                    id: thumbMouse
+                    accessibleName: qsTr("Seleccionar fondo %1: %2").arg(thumbnail.index + 1).arg(root.displayName(thumbnail.path.split("/").pop()))
+                    focusOnTab: false
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    enabled: root.active && !root.applying
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.selectIndex(thumbnail.index)
+                    onDoubleClicked: if (!thumbnail.applied || root.feedback === "error") root.applyPath(thumbnail.path)
                 }
             }
         }
@@ -454,8 +575,8 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: 88 * s
-        visible: root.wallpaperModel.count > 0
+        height: (root.compact ? 104 + 36 * Flags.fontScale : 98) * s
+        visible: root.count > 0
         opacity: root.footerEntered ? 1 : 0
 
         Rectangle {
@@ -469,7 +590,7 @@ Item {
         Column {
             x: 26 * s
             y: 14 * s
-            width: Math.max(1, footer.width - 340 * s)
+            width: Math.max(1, root.compact ? footer.width - 52 * s : applyActions.x - x - 24 * s)
             spacing: 5 * s
 
             Text {
@@ -477,87 +598,45 @@ Item {
                 text: root.selName
                 color: Theme.foreground
                 font.family: Theme.font
-                font.pixelSize: 17 * s
+                font.pixelSize: Theme.fontSizeHeadline * s
                 font.weight: Font.DemiBold
                 elide: Text.ElideMiddle
             }
 
             Text {
                 width: parent.width
-                text: root.feedback === "applying" ? "Cambiando fondo y colores…" : root.feedback === "done" ? "Fondo aplicado" : root.feedback === "error" ? root.applyError : root.selApplied ? "Fondo actual  ·  ← → para explorar" : "← → navegar  ·  Intro o doble clic para aplicar"
-                color: root.feedback === "error" ? "#ff9ba6" : root.feedback === "done" ? root.previewAccent : Qt.alpha(Theme.foreground, Theme.alphaIconSec)
+                text: root.feedback === "applying" ? "Cambiando fondo y colores…" : root.feedback === "done" ? "Fondo y colores actualizados" : root.feedback === "error" ? root.applyError : root.selApplied ? "Fondo actual  ·  ← → para explorar" : "← → navegar  ·  Intro o doble clic para aplicar"
+                color: root.feedback === "error" ? Theme.error : root.feedback === "done" ? root.previewAccent : Qt.alpha(Theme.foreground, Theme.alphaIconSec)
                 font.family: Theme.font
-                font.pixelSize: 11 * s
+                font.pixelSize: Theme.fontSizeSmall * s
+                wrapMode: Text.Wrap
+                maximumLineCount: 2
                 elide: Text.ElideRight
             }
 
         }
 
         Row {
+            id: applyActions
             anchors.right: parent.right
             anchors.rightMargin: 24 * s
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: (root.compact ? 12 : 29) * root.s
             spacing: 8 * s
 
-            Repeater {
-                model: ["chevron_left", "chevron_right"]
-
-                delegate: Rectangle {
-                    required property int index
-                    required property string modelData
-
-                    width: 40 * root.s
-                    height: width
-                    radius: Theme.radiusLg * root.s
-                    color: navMouse.containsMouse ? Qt.alpha(Theme.foreground, 0.14) : Qt.alpha(Theme.foreground, 0.07)
-                    border.width: Theme.borderHairline
-                    border.color: Theme.border
-
-                    MotionArea {
-                        id: navMouse
-                        accessibleName: index === 0 ? qsTr("Anterior") : qsTr("Siguiente")
-
-                        anchors.fill: parent
-                        enabled: !root.applying
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.cycle(index === 0 ? -1 : 1)
-                    }
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Motion.fast
-                        }
-
-                    }
-
-                    MaterialIcon {
-                        compressWithControl: true
-                        interaction: navMouse.motion
-                        hovered: navMouse.containsMouse
-                        anchors.centerIn: parent
-                        iconName: modelData
-                        color: Theme.foreground
-                        font.pixelSize: 22 * root.s
-                    }
-
-}
-
-            }
-
             Rectangle {
-                width: 164 * root.s
+                width: Math.max(164 * root.s, applyLabel.implicitWidth + 58 * root.s)
                 height: 40 * root.s
                 radius: Theme.radiusLg * root.s
                 color: applyMouse.pressed ? Qt.darker(root.previewAccent, 1.1) : applyMouse.containsMouse ? Qt.lighter(root.previewAccent, 1.1) : root.previewAccent
-                opacity: root.applying ? 0.65 : 1
+                opacity: applyMouse.enabled ? 1 : 0.65
 
                 MotionArea {
                     id: applyMouse
                     accessibleName: qsTr("Aplicar fondo")
 
                     anchors.fill: parent
-                    enabled: !root.applying && root.feedback !== "done"
+                    enabled: root.active && !root.applying && root.feedback !== "done" && (!root.selApplied || root.feedback === "error")
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: root.commitSelection()
@@ -588,7 +667,7 @@ Item {
                             to: 360
                             duration: 850
                             loops: Animation.Infinite
-                            running: root.applying && root.open && !Flags.reduceMotion
+                            running: root.applying && root.active && !Flags.reduceMotion
                         }
 
                     }
@@ -597,10 +676,11 @@ Item {
                         scale: applyMouse.motion.visualScale
                         transform: Translate { y: -Motion.labelTravel * applyMouse.motion.presence }
                         anchors.verticalCenter: parent.verticalCenter
-                        text: root.feedback === "done" ? "Listo" : root.applying ? "Aplicando…" : "Aplicar fondo"
+                        id: applyLabel
+                        text: root.feedback === "done" ? "Listo" : root.applying ? "Aplicando…" : root.feedback === "error" ? "Reintentar" : root.selApplied ? "Fondo actual" : "Aplicar fondo"
                         color: root.onPreviewAccent
                         font.family: Theme.font
-                        font.pixelSize: 13 * root.s
+                        font.pixelSize: Theme.fontSizeBodyLg * root.s
                         font.weight: Font.DemiBold
                     }
 
@@ -623,7 +703,7 @@ Item {
     Column {
         anchors.centerIn: parent
         spacing: Theme.spacingLg * s
-        visible: root.wallpaperModel.count === 0
+        visible: root.count === 0
 
         Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -642,7 +722,7 @@ Item {
             }
 
             SequentialAnimation on opacity {
-                running: root.scanning && root.open && !Flags.reduceMotion
+                running: root.scanning && root.active && !Flags.reduceMotion
                 loops: Animation.Infinite
 
                 NumberAnimation {
@@ -683,88 +763,9 @@ Item {
 
     }
 
-    Item {
-        id: applyBurst
-
-        function burst() {
-            applyBurst.visible = true;
-            burstAnim.restart();
-        }
-
-        anchors.centerIn: parent
-        width: 82 * s
-        height: 82 * s
-        visible: false
-        opacity: 0
-        z: 999
-
-        Rectangle {
-            anchors.fill: parent
-            radius: width / 2
-            color: Qt.alpha(Theme.background, 0.92)
-            border.width: Theme.borderEmphasis
-            border.color: root.previewAccent
-        }
-
-        MaterialIcon {
-            anchors.centerIn: parent
-            iconName: Icons.iCheck
-            color: root.previewAccent
-            font.pixelSize: 42 * s
-        }
-
-        SequentialAnimation {
-            id: burstAnim
-
-            ParallelAnimation {
-                PropertyAnimation {
-                    target: applyBurst
-                    property: "scale"
-                    from: 0.65
-                    to: 1.05
-                    duration: Motion.emphasized
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: Motion.emphasizedDecelCurve
-                }
-
-                PropertyAnimation {
-                    target: applyBurst
-                    property: "opacity"
-                    from: 0
-                    to: 1
-                    duration: Motion.standardSmall
-                    easing.type: Easing.OutCubic
-                }
-
-            }
-
-            PauseAnimation {
-                duration: Math.round(120 * Motion.mult)
-            }
-
-            PropertyAnimation {
-                target: applyBurst
-                property: "opacity"
-                from: 1
-                to: 0
-                duration: Motion.standard
-                easing.type: Easing.InCubic
-            }
-
-            ScriptAction {
-                script: {
-                    applyBurst.visible = false;
-                    applyBurst.opacity = 0;
-                }
-            }
-
-        }
-
-    }
-
     Behavior on previewAccent {
         ColorAnimation {
-            duration: Motion.morph
+            duration: Flags.reduceMotion ? 0 : Motion.standard
             easing.type: Easing.OutCubic
         }
 

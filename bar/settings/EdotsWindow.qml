@@ -18,26 +18,35 @@ FocusScope {
     onContentReadyChanged: { if (contentReady) activate(); else settingsPage.closePicker() }
     property alias previewScene: studio.scene
     property alias searchQuery: search.text
-    readonly property int resultCount: settingsPage.entries.length
+    readonly property int resultCount: settingsPage.entries.length + (hyprlandSearchMatch ? 1 : 0)
     readonly property string validationError: settingsPage.validationError
     property bool showPreview: false
     property int page: 0
+    property var hyprlandController: HyprlandSettings
+    readonly property bool hyprlandActive: !search.text && pageMotion.displayedPage === 6
+    readonly property bool hyprlandSearchMatch: {
+        const terms = settingsPage.normalize(search.text).trim().split(/\s+/).filter(Boolean)
+        const haystack = settingsPage.normalize(hyprlandPage.searchTerms)
+        return terms.length > 0 && terms.every(term => haystack.includes(term))
+    }
     readonly property bool compactNavigation: width < 760 || Config.appearance.fontScale > 1.35
+    readonly property int navigationRows: Math.ceil(root.titles.length / (root.compactNavigation ? 4 : root.titles.length))
     readonly property bool richComposition: height >= 680 && width >= 800 && Config.appearance.fontScale <= 1.35
     property bool savePending: false
     property string feedback: ""
-    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "profile", "paths"]
+    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "profile", "paths", "appearance"]
     readonly property var pageFields: [
         ["appearance.workspaceStyle", "appearance.glassAlpha", "appearance.uiScale", "appearance.topGap", "appearance.appGap", "appearance.spacingScale", "appearance.radiusScale", "appearance.time12h"],
         root.richComposition ? [] : ["appearance.barLayout"].concat(Object.keys(Config.schema.sections.modules).map(key => "modules." + key)),
         ["appearance.motionScale", "appearance.reduceMotion", "modules.animateChanges"],
         ["appearance.fontFamily", "appearance.fontMonoFamily", "appearance.fontDisplayFamily", "appearance.fontMediaFamily", "appearance.fontScale"],
         ["profile.displayName", "paths.userAvatar"],
-        ["paths.walColorsFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript", "appearance.pillBlur", "appearance.clockSeconds", "appearance.showGlyphs"]
+        ["paths.paletteFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript", "appearance.pillBlur", "appearance.clockSeconds", "appearance.showGlyphs"],
+        []
     ]
-    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "person", "settings"]
-    readonly property var titles: [qsTr("Apariencia"), qsTr("Composición"), qsTr("Movimiento"), qsTr("Tipografía"), qsTr("Tu perfil"), qsTr("Avanzado")]
-    readonly property var subtitles: [qsTr("Dale a Isla tu forma de sentir el escritorio."), qsTr("Elige qué te acompaña. La Isla permanece en el centro."), qsTr("Ajusta el ritmo. Prueba la respuesta antes de guardar."), qsTr("Una lectura cómoda, con tu propia personalidad."), qsTr("Los pequeños detalles que hacen tuyo este espacio."), qsTr("Archivos y carpetas que utiliza tu shell.")]
+    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "person", "settings", "view_carousel"]
+    readonly property var titles: [qsTr("Apariencia"), qsTr("Composición"), qsTr("Movimiento"), qsTr("Tipografía"), qsTr("Tu perfil"), qsTr("Avanzado"), qsTr("Hyprland")]
+    readonly property var subtitles: [qsTr("Dale a Isla tu forma de sentir el escritorio."), qsTr("Elige qué te acompaña. La Isla permanece en el centro."), qsTr("Ajusta el ritmo. Prueba la respuesta antes de guardar."), qsTr("Una lectura cómoda, con tu propia personalidad."), qsTr("Los pequeños detalles que hacen tuyo este espacio."), qsTr("Archivos y carpetas que utiliza tu shell."), qsTr("Elige cómo se organizan y se mueven tus ventanas.")]
     onPageChanged: if (contentReady && visible && enabled) body.forceActiveFocus()
     EdotsPageMotion {
         id: pageMotion
@@ -47,6 +56,7 @@ FocusScope {
     }
     function saveChanges() {
         body.forceActiveFocus()
+        if (hyprlandActive) { hyprlandPage.saveChanges(); return }
         feedback = ""
         if (!settingsPage.commitDrafts()) { settingsPage.focusFirstError(); return }
         savePending = Config.dirty
@@ -114,20 +124,20 @@ FocusScope {
                 placeholderText: root.width < 760 ? qsTr("Buscar ajustes") : qsTr("Buscar ajustes  ·  Ctrl+F"); color: Theme.foreground; placeholderTextColor: "transparent"
                 font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody)
                 selectByMouse: true; leftPadding: 15
-                selectionColor: Theme.accent; selectedTextColor: Theme.background
+                selectionColor: Theme.accent; selectedTextColor: Theme.primaryContent
                 Keys.onEscapePressed: { text = ""; body.forceActiveFocus() }
                 cornerRadius: height / 2
             }
             EdotsButton { text: ""; symbol: "close"; implicitWidth: 44; Accessible.name: qsTr("Volver a Isla"); onClicked: root.requestClose() }
         }
         Item {
-            Layout.fillWidth: true; implicitHeight: root.compactNavigation ? 96 : 64
+            Layout.fillWidth: true; implicitHeight: root.compactNavigation ? root.navigationRows * 48 : 64
             Rectangle { anchors.fill: parent; radius: 20; color: Qt.alpha(Theme.foreground, 0.035) }
             Rectangle {
                 id: navigationLens
                 x: (root.page % navigation.columns) * (parent.width / navigation.columns) + 4
-                y: Math.floor(root.page / navigation.columns) * (parent.height / (root.compactNavigation ? 2 : 1)) + 4
-                width: parent.width / navigation.columns - 8; height: parent.height / (root.compactNavigation ? 2 : 1) - 8; radius: 16
+                y: Math.floor(root.page / navigation.columns) * (parent.height / root.navigationRows) + 4
+                width: parent.width / navigation.columns - 8; height: parent.height / root.navigationRows - 8; radius: 16
                 color: Qt.alpha(Theme.accent, 0.17); border.width: 1; border.color: Qt.alpha(Theme.accent, 0.24)
                 Behavior on x { enabled: !Config.appearance.reduceMotion && root.visible; SmoothedAnimation { duration: Motion.emphasized; velocity: -1 } }
                 Behavior on y { enabled: !Config.appearance.reduceMotion && root.visible; SmoothedAnimation { duration: Motion.emphasized; velocity: -1 } }
@@ -135,7 +145,7 @@ FocusScope {
             Grid {
                 id: navigation
                 anchors.fill: parent
-                columns: root.compactNavigation ? 3 : 6
+                columns: root.compactNavigation ? 4 : root.titles.length
                 Repeater {
                     model: root.titles
                     MotionButton {
@@ -143,7 +153,7 @@ FocusScope {
                         required property int index
                         required property string modelData
                         objectName: "settingsNav" + index
-                        width: parent.width / navigation.columns; height: parent.height / (root.compactNavigation ? 2 : 1)
+                        width: parent.width / navigation.columns; height: parent.height / root.navigationRows
                         onClicked: { body.forceActiveFocus(); root.page = index; search.text = "" }
                         background: Rectangle {
                             anchors.fill: parent; anchors.margins: 4; radius: 16
@@ -154,7 +164,7 @@ FocusScope {
                         contentItem: Column {
                             spacing: 5
                             EdotsIcon { visible: !root.compactNavigation; Accessible.ignored: true; anchors.horizontalCenter: parent.horizontalCenter; iconName: root.symbols[nav.index]; font.pixelSize: 19; color: root.page === nav.index ? Theme.accent : Theme.foreground; interaction: nav.interaction; selected: root.page === nav.index }
-                            Text { anchors.horizontalCenter: parent.horizontalCenter; text: nav.modelData; color: root.page === nav.index ? Theme.foreground : Qt.alpha(Theme.foreground, 0.75); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody); Behavior on color { ColorAnimation { duration: Motion.fast } } }
+                            Text { anchors.horizontalCenter: parent.horizontalCenter; width: nav.width - 16; horizontalAlignment: Text.AlignHCenter; elide: Text.ElideRight; text: nav.modelData; color: root.page === nav.index ? Theme.foreground : Qt.alpha(Theme.foreground, 0.75); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody); Behavior on color { ColorAnimation { duration: Motion.fast } } }
                         }
                         Accessible.name: modelData
                         Accessible.role: Accessible.PageTab
@@ -172,12 +182,18 @@ FocusScope {
         Column {
             Layout.fillWidth: true; spacing: 7
             Text { text: search.text ? qsTr("Resultados de búsqueda") : root.titles[pageMotion.displayedPage]; color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 24 * Math.min(1.35, Config.appearance.fontScale); font.weight: Font.DemiBold }
-            Text { visible: root.height >= 620; width: parent.width; text: search.text ? qsTr("%1 ajustes encontrados en toda la configuración.").arg(settingsPage.entries.length) : root.subtitles[pageMotion.displayedPage]; color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(13, Theme.fontSizeBodyLg); wrapMode: Text.WordWrap }
+            Text { visible: root.height >= 620; width: parent.width; text: search.text ? qsTr("%1 resultados en toda la configuración.").arg(root.resultCount) : root.subtitles[pageMotion.displayedPage]; color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(13, Theme.fontSizeBodyLg); wrapMode: Text.WordWrap }
         }
         EdotsButton {
-            visible: search.text.length > 0 && settingsPage.entries.length === 0
+            visible: search.text.length > 0 && root.resultCount === 0
             text: qsTr("Limpiar búsqueda")
             onClicked: { search.text = ""; search.forceActiveFocus() }
+        }
+        EdotsButton {
+            objectName: "hyprlandSearchResult"
+            visible: root.hyprlandSearchMatch
+            text: qsTr("Hyprland · Flujo y animaciones"); symbol: "view_carousel"
+            onClicked: { root.page = 6; search.text = ""; body.forceActiveFocus() }
         }
         ModuleComposer {
             Layout.fillWidth: true; visible: !search.text && pageMotion.displayedPage === 1 && root.richComposition
@@ -218,7 +234,7 @@ FocusScope {
         RowLayout {
             Layout.fillWidth: true; Layout.fillHeight: true; spacing: 24
         SettingsPage {
-            id: settingsPage; visible: search.text.length > 0 || pageMotion.displayedPage !== 1 || !root.richComposition
+            id: settingsPage; visible: !root.hyprlandActive && (search.text.length > 0 || pageMotion.displayedPage !== 1 || !root.richComposition)
             Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumWidth: 260
             popupBounds: root
             config: Config; section: root.sections[pageMotion.displayedPage]; fieldKeys: root.pageFields[pageMotion.displayedPage]; query: search.text
@@ -229,6 +245,13 @@ FocusScope {
                 Qt.callLater(() => settingsPage.focusFirstError())
             }
         }
+            HyprlandPage {
+                id: hyprlandPage
+                objectName: "hyprlandPage"
+                visible: root.hyprlandActive
+                Layout.fillWidth: true; Layout.fillHeight: true
+                controller: root.hyprlandController
+            }
             ColumnLayout {
                 visible: !search.text && pageMotion.displayedPage === 2 && root.width >= 900 && root.height >= 660 && Config.appearance.fontScale <= 1.35
                 Layout.preferredWidth: root.width < 900 ? 270 : 330
@@ -254,14 +277,16 @@ FocusScope {
             }
         }
         }
-        Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: Theme.border }
+        Rectangle { visible: !root.hyprlandActive; Layout.fillWidth: true; Layout.preferredHeight: 1; color: Theme.border }
         ColumnLayout {
+            visible: !root.hyprlandActive
             Layout.fillWidth: true; spacing: 8
             Text {
                 objectName: "settingsStatus"
                 Layout.fillWidth: true
                 text: Config.saving ? qsTr("Guardando…") : Config.error || (settingsPage.validationError ? qsTr("No se guardaron los cambios. Revisa los ajustes marcados.")
                     : (Config.dirty || settingsPage.hasDrafts) ? qsTr("Vista previa activa · Guarda para conservar los cambios")
+                    : root.hyprlandController.dirty ? qsTr("Hyprland tiene una vista previa pendiente. Guárdala o reviértela en su sección.")
                     : root.feedback || qsTr("Todos los cambios están guardados"))
                 color: Config.error || settingsPage.validationError ? Theme.error : Theme.foreground
                 font.family: Config.appearance.fontFamily
@@ -276,6 +301,7 @@ FocusScope {
                 Layout.fillWidth: true; spacing: 8
                 EdotsButton { visible: Config.error.length > 0; text: qsTr("Recargar"); onClicked: { settingsPage.clearValidation(); Config.reload() } }
                 EdotsButton { visible: settingsPage.validationError.length > 0; text: qsTr("Revisar ajuste"); onClicked: settingsPage.focusFirstError() }
+                EdotsButton { visible: root.hyprlandController.dirty; text: qsTr("Ver Hyprland"); onClicked: { root.page = 6; search.text = "" } }
                 Item { Layout.fillWidth: true }
                 EdotsButton { text: qsTr("Descartar"); enabled: (Config.dirty || settingsPage.hasDrafts || settingsPage.validationError.length > 0) && !Config.saving; onClicked: { body.forceActiveFocus(); Config.discard(); settingsPage.clearValidation(); root.feedback = qsTr("Cambios descartados") } }
                 EdotsButton { objectName: "settingsSave"; text: qsTr("Guardar"); symbol: "check"; accent: true; enabled: Config.loaded && !Config.saving && !Config.error && (Config.dirty || settingsPage.hasDrafts); onClicked: root.saveChanges() }

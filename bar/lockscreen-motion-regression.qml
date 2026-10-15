@@ -44,8 +44,8 @@ ShellRoot {
             test.check(surface.travel >= surface.expansion, "travel leads growth")
             if (surface.contentOpacity > 0 && !surface.retiring)
                 test.check(surface.expansion > 0.84, "input waits for sufficient geometry")
-            if (surface.wingProgress > 0)
-                test.check(surface.expansion > 0.9, "wings wait for central geometry")
+            const body = test.find(surface, "lockBody")
+            test.check(body.width <= 324 * surface.unit + 1, "auth surface stays a single centered card")
         }
     }
     Timer {
@@ -71,33 +71,35 @@ ShellRoot {
                 break
             case 9:
                 test.check(surface.presentation > 0.99, "opening settles")
-                test.check(surface.wingProgress > 0.99, "wings settle with card")
+                test.check(Math.abs(test.find(surface, "lockBody").width - 324 * surface.unit) < 2, "card settles without side wings")
                 test.capture("03-ready")
-                surface.activateInput("x")
                 break
             case 10:
+                surface.activateInput("x")
+                break
+            case 11:
                 test.check(test.find(surface, "lockPasswordDots").model.count === 1, "typing creates one visual dot")
                 surface.errorText = "Contraseña incorrecta. Inténtalo de nuevo."
                 break
-            case 11: test.capture("04-rejected"); break
-            case 13:
+            case 12: test.capture("04-rejected"); break
+            case 14:
                 test.check(test.sawRejection && Math.abs(surface.fieldOffset) < 0.01, "rejection recoils and settles")
                 surface.errorText = ""
                 surface.authenticated = true
                 break
-            case 16:
+            case 17:
                 test.check(surface.successProgress > 0.5 && !surface.departing, "success shown before departure")
                 test.capture("05-success")
                 break
-            case 19:
+            case 20:
                 test.check(surface.retiring && (!surface.departing || surface.contentOpacity <= 0.001), "content withdraws before collapse")
                 test.capture("06-return")
                 break
-            case 24:
+            case 25:
                 test.check(surface.departing && surface.presentation < 0.01, "success returns to pill")
                 test.capture("07-pill-return")
                 break
-            case 26:
+            case 27:
                 test.check(Config.update({appearance: {reduceMotion: true}}).ok, "temporary config ready")
                 surface.authenticated = false
                 surface.retiring = false
@@ -105,7 +107,7 @@ ShellRoot {
                 surface.entered = true
                 surface.errorText = "Otro error"
                 break
-            case 28:
+            case 29:
                 test.check(surface.presentation === 1 && surface.fieldOffset === 0, "reduced motion resolves geometry without recoil")
                 console.log("PASS: lockscreen morph interruption, rejection, success ordering, return and reduced motion")
                 Qt.quit()

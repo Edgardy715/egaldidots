@@ -13,7 +13,7 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y stow ripgrep
       - name: Installer syntax
         run: |
-          for script in install.sh bar/lockscreen/install.sh bar/lockscreen/lock.sh fish/.local/bin/isla fish/.local/bin/isla-lock hypr/.config/hypr/scripts/apply-wallpaper.sh hypr/.config/hypr/scripts/wallpaper-picker.sh; do
+          for script in install.sh bar/lockscreen/install.sh bar/lockscreen/lock.sh fish/.local/bin/isla fish/.local/bin/isla-lock hypr/.config/hypr/scripts/apply-wallpaper.sh; do
             bash -n "$script"
           done
       - name: Recovery with real Stow and simulated system commands
@@ -21,4 +21,10 @@ jobs:
       - name: Lockscreen launcher
         run: python3 bar/tests/lockscreen-launcher.py
       - name: Starship palette
-        run: python3 starship/.config/starship/test_pywal.py
+        run: python3 starship/.config/starship/test_matugen.py
+      - name: Matugen atomic palette pipeline
+        run: python3 scripts/test-matugen.py
+      - name: Palette roles and settings contract
+        run: |
+          node bar/tests/palette.cjs
+          node bar/tests/settings.cjs

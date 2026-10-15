@@ -17,16 +17,21 @@ Item {
     readonly property color previewAccent: Wallpapers.accentFor(sel ? sel.path : "", accentFallback)
     signal selectionRequested(int index)
     signal applied()
-    onSelectedIndexChanged: requestVisibleThumbs()
-    onOpenChanged: if (open) { feedback = ""; syncCurrentIndex() }
+    onSelectedIndexChanged: {
+        const item = wpModel.count > selectedIndex && selectedIndex >= 0 ? wpModel.get(selectedIndex) : null
+        if (!applying && pendingPath.length > 0 && item && item.path !== pendingPath) feedback = ""
+        requestVisibleThumbs()
+    }
+    onOpenChanged: if (open) { feedback = Wallpapers.applyError ? "error" : ""; syncCurrentIndex() }
     function selectIndex(index) {
         if (wpModel.count === 0 || Wallpapers.applying) return
         selectionRequested(((index % wpModel.count) + wpModel.count) % wpModel.count)
     }
     function syncCurrentIndex() {
         if (wpModel.count === 0 || navigating) return
-        if (Wallpapers.current !== "") {
-            for (var i = 0; i < wpModel.count; i++) if (wpModel.get(i).path === Wallpapers.current) {
+        const target = Wallpapers.applyError && Wallpapers.lastAttemptPath ? Wallpapers.lastAttemptPath : Wallpapers.current
+        if (target !== "") {
+            for (var i = 0; i < wpModel.count; i++) if (wpModel.get(i).path === target) {
                 selectionRequested(i)
                 return
             }
@@ -57,7 +62,7 @@ Item {
             commitIndex(i)
             return
         }
-        commitIndex(selectedIndex)
+        // A stale preview path must never apply a different selected image.
     }
     Component.onCompleted: {
         if (Wallpapers.count > 0) {
@@ -86,10 +91,10 @@ Item {
                         "baseName": w.baseName,
                         "thumb": w.thumb,
                         "thumbReady": w.thumbReady === true,
-                        "thumbSource": w.thumbReady ? ("file://" + encodeURI(w.thumb)) : "",
+                        "thumbSource": w.thumbSource || "",
                         "cacheRevision": w.cacheRevision || 0,
                         "shimmer": !w.thumbReady,
-                        "thumbFailed": false,
+                        "thumbFailed": wpModel.get(i).thumb === w.thumb && wpModel.get(i).thumbFailed,
                         "applied": w.path === Wallpapers.current
                     });
                 }
@@ -102,7 +107,7 @@ Item {
                         "baseName": w.baseName,
                         "thumb": w.thumb,
                         "thumbReady": w.thumbReady === true,
-                        "thumbSource": w.thumbReady ? ("file://" + encodeURI(w.thumb)) : "",
+                        "thumbSource": w.thumbSource || "",
                         "cacheRevision": w.cacheRevision || 0,
                         "shimmer": !w.thumbReady,
                         "thumbFailed": false,

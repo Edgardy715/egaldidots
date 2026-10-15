@@ -10,8 +10,8 @@ bar. Wallpaper colors carry through the shell, terminal, editor and GTK theme.
 - Isla: launcher, workspaces, media, calendar, notifications and clipboard.
 - Edots: settings for the bar layout, appearance and optional modules.
 - A Quickshell lockscreen, with hyprlock as a fallback.
-- Fish and Starship, Kitty, LazyVim, fastfetch and pywal16.
-- Older Waybar, rofi, swaync and wlogout configurations are included.
+- Fish and Starship, Kitty, LazyVim, fastfetch and Matugen.
+- Isla provides the launcher, notifications and session menu; Matugen generates colors.
 
 The screenshots show an earlier version of Isla.
 
@@ -98,8 +98,7 @@ installed Qt version.
 ## Credits
 
 [Quickshell](https://quickshell.org), [Hyprland](https://hyprland.org),
-[pywal16](https://github.com/eylles/pywal16),
-[wpgtk](https://github.com/deviantfero/wpgtk),
+[Matugen](https://github.com/InioX/matugen),
 [Starship](https://starship.rs) and [LazyVim](https://www.lazyvim.org).
 Fluid Island references are listed in its [README](bar/fluid/README.md).
 

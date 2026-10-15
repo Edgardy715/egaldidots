@@ -7,12 +7,38 @@ run `bar/settings/install.sh`.
 ## Settings
 
 The pages cover appearance, workspace styles, optional bar modules, fonts,
-motion, profile and file paths. Search filters the available settings.
+motion, profile, file paths and Hyprland. Search filters settings and links to
+the compositor page for flow and animation queries.
 The bar supports split and compact layouts.
 
 Changes preview in the running shell. **Save** writes them to
 `~/.config/isla/shell.json`; **Discard** restores the values from disk.
 Closing the panel keeps the current page and unsaved edits.
+
+## Hyprland
+
+The Hyprland page reads the running compositor's layout and animations. Choose
+scrolling columns, dwindle tiling or master layout, and adjust the enabled state,
+style and duration of window opening, window closing and workspace transitions.
+Changes preview in the current session through the Lua runtime API; the panel
+does not reload Hyprland or edit its configuration modules.
+
+This page has its own **Save** and **Revert** controls. Save writes
+`$XDG_CONFIG_HOME/isla/hyprland.json` (normally `~/.config/isla/hyprland.json`);
+Isla restores these overrides when it starts. Revert restores the values read
+when the page initialized, or the last saved values. Closing the panel retains
+the preview. Saving shell appearance uses the separate `shell.json` file.
+
+The first version supports Hyprland 0.56's Lua API. It preserves animation
+curves and does not expose inherited leaves that cannot be restored precisely
+without a compositor reload. Physical spring curves determine their own
+duration. Explicit workspace child animations can override the parent setting,
+and globally disabled animations remain disabled.
+
+**Refresh** rereads the runtime when no preview is pending. File conflicts block
+saving. An invalid saved file remains intact until **Use current session** is
+chosen; that action creates a backup before replacing it with the live settings.
+`ISLA_HYPRLAND_CONFIG` selects an isolated persistence file for tests.
 
 Numeric fields validate their ranges before applying an edit. If the same field
 changes on disk while you are editing it, resolve the conflict by editing,

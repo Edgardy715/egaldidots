@@ -110,7 +110,7 @@ Item {
                 id: statusIcon
                 anchors.centerIn: parent
                 iconName: root.succeeded ? "check" : root.busy ? "sync" : "wifi_lock"
-                color: root.succeeded ? Theme.background : Theme.accent
+                color: root.succeeded ? Theme.primaryContent : Theme.accent
                 font.pixelSize: 34 * root.s
                 RotationAnimator on rotation {
                     from: 0; to: 360; duration: 900; loops: Animation.Infinite
@@ -249,7 +249,7 @@ Item {
             }
             contentItem: Text {
                 text: parent.text
-                color: parent.enabled ? Theme.background : Theme.iconSecondary
+                color: parent.enabled ? Theme.primaryContent : Theme.iconSecondary
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeBody * root.s
                 font.weight: Font.DemiBold

@@ -77,10 +77,12 @@ ShellRoot {
                 test.check(input.selectionEnd - input.selectionStart === input.text.length, "selection stays native")
                 input.clear()
                 test.countMatches(input, dots)
+                test.check(!test.find(surface, "lockPasswordDotViewport").visible, "clearing hides retiring dots before placeholder returns")
                 break
             case 3:
                 input.text = "sample"
                 test.countMatches(input, dots)
+                test.check(test.find(surface, "lockPasswordDotViewport").visible, "new input restores visual dots")
                 break
             case 4:
                 test.check(dots.contentWidth > 0 && dots.itemAtIndex(0) !== null, "visual dots are instantiated")

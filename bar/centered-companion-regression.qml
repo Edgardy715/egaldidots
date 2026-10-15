@@ -26,6 +26,8 @@ ShellRoot {
                 check(Math.abs(drop.xPos + drop.wPos / 2 - 960) < 0.1, "card centered horizontally")
                 check(Math.abs(drop.yPos + drop.hPos / 2 - 540) < 0.1, "card centered vertically")
                 drop.close()
+                check(drop.targetW === drop.returnW && drop.targetH === drop.returnH
+                    && drop.targetW >= body.width - body.height, "return lands as pill capsule instead of a ball")
                 for (let i = 0; i < 10; i++) drop.advanceMotion(1 / 60)
                 const x = drop.xPos, vx = drop.vx
                 drop.retarget("media", drop.cardX, drop.cardY, drop.cardW, drop.cardH)
@@ -33,10 +35,30 @@ ShellRoot {
                 for (let i = 0; i < 150; i++) drop.advanceMotion(1 / 60)
                 drop.close()
                 body.width = width === 100 ? 760 : 100
+                body.height = width === 100 ? 56 : 38
+                check(drop.targetW === drop.returnW && drop.targetH === drop.returnH, "return dimensions follow changing pill")
                 for (let i = 0; i < 240 && drop.phase !== "idle"; i++) drop.advanceMotion(1 / 60)
                 check(drop.phase === "idle" && !drop.active, "absorbed after body changes layout")
+                check(drop.coveredByBody, "whole returning capsule fits receiving pill")
                 check(drop.captureExtra === 0, "centered return never stretches right edge")
             }
+            body.width = 1500
+            body.height = 56
+            drop.open = true
+            drop.start()
+            for (let i = 0; i < 150; i++) drop.advanceMotion(1 / 60)
+            drop.open = false
+            check(drop.targetW <= drop.cardW, "wide pill does not enlarge closing editor")
+            for (let i = 0; i < 120 && !drop.joined; i++) drop.advanceMotion(1 / 60)
+            check(drop.joined && !drop.concealed, "return reaches receiving neck before hiding")
+            const before = [drop.xPos, drop.yPos, drop.wPos, drop.hPos, drop.vx, drop.vy, drop.vw, drop.vh]
+            drop.open = true
+            const after = [drop.xPos, drop.yPos, drop.wPos, drop.hPos, drop.vx, drop.vy, drop.vw, drop.vh]
+            check(before.every((value, index) => value === after[index]) && !drop.concealed,
+                "reopen at contact preserves shape and all velocities")
+            drop.open = false
+            for (let i = 0; i < 240 && drop.phase !== "idle"; i++) drop.advanceMotion(1 / 60)
+            check(drop.phase === "idle" && drop.coveredByBody, "wide receiving pill finishes capture")
             Config.update({appearance: {reduceMotion: true}})
             drop.start(); drop.close()
             check(drop.phase === "idle", "reduced motion resolves centered return")

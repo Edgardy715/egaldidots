@@ -41,7 +41,7 @@ var fields = {
     },
     paths: {
         userAvatar: { type: "string", path: true, base: "home", suffix: "/.face", label: "Avatar", control: "path", description: "Ruta de la imagen de usuario para sesión y bloqueo." },
-        walColorsFile: { type: "string", path: true, base: "cacheHome", suffix: "/wal/colors.json", label: "Archivo de colores", control: "path", description: "Archivo de colores que consume la paleta de Isla." },
+        paletteFile: { type: "string", path: true, base: "cacheHome", suffix: "/matugen/palette.json", label: "Archivo de colores", control: "path", description: "Paleta semántica de Matugen que consume Isla." },
         wallpaperDir: { type: "string", path: true, picker: "folder", base: "home", suffix: "/Wallpapers", label: "Carpeta de wallpapers", control: "path", description: "Carpeta de origen del selector de wallpapers." },
         wallpaperCacheDir: { type: "string", path: true, picker: "folder", base: "cacheHome", suffix: "/quickshell/wallpapers", label: "Caché de wallpapers", control: "path", description: "Carpeta para miniaturas generadas por el selector." },
         wallpaperApplyScript: { type: "string", path: true, base: "configHome", suffix: "/hypr/scripts/apply-wallpaper.sh", label: "Script de wallpaper", control: "path", description: "Script ejecutado para aplicar el wallpaper seleccionado." }

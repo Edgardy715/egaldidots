@@ -24,7 +24,7 @@ Singleton {
     // Comandos predeterminados del sistema.
     readonly property string lockCmd: (Quickshell.env("XDG_DATA_HOME")
         || Quickshell.env("HOME") + "/.local/share") + "/quickshell-lockscreen/lock.sh"
-    readonly property string logoutCmd: "hyprctl dispatch exit 0"
+    readonly property string logoutCmd: "if command -v uwsm >/dev/null 2>&1 && uwsm check is-active >/dev/null 2>&1; then uwsm stop; else loginctl terminate-session \"${XDG_SESSION_ID:?}\"; fi"
     readonly property string shutdownCmd: "systemctl poweroff"
     readonly property string rebootCmd: "systemctl reboot"
     readonly property string hibernateCmd: "systemctl hibernate"

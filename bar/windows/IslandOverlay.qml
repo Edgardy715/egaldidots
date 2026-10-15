@@ -368,6 +368,9 @@ PanelWindow {
             forcePinned: router.peekMon === overlay.modelData.name
             fluidJoined: (!overlay.compact && (!overlay.surfaceOpen || overlay.sessionOpen) && fluidCompanion.joined)
                 || sessionCompanion.joined || settingsCompanion.joined
+            fluidEdgeExposure: Math.min(
+                !overlay.compact && (!overlay.surfaceOpen || overlay.sessionOpen) ? fluidCompanion.edgeExposure : 1,
+                sessionCompanion.edgeExposure, settingsCompanion.edgeExposure)
             fluidCaptureExtra: settingsCompanion.active ? settingsCompanion.captureExtra
                 : overlay.compact || overlay.surfaceOpen && !overlay.sessionOpen ? 0 : fluidCompanion.captureExtra
             fluidCaptureLeftExtra: sessionCompanion.captureExtra
@@ -419,7 +422,7 @@ PanelWindow {
         FluidCompanion {
             id: settingsCompanion
             anchors.fill: parent
-            z: 4
+            z: overlay.settingsReturning ? 1 : 4
             body: pill
             centered: true
             surfaceName: "settings"
@@ -435,6 +438,7 @@ PanelWindow {
                 }
             }
             retainExpandedContent: true
+            asynchronousExpandedContent: true
             open: overlay.settingsOpen
             expanded: overlay.settingsOpen
             bodyBusy: pill.surfaceOpen || pill.notifAnimating

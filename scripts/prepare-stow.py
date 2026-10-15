@@ -26,9 +26,8 @@ def prepare(repo, home, backup, packages):
     data = Path(os.environ.get('XDG_DATA_HOME', home / '.local/share'))
     state = Path(os.environ.get('XDG_STATE_HOME', home / '.local/state'))
     generated = [Path('.config/quickshell/bar'), Path('.config/hypr/local.hardware.conf'),
-                 Path('.cache/wal/colors.json'), (data / 'isla/qml/Wpscan').relative_to(home),
+                 Path('.cache/matugen/palette.json'), (data / 'isla/qml/Wpscan').relative_to(home),
                  (data / 'quickshell-lockscreen/lock.sh').relative_to(home),
-                 (data / 'themes/FlatColor/.check').relative_to(home),
                  (data / 'nvim/lazy/lazy.nvim/.check').relative_to(home),
                  (state / 'isla/.check').relative_to(home)]
     for _, rel in sources + [(None, p) for p in generated]:
@@ -78,6 +77,24 @@ def prepare(repo, home, backup, packages):
                 parent.mkdir()
             else:
                 parent.mkdir(exist_ok=True)
+
+    # Retired Stow packages can leave dangling links after updating the checkout.
+    retired = [repo / name for name in ('rofi', 'waybar', 'swaync', 'wlogout', 'wal', 'wpg')]
+    retired += [repo / 'hypr/.config/hypr/scripts' / name for name in
+                ('generate-rofi-theme.py', 'wallpaper-picker.sh', 'wall-colors.py')]
+    retired += [repo / 'starship/.config/starship' / name for name in ('pywal.py', 'test_pywal.py')]
+    roots = [home / '.config' / name for name in
+             ('rofi', 'waybar', 'swaync', 'wlogout', 'wal', 'wpg', 'hypr/scripts', 'starship')]
+    for root in roots:
+        candidates = [root] if root.is_symlink() else []
+        if not root.is_symlink():
+            for directory, dirs, files in os.walk(root, followlinks=False):
+                candidates.extend(Path(directory) / name for name in dirs + files
+                                  if (Path(directory) / name).is_symlink())
+        for link in candidates:
+            resolved = link.resolve()
+            if any(resolved.is_relative_to(old) for old in retired):
+                save(link)
 
     for source, rel in sorted(sources, key=lambda item: str(item[1])):
         target = home / rel

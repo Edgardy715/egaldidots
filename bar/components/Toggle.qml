@@ -70,7 +70,7 @@ Item {
             width: parent.height - 4 * s
             height: parent.height - 4 * s
             radius: width / 2
-            color: "#ffffff"
+            color: root.checked ? Theme.primaryContent : Theme.iconSecondary
             anchors.verticalCenter: parent.verticalCenter
             x: root.checked ? parent.width - width - 2 * s : 2 * s
             Behavior on x { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Motion.hover; velocity: -1 } }

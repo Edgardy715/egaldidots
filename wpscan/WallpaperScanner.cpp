@@ -5,16 +5,41 @@
 #include <QImage>
 #include <QImageReader>
 #include <QImageWriter>
+#include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QSaveFile>
 #include <QtConcurrent/QtConcurrent>
 #include <QSet>
+#include <QFutureWatcher>
 #include <algorithm>
 
 static QString thumbMetadataPath(const QString &cachePath) {
     return cachePath + QStringLiteral(".meta.json");
+}
+
+static QJsonObject thumbSignature(const QFileInfo &source, const QFileInfo &cache,
+                                  int width, int height, int quality) {
+    return {{"source", source.absoluteFilePath()},
+            {"sourceSize", static_cast<double>(source.size())},
+            {"sourceModified", static_cast<double>(source.lastModified().toMSecsSinceEpoch())},
+            {"cacheSize", static_cast<double>(cache.size())},
+            {"cacheModified", static_cast<double>(cache.lastModified().toMSecsSinceEpoch())},
+            {"width", width}, {"height", height}, {"quality", quality}};
+}
+
+static bool isCurrentThumbnail(const QString &sourcePath, const QString &cachePath,
+                               int width, int height, int quality) {
+    QFileInfo source(sourcePath), cache(cachePath);
+    if (!source.isFile() || !cache.isFile() || cache.size() <= 0) return false;
+    QFile metadata(thumbMetadataPath(cachePath));
+    if (!metadata.open(QIODevice::ReadOnly)) return false;
+    const auto stored = QJsonDocument::fromJson(metadata.readAll());
+    if (!stored.isObject() || stored.object() != thumbSignature(source, cache, width, height, quality))
+        return false;
+    QImageReader reader(cachePath);
+    return reader.canRead() && reader.size() == QSize(width, height);
 }
 
 static bool isValidImage(const QString &path) {
@@ -50,7 +75,7 @@ static ThumbResult generateThumbnail(const QString &src, const QString &dst,
     QFileInfo fi(src);
     if (!fi.exists()) { r.errorString = QStringLiteral("source not found"); return r; }
 
-    if (QFileInfo::exists(dst)) {
+    if (isCurrentThumbnail(src, dst, tw, th, q)) {
         r.cacheAvailable = true;
         r.updated = false;
         r.errorString = QStringLiteral("");
@@ -58,6 +83,7 @@ static ThumbResult generateThumbnail(const QString &src, const QString &dst,
     }
 
     QDir().mkpath(QFileInfo(dst).absolutePath());
+    const QFileInfo sourceBefore(src);
 
     QImageReader reader(src);
     reader.setAutoTransform(true);
@@ -89,6 +115,23 @@ static ThumbResult generateThumbnail(const QString &src, const QString &dst,
         return r;
     }
     if (!out.commit()) { r.errorString = out.errorString(); return r; }
+
+    const QFileInfo sourceAfter(src);
+    if (!sourceAfter.isFile() || sourceAfter.size() != sourceBefore.size()
+        || sourceAfter.lastModified() != sourceBefore.lastModified()) {
+        QFile::remove(dst);
+        r.errorString = QStringLiteral("source changed during thumbnail generation");
+        return r;
+    }
+    QSaveFile metadata(thumbMetadataPath(dst));
+    if (!metadata.open(QIODevice::WriteOnly)
+        || metadata.write(QJsonDocument(thumbSignature(sourceAfter, QFileInfo(dst), tw, th, q))
+                          .toJson(QJsonDocument::Compact)) < 0
+        || !metadata.commit()) {
+        r.errorString = metadata.errorString();
+        QFile::remove(dst);
+        return r;
+    }
 
     r.cacheAvailable = true;
     r.updated = true;
@@ -123,7 +166,7 @@ void WallpaperScanner::startScan(const QString &wallDir, const QString &cacheDir
         rec.insert("name", fi.fileName());
         rec.insert("baseName", fi.completeBaseName());
         rec.insert("thumb", thumbFile);
-        rec.insert("thumbReady", QFileInfo::exists(thumbFile));
+        rec.insert("thumbReady", isCurrentThumbnail(abs, thumbFile, thumbW, thumbH, quality));
         result.append(rec);
     }
 
@@ -136,8 +179,13 @@ void WallpaperScanner::startScan(const QString &wallDir, const QString &cacheDir
 void WallpaperScanner::generateThumb(const QString &sourcePath,
                                      const QString &cachePath,
                                      int thumbW, int thumbH, int quality) {
-    QtConcurrent::run([this, sourcePath, cachePath, thumbW, thumbH, quality]() {
-        ThumbResult r = generateThumbnail(sourcePath, cachePath, thumbW, thumbH, quality);
+    auto *watcher = new QFutureWatcher<ThumbResult>(this);
+    connect(watcher, &QFutureWatcher<ThumbResult>::finished, this, [this, watcher]() {
+        const auto r = watcher->result();
         emit thumbReady(r.sourcePath, r.cachePath, r.cacheAvailable, r.updated, r.errorString);
+        watcher->deleteLater();
     });
+    watcher->setFuture(QtConcurrent::run([sourcePath, cachePath, thumbW, thumbH, quality]() {
+        return generateThumbnail(sourcePath, cachePath, thumbW, thumbH, quality);
+    }));
 }

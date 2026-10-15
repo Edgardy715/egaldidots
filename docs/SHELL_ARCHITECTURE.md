@@ -9,6 +9,7 @@ creates an overlay and reserved area for each monitor.
 | --- | --- |
 | `Singletons/Settings.js` | Defaults, field metadata, validation and patch merging |
 | `Singletons/Config.qml` | Settings file, drafts, reload, save and settings IPC |
+| `Singletons/HyprlandSettings.qml` | Compositor preview, separate persistence and runtime recovery |
 | `Singletons/Flags.qml` | Read-only compatibility bindings to Config |
 | `Singletons/Theme.qml`, `Motion.qml` | Appearance and motion tokens |
 | `components/ShellRuntime.qml` | Service initialization and shell integration |
@@ -48,6 +49,10 @@ to `$HOME/.config/isla/shell.json`. See `bar/shell.json.example`.
 
 Change settings with `Config.update`, `Config.discard` and `Config.save`.
 Flags is read-only. Pass settings to visual components through properties.
+The Hyprland page uses a separate controller and `isla/hyprland.json`: compositor
+values come from the live session rather than shell defaults. Its bounded Python
+bridge validates Lua arguments and applies selected options without reload.
+ShellRuntime initializes saved overrides; views receive the controller by property.
 Profile name and avatar affect presentation, not the PAM account.
 The independent lockscreen reads persisted settings, not the bar's live preview.
 
@@ -92,3 +97,9 @@ while its draft is being edited.
 
 Test persistence with a temporary `ISLA_CONFIG`. Check focus, rapid panel swaps,
 reduced motion and both bar layouts when changing presentation.
+
+## Wallpaper color pipeline
+
+Matugen is the sole wallpaper palette generator. `matugen/.config/matugen/generate.py` renders native templates into a staged generation and publishes by swapping `~/.cache/matugen/current`; the versioned canonical document is `palette.json`. `Config.paletteFile` points to it. IslaPalette validates all required semantic roles before replacing the last valid palette; Theme composes the roles with existing glass/motion. Primary controls use primaryContent and containers use their corresponding content role. ANSI/Base16 belongs to terminal consumers, not UI role selection.
+
+The shared wallpaper applicator calls the same pipeline for picker and startup. Live palette reload uses `island.reloadColors`, since a watcher may retain the old symlink target. GTK processes may need reopening to reload their CSS provider.

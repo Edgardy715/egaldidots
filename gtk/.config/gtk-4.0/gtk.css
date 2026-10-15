@@ -1,9 +1,56 @@
-/*
- * Subtle glass for GTK4 file choosers (forward-compat for modern apps /
- * xdg-desktop-portal-gnome if you ever install it).
- * Same logic as gtk-3.0/gtk.css: FlatColor/pywal palette + Hyprland blur.
- * Reversible: delete this file to go back to a solid background.
- */
+/* Isla's Adwaita layer: wallpaper roles for native GTK widgets. */
+@import url("../../.cache/matugen/outputs/colors.css");
+
+window.background, dialog.background {
+    background-color: alpha(@window_bg_color, 0.94);
+    color: @window_fg_color;
+}
+
+headerbar {
+    background-color: alpha(@headerbar_bg_color, 0.92);
+    color: @headerbar_fg_color;
+    border-color: alpha(@outline, 0.28);
+}
+
+entry {
+    background-color: @view_bg_color;
+    color: @view_fg_color;
+    border-color: alpha(@outline, 0.42);
+    caret-color: @accent;
+}
+entry:focus {
+    border-color: @accent;
+}
+
+button {
+    background-color: @surface_container;
+    color: @on_surface;
+    border-color: alpha(@outline, 0.32);
+}
+button:hover {
+    background-color: @muted;
+}
+button.suggested-action {
+    background-color: @accent_bg_color;
+    color: @accent_fg_color;
+}
+button.destructive-action {
+    background-color: @error;
+    color: @on_error;
+}
+
+selection, treeview.view:selected, listview row:selected, columnview row:selected {
+    background-color: @theme_selected_bg_color;
+    color: @theme_selected_fg_color;
+}
+
+treeview.view, listview, columnview {
+    background-color: @view_bg_color;
+    color: @view_fg_color;
+}
+
+/* Keep the existing subtle glass in native file choosers. */
 filechooser {
-    background-color: alpha(@theme_bg_color, 0.92);
+    background-color: alpha(@surface, 0.92);
+    color: @on_surface;
 }

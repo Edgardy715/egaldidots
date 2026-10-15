@@ -1,7 +1,7 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Isla · paleta pywal generada con contraste para el wallpaper actual.
-palette = 'pywal'
+# Isla · paleta matugen generada con contraste para el wallpaper actual.
+palette = 'matugen'
 add_newline = true
 scan_timeout = 30
 command_timeout = 500
@@ -9,34 +9,34 @@ format = '🎩 $username$hostname$directory$git_branch$git_status$git_state$pyth
 right_format = '$status$jobs$cmd_duration$time'
 
 [directory]
-style = 'bold wal_fg'
+style = 'bold text'
 format = '[$path]($style)[$read_only]($read_only_style) '
 truncation_length = 3
 truncate_to_repo = true
 truncation_symbol = '…/'
 read_only = ' '
-read_only_style = 'bold wal9'
+read_only_style = 'bold error'
 
 [username]
 show_always = false
-style_user = 'bold wal13'
-style_root = 'bold wal9'
+style_user = 'bold secondary'
+style_root = 'bold error'
 format = '[$user]($style) '
 
 [hostname]
 ssh_only = true
 ssh_symbol = '↗ '
-style = 'wal13'
+style = 'secondary'
 format = '[$ssh_symbol$hostname]($style) '
 
 [git_branch]
 symbol = ' '
-style = 'wal13'
+style = 'secondary'
 format = '[$symbol$branch]($style) '
 truncation_length = 28
 
 [git_status]
-style = 'wal11'
+style = 'warning'
 format = '([$all_status$ahead_behind]($style) )'
 conflicted = '≠${count} '
 ahead = '↑${count} '
@@ -50,85 +50,84 @@ renamed = '»${count} '
 deleted = '×${count} '
 
 [git_state]
-style = 'bold wal9'
+style = 'bold error'
 format = '[($state( $progress_current/$progress_total))]($style) '
 
 [character]
-success_symbol = '[❯](bold wal12)'
-error_symbol = '[❯](bold wal9)'
-vimcmd_symbol = '[❮](bold wal10)'
-vimcmd_replace_one_symbol = '[❮](bold wal11)'
-vimcmd_replace_symbol = '[❮](bold wal11)'
-vimcmd_visual_symbol = '[❮](bold wal13)'
+success_symbol = '[❯](bold accent)'
+error_symbol = '[❯](bold error)'
+vimcmd_symbol = '[❮](bold success)'
+vimcmd_replace_one_symbol = '[❮](bold warning)'
+vimcmd_replace_symbol = '[❮](bold warning)'
+vimcmd_visual_symbol = '[❮](bold secondary)'
 
 [status]
 disabled = false
 symbol = '✗ '
-style = 'wal9'
+style = 'error'
 format = '[$symbol$status]($style) '
 
 [jobs]
 symbol = '↻ '
-style = 'wal14'
+style = 'tertiary'
 format = '[$symbol$number]($style) '
 number_threshold = 1
 symbol_threshold = 1
 
 [cmd_duration]
 min_time = 2000
-style = 'wal11'
+style = 'warning'
 format = '[󱎫 $duration]($style) '
 
 [time]
 disabled = false
 time_format = '%H:%M'
-style = 'wal8'
+style = 'muted'
 format = '[$time]($style)'
 
 [python]
 symbol = ' '
-style = 'wal11'
+style = 'warning'
 format = '[${symbol}${version}( \($virtualenv\))]($style) '
 
 [nodejs]
 symbol = ' '
-style = 'wal10'
+style = 'success'
 format = '[$symbol$version]($style) '
 
 [bun]
 symbol = 'bun '
-style = 'wal7'
+style = 'text'
 format = '[$symbol$version]($style) '
 
 [rust]
 symbol = ' '
-style = 'wal9'
+style = 'error'
 format = '[$symbol$version]($style) '
 
 [golang]
 symbol = ' '
-style = 'wal14'
+style = 'tertiary'
 format = '[$symbol$version]($style) '
 
 [nix_shell]
 symbol = ' '
-style = 'wal14'
+style = 'tertiary'
 format = '[$symbol$state( \($name\))]($style) '
 
 [docker_context]
 symbol = ' '
-style = 'wal14'
+style = 'tertiary'
 only_with_files = true
 format = '[$symbol$context]($style) '
 
-# Respaldo si pywal todavía no ha generado una paleta.
-[palettes.pywal]
-wal_fg = '#C8D6E5'
-wal7 = '#C8D6E5'
-wal8 = '#9AA4B5'
-wal9 = '#F08A8A'
-wal10 = '#7FD68B'
-wal11 = '#E0B860'
-wal12 = '#8AB4F8'
-wal13 = '#A9B6E5'
-wal14 = '#7FD6E5'
+# Respaldo si matugen todavía no ha generado una paleta.
+[palettes.matugen]
+text = '#C8D6E5'
+muted = '#9AA4B5'
+error = '#F08A8A'
+success = '#7FD68B'
+warning = '#E0B860'
+accent = '#8AB4F8'
+secondary = '#A9B6E5'
+tertiary = '#7FD6E5'

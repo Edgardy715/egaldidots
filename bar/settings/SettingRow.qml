@@ -153,11 +153,11 @@ Item {
                     Rectangle {
                         x: toggle.checked ? 26 : 4; y: 4
                         width: 22; height: 22; radius: 11
-                        color: Theme.foreground
+                        color: toggle.checked ? Theme.primaryContent : Theme.foreground
                         Behavior on x { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: 0.5; epsilon: 0.01 } }
                         EdotsIcon {
                             anchors.centerIn: parent; iconName: "check"; font.pixelSize: Theme.fontSizeBody
-                            color: Theme.background; selected: toggle.checked
+                            color: Theme.accent; selected: toggle.checked
                             controlHovered: toggle.hovered; controlPressed: toggle.down
                             Accessible.ignored: true
                             opacity: toggle.checked ? 1 : 0

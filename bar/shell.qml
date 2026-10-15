@@ -65,13 +65,18 @@ ShellRoot {
         function page(mon: string, name: string): bool { navigation.toggleSurface(mon, name); return true; }
         /** Overview (alt+tab estilo windows): surface de la pill con mini-ventanas
          *  vivas + navegación por teclado. Toggle con `qs -c bar ipc call island
-         *  overview ""` (Super+Tab). Mientras está abierto el overlay toma foco de
+         *  overview ""` (Super+Shift+Tab). Mientras está abierto el overlay toma foco de
          *  teclado Exclusive → Tab/flechas ciclan ventanas, Enter focusa, Esc sale. */
         function overview(mon: string): bool { navigation.toggleSurface(mon, "overview"); return true; }
-        /** Recarga los colores de pywal tras un cambio de wallpaper.
+        /** Recarga los colores de Matugen tras un cambio de wallpaper.
          *  Lo invoca el script de setWallpaper via:
-         *  qs -c bar ipc call island reloadColors "" */
+         *  qs -c bar ipc call island reloadColors */
         function reloadColors(): bool { IslaPalette.forceReload(); return true; }
+        function paletteStatus(): string {
+            return JSON.stringify({loaded:IslaPalette.loaded, error:IslaPalette.error,
+                wallpaper:IslaPalette.wallpaper, primary:String(IslaPalette.accent),
+                surface:String(IslaPalette.background), file:Config.paletteFile})
+        }
         /** Recarga de quickshell conservando el traspaso de recursos nativos.
          *  qs -c bar ipc call island reload */
         function reload(): bool { Quickshell.reload(false); return true; }
