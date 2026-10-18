@@ -103,3 +103,19 @@ reduced motion and both bar layouts when changing presentation.
 Matugen is the sole wallpaper palette generator. `matugen/.config/matugen/generate.py` renders native templates into a staged generation and publishes by swapping `~/.cache/matugen/current`; the versioned canonical document is `palette.json`. `Config.paletteFile` points to it. IslaPalette validates all required semantic roles before replacing the last valid palette; Theme composes the roles with existing glass/motion. Primary controls use primaryContent and containers use their corresponding content role. ANSI/Base16 belongs to terminal consumers, not UI role selection.
 
 The shared wallpaper applicator calls the same pipeline for picker and startup. Live palette reload uses `island.reloadColors`, since a watcher may retain the old symlink target. GTK processes may need reopening to reload their CSS provider.
+
+## Media image presentation
+
+`ArtworkImage` retains two decoded images and serializes each crossfade while
+coalescing pending URLs. The expanded media composition owns its clock: `Pill`
+for compact layout and `FluidMediaCompanion` for split. It preloads panel and
+ambient decode sizes before starting. `PillMaterial` and the surface view receive
+that owner through `artworkTransition`; `PillSurfaceHost` forwards it on load.
+Keep the owner alive through the displayed surface's outgoing transition, then
+release its URLs. Compact covers can use the same component independently.
+
+`CrossfadeLabel` is limited to discrete media metadata; continuously updated
+numbers remain Text. The expanded title reserves two complete font lines to
+prevent layout jumps and clipping. Theme/Matugen and Motion remain the owners of
+colors and durations. Appearance exposes materialDepth, mediaTransitions and
+menuSelectionAnchor through the normal Config draft/save/discard path.

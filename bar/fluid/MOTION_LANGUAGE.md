@@ -245,3 +245,75 @@ ni volver a muestrear el wallpaper bajo cada tarjeta. LockGlass conserva
 PillMaterial como material único; tipografía desde Theme y fecha en español.
 Movimiento reducido resuelve geometría y elimina el recoil de rechazo.
 Pruebas: bar/lockscreen-entrance-regression.qml y bar/lockscreen-motion-regression.qml; no sustituyen PAM real ni pruebas físicas.
+
+## Material y recambio multimedia (2026-10-17)
+
+La profundidad del material añade luz direccional fija y absorción interior tenue;
+no sigue el puntero. materialDepth controla intensidad y cero elimina ambas. Las
+capas siguen edgeExposure para no dibujar costuras al unir o absorber cuerpos.
+
+ArtworkImage conserva la portada saliente hasta decodificar la nueva. El panel y
+su ambiente comparten barrera de carga y progreso, con decodes fijos416·s y256px.
+El dueño vive en la composición de cada layout y conserva las URLs durante la
+retirada del panel. Las peticiones rápidas terminan el fundido en curso y toman
+la última pendiente. Error o fuente vacía retiran el arte obsoleto. Ocultación,
+mediaTransitions desactivado y movimiento reducido resuelven sin animación.
+
+Los metadatos discretos funden dos capas de glifos sin blur ni estiramiento.
+El título expandido reserva dos líneas completas, redondeadas hacia arriba para
+no recortar la segunda por fracciones de métricas tipográficas. No animar ancho
+ni usar este componente para reloj, sliders o tiempos continuos.
+
+## Ambiente y letras musicales (2026-10-17)
+
+El ambiente multimedia difumina un campo192×128 antes de ampliar, con decode256px
+fijo y el mismo reloj de fundido de portada. Su deriva lenta conserva fase al
+pausar; sólo avanza con reproducción y panel asentado/visible. Reduced motion y
+mediaTransitions desactivado lo fijan; composición entrega estado a la hoja.
+
+Las letras centran el viewport lógico y compensan el desplazamiento por fila:
+retardo por distancia limitado80ms y asentamiento Motion.standardLarge. Retarget
+parte del offset actual; navegación manual, ocultación y reducido limpian offsets.
+Saltos mayores al85% del viewport resuelven directamente. Métricas fijas, énfasis
+por color/escala discreta y seek sólo con tiempo sincronizado/capacidad real.
+Botón principal cambia de círculo a esquinas17·s al reproducir, sin girar el icono;
+portada pausada0.94→reproducción1. Las cajas e hit targets permanecen estables.
+
+### Reproductor rediseñado (2026-10-17, sustituye acabado anterior)
+
+Usuario prefiere iconos Material Rounded rellenos y formas de Swiftify a Lucide
+para este reproductor. MediaTransportButton/MediaSymbol limitan esa elección a
+media: glifos locales con rasterización nativa, hit target nativo estable y forma
+principal sinusoidal5→9lóbulos (500ms por Motion). Giro16°/s conserva fase y sólo
+avanza en reproducción visible/habilitada con mediaMotionAllowed; reduced/hidden
+lo detienen. No gira el símbolo. Portada circular con CAVA radial real en música;
+preview16:9 para fuentes generales. Fondoalfa0.32; no añade motor de material.
+Metadatos de altura natural viven en espacio exterior estable: transporte/timeline
+no se desplazan entre una/dos líneas. Letras coexisten junto a portada, sin duplicar
+superficie. Detalles/pruebas: docs/swiftify-2026-10-17/redesign/REPORT.md.
+
+### Afinado de respuesta y seguimiento (2026-10-17)
+
+El diseño aprobado permanece. Espectro expandido48radios3.5·s con recorrido3→31·s
+y compresión perceptual local de señal; silencio sigue quieto y CAVA compacto
+conserva su tratamiento. Letras activas emiten desde glifos con acento y énfasis
+interrumpible; al reabrir retoman posición actual y la navegación manual cede al
+seguimiento tras3.2s de reposo. No introducir desfases temporales sin evidencia.
+
+SwiftMediaTimeline sustituye sólo la barra del panel: trazo4→6·s al interactuar,
+onda34·s y amplitud1.6→2.4·s; fase viaja una onda/1.6s. Tirador4×18·s aparece al
+hover/foco/drag, cola atenuada y separada. Tiempo viene de MediaSession; el reloj
+visual sólo mueve fase. Hidden/reduced/drag detienen fase; pausa aplana la onda.
+Validación y límites: docs/swiftify-2026-10-17/refinement/REPORT.md.
+
+### Exactitud y emisión interior (2026-10-18)
+
+La barra no interpola por segunda vez el progreso de MediaSession: pinta su valor
+actual inmediatamente, incluido seek/cambio de pista. La onda y hover conservan
+sus animaciones y la fase sigue tiempo real; no usar un reset cosmético que
+compita con MPRIS. Arrastres se cancelan al perder duración/visibilidad/actividad.
+
+Botón principal conserva forma/giro aprobados y comparte musicAccent; símbolo
+blanco/negro según luminancia del relleno efectivo. La surface emite luz radial
+interior desde el disco, más tenue al pausar, sin borde exterior ni loop adicional.
+La paleta cancela trabajos obsoletos y reintenta fallos de forma finita.
