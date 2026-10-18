@@ -32,11 +32,11 @@ ShellRoot {
         Component.onCompleted: if (kind === "clear-reduced") Config.update({appearance: {reduceMotion: true}})
         Timer {
             interval: 50; repeat: true
-            running: Quickshell.env("ISLA_CLIPBOARD_CAPTURE_DIR").length > 0
+            running: (Quickshell.env("ISLA_CLIPBOARD_CAPTURE_DIR") || "").length > 0
             onTriggered: {
                 scene.captureStep++
                 if (scene.captureStep >= 23 && scene.captureStep <= 29) {
-                    const path = Quickshell.env("ISLA_CLIPBOARD_CAPTURE_DIR") + "/" + scene.kind + "-" + scene.captureStep + ".png"
+                    const path = (Quickshell.env("ISLA_CLIPBOARD_CAPTURE_DIR") || "") + "/" + scene.kind + "-" + scene.captureStep + ".png"
                     clipboard.grabToImage(result => result.saveToFile(path))
                 }
             }
@@ -45,6 +45,16 @@ ShellRoot {
             interval: 400
             running: true
             onTriggered: {
+                if (scene.kind === "list-error") {
+                    if (clipboard.entries.length !== 0 || clipboard.loading || !clipboard.errorMessage.length) {
+                        console.error("FAIL: partial list output hid process failure")
+                        Qt.exit(1)
+                    } else {
+                        console.log("PASS: clipboard reports list failure")
+                        Qt.quit()
+                    }
+                    return
+                }
                 if (scene.frames < 5 || clipboard.entries.length !== 2 || clipboard.entries[0].text !== "texto") {
                     console.error("FAIL: clipboard entries")
                     Qt.exit(1)
@@ -61,6 +71,7 @@ ShellRoot {
                 clipboard.query = ""
                 clipboard.filterEntries()
                 clipboard.selectedIndex = Quickshell.env("ISLA_CLIPBOARD_TEST_TYPE") === "image" ? 1 : 0
+                if (scene.kind === "image") clipboard.showPreview()
             }
         }
         Timer {

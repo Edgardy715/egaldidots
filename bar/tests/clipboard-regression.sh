@@ -5,7 +5,7 @@ trap 'rm -rf "$tmp"' EXIT
 cat > "$tmp/cliphist" <<'EOF'
 #!/bin/sh
 case "$1" in
-    list) sleep 0.2; printf '1\ttexto\n2\t[[ binary data png ]]\n' ;;
+    list) if [ "$ISLA_CLIPBOARD_TEST_TYPE" = list-error ]; then printf '1\tpartial\n'; exit 1; fi; sleep 0.2; printf '1\ttexto\n2\t[[ binary data png ]]\n' ;;
     decode) [ "$2" = 2 ] && cat "$ISLA_CLIPBOARD_IMAGE" || printf ' contenido\nsegunda línea\n' ;;
     wipe) printf 'wipe\n' >> "$ISLA_WIPE_OUT"; sleep 0.2; [ "$ISLA_CLIPBOARD_TEST_TYPE" != clear-error ] ;;
 esac
@@ -17,7 +17,7 @@ cat > "$ISLA_COPY_OUT"
 EOF
 chmod +x "$tmp/cliphist" "$tmp/wl-copy"
 magick -size 64x32 xc:steelblue "$tmp/image.png"
-for kind in text image clear clear-error clear-reduced; do
+for kind in text image clear clear-error clear-reduced list-error; do
 ISLA_WIPE_OUT="$tmp/wipe-$kind" ISLA_COPY_OUT="$tmp/copied" ISLA_COPY_ARGS="$tmp/args" ISLA_CLIPBOARD_IMAGE="$tmp/image.png" ISLA_CLIPBOARD_TEST_TYPE="$kind" PATH="$tmp:$PATH" \
     QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-offscreen}" timeout 5s quickshell -p bar/clipboard-regression.qml > "$tmp/log" 2>&1 || {
         cat "$tmp/log"
@@ -26,6 +26,10 @@ ISLA_WIPE_OUT="$tmp/wipe-$kind" ISLA_COPY_OUT="$tmp/copied" ISLA_COPY_ARGS="$tmp
 if [ "$kind" = clear ] || [ "$kind" = clear-error ] || [ "$kind" = clear-reduced ]; then
     grep -q 'PASS: clipboard clears asynchronously' "$tmp/log"
     [ "$(wc -l < "$tmp/wipe-$kind")" -eq 1 ]
+    continue
+fi
+if [ "$kind" = list-error ]; then
+    grep -q 'PASS: clipboard reports list failure' "$tmp/log"
     continue
 fi
 grep -q 'PASS: clipboard loads, filters and copies' "$tmp/log"
