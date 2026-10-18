@@ -17,7 +17,7 @@ with tempfile.TemporaryDirectory(prefix="isla-settings-media-") as directory:
         property bool isPlaying: root.fixturePlaying
         property string trackTitle: "Canción de prueba"
         property string trackArtist: "Artista de prueba"
-        property string trackArtUrl: ""
+        property string trackArtUrl: String(Qt.resolvedUrl("../tests/fixtures/artwork-coral.svg"))
         property string identity: "Spotify"
         property string desktopEntry: "spotify"
         property string dbusName: "org.mpris.MediaPlayer2.fixture"

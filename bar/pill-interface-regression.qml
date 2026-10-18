@@ -49,6 +49,18 @@ ShellRoot {
                     verify(clockHit.activeFocus)
                     fuzzyCompare(material.bodyAlpha, 0.439, 0.000001)
                     fuzzyCompare(findChild(material, "pillMaterialShadow").opacity, 0, 0.000001)
+                    const depthLight = findChild(material, "pillMaterialDepthLight")
+                    const depthShade = findChild(material, "pillMaterialDepthShade")
+                    verify(depthLight.opacity > 0 && depthShade.opacity > 0, "default interior depth visible")
+                    verify(Config.update({appearance: {materialDepth: 0}}).ok)
+                    compare(depthLight.opacity, 0)
+                    compare(depthShade.opacity, 0)
+                    verify(Config.update({appearance: {materialDepth: 1}}).ok)
+                    verify(depthLight.opacity > 0.2 && depthShade.opacity > 0.2, "depth intensity follows setting")
+                    material.edgeExposure = 0
+                    compare(depthLight.opacity, 0)
+                    compare(depthShade.opacity, 0)
+                    material.edgeExposure = 1
                     materialBounds.height = 96
                     fuzzyCompare(material.bodyAlpha, 0.604, 0.000001)
                     wait(400)

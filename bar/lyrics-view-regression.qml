@@ -18,7 +18,7 @@ ShellRoot {
             lyricsStatus: "ready"
             lyricsSynced: true
             lyricLines: [{time:0,text:"Primera línea sintética"},{time:5,text:"Segunda línea sintética"},{time:10,text:"Una línea larga de prueba que debe ajustarse al ancho disponible sin invadir los controles"},{time:15,text:"Última línea de prueba"}]
-            playback: ({hasPlayer:true,isPlaying:false,title:"Canción de prueba",artist:"Artista QA",albumDistinct:false,canSeek:true,canShuffle:false,canRepeat:false,canPrevious:false,canNext:false,canToggle:true,dragging:false,progress:0.3,displayPosition:6,length:30,displayTime:"0:06",remainingTime:"0:24"})
+            playback: ({hasPlayer:true,isPlaying:false,title:"Canción de prueba",artist:"Artista QA",album:"",albumDistinct:false,shuffleEnabled:false,repeatEnabled:false,repeatOne:false,canSeek:true,canShuffle:false,canRepeat:false,canPrevious:false,canNext:false,canToggle:true,dragging:false,progress:0.3,displayPosition:6,length:30,displayTime:"0:06",remainingTime:"0:24"})
         }
         SignalSpy { id: retry; target: media; signalName: "lyricsRetryRequested" }
         Timer { interval: 50; running: checks.finished; onTriggered: Qt.quit() }
@@ -37,7 +37,8 @@ ShellRoot {
                     wait(100)
                     compare(list.currentIndex, 1)
                     const row = list.itemAtIndex(1)
-                    verify(row && row.width <= list.width && row.color === Theme.foreground)
+                    verify(row && row.width <= list.width, "lyric fits viewport")
+                    tryCompare(row, "color", Theme.foreground)
                     list.forceActiveFocus()
                     keyClick(Qt.Key_Down)
                     compare(list.currentIndex, -1)

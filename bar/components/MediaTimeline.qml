@@ -20,6 +20,7 @@
 
 pragma ComponentBehavior: Bound
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Shapes
 import "../Singletons"
 
@@ -179,6 +180,13 @@ Item {
         color: Theme.accent
     }
     Rectangle {
+        layer.enabled: root.visible && root.enabled
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: Qt.alpha(Theme.accent, 0.75)
+            shadowBlur: 0.7
+            blurMax: 12
+        }
         x: root.cursorX - width / 2
         anchors.verticalCenter: parent.verticalCenter
         width: 4 * root.s

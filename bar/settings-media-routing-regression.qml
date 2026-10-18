@@ -100,6 +100,26 @@ ShellRoot {
                         compare(pill.surface, "")
                         verify(!overlay.settingsReturning, "reopened settings must cancel return")
                         if (layout === "split") verify(media.open)
+                        navigation.close()
+                        wait(1200)
+                        navigation.toggleSurface("", "media")
+                        tryVerify(() => overlay.mediaSurfaceItem !== null, 4000)
+                        let mediaView = overlay.mediaSurfaceItem
+                        let artwork = findChild(mediaView, "mediaArtworkImage")
+                        tryVerify(() => artwork.ready, 4000)
+                        verify(artwork.transitionSource !== null, "both layouts share panel artwork state")
+                        wait(900)
+                        const displayedArt = artwork.displayedSource
+                        navigation.close()
+                        if (!reduced) {
+                            verify(artwork.ready, "close retains decoded art on its first frame")
+                            compare(artwork.displayedSource, displayedArt)
+                            wait(35)
+                            if (overlay.mediaSurfaceItem && overlay.mediaSurfaceItem.visible)
+                                verify(findChild(overlay.mediaSurfaceItem, "mediaArtworkImage").ready,
+                                    "art remains while outgoing panel is visible")
+                        }
+                        wait(1000)
                     }
                 }
                 navigation.close()

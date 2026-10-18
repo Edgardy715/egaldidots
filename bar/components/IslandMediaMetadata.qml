@@ -43,7 +43,8 @@ Item {
         property bool armed: false
         readonly property real separator: 40 * root.s
 
-        AnimatedLabel {
+        CrossfadeLabel {
+            animated: Flags.mediaTransitions
             id: marqueeText
             anchors.verticalCenter: parent.verticalCenter
             textFormat: Text.RichText
@@ -56,7 +57,8 @@ Item {
             onDisplayedChanged: root.reset()
             x: root.overflow ? (Flags.reduceMotion ? 0 : marquee.scrollX) : (root.width - implicitWidth) / 2
         }
-        AnimatedLabel {
+        CrossfadeLabel {
+            animated: Flags.mediaTransitions
             anchors.verticalCenter: parent.verticalCenter
             textFormat: Text.RichText
             color: Theme.foreground

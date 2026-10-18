@@ -4,6 +4,19 @@ import "../Singletons"
 // Media adapter: source selection/CAVA stay outside the shared motion engine.
 FluidCompanion {
     id: root
+    artUrl: Players.artUrl
+    artworkTransition: sharedArtwork
+    mediaPlaying: Players.live
+    ArtworkImage {
+        id: sharedArtwork
+        visible: false
+        width: 416 * root.s; height: width
+        sourceSize: Qt.size(416 * root.s, 416 * root.s)
+        source: root.expanded || root.surfaceItem !== null ? root.artUrl : ""
+        transitionsEnabled: Flags.mediaTransitions
+        motionVisible: root.visible && root.opacity > 0.01 && root.active
+        preloadAmbient: true
+    }
     readonly property real playingW: collapsedW + 34 * s
     compactWidth: Players.live ? playingW : collapsedW
     readonly property string cavaConsumerId: "fluid-media:" + (screenName || "default")
@@ -32,6 +45,7 @@ Item {
             anchors.rightMargin: 3 * root.s
 
             IslandMediaCover {
+                musicAccent: MediaPalette.accent
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 s: root.s
@@ -63,6 +77,7 @@ Item {
             }
 
             IslandMediaVisualizer {
+                musicAccent: MediaPalette.accent
                 objectName: "mediaVisualizer"
                 // Never cross the cover, even while the container is narrowing.
                 x: Math.max(IslandGeometry.restHeight * root.s,

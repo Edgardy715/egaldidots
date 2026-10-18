@@ -4,6 +4,7 @@ import "../Singletons"
 /** Compact cover and truncated metadata used by media headers. */
 Item {
     id: root
+    property color musicAccent: Theme.accent
 
     property real s: 1
     property real coverDiameter: 34
@@ -25,6 +26,7 @@ Item {
     height: implicitHeight
 
     IslandMediaCover {
+        musicAccent: root.musicAccent
         id: cover
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
@@ -42,7 +44,8 @@ Item {
         width: root.textWidth
         spacing: root.metadataSpacing
 
-        AnimatedLabel {
+        CrossfadeLabel {
+            animated: Flags.mediaTransitions
             width: parent.width
             value: root.title
             elide: Text.ElideRight
@@ -51,7 +54,8 @@ Item {
             font.pixelSize: root.titlePixelSize
             font.weight: Font.Medium
         }
-        AnimatedLabel {
+        CrossfadeLabel {
+            animated: Flags.mediaTransitions
             width: parent.width
             value: root.artist
             visible: root.showArtist

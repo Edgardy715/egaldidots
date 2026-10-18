@@ -134,6 +134,7 @@ Item {
         presented: root.presented && root.contentFits && root.mediaWidth <= root.availableWidth
         animateChanges: Config.modules.animateChanges
         sourceComponent: CompactMediaStatus {
+            musicAccent: MediaPalette.accent
             s: root.s
             title: mediaSession.title
             artist: mediaSession.artist

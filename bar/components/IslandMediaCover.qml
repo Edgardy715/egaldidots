@@ -1,12 +1,13 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Shapes
-import Qt5Compat.GraphicalEffects
 import "../"
 import "../Singletons"
 
 /** Circular cover art and playback-progress ring for the compact media chip. */
 Item {
     id: root
+    property color musicAccent: Theme.accent
 
     property real s: 1
     property real diameter: 34
@@ -33,13 +34,21 @@ Item {
         visible: root.hasProgress
     }
     Shape {
+        id: progressRing
         anchors.centerIn: parent
         width: parent.width
         height: parent.height
         preferredRendererType: Shape.CurveRenderer
         visible: root.hasProgress
+        layer.enabled: visible && root.progress > 0
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: Qt.alpha(root.musicAccent, 0.65 + response.presence * 0.25)
+            shadowBlur: 0.65
+            blurMax: 12
+        }
         ShapePath {
-            strokeColor: Theme.accent
+            strokeColor: root.musicAccent
             strokeWidth: root.ringWidth
             fillColor: "transparent"
             capStyle: ShapePath.RoundCap
@@ -62,38 +71,21 @@ Item {
         height: width
         scale: response.visualScale
 
-        Image {
+        ArtworkImage {
             id: artwork
             anchors.fill: parent
-            fillMode: Image.PreserveAspectCrop
-            cache: true
-            asynchronous: true
-            smooth: true
+            radius: height / 2
             source: root.artUrl
             sourceSize: Qt.size(cover.width * 2, cover.height * 2)
-            visible: false
-        }
-        Rectangle {
-            id: mask
-            anchors.fill: parent
-            radius: height / 2
-            color: "#ffffff"
-            visible: false
+            transitionsEnabled: Flags.mediaTransitions
         }
         MaterialIcon {
             anchors.centerIn: parent
             iconName: "music_note"
             color: Theme.iconSecondary
             font.pixelSize: cover.width * 0.58
-            visible: artwork.status !== Image.Ready
+            visible: !artwork.ready
             Accessible.ignored: true
-        }
-        OpacityMask {
-            anchors.fill: parent
-            source: artwork
-            maskSource: mask
-            opacity: artwork.status === Image.Ready ? 1 : 0
-            Behavior on opacity { Anim { type: Anim.DefaultEffects } }
         }
         Rectangle {
             anchors.fill: parent

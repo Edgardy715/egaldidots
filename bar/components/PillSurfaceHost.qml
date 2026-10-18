@@ -19,6 +19,7 @@ ClippingRectangle {
     property bool closing: false
     property bool suspended: false
     property real reveal: 1
+    property var artworkTransition: null
     property string displayedSurface: ""
     property real swapOpacity: 1
     property real loadReveal: 0
@@ -108,6 +109,7 @@ ClippingRectangle {
 
         onLoaded: {
             root.loadReveal = 1
+            if ("artworkTransition" in item) item.artworkTransition = Qt.binding(() => root.artworkTransition)
             if ("contextWidth" in item) item.contextWidth = Qt.binding(() => root.authContextWidth)
             if ("capsLockOn" in item) item.capsLockOn = Qt.binding(() => root.capsLockOn)
             item.s = Qt.binding(() => root.scaleFactor)

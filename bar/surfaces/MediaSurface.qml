@@ -4,6 +4,7 @@ import "../Singletons"
 
 MediaView {
     id: root
+    musicAccent: MediaPalette.accent
     lyricsSupported: Players.has && Players.sourceInfo.icon === "spotify"
     lyricsStatus: lyricSession.status
     lyricsSynced: lyricSession.synced

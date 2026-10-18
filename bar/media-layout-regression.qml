@@ -38,9 +38,13 @@ ShellRoot {
                         const artwork = named(media, "mediaArtwork")
                         const seek = named(media, "mediaTimeline")
                         const controls = named(media, "mediaTransport")
-                        if (seek.width < media.width * 0.95) throw new Error("seek width")
-                        if (identity.y + identity.height > seek.y + 1) throw new Error("identity overlaps seek")
-                        if (controls.y + controls.height > media.height + 1) throw new Error("controls overflow")
+                        const artBox = artwork.mapToItem(media, 0, 0)
+                        const seekBox = seek.mapToItem(media, 0, 0)
+                        const controlsBox = controls.mapToItem(media, 0, 0)
+                        if (seekBox.x < artBox.x + artwork.width + 20 * media.s) throw new Error("seek overlaps artwork")
+                        if (seek.width < media.width - artwork.width - 30 * media.s) throw new Error("seek does not fill control column")
+                        if (seekBox.x + seek.width > media.width + 1) throw new Error("seek overflows column")
+                        if (controlsBox.y + controls.height > media.height + 1 || controlsBox.x < 0 || controlsBox.x + controls.width > media.width + 1) throw new Error("controls overflow")
                         if (Math.abs(artwork.width - artwork.height) > 1) throw new Error("square artwork")
                     }
                     step++
@@ -49,7 +53,7 @@ ShellRoot {
                     else {
                         const artwork = named(media, "mediaArtwork")
                         if (Math.abs(artwork.height / artwork.width - 9 / 16) > 0.01) throw new Error("wide artwork")
-                        console.log("PASS: full-width seek, identity/control bounds, font scales and square/wide artwork")
+                        console.log("PASS: column seek, artwork/control bounds, font scales and square/wide artwork")
                         Qt.quit()
                     }
                 } catch (error) {

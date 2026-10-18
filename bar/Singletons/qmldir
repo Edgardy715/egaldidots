@@ -21,3 +21,5 @@ singleton Nmcli Nmcli.qml
 # NotifData NO es singleton: es un tipo instanciable (uno por notificación, vía
 # notifComp.createObject). Mismo patrón que NotifCard en components/ (plain type 1.0).
 NotifData 1.0 NotifData.qml
+
+singleton MediaPalette MediaPalette.qml

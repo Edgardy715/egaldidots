@@ -190,6 +190,16 @@ Item {
     property alias wsReady: contentAdapter.workspaceReady
     readonly property string activeWsName: contentAdapter.activeWsName
 
+    ArtworkImage {
+        id: sharedArtwork
+        visible: false
+        width: 416 * pill.s; height: width
+        sourceSize: Qt.size(416 * pill.s, 416 * pill.s)
+        source: pill.surface === "media" || surfaceHost.displayedSurface === "media" ? contentAdapter.artUrl : ""
+        transitionsEnabled: Flags.mediaTransitions
+        motionVisible: pill.visible && (pill.surface === "media" || surfaceHost.displayedSurface === "media")
+        preloadAmbient: true
+    }
     PillMaterial {
         id: material
         s: pill.s
@@ -202,6 +212,9 @@ Item {
         surface: pill.surface
         mode: pill.mode
         artUrl: contentAdapter.artUrl
+        artworkTransition: sharedArtwork
+        mediaPlaying: Players.live
+        mediaSettled: pill.surfaceContentProgress > 0.95 && !pill.surfaceNotifSuspended
         notifBreathGlow: pill.notifBreathGlow
         notifState: pill.notifState
         suppressEdge: pill.fluidJoined
@@ -285,6 +298,7 @@ Item {
     // El contenido es hermano del fondo: necesita su propio recorte redondeado.
     PillSurfaceHost {
         id: surfaceHost
+        artworkTransition: sharedArtwork
         open: pill.surfaceOpen
         surface: pill.surface
         scaleFactor: pill.s
@@ -318,21 +332,12 @@ Item {
         onFallbackBrightnessRequested: (scaleFactor) => osd.showBrightness(scaleFactor)
     }
 
-    // Public API used by wheel and external hosts.
+    // Public API used by external hosts.
     function showVolumeOSD() { statusAdapter.showVolumeOSD() }
 
     Component.onCompleted: {
         // The initial load is complete; the next workspace change is real.
         wsReady = true
-    }
-
-    // wheel → volumen inline (no abre surface)
-    MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.NoButton
-        onWheel: (wheel) => {
-            statusAdapter.adjustVolume(wheel.angleDelta.y > 0 ? 0.04 : -0.04)
-        }
     }
 
     // OSD overlay (brillo/volumen/mic) → components/OsdOverlay.qml

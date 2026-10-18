@@ -1,5 +1,31 @@
 .pragma library
 
+function normalized(value) {
+    return String(value || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim().replace(/\s+/g, " ")
+}
+
+function bestMatch(records, title, artist, album, duration) {
+    if (!Array.isArray(records)) throw new Error("Invalid lyrics search")
+    const wantedTitle = normalized(title), wantedArtist = normalized(artist)
+    const wantedAlbum = normalized(album)
+    const knownDuration = isFinite(duration) && duration >= 1 && duration <= 3600
+    let best = null, bestScore = -Infinity
+    for (const record of records.slice(0, 20)) {
+        if (!record || normalized(record.trackName || record.name) !== wantedTitle ||
+                normalized(record.artistName) !== wantedArtist) continue
+        const seconds = Number(record.duration)
+        if (knownDuration && (!isFinite(seconds) || Math.abs(seconds - duration) > 5)) continue
+        const delta = knownDuration ? Math.abs(seconds - duration) : 0
+        const hasSynced = typeof record.syncedLyrics === "string" && !!record.syncedLyrics.trim()
+        const hasPlain = typeof record.plainLyrics === "string" && !!record.plainLyrics.trim()
+        const score = (hasSynced ? 100 : hasPlain ? 50 : 0) +
+            (wantedAlbum && normalized(record.albumName) === wantedAlbum ? 10 : 0) - delta
+        if (score > bestScore) { best = record; bestScore = score }
+    }
+    return best
+}
+
 function decode(record) {
     if (!record || typeof record !== "object" || Array.isArray(record)) throw new Error("Invalid lyrics record")
     if (record.instrumental === true) return {status: "instrumental", synced: false, lines: []}

@@ -23,4 +23,17 @@ assert.equal(context.decode({}).status, 'empty');
 assert.throws(() => context.decode(null));
 assert.throws(() => context.decode({syncedLyrics:'x'.repeat(100001)}));
 assert.throws(() => context.decode({plainLyrics:'x\n'.repeat(2001)}));
+const candidates = [
+    {trackName:'HOY AQUÍ (Live)', artistName:'Rauw Alejandro', duration:188, albumName:'PLAYA SATURNO'},
+    {trackName:'HOY AQUÍ', artistName:'Otro artista', duration:188, albumName:'PLAYA SATURNO'},
+    {trackName:'HOY AQUÍ', artistName:'Rauw Alejandro', duration:220, albumName:'PLAYA SATURNO'},
+    {trackName:'HOY AQUI', artistName:'Rauw Alejandro', duration:189, albumName:'PLAYA SATURNO', syncedLyrics:'[00:01]Sí'}
+];
+assert.equal(context.bestMatch(candidates, 'HOY AQUÍ', 'Rauw Alejandro', 'PLAYA SATURNO', 188).duration, 189);
+assert.equal(context.bestMatch(candidates.slice(0, 3), 'HOY AQUÍ', 'Rauw Alejandro', 'PLAYA SATURNO', 188), null);
+assert.equal(context.bestMatch([
+    {trackName:'HOY AQUÍ', artistName:'Rauw Alejandro', duration:188, albumName:'PLAYA SATURNO', instrumental:true},
+    {trackName:'HOY AQUÍ', artistName:'Rauw Alejandro', duration:189, albumName:'Otro álbum', syncedLyrics:'[00:01]Sí'}
+], 'HOY AQUÍ', 'Rauw Alejandro', 'PLAYA SATURNO', 188).duration, 189);
+assert.throws(() => context.bestMatch({}, 'a', 'b', '', 0));
 console.log('PASS: lyrics timestamps, multiple tags, blank/invalid lines, seek/backtrack, plain, instrumental and bounds');

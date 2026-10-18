@@ -11,6 +11,7 @@ Item {
     property bool active: false
     property bool primary: false
     property bool dim: false
+    property real cornerRadius: diam / 2
     property real s: 1
     property int size: 40
     property real iconSize: Math.round(size * 0.52)
@@ -48,7 +49,7 @@ Item {
         anchors.centerIn: parent
         width: root.diam
         height: root.diam
-        radius: height / 2
+        radius: root.cornerRadius
         color: root.primary ? Theme.accent : root.active
                ? Qt.alpha(Theme.accent, hover.containsMouse ? 0.88 : 0.72)
                : (hover.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaGlow) : "transparent")

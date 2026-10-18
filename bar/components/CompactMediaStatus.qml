@@ -4,6 +4,7 @@ import "../Singletons"
 // Presentation only; the bar adapter owns player selection and actions.
 Item {
     id: root
+    property color musicAccent: Theme.accent
     property real s: 1
     property string title: ""
     property string artist: ""
@@ -16,6 +17,7 @@ Item {
     height: 38 * s
 
     IslandMediaSummary {
+        musicAccent: root.musicAccent
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         s: root.s
@@ -44,6 +46,7 @@ Item {
         onClicked: root.requestMedia()
     }
     IslandMediaVisualizer {
+        musicAccent: root.musicAccent
         id: visualizer
         x: root.width - width
         anchors.verticalCenter: parent.verticalCenter

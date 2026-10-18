@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
-import Qt5Compat.GraphicalEffects
 import Quickshell.Widgets
 import ".."
 import "../Singletons"
@@ -19,6 +18,9 @@ Item {
     property real materialSweep: -0.55
     property string surface: ""
     property string artUrl: ""
+    property var artworkTransition: null
+    property bool mediaPlaying: false
+    property bool mediaSettled: false
     property string mode: "rest"
     property real notifBreathGlow: 0
     property string notifState: "idle"
@@ -84,50 +86,20 @@ Item {
         Behavior on scale { Anim { type: Anim.FastEffects } }
     }
 
-    Rectangle {
+    ClippingRectangle {
         id: mediaBgLayer
         anchors.fill: parent
         radius: root.bodyRadius
         color: "transparent"
         visible: root.surface === "media" && root.artUrl.length > 0
         z: 1
-        clip: true
 
-        Item {
+        MediaAmbient {
             anchors.fill: parent
-            layer.enabled: true
-            layer.effect: FastBlur { radius: 56 }
-            Image {
-                anchors.fill: parent
-                anchors.margins: -80
-                source: root.surface === "media" ? root.artUrl : ""
-                fillMode: Image.PreserveAspectCrop
-                opacity: 0.12
-                smooth: true
-                asynchronous: true
-                // Stable decode size: resizing the glass must not reload the artwork.
-                sourceSize: Qt.size(256, 256)
-                Behavior on opacity {
-                    SequentialAnimation {
-                        NumberAnimation { to: 0; duration: 120 * Motion.mult; easing.type: Easing.OutCubic }
-                        NumberAnimation { to: 0.12; duration: 120 * Motion.mult; easing.type: Easing.InCubic }
-                    }
-                }
-            }
-        }
-
-        layer.enabled: true
-        layer.effect: OpacityMask {
-            maskSource: Item {
-                width: mediaBgLayer.width
-                height: mediaBgLayer.height
-                Rectangle {
-                    width: mediaBgLayer.width
-                    height: mediaBgLayer.height
-                    radius: mediaBgLayer.radius
-                    color: "white"
-                }
-            }
+            artUrl: root.artUrl
+            artworkTransition: root.artworkTransition
+            playing: root.mediaPlaying
+            settled: root.mediaSettled
         }
     }
 
@@ -221,6 +193,38 @@ Item {
             color: Theme.sheen
             visible: root.edgeExposure > 0
             opacity: (1 - root.readingExposure) * root.edgeExposure
+        }
+
+        Rectangle {
+            objectName: "pillMaterialDepthLight"
+            anchors.top: parent.top
+            anchors.topMargin: root.s
+            x: parent.width * 0.06
+            width: parent.width * 0.68
+            height: Math.max(1, 1.5 * root.s)
+            radius: height / 2
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop { position: 0; color: "transparent" }
+                GradientStop { position: 0.32; color: Theme.foreground }
+                GradientStop { position: 1; color: "transparent" }
+            }
+            opacity: Flags.materialDepth * root.edgeExposure
+                * (1 - root.readingExposure * 0.5) * (1 - root.bodyAlpha * 0.2) * 0.32
+        }
+
+        Rectangle {
+            objectName: "pillMaterialDepthShade"
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            width: parent.width * 0.75
+            height: Math.min(parent.height * 0.18, 16 * root.s)
+            gradient: Gradient {
+                GradientStop { position: 0; color: "transparent" }
+                GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0.12) }
+            }
+            opacity: Flags.materialDepth * root.edgeExposure
+                * (0.45 + root.readingExposure * 0.35) * (1 - root.bodyAlpha * 0.35)
         }
 
         Rectangle {

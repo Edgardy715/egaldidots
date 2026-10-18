@@ -18,6 +18,9 @@ Item {
     property bool leftSide: false
     property bool centered: false
     property string surfaceName: "media"
+    property string artUrl: ""
+    property var artworkTransition: null
+    property bool mediaPlaying: false
     property size surfaceSize: IslandGeometry.mediaSurface
     property Component compactContent
     property Component expandedContent
@@ -331,6 +334,11 @@ Item {
             materialAwake: true
             materialAccent: Theme.accent
             mode: root.surfaceName
+            surface: root.surfaceName === "media" && (root.expanded || surfaceHost.displayedSurface === "media") ? "media" : ""
+            artUrl: root.artUrl
+            artworkTransition: root.artworkTransition
+            mediaPlaying: root.mediaPlaying
+            mediaSettled: root.expanded && root.cardContentProgress > 0.95
             suppressEdge: root.joined || (!root.centered && root.contentExposure < 0.3)
             edgeExposure: root.joined ? root.edgeExposure
                 : !root.centered && root.contentExposure < 0.3 ? 0 : 1
@@ -343,6 +351,7 @@ Item {
 
         PillSurfaceHost {
             id: surfaceHost
+            artworkTransition: root.artworkTransition
             z: 2
             open: root.expanded && !root.expandedContent
             surface: root.expanded && !root.expandedContent ? root.surfaceName : ""

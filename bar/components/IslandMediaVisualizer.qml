@@ -1,10 +1,12 @@
 import QtQuick
 import "../"
 import "../Singletons"
+import "../Singletons/Spectrum.js" as Spectrum
 
 /** Five-band Cava waveform used beside the compact media chip. */
 Item {
     id: root
+    property color musicAccent: Theme.accent
 
     property real s: 1
     property real coreH: 38
@@ -25,31 +27,30 @@ Item {
 
     Row {
         scale: hit.motion.visualScale
-        anchors.centerIn: parent
+        anchors.horizontalCenter: parent.horizontalCenter
+        height: root.height
         spacing: 2.5 * root.s
 
         Repeater {
             model: 5
             delegate: Item {
                 required property int index
-                readonly property var profile: [0.35, 0.70, 1.00, 0.70, 0.35]
-                readonly property var bands: [2, 7, 12, 16, 21]
                 readonly property real minHeight: 2.5 * root.s
-                readonly property real maxHeight: profile[index] * 18 * root.s
-                readonly property real signal: root.isPlaying && root.hasFrame
-                    ? (root.values[bands[index]] || 0) : 0
+                readonly property real maxHeight: 18 * root.s
+                readonly property real signal: root.isPlaying && root.hasFrame && !Flags.reduceMotion
+                    ? Spectrum.band(root.values, index, 5) : 0
                 width: 2.5 * root.s
                 height: root.height
 
                 Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
+                    // Keep the audio axis exact; centered anchors round fractional geometry.
+                    y: (parent.height - height) / 2
                     width: parent.width
                     height: parent.minHeight + parent.signal * (parent.maxHeight - parent.minHeight)
                     radius: width / 2
-                    color: Qt.alpha(Theme.accent, 0.72 + parent.signal * 0.28)
-                    Behavior on height { Anim { type: Anim.FastEffects } }
-                    Behavior on color { ColorAnimation { duration: Motion.fast } }
+                    antialiasing: true
+                    color: Qt.alpha(root.musicAccent, 0.88)
                 }
             }
         }
