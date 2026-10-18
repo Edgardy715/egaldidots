@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "../Singletons"
 import "../"
 
@@ -67,6 +68,13 @@ Item {
 
         Rectangle {
             id: knob
+            layer.enabled: root.visible && root.enabled && root.checked
+            layer.effect: MultiEffect {
+                shadowEnabled: true
+                shadowColor: Qt.alpha(Theme.accent, 0.8)
+                shadowBlur: 0.7
+                blurMax: 12
+            }
             width: parent.height - 4 * s
             height: parent.height - 4 * s
             radius: width / 2

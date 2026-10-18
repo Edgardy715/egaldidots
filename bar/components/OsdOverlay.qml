@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "../Singletons"
 import "../"
 import Quickshell.Services.Pipewire
@@ -59,6 +60,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             iconName: overlay.glyph
             color: Theme.accent
+            neonIntensity: 0.5
             font.pixelSize: Theme.fontSizeTitle * s
         }
         Text {
@@ -84,6 +86,13 @@ Rectangle {
                 width: parent.width * Math.max(0, Math.min(1, overlay.value))
                 radius: height / 2
                 color: Theme.accent
+                layer.enabled: overlay.visible && overlay.value > 0
+                layer.effect: MultiEffect {
+                    shadowEnabled: true
+                    shadowColor: Qt.alpha(Theme.accent, 0.75)
+                    shadowBlur: 0.7
+                    blurMax: 12
+                }
                 Behavior on width {
                     Anim { type: Anim.FastEffects }
                 }

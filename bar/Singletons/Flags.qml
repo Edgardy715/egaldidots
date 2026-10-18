@@ -5,6 +5,9 @@ import Quickshell
 // Config.update/discard/save; consumers cannot break bindings by assigning here.
 Singleton {
     readonly property real glassAlpha: Config.appearance.glassAlpha
+    readonly property real materialDepth: Config.appearance.materialDepth
+    readonly property bool mediaTransitions: Config.appearance.mediaTransitions
+    readonly property bool menuSelectionAnchor: Config.appearance.menuSelectionAnchor
     readonly property bool pillBlur: Config.appearance.pillBlur
     readonly property real topGap: Config.appearance.topGap
     readonly property real appGap: Config.appearance.appGap

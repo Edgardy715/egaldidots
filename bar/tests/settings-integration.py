@@ -91,6 +91,16 @@ with tempfile.TemporaryDirectory(prefix='isla-settings-') as directory:
             wait(lambda x: not x['saving'] and not x['dirty'] and not x['error'])
             saved = json.loads(config.read_text())
             assert saved['custom']['keep'] == 10 and saved['appearance']['clockSeconds']
+            visual = {'materialDepth': 0.6, 'mediaTransitions': False, 'menuSelectionAnchor': False}
+            assert call('update', json.dumps({'appearance': visual}))['ok']
+            assert call('save')
+            wait(lambda x: not x['saving'] and not x['dirty'] and not x['error'])
+            saved = json.loads(config.read_text())
+            for key, value in visual.items():
+                assert saved['appearance'][key] == value
+            assert call('update', '{"appearance":{"materialDepth":0}}')['ok']
+            assert call('discard')
+            assert call('get')['effective']['appearance']['materialDepth'] == 0.6
             config.unlink()
             wait(lambda x: x['effective']['appearance']['fontScale'] == 1)
             assert call('update', '{"appearance":{"time12h":false}}')['ok']

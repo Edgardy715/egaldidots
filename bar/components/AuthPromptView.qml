@@ -216,18 +216,16 @@ PillSurface {
                     MaterialIcon {
                         anchors.centerIn: parent
                         interaction: submit.interaction
-                        iconName: root.successState ? "check" : root.verifying ? "hourglass_top" : "arrow_forward"
-                        visible: !root.verifying || Flags.reduceMotion
+                        iconName: "arrow_forward"
+                        visible: !root.verifying && !root.successState && !root.errorState
                         font.pixelSize: 20 * root.s
                         color: root.stateColor
-                        opacity: submit.enabled || root.verifying || root.successState ? 1 : 0.4
+                        opacity: submit.enabled ? 1 : 0.4
                     }
-                    BusyIndicator {
+                    ConfirmationIndicator {
                         anchors.centerIn: parent
-                        width: 24 * root.s; height: width; padding: 0
-                        palette.dark: root.stateColor
-                        visible: root.verifying && !Flags.reduceMotion
-                        running: visible && root.visible && root.exposure > 0 && (!Window.window || Window.window.visible)
+                        width: 24 * root.s; height: width; s: root.s
+                        status: root.successState ? "success" : root.errorState ? "error" : root.verifying ? "busy" : ""
                     }
                 }
                 onClicked: root.submitResponse()
@@ -274,12 +272,22 @@ PillSurface {
                 KeyNavigation.backtab: submit.enabled ? submit : password
                 onActivated: index => root.selectIdentity(index)
             }
-            MaterialIcon {
+            Item {
                 Layout.preferredWidth: 14 * root.s
-                iconName: root.errorState ? "error_outline" : root.successState ? "check_circle" : root.verifying ? "hourglass_top" : root.capsLockOn && !root.responseVisible ? "keyboard_capslock" : "shield"
-                font.pixelSize: 14 * root.s
-                color: root.stateColor
-                Accessible.ignored: true
+                Layout.preferredHeight: 14 * root.s
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    visible: !root.errorState && !root.successState && !root.verifying
+                    iconName: root.capsLockOn && !root.responseVisible ? "keyboard_capslock" : "shield"
+                    font.pixelSize: 14 * root.s
+                    color: root.stateColor
+                    Accessible.ignored: true
+                }
+                ConfirmationIndicator {
+                    anchors.centerIn: parent
+                    width: 14 * root.s; height: width; s: root.s
+                    status: root.successState ? "success" : root.errorState ? "error" : root.verifying ? "busy" : ""
+                }
             }
             Text {
                 Layout.fillWidth: true

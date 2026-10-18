@@ -100,23 +100,23 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 radius: width / 2
-                color: root.succeeded ? root.successColor : Qt.alpha(Theme.accent, Theme.alphaGlow)
+                color: root.succeeded ? Qt.alpha(root.successColor, 0.16) : Qt.alpha(Theme.accent, Theme.alphaGlow)
                 border.width: Theme.borderHairline
                 border.color: Qt.alpha(root.succeeded ? root.successColor : Theme.accent, Theme.alphaMid)
                 Behavior on color { ColorAnimation { duration: Motion.fast } }
                 Behavior on border.color { ColorAnimation { duration: Motion.fast } }
             }
             MaterialIcon {
-                id: statusIcon
                 anchors.centerIn: parent
-                iconName: root.succeeded ? "check" : root.busy ? "sync" : "wifi_lock"
-                color: root.succeeded ? Theme.primaryContent : Theme.accent
+                visible: !root.succeeded && !root.busy && !root.errorText.length
+                iconName: "wifi_lock"
+                color: Theme.accent
                 font.pixelSize: 34 * root.s
-                RotationAnimator on rotation {
-                    from: 0; to: 360; duration: 900; loops: Animation.Infinite
-                    running: root.active && root.busy && !Flags.reduceMotion
-                    onStopped: statusIcon.rotation = 0
-                }
+            }
+            ConfirmationIndicator {
+                anchors.centerIn: parent
+                width: 43 * root.s; height: width; s: root.s
+                status: root.succeeded ? "success" : root.busy ? "busy" : root.errorText.length ? "error" : ""
             }
         }
 

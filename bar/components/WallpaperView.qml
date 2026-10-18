@@ -373,7 +373,7 @@ Item {
                     anchors.fill: parent
                     z: 2
                     color: Theme.background
-                    opacity: root.active && (root.applying || root.feedback === "done") ? 0.86 : 0
+                    opacity: root.active && (root.applying || root.feedback === "done" || root.feedback === "error") ? 0.86 : 0
                     Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.standardSmall; easing.type: Motion.easeStandard } }
                 }
                 WallpaperApplyFeedback {
@@ -381,7 +381,8 @@ Item {
                     anchors.centerIn: parent
                     z: 3
                     s: root.s
-                    phase: !root.active ? "" : root.applying ? (root.applyPhase || "preparing") : root.feedback === "done" ? "done" : ""
+                    phase: !root.active ? "" : root.applying ? (root.applyPhase || "preparing") : root.feedback === "done" ? "done" : root.feedback === "error" ? "error" : ""
+                    errorText: root.applyError
                     allowed: root.active
                 }
                 Rectangle {

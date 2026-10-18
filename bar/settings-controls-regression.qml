@@ -40,6 +40,14 @@ ShellRoot {
                 onAccepted: draftText = undefined
             }
             EdotsTextField { id: input; x: 0; y: 620; width: 400; placeholderText: "Nombre" }
+            EdotsComboBox {
+                id: shortCombo
+                x: 650; y: 350; width: 160
+                popupBounds: bounds
+                model: ["A", "B", "C"]
+                editable: false
+                visible: false
+            }
         }
         Timer { interval: 100; running: checks.finished; onTriggered: Qt.quit() }
         TestCase {
@@ -149,6 +157,20 @@ ShellRoot {
                 compare(combo.popup.scale, 1)
                 fontRow.visible = false
                 tryCompare(combo.popup, "visible", false)
+                shortCombo.visible = true
+                shortCombo.currentIndex = 1
+                shortCombo.popup.open()
+                tryCompare(shortCombo.popup, "visible", true)
+                const anchorCenter = shortCombo.mapToItem(shortCombo.popup.parent, 0, shortCombo.height / 2).y
+                const selectedCenter = shortCombo.popup.y + shortCombo.popup.topPadding + shortCombo.optionHeight * 1.5
+                verify(Math.abs(anchorCenter - selectedCenter) < 1, "short menu selection aligns with control")
+                shortCombo.popup.close()
+                verify(Config.update({appearance: {menuSelectionAnchor: false}}).ok)
+                shortCombo.popup.open()
+                tryCompare(shortCombo.popup, "visible", true)
+                verify(Math.abs(shortCombo.popup.y + shortCombo.popup.topPadding + shortCombo.optionHeight * 1.5 - anchorCenter) > 10,
+                    "disabled anchor uses bounded placement")
+                shortCombo.popup.close()
                 Config.discard()
                 console.log("PASS: native combo pointer/keyboard/custom font, bounded popup, text editing, switch/slider and module restoration")
                 finished = true

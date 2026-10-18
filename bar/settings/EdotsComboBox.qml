@@ -133,6 +133,17 @@ ComboBox {
             const bottom = bounds ? bounds.mapToItem(parent, 0, bounds.height).y - 12 : root.Window.height - 12
             const below = Math.max(0, bottom - anchor.y - root.height - 6)
             const above = Math.max(0, anchor.y - top - 6)
+            const fullHeight = root.count * root.optionHeight + menu.topPadding + menu.bottomPadding
+            const selectedY = anchor.y + (root.height - root.optionHeight) / 2
+                - menu.topPadding - root.currentIndex * root.optionHeight
+            if (Flags.menuSelectionAnchor && root.currentIndex >= 0
+                    && fullHeight <= 280 && selectedY >= top && selectedY + fullHeight <= bottom) {
+                height = fullHeight
+                x = anchor.x
+                y = selectedY
+                list.positionViewAtBeginning()
+                return
+            }
             const down = below >= Math.min(240, above)
             height = Math.min(280, root.count * root.optionHeight + 16, down ? below : above)
             x = anchor.x

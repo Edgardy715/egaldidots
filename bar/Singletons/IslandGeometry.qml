@@ -8,8 +8,8 @@ Singleton {
     readonly property real compactRestHeight: 56
     readonly property size fallbackSurface: Qt.size(320, 300)
 
-    readonly property size mixerSurface: Qt.size(340, 380)
-    readonly property size mediaSurface: Qt.size(640, 360 + Math.max(0, Flags.fontScale - 1.2) * 120)
+    readonly property size mixerSurface: Qt.size(760, 600 + Math.max(0, Flags.fontScale - 1.2) * 100)
+    readonly property size mediaSurface: Qt.size(720, 440 + Math.max(0, Flags.fontScale - 1.2) * 180)
     readonly property size calendarSurface: Qt.size(660, 470)
     readonly property size workspacesSurface: Qt.size(360, 200)
     readonly property size notificationsSurface: Qt.size(380, 540)
@@ -21,7 +21,7 @@ Singleton {
     readonly property size authSurface: Qt.size(0, 0)
     readonly property size overviewSurface: Qt.size(1000, 340)
     readonly property size connectivitySurface: Qt.size(360, 400)
-    readonly property size clipboardSurface: Qt.size(580, 480)
+    readonly property size clipboardSurface: Qt.size(680, 600)
     readonly property size settingsSurface: Qt.size(1000, 700)
 
     readonly property var surfaceSizes: ({

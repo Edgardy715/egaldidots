@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Controls.Basic
 import "../Singletons"
 
@@ -33,8 +34,15 @@ MotionButton {
     background: Rectangle {
         radius: width / 2
         color: Qt.alpha(Theme.accent, 0.08 + 0.12 * root.interaction.presence)
-        border.color: Qt.alpha(Theme.foreground, 0.12 + 0.2 * root.interaction.presence)
-        border.width: root.activeFocus ? 2 : 1
+        border.color: Qt.alpha(Theme.accent, 0.65 + 0.25 * root.interaction.presence)
+        border.width: (root.activeFocus ? 1.4 : 0.9) * root.s
+        layer.enabled: root.visible
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: Qt.alpha(Theme.accent, 0.28 + 0.14 * root.interaction.presence)
+            shadowBlur: 0.45
+            blurMax: 8
+        }
     }
     contentItem: UserAvatar {
         name: root.userName || "•"

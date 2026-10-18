@@ -32,13 +32,14 @@ FocusScope {
     readonly property bool compactNavigation: width < 760 || Config.appearance.fontScale > 1.35
     readonly property int navigationRows: Math.ceil(root.titles.length / (root.compactNavigation ? 4 : root.titles.length))
     readonly property bool richComposition: height >= 680 && width >= 800 && Config.appearance.fontScale <= 1.35
+    property string saveConfirmation: ""
     property bool savePending: false
     property string feedback: ""
     readonly property var sections: ["appearance", "modules", "appearance", "appearance", "profile", "paths", "appearance"]
     readonly property var pageFields: [
-        ["appearance.workspaceStyle", "appearance.glassAlpha", "appearance.uiScale", "appearance.topGap", "appearance.appGap", "appearance.spacingScale", "appearance.radiusScale", "appearance.time12h"],
+        ["appearance.workspaceStyle", "appearance.glassAlpha", "appearance.materialDepth", "appearance.menuSelectionAnchor", "appearance.uiScale", "appearance.topGap", "appearance.appGap", "appearance.spacingScale", "appearance.radiusScale", "appearance.time12h"],
         root.richComposition ? [] : ["appearance.barLayout"].concat(Object.keys(Config.schema.sections.modules).map(key => "modules." + key)),
-        ["appearance.motionScale", "appearance.reduceMotion", "modules.animateChanges"],
+        ["appearance.motionScale", "appearance.reduceMotion", "appearance.mediaTransitions", "modules.animateChanges"],
         ["appearance.fontFamily", "appearance.fontMonoFamily", "appearance.fontDisplayFamily", "appearance.fontMediaFamily", "appearance.fontScale"],
         ["profile.displayName", "paths.userAvatar"],
         ["paths.paletteFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript", "appearance.pillBlur", "appearance.clockSeconds", "appearance.showGlyphs"],
@@ -58,14 +59,18 @@ FocusScope {
         body.forceActiveFocus()
         if (hyprlandActive) { hyprlandPage.saveChanges(); return }
         feedback = ""
-        if (!settingsPage.commitDrafts()) { settingsPage.focusFirstError(); return }
+        saveConfirmation = ""
+        if (!settingsPage.commitDrafts()) { saveConfirmation = "error"; settingsPage.focusFirstError(); return }
         savePending = Config.dirty
-        if (!Config.save()) { feedback = qsTr("No se pudo iniciar el guardado."); savePending = false }
+        if (savePending) saveConfirmation = "busy"
+        if (!Config.save()) { feedback = qsTr("No se pudo iniciar el guardado."); savePending = false; saveConfirmation = "error" }
     }
     Connections {
         target: Config
+        function onDirtyChanged() { if (Config.dirty && !Config.saving) root.saveConfirmation = "" }
         function onSavingChanged() {
             if (root.savePending && !Config.saving) {
+                root.saveConfirmation = Config.error ? "error" : "success"
                 root.feedback = Config.error || qsTr("Cambios guardados")
                 root.savePending = false
             }
@@ -303,7 +308,15 @@ FocusScope {
                 EdotsButton { visible: settingsPage.validationError.length > 0; text: qsTr("Revisar ajuste"); onClicked: settingsPage.focusFirstError() }
                 EdotsButton { visible: root.hyprlandController.dirty; text: qsTr("Ver Hyprland"); onClicked: { root.page = 6; search.text = "" } }
                 Item { Layout.fillWidth: true }
-                EdotsButton { text: qsTr("Descartar"); enabled: (Config.dirty || settingsPage.hasDrafts || settingsPage.validationError.length > 0) && !Config.saving; onClicked: { body.forceActiveFocus(); Config.discard(); settingsPage.clearValidation(); root.feedback = qsTr("Cambios descartados") } }
+                ConfirmationIndicator {
+                    Layout.preferredWidth: 30
+                    Layout.preferredHeight: 30
+                    status: root.saveConfirmation
+                    Accessible.ignored: false
+                    Accessible.role: Accessible.AlertMessage
+                    Accessible.name: status === "success" ? qsTr("Cambios guardados") : status === "error" ? qsTr("No se guardaron los cambios") : qsTr("Guardando")
+                }
+                EdotsButton { text: qsTr("Descartar"); enabled: (Config.dirty || settingsPage.hasDrafts || settingsPage.validationError.length > 0) && !Config.saving; onClicked: { body.forceActiveFocus(); Config.discard(); settingsPage.clearValidation(); root.saveConfirmation = ""; root.feedback = qsTr("Cambios descartados") } }
                 EdotsButton { objectName: "settingsSave"; text: qsTr("Guardar"); symbol: "check"; accent: true; enabled: Config.loaded && !Config.saving && !Config.error && (Config.dirty || settingsPage.hasDrafts); onClicked: root.saveChanges() }
             }
         }

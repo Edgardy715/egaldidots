@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Shapes
 import "../"
 import "../Singletons"
@@ -15,6 +16,8 @@ Item {
         : chargePaused ? "#8e8e93"
         : charge <= 0.2 ? "#ff453a"
         : charge <= 0.4 ? "#ffd60a" : Theme.iconSecondary
+
+    readonly property color fillTint: charging || chargePaused || charge <= 0.4 ? tint : Theme.accent
 
     width: 27 * s
     height: 14 * s
@@ -37,7 +40,14 @@ Item {
             width: (shell.width - 4 * root.s) * root.charge
             height: shell.height - 4 * root.s
             radius: Math.min(2 * root.s, width / 2)
-            color: Theme.accent
+            color: root.fillTint
+            layer.enabled: root.visible && root.enabled && root.charge > 0
+            layer.effect: MultiEffect {
+                shadowEnabled: true
+                shadowColor: Qt.alpha(root.fillTint, root.chargePaused ? 0.25 : 0.85)
+                shadowBlur: 0.8
+                blurMax: 12
+            }
             visible: root.charge > 0
             Behavior on width { Anim { type: Anim.DefaultEffects } }
         }

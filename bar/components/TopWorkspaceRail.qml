@@ -100,8 +100,8 @@ Item {
         layer.enabled: true
         layer.effect: MultiEffect {
             shadowEnabled: !root.integrated
-            shadowColor: Qt.alpha(Theme.accent, 0.12)
-            shadowBlur: 0.45
+            shadowColor: Qt.alpha(Theme.accent, 0.60)
+            shadowBlur: 0.75
             shadowVerticalOffset: 2 * root.s
         }
         gradient: Gradient {
@@ -167,6 +167,13 @@ Item {
         y: (root.height - height) / 2
         width: 20 * root.s; height: width
         preferredRendererType: Shape.CurveRenderer
+        layer.enabled: visible
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: Qt.alpha(Theme.accent, 0.90)
+            shadowBlur: 0.8
+            blurMax: 16
+        }
         ShapePath {
             strokeWidth: 0
             fillColor: Theme.accent
@@ -211,7 +218,16 @@ Item {
                     Behavior on scale { NumberAnimation { duration: Motion.fast } }
                 }
                 Rectangle {
+                    id: workspaceMark
                     objectName: "workspaceMark-" + cell.wsId
+                    layer.enabled: visible && root.style !== "pacman"
+                        && (cell.highlight > 0.01 || cell.workspaceState.urgent || hit.containsMouse)
+                    layer.effect: MultiEffect {
+                        shadowEnabled: true
+                        shadowColor: Qt.alpha(Theme.accent, 0.85)
+                        shadowBlur: 0.8
+                        blurMax: 12
+                    }
                     visible: root.style !== "numbers"
                     anchors.centerIn: parent
                     width: (root.style === "bars" ? 4 : root.style === "capsules" ? 6 + 14 * cell.highlight : root.style === "pacman" ? 4 : 6 + 4 * cell.highlight) * root.s

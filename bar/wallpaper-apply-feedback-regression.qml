@@ -36,7 +36,7 @@ ShellRoot {
                 capture("apply-preparing")
                 feedback.phase = "transition"; wait(100)
                 feedback.phase = "done"; wait(180)
-                check(feedback.success && feedback.checkProgress > 0 && feedback.checkProgress < 1, "check draws progressively")
+                check(feedback.success && feedback.checkProgress > 0 && feedback.checkProgress < 1, "check draws progressively: " + feedback.checkProgress)
                 capture("apply-check-drawing")
                 wait(400)
                 check(feedback.checkProgress === 1 && feedback.success, "green confirmation completed")

@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "AnimatedIconData.js" as IconData
 import "../Singletons"
 
@@ -48,6 +49,14 @@ Item {
     }
     property font font
     property color color: Theme.foreground
+    property real neonIntensity: interaction ? 0.65 * interaction.presence + 0.25 * interaction.pressure : 0
+    layer.enabled: visible && enabled && neonIntensity > 0.01
+    layer.effect: MultiEffect {
+        shadowEnabled: true
+        shadowColor: Qt.alpha(root.color, Math.min(0.85, root.neonIntensity))
+        shadowBlur: 0.75
+        blurMax: 12
+    }
     property int horizontalAlignment: Text.AlignHCenter
     property int verticalAlignment: Text.AlignVCenter
     readonly property bool vectorIcon: IconData.parts(displayedIcon).length > 0

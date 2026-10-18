@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import "../Singletons"
 
@@ -20,6 +21,7 @@ Item {
     property real size: 30
     property real s: 1
     property real radius: Theme.radiusMd * s
+    property bool active: false
 
     width: size * s
     height: size * s
@@ -34,5 +36,12 @@ Item {
         iconName: root.iconName
         color: root.color
         font.pixelSize: Math.round(root.size * 0.55) * s
+        layer.enabled: root.visible && root.active
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: Qt.alpha(Theme.accent, 0.7)
+            shadowBlur: 0.7
+            blurMax: 12
+        }
     }
 }

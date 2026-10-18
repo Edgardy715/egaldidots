@@ -7,6 +7,17 @@ vm.runInContext(fs.readFileSync(__dirname + '/../Singletons/Settings.js', 'utf8'
 const context = { home: '/home/test', configHome: '/config', cacheHome: '/cache' };
 const validate = doc => settings.validate(doc, context);
 assert.equal(validate({}).effective.appearance.glassAlpha, 0.34);
+assert.equal(validate({}).effective.appearance.materialDepth, 0.25);
+assert.equal(validate({}).effective.appearance.mediaTransitions, true);
+assert.equal(validate({}).effective.appearance.menuSelectionAnchor, true);
+for (const value of [0, 0.6, 1])
+    assert.equal(validate({ appearance: { materialDepth: value } }).effective.appearance.materialDepth, value);
+for (const key of ['mediaTransitions', 'menuSelectionAnchor']) {
+    assert.equal(validate({ appearance: { [key]: false } }).effective.appearance[key], false);
+    assert.equal(validate({ appearance: { [key]: 'false' } }).ok, false);
+}
+for (const value of [-0.01, 1.01, NaN])
+    assert.equal(validate({ appearance: { materialDepth: value } }).ok, false);
 assert.equal(validate({}).effective.appearance.barLayout, 'split');
 assert.equal(validate({}).effective.appearance.workspaceStyle, 'numbers');
 for (const workspaceStyle of ['numbers', 'dots', 'bars', 'capsules', 'pacman'])
@@ -44,6 +55,9 @@ assert.deepEqual(Array.from(schema.sections.appearance.barLayout.options), ['spl
 assert.deepEqual(Array.from(schema.sections.appearance.barLayout.optionLabels), ['Separada', 'Compacta']);
 assert.equal(schema.sections.appearance.barLayout.control, 'choice');
 assert.equal(schema.sections.appearance.fontScale.minimum, 0.75);
+assert.equal(schema.sections.appearance.materialDepth.maximum, 1);
+assert.equal(schema.sections.appearance.mediaTransitions.control, 'toggle');
+assert.equal(schema.sections.appearance.menuSelectionAnchor.control, 'toggle');
 assert.equal(schema.sections.paths.wallpaperDir.default, '/home/test/Wallpapers');
 assert.equal(schema.sections.appearance.fontScale.label, 'Tamaño de texto');
 assert.equal(schema.sections.appearance.reduceMotion.control, 'toggle');

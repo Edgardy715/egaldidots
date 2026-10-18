@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "../Singletons"
 import "../"
 
@@ -54,6 +55,13 @@ Item {
             width: parent.width * root.value
             radius: parent.radius
             color: Theme.accent
+            layer.enabled: root.visible && root.enabled && root.value > 0
+            layer.effect: MultiEffect {
+                shadowEnabled: true
+                shadowColor: Qt.alpha(Theme.accent, 0.7)
+                shadowBlur: 0.7
+                blurMax: 12
+            }
             Behavior on width { Anim { type: Anim.FastEffects } }
         }
     }

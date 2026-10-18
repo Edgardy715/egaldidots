@@ -109,6 +109,7 @@ Item {
                         spacing: Theme.spacingLg * root.s
 
                         IconTile {
+                            active: root.keepAwakeEnabled
                             iconName: Icons.iCoffee
                             color: root.keepAwakeEnabled ? Theme.accent : Theme.foreground
                             size: 30

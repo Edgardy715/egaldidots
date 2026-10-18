@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import "../Singletons"
@@ -79,6 +80,13 @@ Item {
             width: Theme.borderHairline * root.s
             radius: width / 2
             color: Theme.accent
+            layer.enabled: root.visible && root.revealed && root.selected
+            layer.effect: MultiEffect {
+                shadowEnabled: true
+                shadowColor: Qt.alpha(Theme.accent, 0.8)
+                shadowBlur: 0.75
+                blurMax: 12
+            }
             opacity: root.selected ? 1 : 0
             scale: root.selected ? 1 : 0.4
             Behavior on opacity { Anim { type: Anim.FastEffects } }

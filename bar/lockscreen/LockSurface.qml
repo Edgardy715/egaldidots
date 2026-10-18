@@ -454,8 +454,14 @@ Item {
             spacing: 8 * root.unit
             opacity: root.contentExposure * Math.max(0, (root.successProgress - 0.25) / 0.75)
             scale: 0.85 + 0.15 * root.successProgress
-            MaterialIcon { iconName: "check_circle"; font.pixelSize: 24 * root.unit; color: "#b8f7d8" }
+            ConfirmationIndicator { width: 24 * root.unit; height: width; s: root.unit; status: root.authenticated ? "success" : "" }
             Text { text: qsTr("Listo"); font.family: Theme.font; font.pixelSize: 16 * root.textScale; color: root.ink }
+        }
+        ConfirmationIndicator {
+            x: feedback.x - 20 * root.unit
+            anchors.verticalCenter: feedback.verticalCenter
+            width: 18 * root.unit; height: width; s: root.unit
+            status: root.authenticated ? "" : root.busy ? "busy" : root.errorText ? "error" : ""
         }
         Text {
             id: feedback
