@@ -36,6 +36,7 @@ PanelWindow {
     readonly property bool settingsReturning: !settingsOpen && settingsCompanion.active && surface !== "auth"
     property int profileRequest: 0
     readonly property bool settingsPickerOpen: settingsOpen && settingsCompanion.surfaceItem && settingsCompanion.surfaceItem.pathPickerOpen
+    readonly property bool mixerPopupOpen: surface === "mixer" && pill.surfaceItem && !!pill.surfaceItem.popupOpen
     readonly property bool sessionOpen: surface === "session"
     readonly property bool wallpaperOpen: surface === "wallpaper"
     readonly property bool mediaPanelOpen: wallpaperOpen || overviewOpen
@@ -212,7 +213,7 @@ PanelWindow {
     // surface (por ejemplo el TextInput del launcher) tiene el foco.
     Shortcut {
         sequence: "Escape"
-        enabled: inputPolicy.escapeShortcutEnabled && !overlay.settingsPickerOpen
+        enabled: inputPolicy.escapeShortcutEnabled && !overlay.settingsPickerOpen && !overlay.mixerPopupOpen
         onActivated: overlay.dismissSurface()
     }
     Shortcut {

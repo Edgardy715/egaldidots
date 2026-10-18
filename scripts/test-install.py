@@ -79,7 +79,7 @@ class Recovery(unittest.TestCase):
         installer.write_text(installer.read_text().replace('/etc/os-release', str(os_release)).replace('/etc/pam.d/hyprlock', str(pam)))
         self.bin = self.root / 'bin'; self.bin.mkdir()
         fake = self.root / 'fake'; fake.write_text(FAKE); fake.chmod(0o755)
-        commands = ('Hyprland hyprctl hypridle hyprlock quickshell qs fish starship kitty nvim micro fastfetch bat eza zoxide fzf fd rg lazygit jq playerctl wl-copy wl-paste cliphist wl-clip-persist brightnessctl powerprofilesctl hyprshot notify-send pavucontrol thunar magick awww matugen cmake curl nmcli wpctl pactl cava gsettings fc-cache fc-match gh ruff shfmt node npm sudo pacman yay systemctl chsh git makepkg').split()
+        commands = ('Hyprland hyprctl hypridle hyprlock quickshell qs fish starship kitty nvim micro fastfetch bat eza zoxide fzf fd rg lazygit jq playerctl wl-copy wl-paste cliphist wl-clip-persist brightnessctl powerprofilesctl hyprshot notify-send thunar magick awww matugen cmake curl nmcli wpctl pactl parec cava gsettings fc-cache fc-match gh ruff shfmt node npm sudo pacman yay systemctl chsh git makepkg').split()
         # rg is real: the wallpaper name matching is part of the tested flow.
         commands.remove('rg')
         for name in commands: (self.bin / name).symlink_to(fake)

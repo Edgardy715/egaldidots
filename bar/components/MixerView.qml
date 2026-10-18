@@ -1,335 +1,313 @@
 pragma ComponentBehavior: Bound
-
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls.Basic
+import Quickshell
 import "../Singletons"
+import "../settings"
+import "audio"
 
 Item {
     id: root
     property real s: 1
-    property real vol: 0
-    property bool muted: false
-    property bool outputReady: false
-    property real sourceVol: 0
-    property bool sourceMuted: false
-    property bool sourceReady: false
-    property var appStreams: []
+    property bool active: true
+    property bool ready: false
+    property bool busy: false
+    property string error: ""
+    property var outputs: []
+    property var inputs: []
+    property var playback: []
+    property var recording: []
+    property var cards: []
+    property string defaultOutput: ""
+    property string defaultInput: ""
+    property var levels: ({})
+    property var activePopup: null
+    readonly property bool popupOpen: !!activePopup && activePopup.visible
+    function trackMenu(menu) {
+        if (activePopup && activePopup !== menu) activePopup.close()
+        activePopup = menu
+    }
+    onPageChanged: if (activePopup) activePopup.close()
+    onActiveChanged: {
+        if (!active && activePopup) activePopup.close()
+        if (active) { captureApps = false; search.text = "" }
+        updateMeters()
+    }
+    property int page: 0
+    property bool captureApps: false
+    onCaptureAppsChanged: { search.text = ""; Qt.callLater(() => list.positionViewAtBeginning()) }
+    property bool showMonitors: false
+    property bool amplified: false
+    readonly property real maximum: amplified ? 1.5 : 1
+    readonly property var tabLabels: [qsTr("Salida"), qsTr("Entrada"), qsTr("Aplicaciones"), qsTr("Hardware")]
+    readonly property var tabSymbols: ["volume_up", "mic", "apps", "tune"]
+    readonly property string kind: pages.displayedPage === 0 ? "output" : pages.displayedPage === 1 ? "input" : captureApps ? "recording" : "playback"
+    readonly property var rows: pages.displayedPage === 0 ? [...outputs].sort((a,b) => Number(b.name === defaultOutput) - Number(a.name === defaultOutput) || outputs.indexOf(a) - outputs.indexOf(b)) : pages.displayedPage === 1 ? inputs.filter(row => showMonitors || !row.monitor).sort((a,b) => Number(b.name === defaultInput) - Number(a.name === defaultInput) || inputs.indexOf(a) - inputs.indexOf(b))
+        : pages.displayedPage === 3 ? cards : (captureApps ? recording : playback).filter(row => (row.appName + " " + row.mediaName).toLowerCase().includes(search.text.toLowerCase()))
+    property var meterSources: []
+    function updateMeters() {
+        let sources = []
+        if (active && ready && pages.displayedPage !== 3) {
+            const top = list.contentY
+            const bottom = top + list.height
+            sources = rows.filter((row, index) => {
+                const item = list.itemAtIndex(index)
+                return item && item.y + item.height > top && item.y < bottom
+            }).map(row => row.meterSource || (kind === "input" ? row.name : row.monitorSource) || "").filter(name => name.length > 0).slice(0,12)
+        }
+        if (JSON.stringify(sources) !== JSON.stringify(meterSources)) meterSources = sources
+    }
+    onRowsChanged: Qt.callLater(updateMeters)
+    onReadyChanged: Qt.callLater(updateMeters)
+    Component.onCompleted: Qt.callLater(updateMeters)
+    signal requested(string action, var args)
+    signal refreshRequested()
+    signal requestClose()
 
-    signal outputVolumeRequested(real volume)
-    signal outputMuteToggleRequested()
-    signal sourceVolumeRequested(real volume)
-    signal sourceMuteToggleRequested()
-    signal streamVolumeRequested(var node, real volume)
-    signal streamMuteToggleRequested(var node)
-
-    function clamp01(value) { return Math.max(0, Math.min(1, value)) }
-
+    EdotsPageMotion {
+        id: pages
+        requestedPage: root.page
+        active: root.active
+        reduced: Flags.reduceMotion
+        onDisplayedPageChanged: {
+            if (displayedPage === 2) root.captureApps = false
+            Qt.callLater(() => list.positionViewAtBeginning())
+        }
+    }
     ColumnLayout {
         anchors.fill: parent
-        spacing: Theme.spacingLg * root.s
-
-        // header
+        spacing: 16 * root.s
         RowLayout {
             Layout.fillWidth: true
-            spacing: Theme.spacingLg * root.s
-            Text {
-                text: "Volumen"
-                color: Theme.foreground
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeTitle * root.s
-                font.weight: Font.DemiBold
-            }
-            Item { Layout.fillWidth: true }
-            Text {
-                text: Math.round(root.vol * 100) + "%"
-                color: Theme.foreground
-                font.family: Theme.fontMono
-                font.pixelSize: Theme.fontSizeBodyLg * root.s
-            }
-        }
-
-        // volume bar
-        Slider {
-            objectName: "outputVolumeSlider"
-            Layout.fillWidth: true
-            value: root.muted ? 0 : root.clamp01(root.vol)
-            s: root.s
-            enabled: !!root.outputReady
-            activeFocusOnTab: enabled
-            Accessible.role: Accessible.Slider
-            Accessible.name: qsTr("Volumen de salida")
-            Accessible.description: Math.round(root.vol * 100) + "%"
-            Accessible.onIncreaseAction: root.outputVolumeRequested(root.vol + 0.05)
-            Accessible.onDecreaseAction: root.outputVolumeRequested(root.vol - 0.05)
-            Keys.onLeftPressed: root.outputVolumeRequested(root.vol - 0.05)
-            Keys.onRightPressed: root.outputVolumeRequested(root.vol + 0.05)
-            onSliderChanged: v => root.outputVolumeRequested(v)
-            Rectangle {
-                anchors.fill: parent
-                radius: height / 2
-                color: "transparent"
-                border.color: Theme.accent
-                border.width: parent.activeFocus ? Theme.borderHairline : 0
-                Accessible.ignored: true
-            }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            Item { Layout.fillWidth: true }
-            Rectangle {
-  // mute toggle
-                Layout.preferredWidth: 64 * root.s
-                Layout.preferredHeight: 26 * root.s
-                radius: height / 2
-                // wash al hover sobre el tinte base (acento si silenciado)
-                color: root.muted
-                       ? (mt.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaMid) : Qt.alpha(Theme.accent, Theme.alphaChip))
-                       : (mt.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : Qt.alpha(Theme.foreground, Theme.alphaFaint))
-                border.color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
-                border.width: Theme.borderHairline
-                Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-
-                MotionArea {
-                    id: mt
-                    objectName: "outputMuteToggle"
-                    anchors.fill: parent
-                    enabled: !!root.outputReady
-                    accessibleName: qsTr("Alternar silencio del audio")
-                    hoverWash: false
-                    onClicked: { if (root.outputReady) root.outputMuteToggleRequested() }
+            ColumnLayout {
+                Layout.fillWidth: true; Layout.minimumWidth: 0
+                spacing: 4 * root.s
+                Text {
+                    text: qsTr("Sonido")
+                    color: Theme.foreground; font.family: Theme.font
+                    font.pixelSize: Theme.fontSizeHero * root.s; font.weight: Font.DemiBold
                 }
-
                 AnimatedLabel {
-                    scale: mt.motion.visualScale
-                    transform: Translate { y: -Motion.labelTravel * mt.motion.presence }
-                    anchors.centerIn: parent
-                    value: root.muted ? qsTr("Silencio") : qsTr("Sonando")
-                    color: root.muted ? Theme.accent : Theme.foreground
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSizeSmall * root.s
-                    font.weight: Font.Medium
+                    Layout.fillWidth: true
+                    value: !root.ready ? qsTr("Conectando con el audio…") : (root.outputs.length === 1 ? qsTr("1 salida") : qsTr("%1 salidas").arg(root.outputs.length)) + " · " + (root.inputs.filter(row => !row.monitor).length === 1 ? qsTr("1 entrada") : qsTr("%1 entradas").arg(root.inputs.filter(row => !row.monitor).length))
+                    color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s
+                    elide: Text.ElideRight
                 }
-
+            }
+            AudioButton {
+                objectName: "audioRefresh"
+                s: root.s; symbol: "refresh"
+                ToolTip.text: qsTr("Actualizar dispositivos"); ToolTip.visible: hovered
+                onClicked: root.refreshRequested()
+            }
+            AudioButton {
+                objectName: "audioClose"
+                s: root.s; symbol: "close"
+                ToolTip.text: qsTr("Cerrar sonido"); ToolTip.visible: hovered
+                onClicked: root.requestClose()
             }
         }
-
-        // ---- micrófono ----
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: Theme.spacingLg * root.s
-            Text {
-                text: "Micrófono"
-                color: Theme.foreground
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeTitle * root.s
-                font.weight: Font.DemiBold
-            }
-            Item { Layout.fillWidth: true }
-            Text {
-                text: Math.round(root.sourceVol * 100) + "%"
-                color: Theme.foreground
-                font.family: Theme.fontMono
-                font.pixelSize: Theme.fontSizeBodyLg * root.s
-            }
-        }
-
-        // mic volume bar
-        Slider {
-            objectName: "sourceVolumeSlider"
-            Layout.fillWidth: true
-            value: root.sourceMuted ? 0 : root.clamp01(root.sourceVol)
-            s: root.s
-            enabled: root.sourceReady
-            activeFocusOnTab: enabled
-            Accessible.role: Accessible.Slider
-            Accessible.name: qsTr("Volumen del micrófono")
-            Accessible.description: Math.round(root.sourceVol * 100) + "%"
-            Accessible.onIncreaseAction: root.sourceVolumeRequested(root.sourceVol + 0.05)
-            Accessible.onDecreaseAction: root.sourceVolumeRequested(root.sourceVol - 0.05)
-            Keys.onLeftPressed: root.sourceVolumeRequested(root.sourceVol - 0.05)
-            Keys.onRightPressed: root.sourceVolumeRequested(root.sourceVol + 0.05)
-            onSliderChanged: v => root.sourceVolumeRequested(v)
-            Rectangle {
-                anchors.fill: parent
-                radius: height / 2
-                color: "transparent"
-                border.color: Theme.accent
-                border.width: parent.activeFocus ? Theme.borderHairline : 0
-                Accessible.ignored: true
-            }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            Item { Layout.fillWidth: true }
-            Rectangle {
-                Layout.preferredWidth: 64 * root.s
-                Layout.preferredHeight: 26 * root.s
-                radius: height / 2
-                color: root.sourceMuted
-                       ? (smt.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaMid) : Qt.alpha(Theme.accent, Theme.alphaChip))
-                       : (smt.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : Qt.alpha(Theme.foreground, Theme.alphaFaint))
-                border.color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
-                border.width: Theme.borderHairline
-                Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-
-                MotionArea {
-                    id: smt
-                    objectName: "sourceMuteToggle"
-                    anchors.fill: parent
-                    enabled: root.sourceReady
-                    accessibleName: qsTr("Alternar silencio del micrófono")
-                    hoverWash: false
-                    onClicked: { if (root.sourceReady) root.sourceMuteToggleRequested() }
-                }
-
-                AnimatedLabel {
-                    scale: smt.motion.visualScale
-                    transform: Translate { y: -Motion.labelTravel * smt.motion.presence }
-                    anchors.centerIn: parent
-                    value: root.sourceMuted ? qsTr("Mudo") : qsTr("Activo")
-                    color: root.sourceMuted ? Theme.accent : Theme.foreground
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSizeSmall * root.s
-                    font.weight: Font.Medium
-                }
-
-            }
-        }
-
-        Rectangle { Layout.fillWidth: true; Layout.preferredHeight: Theme.borderHairline; color: Theme.hair }
-
-        Text {
-            Layout.fillWidth: true
-            text: qsTr("Aplicaciones")
-            color: Theme.foreground
-            font.family: Theme.font
-            font.pixelSize: Theme.fontSizeBodyLg * root.s
-            font.weight: Font.DemiBold
-        }
-
-        // ---- streams per-app ----
         Item {
+            id: tabs
             Layout.fillWidth: true
-            Layout.fillHeight: true
+            Layout.preferredHeight: 44 * root.s
+            Rectangle {
+                anchors.fill: parent; radius: 13 * root.s
+                color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
+            }
+            Rectangle {
+                x: root.page * tabs.width / 4 + 4 * root.s
+                y: 4 * root.s
+                width: tabs.width / 4 - 8 * root.s; height: tabs.height - 8 * root.s
+                radius: 10 * root.s
+                color: Qt.alpha(Theme.accent, Theme.alphaChip)
+                Behavior on x { enabled: !Flags.reduceMotion && root.active; SmoothedAnimation { duration: Motion.standardSmall; velocity: -1 } }
+            }
+            Row {
+                anchors.fill: parent
+                Repeater {
+                    model: root.tabLabels
+                    delegate: AudioButton {
+                        id: tab
+                        required property int index
+                        required property string modelData
+                        objectName: "audioTab-" + index
+                        s: root.s
+                        width: tabs.width / 4; height: tabs.height
+                        text: root.width > 540 * root.s * Math.max(1, Flags.fontScale) ? modelData : ""
+                        symbol: root.tabSymbols[index]
+                        selected: root.page === index
+                        Accessible.name: modelData
+                        ToolTip.text: modelData
+                        ToolTip.visible: hovered && text.length === 0
+                        Accessible.role: Accessible.PageTab
+                        Accessible.onPressAction: root.page = index
+                        background: Rectangle { color: "transparent"; radius: 10 * root.s; border.width: tab.activeFocus ? 2 : 0; border.color: Theme.accent }
+                        onClicked: root.page = index
+                        Keys.onLeftPressed: root.page = Math.max(0, root.page - 1)
+                        Keys.onRightPressed: root.page = Math.min(3, root.page + 1)
+                    }
+                }
+            }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            visible: root.error.length > 0
+            spacing: 12 * root.s
+            MaterialIcon { Layout.preferredWidth: 20 * root.s; Layout.preferredHeight: 20 * root.s; iconName: "error"; font.pixelSize: 20 * root.s; color: Theme.error }
+            Text {
+                objectName: "audioError"
+                Layout.fillWidth: true
+                text: root.error
+                maximumLineCount: 3; wrapMode: Text.WordWrap; elide: Text.ElideRight
+                font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; color: Theme.error
+                Accessible.role: Accessible.AlertMessage
+            }
+            AudioButton { s: root.s; text: qsTr("Reintentar"); onClicked: root.refreshRequested() }
+        }
+        Item {
+            Layout.fillWidth: true; Layout.fillHeight: true
             clip: true
-
             ColumnLayout {
                 anchors.fill: parent
-                visible: root.appStreams.length === 0
-                spacing: Theme.spacingSm * root.s
-                Item { Layout.fillHeight: true }
-                MaterialIcon {
-                    Layout.alignment: Qt.AlignHCenter
-                    iconName: Icons.iMusic
-                    color: Theme.iconSecondary
-                    font.pixelSize: 24 * root.s
+                opacity: pages.exposure
+                transform: Translate { x: Flags.reduceMotion ? 0 : pages.travel * root.s }
+                enabled: root.active && root.ready && !pages.transitioning
+                spacing: 10 * root.s
+                RowLayout {
+                    Layout.fillWidth: true
+                    Text {
+                        Layout.fillWidth: true
+                        visible: pages.displayedPage !== 2
+                        text: pages.displayedPage === 0 ? qsTr("Dónde quieres escuchar") : pages.displayedPage === 1 ? qsTr("Qué quieres capturar") : pages.displayedPage === 2 ? qsTr("Cada aplicación, a tu manera") : qsTr("Perfiles y conexiones")
+                        font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * root.s; font.weight: Font.Medium; color: Theme.foreground
+                        elide: Text.ElideRight
+                    }
+                    AudioButton {
+                        objectName: "audioMonitors"
+                        visible: pages.displayedPage === 1
+                        s: root.s; text: qsTr("Monitores"); symbol: "speaker"; selected: root.showMonitors
+                        onClicked: root.showMonitors = !root.showMonitors
+                    }
+                    AudioButton {
+                        objectName: "audioPlayback"
+                        Layout.fillWidth: true
+                        visible: pages.displayedPage === 2
+                        s: root.s; text: qsTr("Reproducción · %1").arg(root.playback.length); selected: !root.captureApps
+                        onClicked: root.captureApps = false
+                    }
+                    AudioButton {
+                        objectName: "audioRecording"
+                        Layout.fillWidth: true
+                        visible: pages.displayedPage === 2
+                        s: root.s; text: qsTr("Grabación · %1").arg(root.recording.length); selected: root.captureApps
+                        onClicked: root.captureApps = true
+                    }
                 }
-                Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: qsTr("Sin audio de aplicaciones")
-                    color: Theme.iconSecondary
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSizeBody * root.s
+                EdotsTextField {
+                    id: search
+                    objectName: "audioSearch"
+                    Layout.fillWidth: true
+                    visible: pages.displayedPage === 2
+                    placeholderText: qsTr("Buscar aplicaciones")
+                    onTextChanged: Qt.callLater(() => list.positionViewAtBeginning())
                 }
-                Item { Layout.fillHeight: true }
-            }
-
-            Flickable {
-                anchors.fill: parent
-                visible: root.appStreams.length > 0
-                contentHeight: streamColumn.implicitHeight
-                boundsBehavior: Flickable.StopAtBounds
-                clip: true
-
-                ColumnLayout {
-                    id: streamColumn
-                    width: parent.width
-                    spacing: Theme.spacingLg * root.s
-                    Repeater {
-                        model: root.appStreams
-                        delegate: ColumnLayout {
-                            id: streamDelegate
-                            required property var modelData
-                            Layout.fillWidth: true
-                            spacing: Theme.spacingSm * root.s
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: Theme.spacingMd * root.s
-                                Image {
-                                    id: appImage
-                                    Layout.preferredWidth: 18 * root.s
-                                    Layout.preferredHeight: 18 * root.s
-                                    source: streamDelegate.modelData.icon
-                                    fillMode: Image.PreserveAspectFit
-                                    visible: status === Image.Ready
-                                    sourceSize.width: 36
-                                    sourceSize.height: 36
-                                }
-                                MaterialIcon {
-                                    Layout.preferredWidth: 18 * root.s
-                                    visible: appImage.status !== Image.Ready
-                                    iconName: Icons.iVolume
-                                    color: Theme.iconSecondary
-                                    font.pixelSize: 18 * root.s
-                                }
-                                Text {
-                                    Layout.fillWidth: true
-                                    text: streamDelegate.modelData.appName
-                                    elide: Text.ElideRight
-                                    color: Theme.foreground
-                                    font.family: Theme.font
-                                    font.pixelSize: Theme.fontSizeBody * root.s
-                                }
-                                Text {
-                                    text: Math.round(streamDelegate.modelData.volume * 100) + "%"
-                                    color: Theme.iconSecondary
-                                    font.family: Theme.fontMono
-                                    font.pixelSize: Theme.fontSizeLabel * root.s
-                                }
-                                MaterialIcon {
-                                    Layout.preferredWidth: 28 * root.s
-                                    Layout.preferredHeight: 28 * root.s
-                                    iconName: streamDelegate.modelData.muted ? Icons.iVolOff : Icons.iVolMed
-                                    color: streamDelegate.modelData.muted ? Theme.accent : Theme.foreground
-                                    font.pixelSize: Theme.fontSizeBody * root.s
-                                    MotionArea {
-                                        objectName: "streamMute-" + streamDelegate.modelData.appName
-                                        anchors.fill: parent
-                                        accessibleName: qsTr("Alternar silencio de %1").arg(streamDelegate.modelData.appName)
-                                        hoverWash: false
-                                        onClicked: root.streamMuteToggleRequested(streamDelegate.modelData.node)
-                                    }
+                Item {
+                    Layout.fillWidth: true; Layout.fillHeight: true
+                    MotionList {
+                        id: list
+                        objectName: "audioEndpointList"
+                        anchors.fill: parent
+                        clip: true
+                        spacing: 4 * root.s
+                        boundsBehavior: Flickable.StopAtBounds
+                        onContentYChanged: Qt.callLater(root.updateMeters)
+                        onContentHeightChanged: Qt.callLater(root.updateMeters)
+                        onHeightChanged: Qt.callLater(root.updateMeters)
+                        model: ScriptModel { values: root.rows.map(row => row.id) }
+                        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+                        onModelChanged: positionViewAtBeginning()
+                        delegate: Loader {
+                            id: rowLoader
+                            required property string modelData
+                            onLoaded: Qt.callLater(root.updateMeters)
+                            onHeightChanged: Qt.callLater(root.updateMeters)
+                            onYChanged: Qt.callLater(root.updateMeters)
+                            readonly property var record: root.rows.find(row => row.id === modelData) || ({id:modelData,description:"",channels:[]})
+                            width: list.width - 10 * root.s
+                            height: item ? item.implicitHeight : 0
+                            sourceComponent: pages.displayedPage === 3 ? hardwareComponent : endpointComponent
+                            Component {
+                                id: endpointComponent
+                                AudioEndpoint {
+                                    endpoint: rowLoader.record
+                                    kind: root.kind
+                                    s: root.s; maximum: root.maximum
+                                    popupBounds: root
+                                    card: root.cards.find(card => card.id === endpoint.card) || null
+                                    levels: root.levels
+                                    meterEnabled: root.meterSources.includes(meterSource)
+                                    isDefault: root.kind === "output" ? endpoint.name === root.defaultOutput : root.kind === "input" && endpoint.name === root.defaultInput
+                                    destinations: root.kind === "recording" ? root.inputs : root.outputs
+                                    onMenuOpened: menu => root.trackMenu(menu)
+                                    onRequested: (action, args) => root.requested(action, args)
                                 }
                             }
-                            Slider {
-                                Layout.fillWidth: true
-                                value: streamDelegate.modelData.muted ? 0 : root.clamp01(streamDelegate.modelData.volume)
-                                height_: 8
-                                s: root.s
-                                activeFocusOnTab: true
-                                Accessible.role: Accessible.Slider
-                                Accessible.name: qsTr("Volumen de %1").arg(streamDelegate.modelData.appName)
-                                Accessible.description: Math.round(streamDelegate.modelData.volume * 100) + "%"
-                                Accessible.onIncreaseAction: root.streamVolumeRequested(streamDelegate.modelData.node, streamDelegate.modelData.volume + 0.05)
-                                Accessible.onDecreaseAction: root.streamVolumeRequested(streamDelegate.modelData.node, streamDelegate.modelData.volume - 0.05)
-                                Keys.onLeftPressed: root.streamVolumeRequested(streamDelegate.modelData.node, streamDelegate.modelData.volume - 0.05)
-                                Keys.onRightPressed: root.streamVolumeRequested(streamDelegate.modelData.node, streamDelegate.modelData.volume + 0.05)
-                                onSliderChanged: v => root.streamVolumeRequested(streamDelegate.modelData.node, v)
-                                Rectangle {
-                                    anchors.fill: parent
-                                    radius: height / 2
-                                    color: "transparent"
-                                    border.color: Theme.accent
-                                    border.width: parent.activeFocus ? Theme.borderHairline : 0
-                                    Accessible.ignored: true
+                            Component {
+                                id: hardwareComponent
+                                AudioHardware {
+                                    card: rowLoader.record
+                                    s: root.s; popupBounds: root
+                                    onMenuOpened: menu => root.trackMenu(menu)
+                                    onRequested: (action, args) => root.requested(action, args)
                                 }
                             }
                         }
                     }
+                    ColumnLayout {
+                        anchors.centerIn: parent
+                        width: Math.min(parent.width, 340 * root.s)
+                        spacing: 12 * root.s
+                        visible: root.rows.length === 0
+                        MaterialIcon {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredWidth: 32 * root.s; Layout.preferredHeight: 32 * root.s
+                            iconName: root.ready ? root.tabSymbols[pages.displayedPage] : "sync"
+                            font.pixelSize: 32 * root.s; color: Theme.iconSecondary
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            text: !root.ready ? qsTr("Esperando al servidor de audio") : pages.displayedPage === 2 ? search.text ? qsTr("No hay aplicaciones que coincidan") : root.captureApps ? qsTr("Ninguna aplicación está grabando") : qsTr("Ninguna aplicación está reproduciendo") : qsTr("No hay dispositivos disponibles")
+                            horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
+                            font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * root.s; color: Theme.foreground
+                        }
+                        Text {
+                            Layout.fillWidth: true
+                            text: pages.displayedPage === 2 ? qsTr("Los controles aparecen cuando una aplicación abre un stream de audio.") : qsTr("Conecta un dispositivo o revisa su perfil en Hardware.")
+                            horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
+                            font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; color: Theme.iconSecondary
+                        }
+                    }
                 }
             }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 12 * root.s
+            AudioButton {
+                objectName: "audioAmplification"
+                s: root.s; text: qsTr("Hasta 150 %"); symbol: "volume_up"; selected: root.amplified
+                visible: root.page !== 3
+                onClicked: root.amplified = !root.amplified
+            }
+            Text {
+                Layout.fillWidth: true
+                text: root.busy ? qsTr("Aplicando cambios…") : root.page === 3 ? qsTr("El perfil define las entradas y salidas disponibles.") : root.amplified ? qsTr("Por encima del 100 % puede haber distorsión.") : qsTr("Los cambios se aplican al instante.")
+                elide: Text.ElideRight
+                font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
+            }
+            Text { text: "Esc"; font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary }
         }
     }
 }
