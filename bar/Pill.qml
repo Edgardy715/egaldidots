@@ -11,6 +11,7 @@ Item {
     // ---- API pública (host svg) ----
     property real s: 1
     property bool layoutChanging: false
+    property bool recordingDetached: false
     readonly property real restHeaderOpacity: header.restOpacity
     property real restLeftWidth: 0
     property real restRightWidth: 0
@@ -23,6 +24,34 @@ Item {
     property int launcherClosePhase: 0
     property bool forcePinned: false
     property bool hovered: false
+    property bool interactionOpen: surfaceOpen
+    readonly property bool receiving: material.receiving
+    property real pointerX: width / 2
+    property real pointerY: height / 2
+    property string responseMood: "rest"
+    property string activityNotice: ""
+    property string lastBatteryStatus: ""
+    readonly property string focusTime: Math.floor(FocusSession.remainingSeconds / 60)
+        + ":" + String(FocusSession.remainingSeconds % 60).padStart(2, "0")
+    function respond(kind) {
+        if (!visible || surface === "auth" || layoutChanging) return
+        responseMood = kind
+        expressionHold.restart()
+        if (kind !== "paused" && kind !== "cancel") material.receive(0.55)
+    }
+    function notice(text, kind) {
+        if (!visible || surface === "auth" || layoutChanging) return
+        activityNotice = text
+        noticeHold.restart()
+        respond(kind)
+    }
+    Timer { id: expressionHold; interval: 1600; onTriggered: pill.responseMood = "rest" }
+    Timer { id: noticeHold; interval: 3200; onTriggered: pill.activityNotice = "" }
+    onVisibleChanged: if (!visible) {
+        expressionHold.stop(); noticeHold.stop()
+        responseMood = "rest"; activityNotice = ""
+        material.settleReception()
+    }
     // El motor Fluid puede extender visualmente el casquete derecho sin cambiar
     // el layout ni el contenido de reposo de la pill.
     property bool fluidJoined: false
@@ -110,7 +139,10 @@ Item {
     readonly property real materialPulse: materialMotion.pulse
 
     function awakenMaterial() { materialMotion.awaken() }
-    onSurfaceChanged: if (surface.length > 0) awakenMaterial()
+    onSurfaceChanged: {
+        if (surface !== "focus" && surface !== "recording") Recording.cancelCountdown()
+        if (surface.length > 0) awakenMaterial()
+    }
 
     // ---- target geometry ----
     readonly property var surfaceSize: IslandGeometry.surfaceSizes
@@ -159,13 +191,14 @@ Item {
         id: notificationMotion
         objectName: "pillNotificationMotion"
         blocked: pill.surface === "auth"
+        deferInformational: true
         popup: pill.notificationsEnabled ? Notifs.activePopup : null
-        surfaceOpen: pill.surfaceOpen
+        surfaceOpen: pill.interactionOpen
         collapseDuration: Motion.notifCollapse + 50
         expandDuration: Motion.notifExpand + 80
         holdDuration: Math.round((Motion.notifHoldMin + Motion.notifHoldMax) / 2)
         restoreDuration: Motion.morph + 70
-        onAdvanceRequested: { if (pill.notificationsEnabled) Notifs.advancePopup() }
+        onAdvanceRequested: notification => { if (pill.notificationsEnabled) Notifs.advancePopup(notification) }
     }
     readonly property string notifState: notificationMotion.notifState
 
@@ -249,6 +282,21 @@ Item {
             notifAnimating: pill.notifAnimating
             capsLockOn: statusAdapter.capsLockOn
             now: pill.now
+            companionEnabled: Config.appearance.personality
+            recordingPhase: !pill.recordingDetached && Recording.engaged ? (Recording.uncertain ? "unknown" : Recording.phase) : ""
+            recordingCountdown: Recording.countdown
+            activityText: !pill.recordingDetached && Recording.engaged ? Recording.uncertain ? qsTr("Grabador sin conexión")
+                : Recording.phase === "countdown" ? qsTr("Preparando…")
+                : Recording.phase === "starting" ? qsTr("Iniciando…")
+                : Recording.phase === "stopping" ? qsTr("Finalizando…")
+                : Recording.paused ? qsTr("Pausa · %1").arg(Recording.timeText) : qsTr("REC · %1").arg(Recording.timeText)
+                : pill.activityNotice || (FocusSession.active
+                ? (FocusSession.paused ? qsTr("Pausa · %1").arg(pill.focusTime) : pill.focusTime)
+                : FocusSession.durationSeconds > 0 && FocusSession.remainingSeconds === 0 ? qsTr("Sesión completada") : "")
+            activityMood: pill.responseMood !== "rest" ? pill.responseMood
+                : FocusSession.paused ? "paused" : FocusSession.running ? "working" : "rest"
+            lookX: pill.hovered ? (pill.pointerX / Math.max(1, pill.width) - 0.5) * 2 : 0
+            lookY: pill.hovered ? (pill.pointerY / Math.max(1, pill.height) - 0.5) * 2 : 0
             hasMedia: contentAdapter.hasMedia
             artUrl: contentAdapter.artUrl
             hasProgress: contentAdapter.hasProgress
@@ -256,6 +304,7 @@ Item {
             title: contentAdapter.title
             artist: contentAdapter.artist
             onRequestCalendar: pill.requestSurface("calendar")
+            onRequestFocus: pill.requestSurface(!pill.recordingDetached && Recording.engaged ? "recording" : "focus")
         }
 
         IslandNotification {
@@ -314,6 +363,7 @@ Item {
         reveal: pill.launcherReturning ? 0 : pill.surfaceReveal
         onRequestClose: pill.requestClose()
         onRequestPage: (name) => pill.requestSurface(name)
+        onFeedbackRequested: kind => pill.respond(kind)
     }
     }
 
@@ -327,7 +377,12 @@ Item {
         onShowVolume: (progress, muted) => header.showVolume(progress, muted)
         onShowMic: (progress, muted) => header.showMic(progress, muted)
         onShowBrightness: (progress) => header.showBrightness(progress)
-        onShowBattery: (percent, status) => header.showBattery(percent, status)
+        onShowBattery: (percent, status) => {
+            header.showBattery(percent, status)
+            if (status === "charging" && pill.lastBatteryStatus.length && pill.lastBatteryStatus !== status)
+                pill.notice(qsTr("Cargando · %1%").arg(percent), "connected")
+            pill.lastBatteryStatus = status
+        }
         onFallbackVolumeRequested: (scaleFactor) => osd.showVolume(scaleFactor)
         onFallbackBrightnessRequested: (scaleFactor) => osd.showBrightness(scaleFactor)
     }
@@ -335,7 +390,22 @@ Item {
     // Public API used by external hosts.
     function showVolumeOSD() { statusAdapter.showVolumeOSD() }
 
+    Connections {
+        target: FocusSession
+        function onFinished() { pill.notice(qsTr("Sesión completada"), "finished") }
+    }
+    Connections {
+        target: Recording
+        function onFeedbackRequested(kind) { pill.respond(kind) }
+        function onSaved(path) { pill.notice(qsTr("Grabación guardada"), "finished") }
+    }
+    Connections {
+        target: Config
+        function onSaved() { if (pill.surfaceOpen) pill.respond("received") }
+    }
+
     Component.onCompleted: {
+        lastBatteryStatus = statusAdapter.batteryStatus
         // The initial load is complete; the next workspace change is real.
         wsReady = true
     }

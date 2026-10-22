@@ -1,16 +1,10 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls.Basic
 import Quickshell
-import "../"
-import "../components"
 import "../Singletons"
 
-/**
- * Isla · ConnectivitySurface. Panel de Wi-Fi + Bluetooth.
- * Wi-Fi y Bluetooth comparten el servicio existente; cada radio ocupa una
- * vista enfocada dentro de la misma superficie de la pill.
- */
 Item {
     id: root
     property real s: 1
@@ -42,765 +36,539 @@ Item {
     signal passwordSubmitRequested(string secret)
     signal passwordCancelRequested()
     signal passwordEdited()
-    onResetCredentialsEpochChanged: credentials.reset()
 
-    // evita que la rueda llegue al control de volumen de la pill
+    property string presentedMode: "wifi"
+    property real contentExposure: 1
+    readonly property bool wifiPage: presentedMode === "wifi"
+    readonly property bool radioEnabled: wifiPage ? wifiEnabled : btEnabled
+    readonly property bool scanning: wifiPage ? wifiScanning : btDiscovering
+    readonly property var availableNetworks: [...networks].filter(n => !n.active)
+        .sort((a, b) => b.strength - a.strength)
+    readonly property var connectedNetwork: networks.find(n => n.active) || null
+    readonly property var visibleDevices: [...devices]
+        .filter(d => d.connected || d.bonded || (d.deviceName && d.deviceName.length > 0))
+        .sort((a, b) => (b.connected - a.connected) || (b.paired - a.paired)
+            || (a.deviceName || a.name).localeCompare(b.deviceName || b.name))
+    readonly property int connectedDevices: visibleDevices.filter(d => d.connected).length
+    readonly property bool motionActive: open && visible && !Flags.reduceMotion && !showPasswordDialog
+
+    function revealFocusedControl() {
+        const item = root.Window.window ? root.Window.window.activeFocusItem : null
+        if (!item || !root.open || root.showPasswordDialog) return
+        let ancestor = item.parent
+        while (ancestor && ancestor !== networkList.contentItem) ancestor = ancestor.parent
+        if (!ancestor) return
+        const top = item.mapToItem(networkList.contentItem, 0, 0).y
+        const bottom = top + item.height
+        const padding = 8 * root.s
+        let target = networkList.contentY
+        if (top < target + padding) target = top - padding
+        else if (bottom > target + networkList.height - padding) target = bottom - networkList.height + padding
+        networkList.contentY = Math.max(0, Math.min(target, Math.max(0, networkList.contentHeight - networkList.height)))
+    }
+    Connections {
+        target: root.Window.window
+        function onActiveFocusItemChanged() { root.revealFocusedControl() }
+    }
+
+    function settleMode() {
+        exchange.stop()
+        contentFade.stop()
+        presentedMode = mode
+        contentExposure = 1
+        networkList.contentY = 0
+    }
+    function changeMode() {
+        if (!motionActive) { settleMode(); return }
+        contentFade.stop()
+        if (mode === presentedMode) {
+            exchange.stop()
+            contentFade.to = 1
+        } else {
+            contentFade.to = 0
+            exchange.restart()
+        }
+        contentFade.start()
+    }
+    onModeChanged: changeMode()
+    onMotionActiveChanged: if (!motionActive) settleMode()
+    onResetCredentialsEpochChanged: credentials.reset()
+    Component.onCompleted: settleMode()
+
+    NumberAnimation {
+        id: contentFade
+        target: root
+        property: "contentExposure"
+        duration: Motion.fast * 0.65
+        easing.type: Motion.easeStandard
+    }
+    Timer {
+        id: exchange
+        interval: Motion.fast * 0.65
+        onTriggered: {
+            root.contentExposure = 0
+            root.presentedMode = root.mode
+            networkList.contentY = 0
+            contentFade.to = 1
+            contentFade.start()
+        }
+    }
+
+    component Label: Text {
+        color: Theme.foreground
+        font.family: Theme.font
+        font.pixelSize: Theme.fontSizeBodyLg * root.s
+        elide: Text.ElideRight
+    }
+    component Action: MotionButton {
+        id: action
+        property bool accented: false
+        implicitHeight: 36 * root.s
+        implicitWidth: Math.max(36 * root.s, actionLabel.implicitWidth + Theme.spacingXl * 2 * root.s)
+        padding: Theme.spacingMd * root.s
+        background: Rectangle {
+            radius: height / 2
+            color: action.accented ? Qt.alpha(Theme.accent, Theme.alphaGlow)
+                : Qt.alpha(Theme.foreground, action.hovered ? Theme.alphaWash : Theme.alphaFaint)
+            border.width: action.activeFocus ? Theme.borderHairline : 0
+            border.color: Theme.accent
+        }
+        contentItem: Label {
+            id: actionLabel
+            text: action.text
+            color: action.enabled ? (action.accented ? Theme.accent : Theme.foreground) : Theme.iconSecondary
+            font.pixelSize: Theme.fontSizeSmall * root.s
+            font.weight: Font.Medium
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+    }
+    component StatusIcon: Rectangle {
+        id: badge
+        property string iconName: Icons.iWifi
+        property bool highlighted: false
+        property bool busy: false
+        implicitWidth: 42 * root.s
+        implicitHeight: 42 * root.s
+        radius: Theme.radiusXxl * root.s
+        color: Qt.alpha(badge.highlighted ? Theme.accent : Theme.foreground,
+            badge.highlighted ? Theme.alphaGlow : Theme.alphaFaint)
+        MaterialIcon {
+            anchors.centerIn: parent
+            iconName: badge.busy ? Icons.iRefresh : badge.iconName
+            color: badge.highlighted || badge.busy ? Theme.accent : Theme.iconSecondary
+            font.pixelSize: Theme.fontSizeDisplayLg * root.s
+            RotationAnimator on rotation {
+                from: 0; to: 360
+                duration: 1000
+                loops: Animation.Infinite
+                running: badge.busy && root.motionActive && badge.visible
+            }
+        }
+    }
+
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
-        onWheel: (wheel) => {}
+        onWheel: wheel => { wheel.accepted = true }
     }
-
-    Flickable {
-        id: networkList
+    ColumnLayout {
+        id: page
         anchors.fill: parent
-        contentHeight: col.implicitHeight
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
-        enabled: !root.showPasswordDialog
+        spacing: Theme.spacingXxl * root.s
+        visible: opacity > 0
+        enabled: !root.showPasswordDialog && root.open
         opacity: root.showPasswordDialog ? 0 : 1
-        visible: opacity > 0.01
-        Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
+        Behavior on opacity { enabled: root.motionActive; NumberAnimation { duration: Motion.fast } }
 
-        ColumnLayout {
-            id: col
-            width: parent.width
-            spacing: Theme.spacingLg * s
-
-            // ── Header con animación de entrada ─────────────────────────────
-            Item {
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 36 * root.s
+            Label {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 62 * s
-                opacity: root.open ? 1 : 0
-                Behavior on opacity { Anim { type: Anim.DefaultEffects } }
-
-                RowLayout {
-                    anchors.fill: parent
-                    spacing: Theme.spacingLg * s
-
-                    Item {
-                        width: 46 * s; height: 46 * s
-                        Rectangle {
+                text: qsTr("Conectividad")
+                font.family: Theme.fontMedia
+                font.pixelSize: Theme.fontSizeHero * root.s
+                font.weight: Font.Medium
+            }
+            MaterialIcon {
+                iconName: "settings_input_antenna"
+                color: Theme.iconSecondary
+                font.pixelSize: Theme.fontSizeDisplayLg * root.s
+            }
+        }
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 66 * root.s
+            radius: Theme.radiusFull * root.s
+            color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
+            Rectangle {
+                x: root.mode === "wifi" ? 4 * root.s : parent.width / 2
+                y: 4 * root.s
+                width: parent.width / 2 - 4 * root.s
+                height: parent.height - 8 * root.s
+                radius: Theme.radiusXxl * root.s
+                color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
+                Behavior on x { enabled: root.motionActive; SmoothedAnimation { duration: Motion.standard; velocity: -1 } }
+            }
+            RowLayout {
+                anchors.fill: parent
+                spacing: 0
+                Repeater {
+                    model: ["wifi", "bluetooth"]
+                    delegate: Item {
+                        id: modeButton
+                        required property string modelData
+                        readonly property bool wifi: modelData === "wifi"
+                        readonly property bool radioOn: wifi ? root.wifiEnabled : root.btEnabled
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: Theme.spacingMd * root.s
+                            MaterialIcon {
+                                iconName: modeButton.wifi ? Icons.iWifi : Icons.iBluetooth
+                                color: root.mode === modeButton.modelData ? Theme.accent : Theme.iconSecondary
+                                font.pixelSize: Theme.fontSizeDisplayLg * root.s
+                            }
+                            Column {
+                                spacing: Theme.spacingXs * root.s
+                                Label {
+                                    text: modeButton.wifi ? qsTr("Wi-Fi") : qsTr("Bluetooth")
+                                    font.weight: root.mode === modeButton.modelData ? Font.DemiBold : Font.Normal
+                                }
+                                Label {
+                                    text: !modeButton.radioOn ? qsTr("Desactivado")
+                                        : modeButton.wifi ? (root.activeSsid || root.connectedNetwork ? qsTr("Conectado") : qsTr("Activado"))
+                                        : root.connectedDevices ? qsTr("%1 conectado(s)").arg(root.connectedDevices) : qsTr("Activado")
+                                    color: Theme.iconSecondary
+                                    font.pixelSize: Theme.fontSizeSmall * root.s
+                                }
+                            }
+                        }
+                        MotionArea {
+                            objectName: "mode-" + modeButton.modelData
                             anchors.fill: parent
-                            radius: Theme.radiusXl * s
-                            gradient: Gradient {
-                                GradientStop { position: 0; color: Qt.alpha(Theme.accent, Theme.alphaEmphasis) }
-                                GradientStop { position: 1; color: Qt.alpha(Theme.accent, Theme.alphaGhost) }
-                            }
-                            border.width: Theme.borderHairline
-                            border.color: Qt.alpha(Theme.accent, Theme.alphaMid)
-                            MaterialIcon {
-                                anchors.centerIn: parent
-                                iconName: root.mode === "wifi" ? Icons.iWifi : Icons.iBluetooth
-                                color: Theme.accent
-                                font.pixelSize: Theme.fontSizeTitleLg * s
-                                Behavior on color { ColorAnimation { duration: Motion.fast } }
-                            }
+                            accessibleName: modeButton.wifi ? qsTr("Mostrar Wi-Fi") : qsTr("Mostrar Bluetooth")
+                            hoverWash: false
+                            onClicked: root.mode = modeButton.modelData
                         }
                     }
-
-                    ColumnLayout {
-                        spacing: Theme.spacingXxs * s
-                        Layout.fillWidth: true
-                        AnimatedLabel {
-                            value: root.mode === "wifi" ? qsTr("Wi-Fi") : qsTr("Bluetooth")
-                            color: Theme.foreground
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeTitle * s; font.weight: Font.DemiBold
-                        }
-                        AnimatedLabel {
-                            value: root.mode === "wifi"
-                                ? (root.wifiEnabled ? (root.activeSsid || qsTr("Busca una red para conectarte")) : qsTr("Desactivado"))
-                                : (btCard.btEnabled ? qsTr("Dispositivos disponibles") : qsTr("Desactivado"))
-                            color: Theme.iconSecondary
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s
-                            elide: Text.ElideRight
-                            Layout.fillWidth: true
-                        }
-                    }
-
                 }
             }
-
-            Item {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 40 * s
-                Rectangle {
-                    anchors.fill: parent
-                    radius: Theme.radiusLg * s
-                    color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
+        }
+        Flickable {
+            id: networkList
+            objectName: "connectivityScroll"
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            contentHeight: body.implicitHeight
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AsNeeded
+                implicitWidth: 4 * root.s
+                contentItem: Rectangle {
+                    implicitWidth: 4 * root.s
+                    radius: width / 2
+                    color: Qt.alpha(Theme.iconSecondary, Theme.alphaStrong)
+                }
+                background: null
+            }
+            opacity: root.contentExposure
+            enabled: !exchange.running
+            transform: Translate { y: Flags.reduceMotion ? 0 : (1 - root.contentExposure) * 6 * root.s }
+            ColumnLayout {
+                id: body
+                width: networkList.width
+                spacing: Theme.spacingXxl * root.s
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 40 * root.s
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: Theme.spacingXs * root.s
+                        Label {
+                            text: root.radioEnabled ? qsTr("Activado") : qsTr("Desactivado")
+                            font.pixelSize: Theme.fontSizeTitle * root.s
+                            font.weight: Font.DemiBold
+                        }
+                        Label {
+                            Layout.fillWidth: true
+                            text: root.wifiPage ? qsTr("Conexión inalámbrica") : qsTr("Audio y dispositivos cercanos")
+                            color: Theme.iconSecondary
+                            font.pixelSize: Theme.fontSizeSmall * root.s
+                        }
+                    }
+                    Toggle {
+                        objectName: root.wifiPage ? "wifiToggle" : "bluetoothToggle"
+                        s: root.s
+                        accessibleName: root.wifiPage ? qsTr("Wi-Fi") : qsTr("Bluetooth")
+                        checked: root.radioEnabled
+                        onToggled: root.wifiPage ? root.wifiToggleRequested() : root.bluetoothToggleRequested()
+                    }
                 }
                 Rectangle {
-                    x: root.mode === "wifi" ? 3 * s : parent.width / 2
-                    y: 3 * s
-                    width: parent.width / 2 - 3 * s
-                    height: parent.height - 6 * s
-                    radius: Theme.radiusMd * s
-                    color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
-                    Behavior on x { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Motion.morph; velocity: -1 } }
+                    id: connectedHero
+                    objectName: "wifiConnectedState"
+                    visible: root.wifiPage && root.wifiEnabled && (root.connectedNetwork !== null || root.activeSsid.length > 0)
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Math.max(92 * root.s, connectedInfo.implicitHeight + Theme.spacingXxl * 2 * root.s)
+                    radius: Theme.radiusXxl * root.s
+                    color: Qt.alpha(Theme.accent, Theme.alphaHair)
+                    MotionArea {
+                        objectName: "network-" + (root.connectedNetwork ? root.connectedNetwork.ssid : root.activeSsid)
+                        anchors.fill: parent
+                        enabled: root.connectedNetwork !== null
+                        accessibleName: qsTr("Desconectar de %1").arg(root.activeSsid)
+                        hoverWash: false
+                        onClicked: root.networkRequested(root.connectedNetwork)
+                    }
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.margins: Theme.spacingXl * root.s
+                        spacing: Theme.spacingXl * root.s
+                        StatusIcon { highlighted: true; iconName: Icons.iWifi }
+                        ColumnLayout {
+                            id: connectedInfo
+                            Layout.fillWidth: true
+                            spacing: Theme.spacingSm * root.s
+                            Label {
+                                Layout.fillWidth: true
+                                text: root.activeSsid || (root.connectedNetwork ? root.connectedNetwork.ssid : "")
+                                font.family: Theme.fontMedia
+                                font.pixelSize: Theme.fontSizeTitleLg * root.s
+                                font.weight: Font.Medium
+                            }
+                            Label {
+                                Layout.fillWidth: true
+                                text: !root.connectedNetwork ? qsTr("Conectado")
+                                    : root.connectedNetwork.isSecure ? qsTr("Conectado · Red protegida") : qsTr("Conectado · Red abierta")
+                                color: Theme.iconSecondary
+                                font.pixelSize: Theme.fontSizeSmall * root.s
+                            }
+                        }
+                        Action {
+                            objectName: "wifiDisconnect"
+                            text: qsTr("Desconectar")
+                            onClicked: root.wifiDisconnectRequested()
+                        }
+                    }
                 }
                 RowLayout {
-                    anchors.fill: parent
-                    spacing: 0
-                    Repeater {
-                        model: [{ key: "wifi", label: "Wi-Fi" }, { key: "bluetooth", label: "Bluetooth" }]
-                        delegate: Item {
-                            required property var modelData
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            Text {
-                                anchors.centerIn: parent
-                                text: modelData.label
-                                color: root.mode === modelData.key ? Theme.foreground : Theme.iconSecondary
-                                font.family: Theme.font
-                                font.pixelSize: Theme.fontSizeBody * s
-                                font.weight: root.mode === modelData.key ? Font.DemiBold : Font.Normal
-                            }
-                            MotionArea {
-                                anchors.fill: parent
-                                accessibleName: qsTr("Mostrar %1").arg(modelData.label)
-                                hoverWash: false
-                                onClicked: root.mode = modelData.key
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ════════════════════ WI-FI ════════════════════
-            Rectangle {
-                id: wifiCard
-                visible: root.mode === "wifi"
-                Layout.fillWidth: true
-                radius: Theme.radiusXxl * s
-                color: "transparent"
-                implicitHeight: wifiCol.implicitHeight + 20 * s
-
-                ColumnLayout {
-                    id: wifiCol
-                    anchors.fill: parent
-                    anchors.margins: 12 * s
-                    spacing: Theme.spacingMd * s
-
-                    // ── Fila de cabecera WiFi ──
-                    RowLayout {
+                    visible: root.radioEnabled
+                    Layout.fillWidth: true
+                    Label {
                         Layout.fillWidth: true
-                        spacing: Theme.spacingLg * s
-
-                        // toggle animado estilo iOS (componente unificado)
-                        Toggle {
-                            objectName: "wifiToggle"
-                            accessibleName: qsTr("Wi-Fi")
-                            checked: root.wifiEnabled
-                            onToggled: root.wifiToggleRequested()
-                        }
-
-                        AnimatedLabel {
-                            value: root.wifiEnabled ? qsTr("Redes disponibles") : qsTr("Wi-Fi desactivado")
-                            color: root.wifiEnabled ? Theme.foreground : Theme.iconMuted
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * s; font.weight: Font.DemiBold
-                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-                        }
-
-                        Item { Layout.fillWidth: true }
-
-                        Text {
-                            text: root.wifiScanning ? qsTr("Buscando…") : ""
-                            color: Theme.iconSecondary
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * s
-                            visible: text.length > 0
-                        }
-
-                        // botón de scan circular animado
-                        Item {
-                            width: 26 * s; height: 26 * s
-                            opacity: root.wifiEnabled ? 1 : 0.3
-                            Behavior on opacity { Anim { type: Anim.DefaultEffects } }
-                            Rectangle {
-        scale: scanWifiHover.motion.visualScale
-                                anchors.fill: parent; radius: Theme.radiusXl * s
-                                color: scanWifiHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : "transparent"
-                                border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaIconSec)
-                                Behavior on color { ColorAnimation { duration: Motion.fast } }
-                            }
-                            MaterialIcon {
-                                interaction: scanWifiHover.motion
-                                anchors.centerIn: parent
-                                iconName: Icons.iRefresh
-                                hovered: scanWifiHover.containsMouse
-                                scale: scanWifiHover.motion.visualScale
-                                color: root.wifiScanning ? Theme.accent : Theme.foreground
-                                font.pixelSize: Theme.fontSizeTitle * s
-                                RotationAnimator on rotation {
-                                    from: 0; to: 360
-                                    duration: 900
-                                    loops: Animation.Infinite
-                                    running: root.wifiScanning && root.open && !Flags.reduceMotion
-                                }
-                            }
-                            MotionArea {
-                                id: scanWifiHover
-                                anchors.fill: parent
-                                accessibleName: qsTr("Buscar redes Wi-Fi")
-                                hoverWash: false
-                                onClicked: root.wifiScanRequested()
-                            }
-                        }
-                    }
-
-                    // ── Lista de redes ──
-                    MotionList {
-                        id: wifiRows
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: count * 44 * root.s + Math.max(0, count - 1) * spacing
-                        spacing: Theme.spacingLg * root.s
-                        interactive: false
-                        clip: true
-                        visible: root.wifiEnabled
-                        model: ScriptModel {
-                            values: [...root.networks].sort((a, b) => {
-                                if (a.active !== b.active) return b.active - a.active
-                                return b.strength - a.strength
-                            }).slice(0, 8)
-                        }
-
-                        delegate: Item {
-                            id: netRow
-                            required property var modelData
-                            required property int index
-                            readonly property bool isConnecting: root.connectingToSsid === modelData.ssid
-                            width: wifiRows.width
-                            height: 44 * root.s
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: Theme.radiusXl * s
-                                color: {
-                                    if (modelData.active) return Qt.alpha(Theme.accent, Theme.alphaGlow)
-                                    return netRowHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaHair) : Qt.alpha(Theme.cardTop, Theme.alphaCritical)
-                                }
-                                border.width: modelData.active ? Theme.borderHairline : 0
-                                border.color: Qt.alpha(Theme.accent, Theme.alphaStrong)
-                                Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                                Behavior on border.color { ColorAnimation { duration: Motion.fast } }
-                            }
-
-                            RowLayout {
-                                anchors.fill: parent; anchors.margins: 10 * s
-                                spacing: Theme.spacingLg * s
-
-                                // barras de señal dibujadas
-                                Item {
-                                    width: 18 * s; height: 16 * s
-                                    id: signalBars
-                                    property int level: Math.round(modelData.strength / 25) // 0-4
-                                    property bool active: modelData.active
-                                    Repeater {
-                                        model: 4
-                                        delegate: Rectangle {
-                                            readonly property int barIdx: index
-                                            width: 2.5 * s
-                                            height: (4 - barIdx) * 3 * s + 4 * s
-                                            radius: 1.5 * s
-                                            x: barIdx * 4.5 * s
-                                            y: parent.height - height
-                                            color: {
-                                                if (signalBars.active) return Theme.accent
-                                                if (barIdx < signalBars.level) return Theme.foreground
-                                                return Qt.alpha(Theme.foreground, Theme.alphaSubtle)
-                                            }
-                                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-                                            Behavior on height { Anim { type: Anim.FastEffects } }
-                                        }
-                                    }
-                                }
-
-                                ColumnLayout {
-                                    spacing: Theme.spacingXxs * s
-                                    Layout.fillWidth: true
-                                    Text {
-                                        scale: netRowHover.motion.visualScale
-                                        transform: Translate { y: -Motion.labelTravel * netRowHover.motion.presence }
-                                        text: modelData.ssid
-                                        color: modelData.active ? Theme.accent : Theme.foreground
-                                        font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * s
-                                        font.weight: modelData.active ? Font.DemiBold : Font.Normal
-                                        elide: Text.ElideRight
-                                        Layout.fillWidth: true
-                                    }
-                                    Text {
-                                        scale: netRowHover.motion.visualScale
-                                        transform: Translate { y: -Motion.labelTravel * netRowHover.motion.presence }
-                                        text: modelData.active
-                                            ? "Conectado"
-                                            : (modelData.isSecure ? "Protegida · WPA" : "Abierta")
-                                        visible: modelData.active || modelData.isSecure
-                                        color: modelData.active ? Theme.accent : Theme.iconSecondary
-                                        font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * s
-                                        Behavior on color { ColorAnimation { duration: Motion.fast } }
-                                    }
-                                }
-
-                                // icono candado
-                                MaterialIcon {
-                                    compressWithControl: true
-                                    interaction: netRowHover.motion
-                                    iconName: Icons.iLock
-                                    visible: modelData.isSecure && !modelData.active
-                                    color: Theme.iconMuted
-                                    font.pixelSize: Theme.fontSizeLabel * s
-                                }
-
-                                // spinner de conexión
-                                Item {
-                                    width: 18 * s; height: 18 * s
-                                    visible: isConnecting
-                                    Rectangle {
-                                        anchors.centerIn: parent
-                                        width: 14 * s; height: 14 * s; radius: Theme.radiusSm * s
-                                        color: "transparent"
-                                        border.width: Theme.borderEmphasis * s
-                                        border.color: Theme.accent
-                                        NumberAnimation on rotation {
-                                            from: 0; to: 360
-                                            duration: 700
-                                            loops: Animation.Infinite
-                                            running: isConnecting && root.open && !Flags.reduceMotion
-                                        }
-                                    }
-                                }
-
-                                // botón de desconexión / estado conectado
-                                Item {
-                                    width: 24 * s; height: 24 * s
-                                    visible: modelData.active
-                                    Rectangle {
-        scale: disconnectWifiHover.motion.visualScale
-                                        anchors.fill: parent; radius: Theme.radiusXl * s
-                                        color: Qt.alpha(Theme.accent, Theme.alphaGlow)
-                                        MaterialIcon {
-                                            interaction: disconnectWifiHover.motion
-                                            anchors.centerIn: parent
-                                            iconName: Icons.iClose
-                                            hovered: disconnectWifiHover.containsMouse
-                                            color: Theme.accent
-                                            font.pixelSize: Theme.fontSizeSmall * s
-                                        }
-                                    }
-                                    MotionArea {
-                                        id: disconnectWifiHover
-                                        anchors.fill: parent
-                                        accessibleName: qsTr("Desconectar de %1").arg(modelData.ssid)
-                                        hoverWash: false
-                                        onClicked: root.wifiDisconnectRequested()
-                                    }
-                                }
-                            }
-
-                            MotionArea {
-                                id: netRowHover
-                                objectName: "network-" + modelData.ssid
-                                accessibleName: qsTr("Conectar a %1").arg(modelData.ssid)
-                                focusOnTab: false
-                                anchors.fill: parent
-                                hoverWash: false
-                                onClicked: root.networkRequested(modelData)
-                            }
-                        }
-                    }
-
-                    // estado vacío
-                    Text {
-                        Layout.fillWidth: true
-                        readonly property bool presented: root.wifiEnabled && root.networks.length === 0 && !root.wifiScanning
-                        visible: opacity > 0
-                        text: "Sin redes disponibles"
+                        text: root.wifiPage ? qsTr("Redes disponibles") : qsTr("Mis dispositivos y cercanos")
                         color: Theme.iconSecondary
-                        font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s
-                        horizontalAlignment: Text.AlignHCenter
-                        opacity: presented ? 0.7 : 0
-                        Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                        font.pixelSize: Theme.fontSizeBody * root.s
+                        font.weight: Font.Medium
                     }
-
-                    // hint cuando wifi apagado
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 34 * s
-                        radius: Theme.radiusLg * s
-                        visible: !root.wifiEnabled
-                        color: Qt.alpha(Theme.cardBot, Theme.alphaCritical)
-                        border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaCritical)
-                        RowLayout {
-                            anchors.centerIn: parent; spacing: Theme.spacingMd * s
-                            MaterialIcon { iconName: Icons.iWifiOff; font.pixelSize: Theme.fontSizeBodyLg * s; color: Theme.iconMuted }
-                            Text {
-                                text: "Activa el Wi-Fi para ver redes"
-                                color: Theme.iconSecondary
-                                font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s
-                            }
-                        }
+                    Action {
+                        objectName: root.wifiPage ? "wifiScan" : "bluetoothScan"
+                        text: root.scanning ? (root.wifiPage ? qsTr("Buscando…") : qsTr("Detener")) : qsTr("Buscar")
+                        accented: root.scanning
+                        enabled: root.radioEnabled && (!root.wifiPage || !root.wifiScanning)
+                        onClicked: root.wifiPage ? root.wifiScanRequested() : root.bluetoothDiscoveryToggleRequested()
                     }
                 }
-            }
-
-            // ════════════════════ BLUETOOTH ════════════════════
-            Rectangle {
-                id: btCard
-                visible: root.mode === "bluetooth"
-                Layout.fillWidth: true
-                radius: Theme.radiusXxl * s
-                color: "transparent"
-                implicitHeight: btCol.implicitHeight + 20 * s
-
-                readonly property bool btEnabled: root.btEnabled
-                readonly property bool btDiscovering: root.btDiscovering
-                readonly property var btDevices: root.devices
-
-                ColumnLayout {
-                    id: btCol
-                    anchors.fill: parent
-                    anchors.margins: 12 * s
-                    spacing: Theme.spacingMd * s
-
-                    // ── Cabecera Bluetooth ──
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: Theme.spacingLg * s
-
-                        // toggle animado estilo iOS (componente unificado)
-                        Toggle {
-                            objectName: "bluetoothToggle"
-                            accessibleName: qsTr("Bluetooth")
-                            checked: btCard.btEnabled
-                            onToggled: root.bluetoothToggleRequested()
-                        }
-
-                        Text {
-                            text: "Bluetooth"
-                            color: btCard.btEnabled ? Theme.foreground : Theme.iconMuted
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * s; font.weight: Font.DemiBold
-                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-                        }
-
-                        Item { Layout.fillWidth: true }
-
-                        // botón de scan animado
-                        Item {
-                            width: 26 * s; height: 26 * s
-                            opacity: btCard.btEnabled ? 1 : 0.3
-                            Behavior on opacity { Anim { type: Anim.DefaultEffects } }
-                            Rectangle {
-        scale: scanBtHover.motion.visualScale
-                                anchors.fill: parent; radius: Theme.radiusXl * s
-                                color: scanBtHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : "transparent"
-                                border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaIconSec)
-                                Behavior on color { ColorAnimation { duration: Motion.fast } }
-                            }
-                            MaterialIcon {
-                                interaction: scanBtHover.motion
-                                anchors.centerIn: parent
-                                iconName: Icons.iRefresh
-                                hovered: scanBtHover.containsMouse
-                                scale: scanBtHover.motion.visualScale
-                                color: btCard.btDiscovering ? Theme.accent : Theme.foreground
-                                font.pixelSize: Theme.fontSizeTitle * s
-                                RotationAnimator on rotation {
-                                    from: 0; to: 360
-                                    duration: 900
-                                    loops: Animation.Infinite
-                                    running: btCard.btDiscovering && root.open && !Flags.reduceMotion
-                                }
-                            }
-                            MotionArea {
-                                id: scanBtHover
-                                anchors.fill: parent
-                                accessibleName: qsTr("Buscar dispositivos Bluetooth")
-                                hoverWash: false
-                                onClicked: root.bluetoothDiscoveryToggleRequested()
-                            }
-                        }
-                    }
-
-                    // ── Dispositivos ──
-                    MotionList {
-                        id: btRows
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: count * 44 * root.s + Math.max(0, count - 1) * spacing
-                        spacing: Theme.spacingLg * root.s
-                        interactive: false
-                        clip: true
-                        visible: btCard.btEnabled
-                        model: ScriptModel {
-                            // `name` lee el Alias de BlueZ, que para un dispositivo sin
-                            // nombre resuelto vale la MAC → NO sirve para detectar si hay
-                            // nombre real. `deviceName` es el Name real (vacío = anónimo).
-                            // Oculta anuncios BLE anónimos (sin Name resolvible y sin
-                            // emparejar): sólo ruido de MAC, no un dispositivo real.
-                            values: [...root.devices]
-                                .filter(d => d.connected || d.bonded || (d.deviceName && d.deviceName.length > 0))
-                                .sort((a, b) =>
-                                    (b.connected - a.connected)
-                                    || (b.paired - a.paired)
-                                    || (a.deviceName || a.name).localeCompare(b.deviceName || b.name)
-                                ) // qmllint disable unresolved-type
-                        }
-
+                Column {
+                    Layout.fillWidth: true
+                    visible: root.wifiPage && root.wifiEnabled
+                    spacing: Theme.spacingSm * root.s
+                    Repeater {
+                        model: root.availableNetworks
                         delegate: Item {
+                            id: networkRow
                             required property var modelData
-                            required property int index
-                            width: btRows.width
-                            height: 44 * root.s
-
-                            // estado transitorio: connecting/disconnecting/pairing
-                            readonly property bool busy: modelData.state === root.connectingState
-                                || modelData.state === root.disconnectingState
-                                || modelData.pairing
-                            readonly property int statusIdx: modelData.state
-                                                            // qmllint disable unresolved-type
-                            // nombre mostrable: nombre real → alias (sólo si no es la MAC) → "Desconocido".
-                            // Nunca se muestra la MAC como título (eso es lo que veíamos mal):
-                            // `name` (Alias de BlueZ) cae a la MAC cuando no hay nombre real,
-                            // y `deviceName` es el Name real (vacío = anónimo).
-                            readonly property string displayName: {
-                                if (modelData.deviceName && modelData.deviceName.length > 0)
-                                    return modelData.deviceName
-                                if (modelData.name && modelData.name.length > 0
-                                        && modelData.name !== modelData.address
-                                        && modelData.name !== modelData.address.replace(/:/g, "-").toUpperCase())
-                                    return modelData.name
-                                return "Dispositivo desconocido"
-                            }
-
+                            readonly property bool busy: root.connectingToSsid === modelData.ssid
+                            width: body.width
+                            height: 66 * root.s
                             Rectangle {
                                 anchors.fill: parent
-                                radius: Theme.radiusXl * s
-                                color: modelData.connected
-                                    ? Qt.alpha(Theme.accent, Theme.alphaGlow)
-                                    : (btRowHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaHair) : Qt.alpha(Theme.cardTop, Theme.alphaCritical))
-                                border.width: Theme.borderHairline
-                                border.color: modelData.connected ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Qt.alpha(Theme.border, Theme.alphaCritical)
-                                Behavior on color { ColorAnimation { duration: Motion.fast } }
-                                Behavior on border.color { ColorAnimation { duration: Motion.fast } }
+                                radius: Theme.radiusXl * root.s
+                                color: Qt.alpha(Theme.foreground, networkArea.containsMouse ? Theme.alphaHair : Theme.alphaTransparent)
                             }
-
                             RowLayout {
-                                anchors.fill: parent; anchors.margins: 10 * s
-                                spacing: Theme.spacingLg * s
-
-                                // icono dispositivo animado
-                                Item {
-                                    width: 30 * s; height: 30 * s
-                                    Rectangle {
-                                        anchors.fill: parent; radius: Theme.radiusMd * s
-                                        color: modelData.connected ? Qt.alpha(Theme.accent, Theme.alphaSubtle) : Qt.alpha(Theme.foreground, Theme.alphaHair)
-                                        border.width: Theme.borderHairline
-                                        border.color: modelData.connected ? Qt.alpha(Theme.accent, Theme.alphaMid) : Qt.alpha(Theme.border, Theme.alphaCritical)
-                                        MaterialIcon {
-                                            interaction: btRowHover.motion
-                                            anchors.centerIn: parent
-                                            iconName: Icons.iBluetooth
-                                            color: modelData.connected ? Theme.accent : Theme.foreground
-                                            font.pixelSize: Theme.fontSizeBodyLg * s
-                                            scale: modelData.connected ? 1.1 : 1
-                                            opacity: busy ? 0 : 1
-                                            Behavior on scale { Anim { type: Anim.FastEffects } }
-                                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-                                            Behavior on opacity { Anim { type: Anim.FastEffects } }
-                                        }
-                                        // spinner mientras conecta/vincula (mismos ejes que el scan de Wi-Fi)
-                                        MaterialIcon {
-                                            compressWithControl: true
-                                            interaction: btRowHover.motion
-                                            anchors.centerIn: parent
-                                            iconName: Icons.iRefresh
-                                            color: modelData.connected ? Theme.accent : Theme.accent
-                                            font.pixelSize: Theme.fontSizeBodyLg * s
-                                            visible: busy
-                                            RotationAnimator on rotation {
-                                                from: 0; to: 360
-                                                duration: 900
-                                                loops: Animation.Infinite
-                                                running: busy && root.open && !Flags.reduceMotion
-                                            }
-                                        }
-                                    }
-                                }
-
+                                anchors.fill: parent
+                                anchors.leftMargin: Theme.spacingMd * root.s
+                                anchors.rightMargin: Theme.spacingMd * root.s
+                                spacing: Theme.spacingXl * root.s
+                                StatusIcon { iconName: Icons.iWifi; busy: networkRow.busy }
                                 ColumnLayout {
-                                    spacing: Theme.spacingXxs * s
                                     Layout.fillWidth: true
-                                    Text {
-                                        scale: btRowHover.motion.visualScale
-                                        transform: Translate { y: -Motion.labelTravel * btRowHover.motion.presence }
-                                        text: displayName
-                                        color: modelData.connected ? Theme.accent : Theme.foreground
-                                        font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * s; font.weight: Font.DemiBold
-                                        elide: Text.ElideRight
+                                    spacing: Theme.spacingSm * root.s
+                                    Label {
                                         Layout.fillWidth: true
-                                        Behavior on color { ColorAnimation { duration: Motion.fast } }
+                                        text: networkRow.modelData.ssid
+                                        font.weight: Font.Medium
                                     }
-                                    Text {
-                                        scale: btRowHover.motion.visualScale
-                                        transform: Translate { y: -Motion.labelTravel * btRowHover.motion.presence }
-                                        text: {
-                                            if (modelData.pairing) return "Vinculando…"
-                                            if (modelData.state === root.connectingState) return "Conectando…"
-                                            if (modelData.state === root.disconnectingState) return "Desconectando…"
-                                            if (modelData.connected) {
-                                                var base = "Conectado"
-                                                if (modelData.batteryAvailable)
-                                                    base += " · " + Math.round(modelData.battery * 100) + "%"
-                                                return base
-                                            }
-                                            var state = modelData.paired ? "Vinculado" : "Disponible"
-                                            // sin nombre real → acompaña la MAC como referencia (nunca como título)
-                                            if (!modelData.deviceName || modelData.deviceName.length === 0)
-                                                return state + " · " + (modelData.address || "")
-                                            return state
-                                        }
-                                        color: modelData.connected ? Theme.accent : Theme.iconSecondary
-                                        font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * s
-                                        Behavior on color { ColorAnimation { duration: Motion.fast } }
+                                    Label {
+                                        Layout.fillWidth: true
+                                        text: networkRow.busy ? qsTr("Conectando…")
+                                            : (networkRow.modelData.isSecure ? qsTr("Protegida") : qsTr("Abierta"))
+                                            + " · " + qsTr("Señal %1%").arg(networkRow.modelData.strength)
+                                        color: Theme.iconSecondary
+                                        font.pixelSize: Theme.fontSizeSmall * root.s
                                     }
                                 }
-
-                                // botón de acción
-                                Item {
-                                    width: (modelData.connected ? 78 : (modelData.paired ? 66 : 56)) * s
-                                    height: 26 * s
-                                    Behavior on width { Anim { type: Anim.FastSpatial } }
-                                    Rectangle {
-                                        anchors.fill: parent; radius: Theme.radiusXl * s
-                                        opacity: busy ? 0.55 : 1
-                                        color: {
-                                            if (modelData.connected) return Qt.alpha(Theme.accentStrong, Theme.alphaGlow)
-                                            if (modelData.paired) return Qt.alpha(Theme.accent, Theme.alphaGlow)
-                                            return Qt.alpha(Theme.foreground, Theme.alphaHair)
-                                        }
-                                        border.width: Theme.borderHairline
-                                        border.color: {
-                                            if (modelData.connected) return Qt.alpha(Theme.accentStrong, Theme.alphaMid)
-                                            if (modelData.paired) return Qt.alpha(Theme.accent, Theme.alphaMid)
-                                            return Qt.alpha(Theme.border, Theme.alphaCritical)
-                                        }
-                                        Behavior on color { ColorAnimation { duration: Motion.fast } }
-                                        Behavior on border.color { ColorAnimation { duration: Motion.fast } }
-                                        Behavior on opacity { Anim { type: Anim.FastEffects } }
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: {
-                                                if (busy) return "…"
-                                                if (modelData.connected) return "Desconectar"
-                                                if (modelData.paired) return "Conectar"
-                                                return "Vincular"
-                                            }
-                                            color: modelData.connected ? Theme.accentStrong : Theme.accent
-                                            font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * s; font.weight: Font.Medium
-                                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-                                        }
-                                    }
-                                    MotionArea {
-                                        objectName: "bluetooth-action-" + displayName
-                                        anchors.fill: parent
-                                        enabled: !busy
-                                        accessibleName: modelData.connected ? qsTr("Desconectar %1").arg(displayName)
-                                            : modelData.paired ? qsTr("Conectar %1").arg(displayName)
-                                            : qsTr("Vincular %1").arg(displayName)
-                                        hoverWash: false
-                                        onClicked: root.bluetoothActionRequested(modelData,
-                                            modelData.connected ? "disconnect" : modelData.paired ? "connect" : "pair")
-                                    }
-                                }
-
-                                // botón "olvidar" (sólo vinculados); aparece a la izquierda
-                                Item {
-                                    width: (modelData.paired && !busy ? 26 : 0) * s
-                                    height: 26 * s
-                                    clip: true
-                                    visible: width > 0
-                                    Behavior on width { Anim { type: Anim.FastSpatial } }
-                                    Rectangle {
-        scale: btForgetHover.motion.visualScale
-                                        anchors.fill: parent; radius: Theme.radiusXl * s
-                                        color: btForgetHover.containsMouse
-                                            ? Qt.alpha(Theme.accentStrong, Theme.alphaGlow)
-                                            : "transparent"
-                                        border.width: Theme.borderHairline
-                                        border.color: Qt.alpha(Theme.border, Theme.alphaCritical)
-                                        Behavior on color { ColorAnimation { duration: Motion.fast } }
-                                        MaterialIcon {
-                                            interaction: btForgetHover.motion
-                                            anchors.centerIn: parent
-                                            iconName: "delete"
-                                            hovered: btForgetHover.containsMouse
-                                            color: Theme.iconSecondary
-                                            font.pixelSize: Theme.fontSizeBody * s
-                                        }
-                                    }
-                                    MotionArea {
-                                        id: btForgetHover
-                                        anchors.fill: parent
-                                        accessibleName: qsTr("Olvidar %1").arg(displayName)
-                                        hoverWash: false
-                                        onClicked: root.bluetoothActionRequested(modelData, "forget")
-                                    }
+                                MaterialIcon {
+                                    iconName: networkRow.modelData.isSecure ? Icons.iLock : "chevron_right"
+                                    color: Theme.iconSecondary
+                                    font.pixelSize: Theme.fontSizeHead * root.s
                                 }
                             }
                             MotionArea {
-                                id: btRowHover
-                                accessibleName: qsTr("Vincular %1").arg(displayName)
-                                focusOnTab: false
+                                id: networkArea
+                                objectName: "network-" + networkRow.modelData.ssid
                                 anchors.fill: parent
-                                visible: !modelData.connected && !modelData.paired
+                                accessibleName: qsTr("Conectar a %1").arg(networkRow.modelData.ssid)
+                                enabled: !networkRow.busy
                                 hoverWash: false
-                                onClicked: root.bluetoothActionRequested(modelData, "pair")
-                            }
-                        }
-                    }
-
-                    // hint cuando bt apagado
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 34 * s
-                        radius: Theme.radiusLg * s
-                        visible: !btCard.btEnabled
-                        color: Qt.alpha(Theme.cardBot, Theme.alphaCritical)
-                        border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaCritical)
-                        RowLayout {
-                            anchors.centerIn: parent; spacing: Theme.spacingMd * s
-                            MaterialIcon { iconName: Icons.iBluetoothOff; font.pixelSize: Theme.fontSizeBodyLg * s; color: Theme.iconMuted }
-                            Text {
-                                text: "Activa el Bluetooth para ver dispositivos"
-                                color: Theme.iconSecondary
-                                font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * s
+                                onClicked: root.networkRequested(networkRow.modelData)
                             }
                         }
                     }
                 }
+                Column {
+                    Layout.fillWidth: true
+                    visible: !root.wifiPage && root.btEnabled
+                    spacing: Theme.spacingMd * root.s
+                    Repeater {
+                        model: root.visibleDevices
+                        delegate: Rectangle {
+                            id: deviceRow
+                            required property var modelData
+                            readonly property bool busy: modelData.state === root.connectingState
+                                || modelData.state === root.disconnectingState || modelData.pairing
+                            readonly property string displayName: modelData.deviceName ||
+                                (modelData.name && modelData.name !== modelData.address
+                                    && modelData.name !== (modelData.address || "").replace(/:/g, "-").toUpperCase()
+                                    ? modelData.name : qsTr("Dispositivo desconocido"))
+                            width: body.width
+                            height: deviceContent.implicitHeight + Theme.spacingXl * 2 * root.s
+                            radius: Theme.radiusXxl * root.s
+                            color: modelData.connected ? Qt.alpha(Theme.accent, Theme.alphaHair) : Qt.alpha(Theme.foreground, Theme.alphaGhost)
+                            ColumnLayout {
+                                id: deviceContent
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                anchors.margins: Theme.spacingXl * root.s
+                                spacing: Theme.spacingMd * root.s
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    spacing: Theme.spacingXl * root.s
+                                    StatusIcon {
+                                        iconName: Icons.iBluetooth
+                                        highlighted: deviceRow.modelData.connected
+                                        busy: deviceRow.busy
+                                    }
+                                    ColumnLayout {
+                                        Layout.fillWidth: true
+                                        spacing: Theme.spacingSm * root.s
+                                        Label {
+                                            Layout.fillWidth: true
+                                            text: deviceRow.displayName
+                                            font.weight: Font.Medium
+                                        }
+                                        Label {
+                                            Layout.fillWidth: true
+                                            text: {
+                                                const d = deviceRow.modelData
+                                                if (d.pairing) return qsTr("Vinculando…")
+                                                if (d.state === root.connectingState) return qsTr("Conectando…")
+                                                if (d.state === root.disconnectingState) return qsTr("Desconectando…")
+                                                if (d.connected) return d.batteryAvailable
+                                                    ? qsTr("Conectado · %1%").arg(Math.round(d.battery * 100)) : qsTr("Conectado")
+                                                const status = d.paired ? qsTr("Vinculado") : qsTr("Disponible")
+                                                return !d.deviceName ? status + " · " + (d.address || "") : status
+                                            }
+                                            color: deviceRow.modelData.connected ? Theme.accent : Theme.iconSecondary
+                                            font.pixelSize: Theme.fontSizeSmall * root.s
+                                        }
+                                    }
+                                }
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Layout.leftMargin: 42 * root.s + Theme.spacingXl * root.s
+                                    spacing: Theme.spacingMd * root.s
+                                    Action {
+                                        objectName: "bluetooth-action-" + deviceRow.displayName
+                                        text: deviceRow.busy ? qsTr("Espera…") : deviceRow.modelData.connected ? qsTr("Desconectar")
+                                            : deviceRow.modelData.paired ? qsTr("Conectar") : qsTr("Vincular")
+                                        enabled: !deviceRow.busy
+                                        Accessible.name: deviceRow.modelData.connected ? qsTr("Desconectar %1").arg(deviceRow.displayName)
+                                            : deviceRow.modelData.paired ? qsTr("Conectar %1").arg(deviceRow.displayName)
+                                            : qsTr("Vincular %1").arg(deviceRow.displayName)
+                                        accented: !deviceRow.modelData.connected
+                                        onClicked: root.bluetoothActionRequested(deviceRow.modelData,
+                                            deviceRow.modelData.connected ? "disconnect" : deviceRow.modelData.paired ? "connect" : "pair")
+                                    }
+                                    Action {
+                                        objectName: "bluetooth-forget-" + deviceRow.displayName
+                                        visible: deviceRow.modelData.paired
+                                        text: qsTr("Olvidar")
+                                        enabled: !deviceRow.busy
+                                        Accessible.name: qsTr("Olvidar %1").arg(deviceRow.displayName)
+                                        onClicked: root.bluetoothActionRequested(deviceRow.modelData, "forget")
+                                    }
+                                    Item { Layout.fillWidth: true }
+                                }
+                            }
+                        }
+                    }
+                }
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    Layout.topMargin: Theme.spacingXxl * root.s
+                    visible: !root.radioEnabled || (root.wifiPage ? root.availableNetworks.length === 0 : root.visibleDevices.length === 0)
+                    spacing: Theme.spacingXl * root.s
+                    StatusIcon {
+                        Layout.alignment: Qt.AlignHCenter
+                        iconName: root.radioEnabled ? (root.wifiPage ? Icons.iWifi : Icons.iBluetooth)
+                            : (root.wifiPage ? Icons.iWifiOff : Icons.iBluetoothOff)
+                        busy: root.radioEnabled && root.scanning
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        text: !root.radioEnabled ? (root.wifiPage ? qsTr("Wi-Fi desactivado") : qsTr("Bluetooth desactivado"))
+                            : root.scanning ? qsTr("Buscando cerca de ti…")
+                            : root.wifiPage ? qsTr("No hay más redes disponibles") : qsTr("Sin dispositivos disponibles")
+                        font.pixelSize: Theme.fontSizeTitle * root.s
+                        font.weight: Font.Medium
+                    }
+                    Label {
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        wrapMode: Text.WordWrap
+                        text: !root.radioEnabled ? qsTr("Activa la conexión con el interruptor superior.")
+                            : root.wifiPage ? qsTr("Las redes cercanas aparecerán aquí.")
+                            : qsTr("Pon el dispositivo en modo de vinculación y pulsa Buscar.")
+                        color: Theme.iconSecondary
+                        font.pixelSize: Theme.fontSizeBody * root.s
+                    }
+                }
+                Item { Layout.preferredHeight: Theme.spacingMd * root.s }
             }
-
-            Item { Layout.preferredHeight: 2 * s }
         }
     }
-
-    // La lista cede el mismo vidrio a la credencial; no aparece un segundo modal.
     WifiCredentials {
         id: credentials
+        objectName: "connectivityCredentials"
         anchors.fill: parent
         s: root.s
         ssid: root.passwordNetwork ? root.passwordNetwork.ssid : ""
-        active: root.showPasswordDialog
+        active: root.showPasswordDialog && root.open
         busy: root.passwordConnecting
         succeeded: root.passwordSucceeded
         errorText: root.passwordError
-        visible: opacity > 0.01
-        enabled: root.showPasswordDialog && !root.passwordSucceeded
+        visible: opacity > 0
+        enabled: root.showPasswordDialog && !root.passwordSucceeded && root.open
         opacity: root.showPasswordDialog ? 1 : 0
-        transform: Translate {
-            y: root.showPasswordDialog ? 0 : 14 * root.s
-            Behavior on y { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Motion.morph; velocity: -1 } }
-        }
-        z: 2
-        Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
+        Behavior on opacity { enabled: root.open && !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
         onSubmitted: secret => root.passwordSubmitRequested(secret)
         onCancelled: root.passwordCancelRequested()
         onEdited: root.passwordEdited()

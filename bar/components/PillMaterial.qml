@@ -29,6 +29,10 @@ Item {
     property real captureExtra: 0
     property real captureLeftExtra: 0
 
+    function receive(position) { reception.trigger(position) }
+    function settleReception() { reception.settle() }
+    readonly property bool receiving: reception.running
+
     readonly property real bodyRadius: root.morphRadius + root.notifBreathRadius
     // A light compact tint grows gently for reading, keeping the backdrop visible.
     readonly property real readingExposure: Math.max(0, Math.min(1, (height / s - 38) / 58))
@@ -134,6 +138,12 @@ Item {
             opacity: root.mode === "lateral" || root.width >= 300 * root.s || root.height > 80 * root.s ? 0
                 : root.materialAwake ? 0.48 : root.mode === "rest" ? 0.34 : root.mode === "status" ? 0.38 : 0
             Behavior on opacity { Anim { type: Anim.DefaultEffects } }
+        }
+
+        ReceptionPulse {
+            id: reception
+            anchors.fill: parent
+            accent: root.materialAccent
         }
 
         Rectangle {

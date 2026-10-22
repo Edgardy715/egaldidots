@@ -33,6 +33,16 @@ ShellRoot {
             policy.sessionX = 40; policy.sessionY = 15; policy.sessionW = 40; policy.sessionH = 30
             test.check(policy.maskX === 40 && policy.maskW === 260 && !policy.outsideBodies(260, 25)
                 && !policy.outsideBodies(50, 25), "both companions extend capture")
+            policy.recordingActive = true
+            policy.recordingX = 5; policy.recordingY = 4
+            policy.recordingW = 30; policy.recordingH = 50
+            test.check(policy.maskX === 5 && policy.maskY === 4 && policy.maskW === 295
+                && policy.maskH === 50 && !policy.outsideBodies(10, 6)
+                && policy.outsideBodies(1, 6), "recording uses reflected visual bounds")
+            test.check(policy.maskMode === "pill" && !policy.exclusiveFocus,
+                "recording hover never captures fullscreen input or keyboard")
+            policy.recordingActive = false
+            test.check(policy.outsideBodies(10, 6), "absorbed recording releases its input bounds")
             policy.surface = "calendar"
             test.check(policy.maskMode === "full" && policy.kbFocusWanted && policy.exclusiveFocus,
                 "ordinary modal surface grabs keyboard for Escape and navigation")

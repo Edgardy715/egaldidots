@@ -42,3 +42,4 @@ __pycache__/
 *.log
 .cache/
 bar/shell.json
+rust/*/target/

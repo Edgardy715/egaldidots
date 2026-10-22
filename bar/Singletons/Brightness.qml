@@ -37,6 +37,9 @@ Singleton {
         : 0
     /** Última mutación ledó a escritura real? (false si el write falló) */
     property bool lastWriteOk: true
+    property bool _writing: false
+    property int _targetRaw: -1
+    property int _writeRevision: 0
 
     signal brightnessChanged(real percent)
     signal writeFailed()
@@ -49,7 +52,8 @@ Singleton {
     }
 
     function refresh(): void {
-        if (!available) return
+        if (!available || _writing || readProc.running) return
+        readProc.revision = _writeRevision
         readProc.command = ["cat", "/sys/class/backlight/" + device + "/actual_brightness"]
         readProc.running = true
     }
@@ -61,7 +65,10 @@ Singleton {
         writeRaw(raw)
     }
 
-    function stepPercent(amount: real): void { setPercent(percent + amount) }
+    function stepPercent(amount: real): void {
+        const base = _writing && maxBrightness > 0 ? _targetRaw * 100 / maxBrightness : percent
+        setPercent(base + amount)
+    }
     function increase(): void { stepPercent(10) }
     function decrease(): void { stepPercent(-10) }
 
@@ -69,9 +76,37 @@ Singleton {
      *  Fallback: pkexec sh -c (requiere polkit rule) o brightnessctl si está. */
     function writeRaw(raw: int): void {
         if (!available || device.length === 0) return
-        writeProc.command = ["sh", "-c", "echo " + raw + " > /sys/class/backlight/" + device + "/brightness"]
+        _targetRaw = raw
+        _writeRevision++
+        if (!_writing) startWrite()
+    }
+
+    function startWrite(): void {
+        _writing = true
+        writeProc.pendingValue = _targetRaw
+        writeProc.command = ["sh", "-c", "echo " + _targetRaw + " > /sys/class/backlight/" + device + "/brightness"]
         writeProc.running = true
-        writeProc.pendingValue = raw
+    }
+
+    function finishWrite(value: int, success: bool): void {
+        if (success) {
+            rawBrightness = value
+            lastWriteOk = true
+            brightnessChanged(percent)
+            if (_targetRaw !== value) {
+                startWrite()
+                return
+            }
+            _targetRaw = -1
+            _writing = false
+        } else {
+            // A denied authorization ends this burst instead of prompting again.
+            _targetRaw = -1
+            _writing = false
+            lastWriteOk = false
+            writeFailed()
+            refresh()
+        }
     }
 
     // ---- process ----
@@ -102,9 +137,11 @@ Singleton {
 
     Process {
         id: readProc
+        property int revision: 0
         stdout: StdioCollector {
             id: readColl
             onStreamFinished: {
+                if (root._writing || readProc.revision !== root._writeRevision) return
                 var v = parseInt((readColl.text || "0").trim(), 10)
                 if (!isNaN(v) && v !== root.rawBrightness) {
                     root.rawBrightness = v
@@ -121,16 +158,14 @@ Singleton {
 
         onExited: code => {
             if (code === 0) {
-                root.rawBrightness = pendingValue
-                root.lastWriteOk = true
-                root.brightnessChanged(root.percent)
+                root.finishWrite(pendingValue, true)
                 return
             }
             // fallback: pkexec con echo directo. requiere polkit rule
             // /etc/polkit-1/rules.d/50-brightness.rules (allow subject in group video)
             fallbackProc.command = ["sh", "-c",
-                "pkexec sh -c 'echo " + pendingValue + " > /sys/class/backlight/" + root.device + "/brightness'"]
-            fallbackProc.pendingValue = pendingValue
+                "pkexec sh -c 'echo " + root._targetRaw + " > /sys/class/backlight/" + root.device + "/brightness'"]
+            fallbackProc.pendingValue = root._targetRaw
             fallbackProc.running = true
         }
     }
@@ -138,18 +173,7 @@ Singleton {
     Process {
         id: fallbackProc
         property int pendingValue: -1
-        onExited: code => {
-            if (code === 0) {
-                root.rawBrightness = pendingValue
-                root.lastWriteOk = true
-                root.brightnessChanged(root.percent)
-            } else {
-                root.lastWriteOk = false
-                root.writeFailed()
-                // intenta refrescar por si algo externo cambio el valor
-                root.refresh()
-            }
-        }
+        onExited: code => root.finishWrite(pendingValue, code === 0)
     }
 
     // ---- IPC: adjuntado al target "island.brightness" para keybinds separados ----

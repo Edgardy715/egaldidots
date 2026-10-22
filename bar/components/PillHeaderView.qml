@@ -32,6 +32,14 @@ Item {
     readonly property real restContentWidth: restContent.implicitWidth
     readonly property bool workspaceAnimating: restStatus.workspaceAnimating
     signal requestCalendar()
+    signal requestFocus()
+    property bool companionEnabled: true
+    property string activityText: ""
+    property string activityMood: "rest"
+    property string recordingPhase: ""
+    property int recordingCountdown: 0
+    property real lookX: 0
+    property real lookY: 0
 
     function flashWorkspace(number) { restStatus.flashWorkspace(number) }
     function showVolume(progress, muted) { restStatus.showVolume(progress, muted) }
@@ -74,7 +82,14 @@ Item {
             coreH: root.coreH
             capsLockOn: root.capsLockOn
             now: root.now
+            companionEnabled: root.companionEnabled
+            activityText: root.activityText
+            activityMood: root.activityMood
+            recordingPhase: root.recordingPhase
+            recordingCountdown: root.recordingCountdown
+            lookX: root.lookX; lookY: root.lookY
             onRequestCalendar: root.requestCalendar()
+            onRequestFocus: root.requestFocus()
         }
     }
 

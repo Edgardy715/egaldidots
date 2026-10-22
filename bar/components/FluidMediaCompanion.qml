@@ -51,6 +51,8 @@ Item {
                 s: root.s
                 hovered: root.hovered
                 pressed: root.pressed
+                trackTransitions: !root.expanded && root.cardContentProgress < 0.01
+                trackKey: Players.trackKeyNoArt
                 diameter: 34 * root.s
                 ringWidth: 1.8 * root.s
                 ringGap: 2 * root.s

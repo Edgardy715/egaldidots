@@ -40,6 +40,9 @@ QtObject {
 
     readonly property real displayPosition: dragging && player ? dragFraction * player.length : position
     readonly property real remaining: player ? Math.max(0, player.length - displayPosition) : 0
+    readonly property real length: player ? player.length : 0
+    readonly property string displayTime: formatTime(displayPosition)
+    readonly property string remainingTime: formatTime(remaining)
     readonly property bool shuffleEnabled: !!player && canShuffle && player.shuffle
     readonly property bool repeatEnabled: !!player && canRepeat && player.loopState !== loopNone
 

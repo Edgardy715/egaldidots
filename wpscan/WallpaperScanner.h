@@ -27,6 +27,18 @@ signals:
                     bool cacheAvailable, bool updated, const QString &errorString);
 
 private:
+    struct ScanRequest {
+        QString wallDir;
+        QString cacheDir;
+        int thumbW;
+        int thumbH;
+        int quality;
+        int serial;
+    };
+    void startPendingScan();
+
+    ScanRequest m_pendingScan;
+    bool m_scanRunning = false;
     int m_scanSerial = 0;
     int m_doneSerial = 0;
 };

@@ -7,6 +7,7 @@ Item {
     property real s: 1
     property bool observeServices: true
     readonly property bool capsLockOn: root.observeServices && DesktopStatus.capsLockOn
+    readonly property string batteryStatus: root.observeServices ? DesktopStatus.batteryStatus : ""
 
     signal showVolume(real progress, bool muted)
     signal showMic(real progress, bool muted)

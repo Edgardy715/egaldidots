@@ -23,3 +23,5 @@ singleton Nmcli Nmcli.qml
 NotifData 1.0 NotifData.qml
 
 singleton MediaPalette MediaPalette.qml
+singleton FocusSession FocusSession.qml
+singleton Recording Recording.qml

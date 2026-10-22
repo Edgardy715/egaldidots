@@ -15,6 +15,7 @@ import audio_pulse
 import audio_meter
 import audio_discovery
 import audio_policy
+from process_lifetime import die_with_parent
 
 
 PACTL = "pactl"
@@ -37,8 +38,10 @@ def emit(message):
 
 
 def command(args):
+    parent = os.getpid()
     result = subprocess.run([PACTL, *args], capture_output=True, text=True, check=False,
-                            env={**os.environ, "LC_ALL": "C.UTF-8"}, timeout=8)
+                            env={**os.environ, "LC_ALL": "C.UTF-8"}, timeout=8,
+                            preexec_fn=lambda: die_with_parent(parent))
     if result.returncode:
         raise RuntimeError(result.stderr.strip() or result.stdout.strip() or
                            f"pactl terminó con código {result.returncode}")
@@ -328,8 +331,10 @@ class Bridge:
             emit({"type": "error", "message": str(exc)})
 
     def subscribe(self):
+        parent = os.getpid()
         self.subscription = subprocess.Popen([PACTL, "subscribe"], stdout=subprocess.PIPE,
-                                             stderr=subprocess.DEVNULL, bufsize=0)
+                                             stderr=subprocess.DEVNULL, bufsize=0,
+                                             preexec_fn=lambda: die_with_parent(parent))
         os.set_blocking(self.subscription.stdout.fileno(), False)
         self.selector.register(self.subscription.stdout, selectors.EVENT_READ, ("subscribe", None))
 
@@ -355,7 +360,9 @@ class Bridge:
                 args.append("--device=" + output["monitorSource"])
             else:
                 args.append("--device=" + source)
-            proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
+            parent = os.getpid()
+            proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0,
+                                    preexec_fn=lambda: die_with_parent(parent))
             os.set_blocking(proc.stdout.fileno(), False)
             self.selector.register(proc.stdout, selectors.EVENT_READ, ("meter", source))
             self.meters[source] = proc

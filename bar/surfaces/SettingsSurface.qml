@@ -1,6 +1,7 @@
 import QtQuick
 import "../"
 import "../settings"
+import "../Singletons"
 
 PillSurface {
     id: root
@@ -11,6 +12,10 @@ PillSurface {
     Component.onCompleted: { if (profileRequest > 0) editor.showProfile() }
 
     function activate() { editor.activate() }
+    Connections {
+        target: Config
+        function onSaved() { if (root.active) root.feedbackRequested("received") }
+    }
 
     EdotsWindow {
         id: editor

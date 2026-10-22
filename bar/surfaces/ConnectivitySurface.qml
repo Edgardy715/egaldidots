@@ -14,5 +14,6 @@ PillSurface {
         anchors.fill: parent
         s: root.s
         open: root.open
+        onFeedbackRequested: kind => root.feedbackRequested(kind)
     }
 }

@@ -11,6 +11,14 @@ Row {
     property bool capsLockOn: false
     property date now: new Date()
     signal requestCalendar()
+    signal requestFocus()
+    property bool companionEnabled: true
+    property string activityText: ""
+    property string activityMood: "rest"
+    property string recordingPhase: ""
+    property int recordingCountdown: 0
+    property real lookX: 0
+    property real lookY: 0
 
     readonly property bool workspaceAnimating: workspaceFlash.shown || workspaceFlash.width > 0.01
 
@@ -94,6 +102,17 @@ Row {
         Behavior on opacity { Anim { type: Anim.FastEffects } }
     }
     Item { width: root.capsLockOn ? 6 * root.s : 0; height: 1; visible: root.capsLockOn }
+
+    IslandActivityChip {
+        s: root.s; coreH: root.coreH
+        companionEnabled: root.companionEnabled
+        label: root.activityText; mood: root.activityMood
+        recordingPhase: root.recordingPhase
+        recordingCountdown: root.recordingCountdown
+        actionName: root.recordingPhase.length ? qsTr("Abrir grabación") : qsTr("Abrir enfoque")
+        lookX: root.lookX; lookY: root.lookY
+        onActivated: root.requestFocus()
+    }
 
     Item {
         id: clockArea

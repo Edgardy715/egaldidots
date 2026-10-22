@@ -17,6 +17,7 @@ Item {
     property string title: ""
     property string artist: ""
     property bool showArtist: true
+    property bool trackTransitions: false
     property real progress: 0
     property bool hasProgress: false
 
@@ -32,6 +33,8 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         s: root.s
         diameter: root.coverDiameter
+        trackTransitions: root.trackTransitions
+        trackKey: JSON.stringify([root.title, root.artist])
         artUrl: root.artUrl
         hasProgress: root.hasProgress
         progress: root.progress
@@ -46,6 +49,7 @@ Item {
 
         CrossfadeLabel {
             animated: Flags.mediaTransitions
+            swapTravel: root.trackTransitions && !Flags.reduceMotion ? 4 * root.s : 0
             width: parent.width
             value: root.title
             elide: Text.ElideRight
@@ -56,6 +60,7 @@ Item {
         }
         CrossfadeLabel {
             animated: Flags.mediaTransitions
+            swapTravel: root.trackTransitions && !Flags.reduceMotion ? 4 * root.s : 0
             width: parent.width
             value: root.artist
             visible: root.showArtist

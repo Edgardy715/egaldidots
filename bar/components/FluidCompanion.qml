@@ -27,19 +27,28 @@ Item {
     property bool retainExpandedContent: false
     property bool asynchronousExpandedContent: false
     property real compactWidth: collapsedW
+    property real hoverWidth: 218 * s
+    property real compactY: bodyY
+    property string compactAccessibleName: qsTr("Abrir panel multimedia")
     readonly property var surfaceItem: expandedContent
         ? (expandedLoader.status === Loader.Ready ? expandedLoader.item : null) : surfaceHost.loadedItem
     readonly property real visualX: leftSide ? 2 * bodyX + bodyW - xPos - wPos : xPos
     readonly property real visualCapX: leftSide ? bodyX - captureExtra + bodyRadius : capX
     readonly property bool pressed: compactHit.enabled && compactHit.pressed && compactHit.containsMouse
     signal requestToggle()
+    function receive() { if (root.active && root.expanded) companionMaterial.receive(0.55) }
+    Connections {
+        target: root.surfaceItem
+        ignoreUnknownSignals: true
+        function onFeedbackRequested(kind) { if (kind !== "paused" && kind !== "cancel") root.receive() }
+    }
 
     readonly property real bodyX: body ? body.x : 0
     readonly property real bodyY: body ? body.y : 0
     readonly property real bodyW: body ? body.width : 0
     readonly property real bodyH: body ? body.height : IslandGeometry.restHeight * s
     readonly property real bodyRadius: bodyH / 2
-    readonly property real moduleW: 218 * s
+    readonly property real moduleW: hoverWidth
     readonly property real moduleH: IslandGeometry.restHeight * s
     readonly property real collapsedW: 42 * s
     readonly property real returnH: centered ? Math.min(moduleH, bodyH) : moduleH
@@ -171,7 +180,7 @@ Item {
         }
         if (phase === "nacimiento" || phase === "retornando" || phase === "absorbiendo") return
         const compactW = hovered ? moduleW : compactWidth
-        retarget("companion", bodyX + bodyW + gap, bodyY, compactW, moduleH)
+        retarget("companion", bodyX + bodyW + gap, compactY, compactW, moduleH)
     }
 
     function spring(value: real, velocity: real, target: real, dt: real): var {
@@ -206,7 +215,7 @@ Item {
         else if (open && (phase === "retornando" || phase === "absorbiendo"))
             retarget(expanded ? "media" : "companion",
                      expanded ? cardX : bodyX + bodyW + gap,
-                     expanded ? cardY : bodyY,
+                     expanded ? cardY : compactY,
                      expanded ? cardW : compactWidth,
                      expanded ? cardH : moduleH)
         else if (open) syncHoverSize()
@@ -231,12 +240,14 @@ Item {
     onBodyXChanged: followBody()
     onBodyWChanged: followBody()
     onBodyYChanged: followBody()
+    onCompactYChanged: followBody()
     onBodyHChanged: followBody()
     onReturnWChanged: if (phase === "retornando") followBody()
     onReturnHChanged: if (phase === "retornando") followBody()
     onBodyBusyChanged: updateBond()
     onHoveredChanged: syncHoverSize()
     onCompactWidthChanged: syncHoverSize()
+    onHoverWidthChanged: if (hovered) syncHoverSize()
 
     Timer {
         id: birthTimer
@@ -244,7 +255,7 @@ Item {
         repeat: false
         onTriggered: if (root.phase === "nacimiento") {
             root.retarget("separando", root.bodyX + root.bodyW + root.gap,
-                          root.bodyY, root.compactWidth, root.moduleH)
+                          root.compactY, root.compactWidth, root.moduleH)
             if (Flags.reduceMotion) {
                 root.phase = "companion"
                 root.bond = false
@@ -260,7 +271,7 @@ Item {
             birthTimer.stop()
             root.retarget(root.open ? (root.expanded ? "media" : "companion") : "retornando",
                 root.open ? (root.expanded ? root.cardX : root.bodyX + root.bodyW + root.gap) : root.targetX,
-                root.open ? (root.expanded ? root.cardY : root.bodyY) : root.targetY,
+                root.open ? (root.expanded ? root.cardY : root.compactY) : root.targetY,
                 root.open ? (root.expanded ? root.cardW : root.compactWidth) : root.targetW,
                 root.open ? (root.expanded ? root.cardH : root.moduleH) : root.targetH)
             root.captureExtra = 0; root.captureTarget = 0; root.captureV = 0
@@ -328,6 +339,7 @@ Item {
         }
 
         PillMaterial {
+            id: companionMaterial
             anchors.fill: parent
             s: root.s
             morphRadius: root.cardRadius
@@ -396,7 +408,7 @@ Item {
 
         MotionArea {
             id: compactHit
-            accessibleName: qsTr("Abrir panel multimedia")
+            accessibleName: root.compactAccessibleName
             feedbackEnabled: false
             anchors.fill: parent
             enabled: !root.expanded && root.cardFraction < 0.05

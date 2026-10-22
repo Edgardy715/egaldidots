@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "../"
 import "../Singletons"
 import "../Singletons/Spectrum.js" as Spectrum
@@ -26,6 +27,19 @@ Item {
     Behavior on opacity { Anim { type: Anim.DefaultEffects } }
 
     Row {
+        id: spectrumBars
+        objectName: "smallCavaGlow"
+        readonly property real energy: root.visible && root.isPlaying && root.hasFrame && !Flags.reduceMotion
+            ? Spectrum.band(root.values, 0, 1) : 0
+        layer.enabled: root.visible && energy > 0.001
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: Qt.alpha(root.musicAccent, 0.8 * spectrumBars.energy)
+            shadowBlur: 0.85
+            blurMax: 8
+            shadowVerticalOffset: 0
+            shadowHorizontalOffset: 0
+        }
         scale: hit.motion.visualScale
         anchors.horizontalCenter: parent.horizontalCenter
         height: root.height
@@ -37,7 +51,7 @@ Item {
                 required property int index
                 readonly property real minHeight: 2.5 * root.s
                 readonly property real maxHeight: 18 * root.s
-                readonly property real signal: root.isPlaying && root.hasFrame && !Flags.reduceMotion
+                readonly property real signal: root.visible && root.isPlaying && root.hasFrame && !Flags.reduceMotion
                     ? Spectrum.band(root.values, index, 5) : 0
                 width: 2.5 * root.s
                 height: root.height

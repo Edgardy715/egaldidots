@@ -21,6 +21,7 @@ ShellRoot {
                 fieldKey: "time12h"; field: Config.schema.sections.appearance.time12h
                 value: Config.appearance.time12h
                 onChangeRequested: next => Config.update({appearance: {time12h: next}})
+                onResetRequested: Config.update({appearance: {time12h: field.default}})
             }
             SettingRow {
                 id: sliderRow; x: 0; y: 285; width: 600
@@ -67,6 +68,11 @@ ShellRoot {
             function findType(item, typeName) {
                 if (String(item).startsWith(typeName + "_")) return item
                 for (const child of item.children || []) { const found = findType(child, typeName); if (found) return found }
+                return null
+            }
+            function findReset(item) {
+                if (item.text === "Restablecer" && typeof item.clicked === "function") return item
+                for (const child of item.children || []) { const found = findReset(child); if (found) return found }
                 return null
             }
             function test_native_controls() {
@@ -147,6 +153,21 @@ ShellRoot {
                 toggle.forceActiveFocus()
                 keyClick(Qt.Key_Space)
                 compare(Config.appearance.time12h, beforeToggle)
+                Config.update({appearance: {time12h: !switchRow.field.default}})
+                wait(50)
+                const reset = findReset(switchRow)
+                verify(reset, "modified row loads reset")
+                reset.forceActiveFocus()
+                keyClick(Qt.Key_Space)
+                compare(Config.appearance.time12h, switchRow.field.default, "keyboard reset applied")
+                wait(50)
+                compare(findReset(switchRow), null, "default row releases reset")
+                keyClick(Qt.Key_Tab)
+                verify(window.activeFocusItem && window.activeFocusItem.visible && window.activeFocusItem.Accessible.name.length > 0,
+                       "Tab remains usable after focused reset unloads")
+                keyClick(Qt.Key_Tab, Qt.ShiftModifier)
+                verify(window.activeFocusItem && window.activeFocusItem.visible && window.activeFocusItem.Accessible.name.length > 0,
+                       "Shift+Tab remains usable after reset")
                 const slider = findType(sliderRow, "Slider")
                 verify(slider)
                 mouseClick(slider, slider.width * 0.75, slider.height / 2)

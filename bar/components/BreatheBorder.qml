@@ -35,7 +35,8 @@ Rectangle {
 
     SequentialAnimation on border.color {
         id: anim
-        running: root.running && Motion.mult >= 1
+        objectName: "breatheAnimation"
+        running: root.running && root.visible && !Flags.reduceMotion
         loops: Animation.Infinite
         ColorAnimation {
             to: Qt.alpha(root.glowColor, root.alphaMax)

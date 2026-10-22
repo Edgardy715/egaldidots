@@ -30,12 +30,13 @@ Singleton {
      * asigna la siguiente a activePopup (la pill detecta el cambio y arranca el
      * ciclo de la nueva). Si no hay más, activePopup=null → pill vuelve a reposo.
      */
-    function advancePopup() {
-        if (root.activePopup) {
-            root.activePopup.popup = false
+    function advancePopup(shown) {
+        const completed = shown
+        if (completed) {
+            completed.popup = false
         }
-        var next = root.popups.length > 0 ? root.popups[0] : null
-        root.activePopup = next
+        if (root.activePopup && root.activePopup !== completed && root.activePopup.popup) return
+        root.activePopup = root.popups.find(n => n.isCritical) || root.popups[0] || null
     }
 
     /**
@@ -44,8 +45,11 @@ Singleton {
      * asignará cuando advancePopup() la promocione.
      */
     function _maybePromote() {
-        if (!root.activePopup && root.popups.length > 0) {
-            root.activePopup = root.popups[0]
+        const critical = root.popups.find(n => n.isCritical)
+        if (critical && root.activePopup && !root.activePopup.isCritical) {
+            root.activePopup = critical
+        } else if ((!root.activePopup || !root.activePopup.popup || root.activePopup.closed) && root.popups.length > 0) {
+            root.activePopup = critical || root.popups[0]
         } else if (root.activePopup && root.popups.length === 0) {
             // la activa ya expiró/cerró y no hay más → null
             root.activePopup = null

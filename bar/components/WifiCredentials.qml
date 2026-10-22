@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls.Basic
@@ -18,8 +19,8 @@ Item {
     signal cancelled()
     signal edited()
 
-    readonly property color successColor: "#a6efd0"
-    readonly property color errorColor: "#ffb4bc"
+    readonly property color successColor: Theme.accent
+    readonly property color errorColor: Theme.error
 
     function focusInput() { if (active && !busy && !succeeded) password.forceActiveFocus() }
     function reset() {
@@ -127,7 +128,7 @@ Item {
             elide: Text.ElideRight
             color: Theme.foreground
             font.family: Theme.font
-            font.pixelSize: Theme.fontSizeTitle * root.s
+            font.pixelSize: Theme.fontSizeHero * root.s
             font.weight: Font.DemiBold
         }
         Text {
@@ -136,7 +137,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             color: root.succeeded ? root.successColor : Theme.iconSecondary
             font.family: Theme.font
-            font.pixelSize: Theme.fontSizeCaption * root.s
+            font.pixelSize: Theme.fontSizeBody * root.s
         }
 
         Item { Layout.fillHeight: true }
@@ -187,7 +188,7 @@ Item {
                 placeholderTextColor: "transparent"
                 InputPlaceholder { input: password; color: Theme.iconSecondary; motionActive: root.active && !root.succeeded }
                 font.family: Theme.font
-                font.pixelSize: Theme.fontSizeBody * root.s
+                font.pixelSize: Theme.fontSizeTitle * root.s
                 echoMode: root.reveal ? TextInput.Normal : TextInput.Password
                 passwordMaskDelay: 0
                 enabled: root.active && !root.busy
@@ -227,7 +228,7 @@ Item {
                 : password.text.length >= 8 ? qsTr("Pulsa Enter para conectar") : qsTr("Mínimo 8 caracteres"))
             color: root.errorText.length ? root.errorColor : Theme.iconSecondary
             font.family: Theme.font
-            font.pixelSize: Theme.fontSizeCaption * root.s
+            font.pixelSize: Theme.fontSizeBody * root.s
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
@@ -236,6 +237,7 @@ Item {
         }
 
         MotionButton {
+            id: connectButton
             Layout.fillWidth: true
             Layout.preferredHeight: 42 * root.s
             opacity: root.succeeded ? 0 : 1
@@ -248,10 +250,10 @@ Item {
                 color: parent.enabled ? Theme.accent : Qt.alpha(Theme.foreground, Theme.alphaSoft)
             }
             contentItem: Text {
-                text: parent.text
-                color: parent.enabled ? Theme.primaryContent : Theme.iconSecondary
+                text: connectButton.text
+                color: connectButton.enabled ? Theme.primaryContent : Theme.iconSecondary
                 font.family: Theme.font
-                font.pixelSize: Theme.fontSizeBody * root.s
+                font.pixelSize: Theme.fontSizeBodyLg * root.s
                 font.weight: Font.DemiBold
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter

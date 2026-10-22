@@ -428,6 +428,17 @@ Item {
             }
         }
 
+        MotionButton {
+            objectName: "openFocus"
+            Layout.fillWidth: true
+            Layout.preferredHeight: 40 * root.s
+            text: qsTr("Enfoque y grabación")
+            font.family: Theme.font
+            font.pixelSize: Theme.fontSizeBodyLg * root.s
+            contentItem: Text { text: parent.text; font: parent.font; color: Theme.foreground; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+            background: Rectangle { radius: Theme.radiusMd * root.s; color: Qt.alpha(Theme.accent, Theme.alphaWash); border.width: parent.activeFocus ? 2 : 0; border.color: Theme.accent }
+            onClicked: root.requestPage("focus")
+        }
         Item { Layout.fillHeight: true }
     }
 }

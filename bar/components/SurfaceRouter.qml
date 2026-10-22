@@ -12,6 +12,7 @@ QtObject {
         toggleSurface(focusedMonitorName, surface)
     }
     property bool reduceMotion: false
+    onReduceMotionChanged: if (reduceMotion && launcherClosePhase !== 0) close()
     property int resultsDuration: 250
     property int morphDuration: 420
     signal authCloseRequested()

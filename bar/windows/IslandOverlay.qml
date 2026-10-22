@@ -22,12 +22,17 @@ PanelWindow {
         requestedCompact: Config.appearance.barLayout === "compact"
         exitReady: overlay.layoutContentWithdrawn
             && fluidCompanion.phase === "idle"
+            && recordingCompanion.phase === "idle"
             && (!overlay.mediaOpen || !pill.surfaceOpen && pill.morphCloseness > 0.999)
         settleReady: pill.morphCloseness > 0.999
     }
     readonly property var mediaSurfaceItem: compact ? pill.surfaceItem : fluidCompanion.surfaceItem
     readonly property real lateralAvailable: Math.max(0, compact ? Math.min(500 * s, (width - pill.restCenterWidth - 72 * s) / 2)
         : (width - Math.max(pill.width, pill.targetW)) / 2 - 48 * s)
+    readonly property real recordingLeftBoundary: !compact && sideModules.workspaceModule.active
+        ? sideModules.x + sideModules.workspaceModule.x + sideModules.workspaceModule.width + 12 * s : 12 * s
+    readonly property bool recordingHasRoom: Math.min(pill.x, (width - Math.max(pill.width, pill.targetW)) / 2)
+        - recordingLeftBoundary >= Math.max(recordingCompanion.compactWidth, recordingCompanion.hoverWidth) + recordingCompanion.gap
     readonly property string surface: router.openMon === modelData.name ? router.openSurface : ""
     readonly property bool surfaceOpen: surface.length > 0
     readonly property bool overviewOpen: surface === "overview"
@@ -58,6 +63,7 @@ PanelWindow {
     readonly property bool launcherReturning: launcherOpen && router.launcherClosePhase === 2
     OverlayInputPolicy {
         id: inputPolicy
+        objectName: "islandInputPolicy"
         monitorName: overlay.modelData ? overlay.modelData.name : ""
         focusedMonitorName: Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
         monitors: Hyprland.monitors.values
@@ -69,6 +75,9 @@ PanelWindow {
         mediaActive: !overlay.compact && fluidCompanion.active
         mediaX: fluidCompanion.xPos; mediaY: fluidCompanion.yPos
         mediaW: fluidCompanion.wPos; mediaH: fluidCompanion.hPos
+        recordingActive: recordingCompanion.active && !overlay.monFullscreen
+        recordingX: recordingCompanion.visualX; recordingY: recordingCompanion.yPos
+        recordingW: recordingCompanion.wPos; recordingH: recordingCompanion.hPos
         sessionActive: sessionCompanion.active
         sessionX: sessionCompanion.visualX; sessionY: sessionCompanion.yPos
         sessionW: sessionCompanion.wPos; sessionH: sessionCompanion.hPos
@@ -224,6 +233,7 @@ PanelWindow {
 
     FocusScope {
         id: focusScope
+        objectName: "islandOverlayContent"
         anchors.fill: parent
         // Closed surfaces release keyboard input to the desktop.
         focus: overlay.kbFocusWanted
@@ -245,6 +255,10 @@ PanelWindow {
         HoverHandler {
             parent: pill
             onHoveredChanged: pill.hovered = hovered
+            onPointChanged: {
+                pill.pointerX = point.position.x
+                pill.pointerY = point.position.y
+            }
         }
 
         TopBarModules {
@@ -359,7 +373,9 @@ PanelWindow {
             }
             s: overlay.s
             screenName: overlay.modelData.name
+            recordingDetached: recordingCompanion.open || recordingCompanion.active
             layoutChanging: overlay.layoutChanging
+            interactionOpen: overlay.surfaceOpen
             restHeight: overlay.compact ? IslandGeometry.compactRestHeight : IslandGeometry.restHeight
             restLeftWidth: overlay.compact ? sideModules.leftWidth : 0
             restRightWidth: overlay.compact ? sideModules.rightWidth : 0
@@ -368,14 +384,15 @@ PanelWindow {
             launcherClosePhase: router.launcherClosePhase
             forcePinned: router.peekMon === overlay.modelData.name
             fluidJoined: (!overlay.compact && (!overlay.surfaceOpen || overlay.sessionOpen) && fluidCompanion.joined)
-                || sessionCompanion.joined || settingsCompanion.joined
+                || sessionCompanion.joined || settingsCompanion.joined || recordingCompanion.joined
             fluidEdgeExposure: Math.min(
                 !overlay.compact && (!overlay.surfaceOpen || overlay.sessionOpen) ? fluidCompanion.edgeExposure : 1,
-                sessionCompanion.edgeExposure, settingsCompanion.edgeExposure)
+                sessionCompanion.edgeExposure, settingsCompanion.edgeExposure, recordingCompanion.edgeExposure)
             fluidCaptureExtra: settingsCompanion.active ? settingsCompanion.captureExtra
                 : overlay.compact || overlay.surfaceOpen && !overlay.sessionOpen ? 0 : fluidCompanion.captureExtra
-            fluidCaptureLeftExtra: sessionCompanion.captureExtra
+            fluidCaptureLeftExtra: Math.max(sessionCompanion.captureExtra, recordingCompanion.captureExtra)
             opacity: overlay.monFullscreen ? 0 : 1
+            visible: opacity > 0.005
             Behavior on opacity {
                 NumberAnimation {
                     duration: Motion.morph
@@ -403,6 +420,27 @@ PanelWindow {
             notificationsEnabled: overlay.monitorIsFocused
         }
 
+        FluidRecordingCompanion {
+            id: recordingCompanion
+            objectName: "islandRecordingCompanion"
+            anchors.fill: parent
+            z: 3
+            body: pill
+            leftSide: true
+            s: overlay.s
+            screenName: overlay.modelData.name
+            recordingPhase: Recording.uncertain ? "unknown" : Recording.phase
+            elapsedText: Recording.timeText
+            tallBar: overlay.compact
+            countdown: Recording.countdown
+            open: Recording.engaged && !overlay.layoutChanging && !overlay.monFullscreen
+                && overlay.recordingHasRoom && !overlay.sessionOpen && sessionCompanion.phase === "idle"
+                && !overlay.settingsOpen && settingsCompanion.phase === "idle"
+            bodyBusy: pill.surfaceOpen || pill.notifAnimating
+            opacity: overlay.monFullscreen ? 0 : 1
+            onRequestRecording: router.toggleSurface(overlay.modelData.name, "recording")
+        }
+
         FluidCompanion {
             id: sessionCompanion
             anchors.fill: parent
@@ -411,7 +449,7 @@ PanelWindow {
             leftSide: true
             surfaceName: "session"
             surfaceSize: IslandGeometry.sessionSurface
-            open: overlay.sessionOpen && !overlay.settingsReturning
+            open: overlay.sessionOpen && !overlay.settingsReturning && recordingCompanion.phase === "idle"
             expanded: overlay.sessionOpen && !overlay.settingsReturning
             bodyBusy: pill.surfaceOpen || pill.notifAnimating
             s: overlay.s
@@ -454,6 +492,7 @@ PanelWindow {
             objectName: "islandMediaCompanion"
             z: fluidCompanion.cardFraction > 0.05 ? 3 : 1
             opacity: overlay.monFullscreen || overlay.compact ? 0 : 1
+            visible: opacity > 0.005
             anchors.fill: parent
             body: pill
             open: !overlay.layoutChanging && !overlay.compact && (Players.has || overlay.mediaOpen) && !overlay.launcherOpen && !overlay.mediaPanelOpen

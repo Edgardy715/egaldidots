@@ -14,8 +14,17 @@ Item {
     property bool passwordConnecting: false
     property int passwordAttempt: 0
     property string passwordError: ""
+    signal feedbackRequested(string kind)
 
     readonly property string activeSsid: Nmcli.active ? Nmcli.active.ssid : ""
+    property bool ssidObserved: false
+    property string previousSsid: ""
+    Component.onCompleted: { previousSsid = activeSsid; ssidObserved = true }
+    onActiveSsidChanged: {
+        if (ssidObserved && open && activeSsid.length && activeSsid !== previousSsid)
+            root.feedbackRequested("connected")
+        previousSsid = activeSsid
+    }
     readonly property int connectingState: BluetoothDeviceState.Connecting
     readonly property int disconnectingState: BluetoothDeviceState.Disconnecting
 
@@ -46,6 +55,7 @@ Item {
             if (result && result.success) {
                 passwordSucceeded = true
                 passwordError = ""
+                root.feedbackRequested("connected")
                 successHold.restart()
             } else if (result && result.needsPassword) {
                 passwordError = qsTr("Contraseña incorrecta. Inténtalo de nuevo.")

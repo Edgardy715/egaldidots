@@ -47,6 +47,8 @@ ShellRoot {
         function calendar(mon: string): bool   { navigation.toggleSurface(mon, "calendar"); return true; }
         function mixer(mon: string): bool      { navigation.toggleSurface(mon, "mixer"); return true; }
         function media(mon: string): bool { navigation.toggleSurface(mon, "media"); return true; }
+        function focus(mon: string): bool { navigation.toggleSurface(mon, "focus"); return true; }
+        function recording(mon: string): bool { navigation.toggleSurface(mon, "recording"); return true; }
         function workspaces(mon: string): bool { navigation.toggleSurface(mon, "workspaces"); return true; }
         function notifs(mon: string): bool   { navigation.toggleSurface(mon, "notifs"); return true; }
         function wallpaper(mon: string): bool { navigation.toggleSurface(mon, "wallpaper"); return true; }

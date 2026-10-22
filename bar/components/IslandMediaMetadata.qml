@@ -45,6 +45,7 @@ Item {
 
         CrossfadeLabel {
             animated: Flags.mediaTransitions
+            swapTravel: Flags.reduceMotion ? 0 : 4 * root.s
             id: marqueeText
             anchors.verticalCenter: parent.verticalCenter
             textFormat: Text.RichText
@@ -59,6 +60,7 @@ Item {
         }
         CrossfadeLabel {
             animated: Flags.mediaTransitions
+            swapTravel: Flags.reduceMotion ? 0 : 4 * root.s
             anchors.verticalCenter: parent.verticalCenter
             textFormat: Text.RichText
             color: Theme.foreground

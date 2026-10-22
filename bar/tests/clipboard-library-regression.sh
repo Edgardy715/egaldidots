@@ -5,7 +5,7 @@ trap 'rm -rf "$tmp"' EXIT
 cat > "$tmp/cliphist" <<'EOF'
 #!/bin/sh
 case "$1" in
-    list) [ -f "$ISLA_WIPED" ] || printf '1\tshort\n2\t[[ binary data png 64x32 ]]\n' ;;
+    list) if [ ! -f "$ISLA_WIPED" ]; then printf '1\tshort\n2\t[[ binary data png 64x32 ]]\n'; printf '3\t%0120d-tail-history\n' 0; fi ;;
     decode) [ "$2" = 2 ] && cat "$ISLA_CLIPBOARD_IMAGE" || printf 'full untruncated text\n' ;;
     wipe) touch "$ISLA_WIPED" ;;
 esac

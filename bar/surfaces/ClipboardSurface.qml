@@ -28,7 +28,11 @@ PillSurface {
         onCloseRequested: root.requestClose()
         onConcealRequested: view.concealHistory()
         onResetQueryRequested: view.resetQuery()
-        onLibraryActionFinished: (action, success, entryId) => view.libraryResult(action, success, entryId)
+        onLibraryActionFinished: (action, success, entryId) => {
+            view.libraryResult(action, success, entryId)
+            if (success && (action === "save" || action === "move" || action === "create"))
+                root.feedbackRequested("received")
+        }
     }
     ClipboardView {
         id: view

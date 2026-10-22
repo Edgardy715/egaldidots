@@ -11,6 +11,8 @@ node bar/tests/media-source.cjs
 node bar/tests/lyrics.cjs
 python bar/tests/settings-integration.py
 python bar/tests/hyprland-settings.py
+python bar/tests/nmcli-service.py
+python bar/tests/brightness-service.py
 python starship/.config/starship/test_matugen.py
 ```
 
@@ -18,7 +20,90 @@ The configuration gate includes settings validation, component boundaries and
 the calculator parser. The integration test runs the QML settings service and
 checks IPC, reloads, conflicts and atomic saves.
 
+## Performance and process lifetime
+
+`python bar/tests/settings-navigation-performance.py --rounds 2 --output
+/tmp/settings-navigation.json` (one line) alternates isolated Wayland copies of
+the current and frozen baseline Edots navigation. It records driver intervals
+and private Config call counters; these are not physical display FPS. The
+`--baseline-lazy-check` mode verifies that the old row creates hidden editors.
+Run controls/UX Wayland fixtures serially to avoid focus interference.
+
+```sh
+python bar/tests/sample-process.py --self-test
+python bar/tests/cava-stream.py
+python bar/tests/cava-envelope.py
+python bar/tests/cava-backend.py
+ISLA_CAVA_RUST_BINARY="$HOME/.local/share/isla/bin/isla-cava-stream" python bar/tests/cava-rust-lifecycle.py
+python bar/tests/nmcli-lifetime.py
+python bar/tests/audio-lifetime.py
+QT_QPA_PLATFORM=wayland python bar/tests/qml-performance.py --output /tmp/isla-qml-performance
+python bar/tests/wallpaper-scanner-async.py --build /tmp/isla-wpscan-test
+ISLA_WPSCAN_BUILD=/tmp/isla-wpscan-test python bar/tests/wallpaper-scanner.py
+```
+
+The Cava envelope and discovery tests use synthetic data and fake producers;
+they never capture personal audio. `nmcli-lifetime.py` checks graceful quit,
+SIGTERM, hot reload and monitor restart using fake NetworkManager commands.
+`desktop-status-audio-rebind-regression.qml` tests observer replacement with
+mock devices. The native scanner test checks stale scans, coalescing, reentry
+and destruction while work is active.
+
+`wallpaper-scan-benchmark.py --build /tmp/isla-wpscan-test` measures call latency,
+completion and a QML heartbeat with temporary caches. `sample-process.py --pid
+PID --seconds 30 --output /tmp/process.json` reads Linux CPU/RSS/PSS. For a real
+audio-server discovery comparison, `cava-discovery-performance.py --before
+/path/to/baseline/cava_stream.py --output /tmp/cava.json` uses an unresolved test
+identity and performs read-only queries. Animation-driver/heartbeat intervals
+are not display FPS. See `docs/performance-2026-10-21/REPORT.md` for evidence and
+the exact baseline source archive.
+
+The hybrid backend's QML caller, exec ownership, fallback and atomic install
+are checked by `cava-backend.py` using fake producers. Rust unit tests and clippy
+run in `rust/cava-stream` with `cargo test --locked` and
+`cargo clippy --locked --all-targets -- -D warnings`. Run the same discovery and
+capture regression against the installed helper with `ISLA_CAVA_TEST_BINARY=
+/absolute/path/to/isla-cava-stream python bar/tests/cava-stream.py` (one line).
+`cava-rust-lifecycle.py` tests forced death, blocked snapshots and stdout using
+fake processes. `cava-hybrid-performance.py --rust /absolute/path/to/helper
+--seconds 12 --rounds 2 --output /tmp/cava-hybrid.json` compares Python/Rust with
+real CAVA and a private inaudible null sink, then removes its stream/module and
+checks unchanged defaults. It excludes the shared audio server and tone producer
+from process-tree CPU/PSS. See `docs/rust-cava-2026-10-21/REPORT.md`.
+
+The optional peak reducer keeps the Python bridge and its envelope. Build with
+`sh scripts/build-audio-peak.sh`. Run `cargo test --locked` and
+`cargo clippy --locked --all-targets -- -D warnings` in `rust/audio-peak`.
+`python bar/tests/audio-peak.py --library /absolute/path/libisla_audio_peak.so`
+checks exact baseline/native/fallback parity including fragmented PCM and
+non-finite values. `python bar/tests/audio-peak-install.py` checks atomic install
+and preservation after build/copy failures using a fake compiler.
+`python bar/tests/audio-peak-qml.py --library /absolute/path/libisla_audio_peak.so`
+checks the real QML controller with a private silent monitor, both native and
+fallback, including close/reopen and child cleanup. This is offscreen integration,
+not visual QA. `audio-lifetime.py` uses fake audio commands to test stdin EOF,
+TERM/KILL, a blocked query and subscription EOF, without accessing host audio.
+`python bar/tests/audio-peak-performance.py --library /absolute/path/libisla_audio_peak.so
+--seconds 12 --rounds 4 --output /tmp/audio-peak.json` (one line) measures complete
+feed calls and the real bridge with two private, inaudible meters. It verifies
+the loaded library, attack/release, EOF/TERM child cleanup and unchanged defaults.
+CPU/PSS excludes the shared server and tone producer; this is not a whole-shell
+benchmark. See `docs/rust-audio-peak-2026-10-21/REPORT.md`.
+
 ## Installer and authentication
+
+The saved clipboard reader can be built with `sh scripts/build-clipboard-list.sh`.
+`python bar/tests/clipboard-list.py --binary /absolute/path/isla-clipboard-list`
+checks metadata parity, private permissions, Python flock compatibility,
+cancelled reads, BrokenPipe and JSON compatibility via exec fallback.
+`python bar/tests/clipboard-list-backend.py` checks launcher exec/argv and atomic
+build/copy failures using fake binaries. Run `bash bar/tests/clipboard-library-regression.sh`
+with the native binary installed to cover the full QML controller with fake
+cliphist/wl-copy and a temporary library. It must also pass when the binary is
+absent. `python bar/tests/clipboard-list-performance.py --binary /absolute/path/isla-clipboard-list
+--output /tmp/clipboard-list.json` (one line) alternates CLI and QML read requests
+over private 0/100/1000-entry libraries, with separate sampled memory runs.
+QML times measure data readiness, not presentation or screen FPS.
 
 ```sh
 python scripts/test-install.py
@@ -54,6 +139,11 @@ ISLA_CONFIG=/tmp/isla-motion-test.json QT_QPA_PLATFORM=offscreen \
 30/60/144/240 Hz, delayed frames, capture/reopen, geometric neck pinching,
 continuous return edges and switching reduced motion during a transition.
 
+`bar/settings-navigation-regression.qml` checks atomic page selection, hidden
+composition rows, font editors only on font fields, resize, search, drafts,
+rapid retargeting and reduced motion. Run on Wayland with a temporary ISLA_CONFIG.
+Its FrameAnimation intervals are driver samples, not display FPS; measure alone.
+
 `bar/settings-async-regression.qml` checks cold asynchronous editor loading,
 cancel/reopen while loading, retention and reduced motion on Wayland.
 
@@ -78,7 +168,50 @@ python bar/tests/overlay-native-input.py
 These tests need a running Wayland session. Offscreen checks do not establish
 visual quality or compositor input behavior.
 
+## Service and interaction regressions
+
+`nmcli-service.py` runs a fake nmcli: refresh bursts serialize, callbacks survive
+failures/reentry, and completed command objects are destroyed. `brightness-service.py`
+uses fake sysfs commands only: slider bursts, accumulated steps, fallback denial
+and stale reads never change hardware or invoke polkit.
+
+`launcher-pending-regression.qml` checks pending-result activation, hidden searches
+and reopening. `clipboard-preview-jobs-regression.qml` checks simultaneous preview
+completion and cache retention; the library regression also checks long unsaved
+history text after library refresh. `breathe-border-regression.qml` checks hidden
+and reduced-motion animation gates, including agile speed. Use temporary ISLA_CONFIG.
+
+`QT_QPA_PLATFORM=wayland python bar/tests/wallpaper-source.py` loads a filename
+with spaces, #, ?, percent and Unicode in overview and lockscreen preview windows.
+It uses a temporary config/cache, applies no wallpaper and acquires no session lock.
+Optional ISLA_TEST_OUTPUT saves mock-only screenshots.
+
 ## Manual checks
+
+Direct recording: `python bar/tests/gpu-recording.py` uses fake recorder
+executables and temporary output; never captures the desktop. It checks owned
+process start, pause, stop/finalization, invalid input, errors and EOF cleanup.
+`recording-view-regression.qml` checks audio toggles, native controls and
+morph/hidden/reduced. `recording-integration-regression.qml` tests tabs, countdown
+cancellation on tab, route and close, pill recording/pause/unknown and saved
+feedback with injected snapshots and observation disabled. Use temporary
+`ISLA_CONFIG`; optional `ISLA_TEST_OUTPUT` captures mock-only states.
+`recording-drop-regression.qml` runs on Wayland with injected states and no
+backend. It checks the left droplet, music on the right, click routing, normal
+and reduced absorption/interruption, split/compact center alignment, fullscreen,
+session/settings and narrow-space fallback. `overlay-input-policy-regression.qml`
+checks reflected recording bounds without grabbing desktop-wide idle input.
+Real capture additionally needs the ScreenCast picker and a working GPU encoder.
+
+`personality-regression.qml` covers finite material reception, surface result routing,
+charging presentation, companion opt-out, reduced motion and hiding. Run on Wayland
+with a temporary `ISLA_CONFIG`; `ISLA_TEST_OUTPUT` stores mock-only captures.
+`focus-session-regression.qml` checks deadlines, suspend, pause/resume milliseconds,
+single completion, choosing the next duration, custom minutes and keyboard input.
+`notification-attention-regression.qml` and `notification-priority-regression.qml`
+check informational deferral, critical/auth priority, expiry and consuming the
+displayed notification by identity. Give notification fixtures a temporary
+`XDG_STATE_HOME` as well as `ISLA_CONFIG` to isolate their queue storage.
 
 - Open and close each panel; Escape and clicking outside should return to rest.
 - Switch panels during a transition and check that the latest request wins.
@@ -263,3 +396,50 @@ HTTP cancellation, bounded retries and watchdog with an isolated cache/config.
 small/large seeks and natural advances, obsolete-drag cancellation, unsupported
 length clock stop and correct neutral endpoints. `media-palette-regression.qml`
 checks the main button's palette color and the interior neon field as well.
+
+## Compact layout audit
+
+`bar/compact-island-regression.qml` also checks cover-only narrow layout, readable
+short metadata, font scaling, oversized workspace rail width recovery, selection
+inside workspace cells, keyboard/whole-row pointer activation, rapid panel
+retargeting and reduced motion enabled during a morph. Always use temporary
+ISLA_CONFIG. `ISLA_COMPACT_SHOTS` saves fixture captures; optional
+`ISLA_COMPACT_FRAMES=1` samples two calendar open/close cycles and logs elapsed
+times and geometry. These are irregular Wayland-rendered scene samples, not
+presentation FPS or a complete compositor recording.
+
+Compact media follow-up: `compact-island-regression.qml` checks the compact
+progress ring, paused external seek and unknown duration. `cava-center-regression.qml`
+also checks shared small-CAVA neon activation by audio energy, pause/reduced
+shutdown and preserves five-bar centering at scales1/1.25. Optional
+ISLA_TEST_OUTPUT saves native fixture images.
+
+`bar/rest-media-transition-regression.qml` checks the opt-in compact/split rest
+choreography: retained/latest artwork, metadata crossfade, same-album track
+changes, stable cover geometry, rapid replacement, hidden/reopen, reduced motion
+and disabled transitions. Use temporary ISLA_CONFIG; QT_QPA_PLATFORM=wayland
+and ISLA_TEST_OUTPUT for native fixture captures. No personal playback changes.
+
+## Connectivity redesign
+
+`bar/connectivity-design-regression.qml` checks mock Wi-Fi/Bluetooth actions,
+mode retargeting, disabled/empty states, source1.5 text, credential states and
+reduced reopening. Tab/Shift+Tab must reveal Bluetooth actions without manual
+scroll. Use temporary `ISLA_CONFIG`, Wayland for native input/rendering and
+optional `ISLA_TEST_OUTPUT` for screenshots. No radio changes are made.
+
+`bar/connectivity-host-regression.qml` checks the actual pill host geometry,
+split/compact rest heights, interrupted reopening, unload and reduced motion.
+It reads existing connectivity services but never invokes their actions.
+
+`bar/wallpaper-media-header-regression.qml` checks music at the wallpaper body's
+actual inset width, UI/font scales, narrow and no-player states. Optional
+`ISLA_TEST_OUTPUT` saves native fixture screenshots. `bar/media-dock-surfaces-regression.qml`
+forces a fixture companion present and verifies absorption before wallpaper,
+overview and launcher, then close/release in normal/reduced motion. Use temporary
+ISLA_CONFIG and Wayland; neither changes wallpaper or personal playback.
+
+`bar/workspace-width-regression.qml` checks 5→6 growth through intermediate widths,
+selection bounds, rapid reversal, split/integrated styles and reduced/hidden/
+disabled animation. Use temporary ISLA_CONFIG and Wayland for native captures
+(`ISLA_TEST_OUTPUT`). No real workspace switches.

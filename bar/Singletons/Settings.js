@@ -11,6 +11,7 @@ var fields = {
         glassAlpha: { type: "number", default: 0.34, minimum: 0.15, maximum: 1, label: "Opacidad del vidrio", control: "number", description: "Ajusta la opacidad del material de vidrio." },
         materialDepth: { type: "number", default: 0.25, minimum: 0, maximum: 1, label: "Profundidad del material", control: "number", description: "Intensidad de la luz direccional y la sombra interior del vidrio de Isla." },
         mediaTransitions: { type: "boolean", default: true, label: "Transiciones multimedia", control: "toggle", options: [false, true], description: "Suaviza los cambios de portada y texto al cambiar de canción." },
+        personality: { type: "boolean", default: true, label: "Compañero de Isla", control: "toggle", options: [false, true], description: "Muestra una expresión discreta junto al reloj, con mirada y respuesta a las actividades." },
         menuSelectionAnchor: { type: "boolean", default: true, label: "Alinear selección en menús", control: "toggle", options: [false, true], description: "Alinea la opción seleccionada con su control cuando la lista completa cabe en pantalla." },
         pillBlur: { type: "boolean", default: false, label: "Desenfoque de la pill", control: "toggle", options: [false, true], availability: "inactive", description: "Se conserva en la configuración, pero no tiene consumidor activo." },
         topGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación superior", control: "number", description: "Multiplicador del espacio entre Isla y el borde superior." },
@@ -123,11 +124,13 @@ var surfaces = [
     { id: "calendar", label: "Calendario", availability: "routed", dependsOn: ["system-clock"], optionalDependsOn: ["curl", "weather.wttr.in"] },
     { id: "clipboard", label: "Portapapeles", availability: "routed", dependsOn: ["cliphist"], optionalDependsOn: ["wl-copy", "magick"] },
     { id: "connectivity", label: "Conectividad", availability: "routed", dependsOn: ["nmcli.wifi"], optionalDependsOn: ["quickshell.bluetooth.defaultAdapter"] },
+    { id: "focus", label: "Enfoque", availability: "routed", dependsOn: [], optionalDependsOn: [] },
     { id: "launcher", label: "Lanzador", availability: "routed", dependsOn: ["desktop-entries", "quickshell.execDetached"], optionalDependsOn: [] },
     { id: "media", label: "Multimedia", availability: "routed", dependsOn: [], optionalDependsOn: ["mpris.players", "cava"] },
     { id: "mixer", label: "Mezclador", availability: "routed", dependsOn: [], optionalDependsOn: ["pipewire.defaultAudioSink"] },
     { id: "notifs", label: "Notificaciones", availability: "routed", dependsOn: ["quickshell.notification-server"], optionalDependsOn: [] },
     { id: "overview", label: "Vista general", availability: "routed", dependsOn: ["hyprland.monitors", "hyprland.workspaces", "hyprland.toplevels"], optionalDependsOn: [] },
+    { id: "recording", label: "Grabación de pantalla", availability: "routed", dependsOn: [], optionalDependsOn: ["gpu-screen-recorder"] },
     { id: "session", label: "Sesión y energía", availability: "routed", dependsOn: ["island.session"], optionalDependsOn: ["island.lockscreen", "hyprctl", "systemctl"] },
     { id: "settings", label: "Ajustes Edots", availability: "routed", dependsOn: ["settings.config"], optionalDependsOn: [] },
     { id: "utils", label: "Controles rápidos", availability: "routed", dependsOn: [], optionalDependsOn: ["systemd-inhibit", "sysfs.backlight", "powerprofilesctl"] },
@@ -136,6 +139,7 @@ var surfaces = [
 ]
 
 var capabilities = [
+    { id: "gpu-screen-recorder", label: "Grabación por GPU", availability: "runtime-conditional", detectedBy: "Recording.connected", condition: "gpu-screen-recorder disponible y portal ScreenCast de Wayland operativo." },
     { id: "hyprland.monitors", label: "Monitores Hyprland", availability: "runtime", detectedBy: "IslandOverlay" },
     { id: "hyprland.workspaces", label: "Workspaces Hyprland", availability: "runtime", detectedBy: "WorkspaceModel" },
     { id: "hyprland.toplevels", label: "Ventanas Hyprland", availability: "runtime", detectedBy: "TopSystemStatus / WinMap" },

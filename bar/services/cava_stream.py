@@ -2,12 +2,12 @@
 """Emit Cava ASCII bands for one exact MPRIS player's PulseAudio stream."""
 
 import argparse
-import ctypes
 import errno
 import json
 import os
 from pathlib import Path
-import selectors
+import re
+import select
 import signal
 import subprocess
 import sys
@@ -15,21 +15,15 @@ import tempfile
 import time
 
 from audio_discovery import stream_identity
+from process_lifetime import die_with_parent
 
 
 BARS = 24
 MAX_BAND = 65535
 ZERO = " ".join(["0"] * BARS)
-PR_SET_PDEATHSIG = 1
-LIBC = ctypes.CDLL(None, use_errno=True)
-
-
-def die_with_parent(expected_parent):
-    """Linux: kill the child even if the helper itself is killed without cleanup."""
-    if LIBC.prctl(PR_SET_PDEATHSIG, signal.SIGKILL, 0, 0, 0) != 0:
-        os._exit(1)
-    if os.getppid() != expected_parent:
-        os._exit(1)
+# Each pactl query emits client events itself; reacting to those loops forever.
+DISCOVERY_EVENT = re.compile(rb" on (?:sink-input|sink|server)(?:\s|$)")
+CLIENT_EVENT = re.compile(rb"'change' on client #(\d+)(?:\s|$)")
 
 
 def _token(value):
@@ -86,6 +80,21 @@ def snapshot():
                                    capture_output=True, check=True, timeout=2)
         result[kind] = json.loads(completed.stdout)
     return result
+
+
+def stream_clients(state):
+    owners = {str(item.get("client") if item.get("client") is not None
+                  else (item.get("properties") or {}).get("client.id", ""))
+              for item in state.get("sink-inputs") or []}
+    return owners | {str(client.get("index")) for client in state.get("clients") or []
+                     if str((client.get("properties") or {}).get("object.id")) in owners}
+
+
+def discovery_event(line, clients):
+    if DISCOVERY_EVENT.search(line):
+        return True
+    match = CLIENT_EVENT.search(line)
+    return bool(match and match[1].decode("ascii") in clients)
 
 
 def config(fifo):
@@ -186,14 +195,16 @@ class Capture:
         self.cava = None
         self.frames.clear()
 
-    def pump(self, timeout):
-        if not self.cava or not self.parec:
-            time.sleep(timeout)
-            return
-        with selectors.DefaultSelector() as selected:
-            selected.register(self.cava.stdout, selectors.EVENT_READ)
-            for key, _ in selected.select(timeout):
-                data = os.read(key.fileobj.fileno(), 65536)
+    def pump(self, timeout, events=None):
+        readers = [events] if events else []
+        if self.cava and self.parec:
+            readers.append(self.cava.stdout)
+        event_data = None
+        for source in select.select(readers, [], [], timeout)[0]:
+            if source is events:
+                event_data = os.read(source.fileno(), 4096)
+            else:
+                data = os.read(source.fileno(), 65536)
                 if not data:
                     raise RuntimeError("audio child exited")
                 self.frames.extend(data)
@@ -210,6 +221,7 @@ class Capture:
                             print(" ".join(map(str, bands)), flush=True)
                 if len(self.frames) > 4096:
                     self.frames.clear()
+        return event_data
 
 
 def main():
@@ -227,17 +239,41 @@ def main():
     signal.signal(signal.SIGTERM, request_stop)
     signal.signal(signal.SIGINT, request_stop)
     active = None
+    selected = None
+    clients = set()
     last_zero = 0.0
+    subscription = None
+    event_buffer = b""
+    retry_at = 0.0
+    refresh_at = 0.0
     with tempfile.TemporaryDirectory(prefix="isla-cava-") as directory:
         capture = Capture(directory)
         try:
             while not stopping:
                 started = time.monotonic()
-                try:
-                    selected = select_stream(snapshot(), args.identity, args.desktop, args.bus)
-                except (OSError, subprocess.SubprocessError, ValueError, json.JSONDecodeError) as exc:
-                    print(f"cava_stream: discovery: {exc}", file=sys.stderr)
-                    selected = None
+                if subscription is None and started >= retry_at:
+                    try:
+                        parent = os.getpid()
+                        subscription = subprocess.Popen(
+                            ["pactl", "subscribe"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                            env={**os.environ, "LC_ALL": "C"},
+                            preexec_fn=lambda: die_with_parent(parent))
+                        event_buffer = b""
+                        refresh_at = started
+                    except OSError as exc:
+                        print(f"cava_stream: subscription: {exc}", file=sys.stderr)
+                        retry_at = started + 1
+                if started >= refresh_at:
+                    try:
+                        state = snapshot()
+                        clients = stream_clients(state)
+                        selected = select_stream(state, args.identity, args.desktop, args.bus)
+                        # Reconcile rarely as well: servers can omit metadata events.
+                        refresh_at = started + (30 if subscription else 1)
+                    except (OSError, subprocess.SubprocessError, ValueError, json.JSONDecodeError) as exc:
+                        print(f"cava_stream: discovery: {exc}", file=sys.stderr)
+                        selected = None
+                        refresh_at = time.monotonic() + 1
                 if selected != active or (selected and
                                           (capture.cava.poll() is not None or capture.parec.poll() is not None)):
                     capture.stop()
@@ -253,15 +289,36 @@ def main():
                     print(ZERO, flush=True)
                     last_zero = started
                 while not stopping and time.monotonic() - started < 1:
+                    now = time.monotonic()
+                    if now >= refresh_at:
+                        break
                     try:
-                        capture.pump(min(0.1, max(0, 1 - (time.monotonic() - started))))
+                        data = capture.pump(min(0.1, max(0, 1 - (now - started)),
+                                                max(0, refresh_at - now)),
+                                            subscription.stdout if subscription else None)
+                        if data == b"":
+                            stop_process(subscription)
+                            subscription = None
+                            capture.stop()
+                            active = selected = None
+                            retry_at = refresh_at = time.monotonic() + 1
+                        elif data:
+                            event_buffer += data
+                            while b"\n" in event_buffer:
+                                line, event_buffer = event_buffer.split(b"\n", 1)
+                                if discovery_event(line, clients):
+                                    refresh_at = min(refresh_at, time.monotonic() + 0.05)
+                            if len(event_buffer) > 4096:
+                                event_buffer = b""
                     except (OSError, RuntimeError) as exc:
                         print(f"cava_stream: stream: {exc}", file=sys.stderr)
                         capture.stop()
                         active = None
+                        refresh_at = time.monotonic()
                         break
         finally:
             capture.stop()
+            stop_process(subscription)
 
 
 if __name__ == "__main__":

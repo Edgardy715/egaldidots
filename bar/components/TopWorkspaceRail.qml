@@ -11,13 +11,21 @@ Item {
     property var occupied: ({})
     property real s: 1
     property bool integrated: false
+    property bool animateChanges: true
     property string style: "numbers"
     property real availableWidth: 320
     property int hoverId: 0
     onVisibleChanged: if (!visible) {
         hoverId = 0
+        root.finishResize()
         lens.lensX = lens.targetX
         lens.velocityX = 0
+    }
+    function finishResize() {
+        resizeBehavior.enabled = false
+        root.width = root.targetWidth
+        root.width = Qt.binding(() => root.targetWidth)
+        resizeBehavior.enabled = Qt.binding(() => root.visible && root.animateChanges && !Flags.reduceMotion)
     }
     signal requestWorkspaces()
     signal workspaceRequested(int id)
@@ -25,8 +33,15 @@ Item {
     readonly property real navWidth: (integrated ? 40 : 68) * s
     readonly property real slot: Math.min((style === "numbers" ? (integrated ? 28 : 38) : (integrated ? 22 : 24)) * s, Math.max(19 * s, (availableWidth - navWidth - 8 * s) / count))
     readonly property real inset: 4 * s
-    readonly property bool fits: count > 0 && width <= availableWidth
-    width: navWidth + count * slot + inset * 2
+    readonly property real targetWidth: navWidth + count * slot + inset * 2
+    readonly property bool fits: count > 0 && targetWidth <= availableWidth
+    width: targetWidth
+    Behavior on width {
+        id: resizeBehavior
+        enabled: root.visible && root.animateChanges && !Flags.reduceMotion
+        SmoothedAnimation { velocity: -1; duration: Motion.morph }
+    }
+    onAnimateChangesChanged: if (!animateChanges) root.finishResize()
     height: 48 * s
     visible: fits
 
@@ -75,8 +90,8 @@ Item {
         visible: root.style === "numbers"
         objectName: "workspaceLens"
         readonly property int destination: root.hoverId > 0 ? root.hoverId : Math.max(1, root.activeId)
-        readonly property real targetX: root.navWidth + root.inset + (destination - 1) * root.slot
-            + (root.slot - lens.width) / 2
+        readonly property real targetX: Math.min(root.width - lens.width,
+            root.navWidth + root.inset + (destination - 1) * root.slot + (root.slot - lens.width) / 2)
         property real lensX: targetX
         property real velocityX: 0
         readonly property real distance: Math.abs(targetX - lensX)
@@ -89,7 +104,8 @@ Item {
         }
         x: lensX
         y: (root.height - height) / 2
-        width: (root.style === "numbers" ? (root.integrated ? 28 : 46) : 20) * root.s
+        width: (root.style === "numbers"
+            ? (root.integrated ? Math.min(28, root.slot / root.s) : 46) : 20) * root.s
         height: width
         radius: height / 2
         transform: Scale {
@@ -143,6 +159,7 @@ Item {
             target: Flags
             function onReduceMotionChanged() {
                 if (Flags.reduceMotion) {
+                    root.finishResize()
                     lens.lensX = lens.targetX
                     lens.velocityX = 0
                 }
@@ -192,6 +209,10 @@ Item {
                 id: cell
                 required property int index
                 readonly property int wsId: index + 1
+                readonly property real exposure: Math.max(0, Math.min(1,
+                    (root.width - root.navWidth - root.inset - x - root.slot * 0.75) / (root.slot * 0.25)))
+                opacity: exposure
+                enabled: exposure > 0.99
                 readonly property var workspaceState: root.occupied[wsId] || ({ occupied: false, urgent: false })
                 readonly property real centerDistance: Math.abs(lens.x + lens.width / 2
                     - (root.navWidth + root.inset + x + width / 2))

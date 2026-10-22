@@ -15,6 +15,7 @@ Item {
     Binding { target: root.router; property: "reduceMotion"; value: Flags.reduceMotion }
     Binding { target: root.router; property: "resultsDuration"; value: Motion.standard }
     Binding { target: root.router; property: "morphDuration"; value: Motion.morph }
+    Binding { target: Recording; property: "observe"; value: root.router.openSurface === "focus" || root.router.openSurface === "recording" || Recording.engaged || Recording.busy }
     Binding { target: Notifs; property: "centerOpen"; value: root.router.openSurface === "notifs" }
 
     Connections {
@@ -83,7 +84,7 @@ Item {
         focusedmon: true, focusedmonv2: true,
         openwindow: true, closewindow: true,
         movewindow: true, movewindowv2: true,
-        fullscreen: true,
+        fullscreen: true, urgent: true,
         monitoradded: true, monitoraddedv2: true, monitorremoved: true
     })
 

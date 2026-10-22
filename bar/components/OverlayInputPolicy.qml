@@ -19,6 +19,11 @@ QtObject {
     property real mediaY: 0
     property real mediaW: 0
     property real mediaH: 0
+    property bool recordingActive: false
+    property real recordingX: 0
+    property real recordingY: 0
+    property real recordingW: 0
+    property real recordingH: 0
     property bool sessionActive: false
     property real sessionX: 0
     property real sessionY: 0
@@ -53,14 +58,17 @@ QtObject {
     readonly property real baseW: Math.max(pillWidth, pillTargetW)
     readonly property real baseH: Math.max(pillHeight, pillTargetH)
     readonly property real maskX: Math.min(pillX + (pillWidth - baseW) / 2,
-        sessionActive ? sessionX : pillX, settingsActive ? settingsX : pillX)
+        recordingActive ? recordingX : pillX, sessionActive ? sessionX : pillX, settingsActive ? settingsX : pillX)
     readonly property real maskY: Math.min(pillY, mediaActive ? mediaY : pillY,
+        recordingActive ? recordingY : pillY, sessionActive ? sessionY : pillY,
         settingsActive ? settingsY : pillY)
     readonly property real maskW: Math.max(pillX + baseW,
         mediaActive ? mediaX + mediaW : pillX + baseW,
+        recordingActive ? recordingX + recordingW : pillX + baseW,
         settingsActive ? settingsX + settingsW : pillX + baseW) - maskX
     readonly property real maskH: Math.max(pillY + baseH,
         mediaActive ? mediaY + mediaH : pillY + baseH,
+        recordingActive ? recordingY + recordingH : pillY + baseH,
         sessionActive ? sessionY + sessionH : pillY + baseH,
         settingsActive ? settingsY + settingsH : pillY + baseH) - maskY
 
@@ -69,10 +77,12 @@ QtObject {
             && y >= pillY && y <= pillY + baseH
         var inMedia = mediaActive && x >= mediaX && x <= mediaX + mediaW
             && y >= mediaY && y <= mediaY + mediaH
+        var inRecording = recordingActive && x >= recordingX && x <= recordingX + recordingW
+            && y >= recordingY && y <= recordingY + recordingH
         var inSession = sessionActive && x >= sessionX && x <= sessionX + sessionW
             && y >= sessionY && y <= sessionY + sessionH
         var inSettings = settingsActive && x >= settingsX && x <= settingsX + settingsW
             && y >= settingsY && y <= settingsY + settingsH
-        return !inPill && !inMedia && !inSession && !inSettings
+        return !inPill && !inMedia && !inRecording && !inSession && !inSettings
     }
 }

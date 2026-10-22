@@ -39,6 +39,7 @@ Item {
     property alias bgRect: _surfaceBg
 
     signal requestClose()
+    signal feedbackRequested(string kind)
 
     // Los márgenes pertenecen al contrato visual de cada surface. Aplicarlos
     // aquí mantiene el contenido dentro del vidrio y evita que los encabezados

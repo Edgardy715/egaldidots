@@ -95,7 +95,8 @@ ShellRoot {
             test.check(router.openSurface === "launcher", "first launcher request survives monitor startup")
             router.close()
             router.reduceMotion = true
-            router.close()
+            test.check(router.openSurface === "" && router.launcherClosePhase === 0,
+                       "enabling reduced motion resolves an in-flight close")
             router.focusedMonitorName = ""
             router.toggleSurface("", "calendar")
             router.toggleSurface("", "calendar")

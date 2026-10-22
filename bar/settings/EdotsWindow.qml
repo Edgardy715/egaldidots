@@ -38,8 +38,8 @@ FocusScope {
     readonly property var sections: ["appearance", "modules", "appearance", "appearance", "profile", "paths", "appearance"]
     readonly property var pageFields: [
         ["appearance.workspaceStyle", "appearance.glassAlpha", "appearance.materialDepth", "appearance.menuSelectionAnchor", "appearance.uiScale", "appearance.topGap", "appearance.appGap", "appearance.spacingScale", "appearance.radiusScale", "appearance.time12h"],
-        root.richComposition ? [] : ["appearance.barLayout"].concat(Object.keys(Config.schema.sections.modules).map(key => "modules." + key)),
-        ["appearance.motionScale", "appearance.reduceMotion", "appearance.mediaTransitions", "modules.animateChanges"],
+        ["appearance.barLayout"].concat(Object.keys(Config.schema.sections.modules).map(key => "modules." + key)),
+        ["appearance.motionScale", "appearance.reduceMotion", "appearance.mediaTransitions", "appearance.personality", "modules.animateChanges"],
         ["appearance.fontFamily", "appearance.fontMonoFamily", "appearance.fontDisplayFamily", "appearance.fontMediaFamily", "appearance.fontScale"],
         ["profile.displayName", "paths.userAvatar"],
         ["paths.paletteFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript", "appearance.pillBlur", "appearance.clockSeconds", "appearance.showGlyphs"],
@@ -240,9 +240,15 @@ FocusScope {
             Layout.fillWidth: true; Layout.fillHeight: true; spacing: 24
         SettingsPage {
             id: settingsPage; visible: !root.hyprlandActive && (search.text.length > 0 || pageMotion.displayedPage !== 1 || !root.richComposition)
+            // Update the form atomically: empty keys otherwise briefly build a whole section.
+            fieldSelection: {
+                const page = pageMotion.displayedPage
+                return { active: search.text.length > 0 || (page !== 6 && (page !== 1 || !root.richComposition)),
+                         section: root.sections[page], keys: root.pageFields[page] }
+            }
             Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumWidth: 260
             popupBounds: root
-            config: Config; section: root.sections[pageMotion.displayedPage]; fieldKeys: root.pageFields[pageMotion.displayedPage]; query: search.text
+            config: Config; query: search.text
             onEdited: root.feedback = ""
             onErrorFieldRequested: id => {
                 const dot = id.indexOf(".")

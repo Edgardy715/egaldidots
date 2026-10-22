@@ -18,22 +18,27 @@ Item {
     property var mediaPlayer: Players.active
     property string mediaArtUrl: Players.artUrl || ""
     readonly property real workspaceWidth: workspaceItem && workspaceItem.fits ? workspaceItem.width : 0
-    readonly property real mediaWidth: Math.min(mediaNaturalWidth, Math.max(76 * s,
-        availableWidth - (workspaceLoader.active ? (48 + (workspaceItem ? workspaceItem.count : 5) * 19) * s : 0) - 12 * s))
+    readonly property real workspaceMinimumWidth: (48 + (workspaceItem ? workspaceItem.count : 5) * 19) * s
+    readonly property bool reserveWorkspace: workspaceLoader.active
+        && workspaceMinimumWidth + 48 * s <= availableWidth
+    readonly property real mediaBudget: Math.min(mediaNaturalWidth, Math.max(36 * s,
+        availableWidth - (reserveWorkspace ? workspaceMinimumWidth : 0) - 12 * s))
+    // Below a readable line, reserve only the cover instead of an empty text column.
+    readonly property real mediaWidth: mediaBudget < 112 * s ? 36 * s : mediaBudget
     readonly property real mediaNaturalWidth: Math.min(256 * s,
-        48 * s + Math.min(174 * s, Math.max(mediaTitleMetrics.width, mediaArtistMetrics.width)) + 34 * s)
+        48 * s + Math.min(174 * s, Math.max(64 * s, mediaTitleMetrics.width, mediaArtistMetrics.width)) + 34 * s)
     TextMetrics {
         id: mediaTitleMetrics
         text: mediaSession.title
         font.family: Theme.font
-        font.pixelSize: 13 * root.s
+        font.pixelSize: Theme.fontSizeBodyLg * root.s
         font.weight: Font.Medium
     }
     TextMetrics {
         id: mediaArtistMetrics
         text: mediaSession.artist
         font.family: Theme.font
-        font.pixelSize: 11 * root.s
+        font.pixelSize: Theme.fontSizeSmall * root.s
     }
     readonly property real leftWidth: workspaceWidth
         + (mediaLoader.active ? mediaWidth + (workspaceWidth > 0 ? 12 * s : 0) : 0)
@@ -48,7 +53,7 @@ Item {
     readonly property alias statusModule: statusLoader
     readonly property alias mediaModule: mediaLoader
     readonly property bool cavaActive: compact && mediaLoader.interactive && visible
-        && mediaSession.isPlaying && mediaWidth >= 130 * s
+        && mediaSession.isPlaying && mediaWidth >= 146 * s
     readonly property string cavaConsumerId: "compact-media:" + screenName
     onCavaActiveChanged: Cava.setConsumer(cavaConsumerId, cavaActive)
     Component.onCompleted: Cava.setConsumer(cavaConsumerId, cavaActive)
@@ -72,6 +77,7 @@ Item {
             s: root.s
             integrated: root.compact
             style: Config.appearance.workspaceStyle
+            animateChanges: Config.modules.animateChanges
             WorkspaceModel { id: workspaceData; screenName: root.screenName }
             activeId: workspaceData.activeId
             count: workspaceData.count
@@ -139,6 +145,8 @@ Item {
             title: mediaSession.title
             artist: mediaSession.artist
             artUrl: root.mediaArtUrl
+            hasProgress: mediaSession.canSeek
+            progress: mediaSession.progress
             playing: mediaSession.isPlaying
             hasFrame: Cava.hasFrame
             values: Cava.values
@@ -149,9 +157,10 @@ Item {
     Repeater {
         model: [
             { position: 18 * root.s + root.workspaceWidth + 6 * root.s,
+                exposure: Math.min(workspaceLoader.exposure, mediaLoader.exposure),
                 shown: root.workspaceWidth > 0 && mediaLoader.active },
-            { position: root.clockX - 9 * root.s, shown: root.leftWidth > 0 },
-            { position: root.clockX + root.centerWidth + 9 * root.s, shown: root.rightWidth > 0 }
+            { position: root.clockX - 9 * root.s, exposure: Math.max(workspaceLoader.exposure, mediaLoader.exposure), shown: root.leftWidth > 0 },
+            { position: root.clockX + root.centerWidth + 9 * root.s, exposure: Math.max(statusLoader.exposure, userLoader.exposure), shown: root.rightWidth > 0 }
         ]
         Rectangle {
             required property var modelData
@@ -160,8 +169,8 @@ Item {
             width: Theme.borderHairline
             height: 20 * root.s
             color: Theme.hair
-            opacity: 0.65
-            visible: root.compact && root.presented && root.contentFits && modelData.shown
+            opacity: 0.65 * modelData.exposure
+            visible: root.compact && root.contentFits && modelData.shown && opacity > 0
         }
     }
 

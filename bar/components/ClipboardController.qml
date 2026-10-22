@@ -9,6 +9,11 @@ Item {
     property string query: ""
     property var entries: []
     property var savedEntries: []
+    readonly property var savedEntriesById: {
+        const result = ({})
+        for (const entry of savedEntries) result[entry.id] = entry
+        return result
+    }
     property var sessionSavedIds: ({})
     property var collections: []
     property string section: "history"
@@ -24,6 +29,7 @@ Item {
     property var libraryRefresh: null
     signal libraryActionFinished(string action, bool success, string entryId)
     readonly property string libraryScript: Qt.resolvedUrl("../services/clipboard_library.py").toString().replace(/^file:\/\//, "")
+    readonly property string libraryListScript: Qt.resolvedUrl("../services/clipboard-list.sh").toString().replace(/^file:\/\//, "")
     property var filteredEntries: []
     property bool loading: true
     property bool copying: false
@@ -52,7 +58,7 @@ Item {
         running: true
         stdout: StdioCollector { onStreamFinished: root.previewDir = text.trim() }
     }
-    ListModel { id: previewJobs }
+    ListModel { id: previewJobs; objectName: "clipboardPreviewJobs" }
     ListModel { id: textJobs }
     Repeater {
         model: textJobs
@@ -143,6 +149,16 @@ Item {
             var failures = Object.assign({}, previewFailures)
             failures[key] = true
             previewFailures = failures
+        }
+        if (source.length || failed) Qt.callLater(() => root.removePreviewJob(id, selected))
+    }
+    function removePreviewJob(id, selected) {
+        for (var i = 0; i < previewJobs.count; i++) {
+            const job = previewJobs.get(i)
+            if (job.entryId === id && job.selectedPreview === selected) {
+                previewJobs.remove(i)
+                return
+            }
         }
     }
     function requestText(id) {
@@ -242,8 +258,9 @@ Item {
             if (parts.length >= 2) {
                 var content = parts.slice(1).join("\t")
                 var isImage = content.startsWith("[[ binary data ") && content.endsWith("]]")
-                var saved = savedEntries.find(function(e) { return e.id === sessionSavedIds[parts[0]] })
+                var saved = savedEntriesById[sessionSavedIds[parts[0]]]
                 parsed.push({id: parts[0], text: isImage ? "" : (saved ? saved.text : content),
+                    historyText: isImage ? "" : content,
                     isImage: isImage, preview: isImage ? content : content.substring(0, 100),
                     saved: !!saved, savedId: saved ? saved.id : "", collectionId: saved ? saved.collectionId : ""})
             }
@@ -278,7 +295,8 @@ Item {
         libraryOutputText = ""
         libraryOutputReady = false
         libraryExited = false
-        libraryProcess.command = ["python3", libraryScript, action].concat(args)
+        libraryProcess.command = action === "list" ? ["sh", libraryListScript]
+            : ["python3", libraryScript, action].concat(args)
         libraryProcess.running = true
         return true
     }
@@ -372,8 +390,8 @@ Item {
                     return Object.assign({}, e, {saved: true})
                 })
                 root.entries = root.entries.map(function(e) {
-                    var saved = root.savedEntries.find(function(item) { return item.id === root.sessionSavedIds[e.id] })
-                    return Object.assign({}, e, {text: saved ? saved.text : e.preview, saved: !!saved,
+                    var saved = root.savedEntriesById[root.sessionSavedIds[e.id]]
+                    return Object.assign({}, e, {text: saved ? saved.text : (e.historyText === undefined ? e.text : e.historyText), saved: !!saved,
                         savedId: saved ? saved.id : "", collectionId: saved ? saved.collectionId : ""})
                 })
                 if (root.section !== "history" && root.section !== "saved" &&

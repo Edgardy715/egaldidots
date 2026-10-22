@@ -13,6 +13,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QSet>
 #include <QFutureWatcher>
+#include <QPointer>
 #include <algorithm>
 
 static QString thumbMetadataPath(const QString &cachePath) {
@@ -143,37 +144,57 @@ WallpaperScanner::WallpaperScanner(QObject *parent) : QObject(parent) {}
 
 void WallpaperScanner::startScan(const QString &wallDir, const QString &cacheDir,
                                  int thumbW, int thumbH, int quality) {
-    const int serial = ++m_scanSerial;
+    m_pendingScan = {wallDir, cacheDir, thumbW, thumbH, quality, ++m_scanSerial};
+    if (!m_scanRunning)
+        startPendingScan();
+}
 
-    QDir().mkpath(cacheDir);
+void WallpaperScanner::startPendingScan() {
+    const auto request = m_pendingScan;
+    m_scanRunning = true;
+    auto *watcher = new QFutureWatcher<QJsonArray>(this);
+    connect(watcher, &QFutureWatcher<QJsonArray>::finished, this, [this, watcher, serial = request.serial]() {
+        const auto result = watcher->result();
+        watcher->deleteLater();
+        m_scanRunning = false;
+        if (serial != m_scanSerial) {
+            startPendingScan();
+            return;
+        }
+        m_doneSerial = serial;
+        const QPointer<WallpaperScanner> guard(this);
+        emit scanDone(result);
+        if (guard && serial == m_scanSerial)
+            emit scanFinished();
+    });
+    watcher->setFuture(QtConcurrent::run([request]() {
+        QDir().mkpath(request.cacheDir);
 
-    QStringList images;
-    QDirIterator it(wallDir, QDir::Files | QDir::Readable);
-    while (it.hasNext()) {
-        it.next();
-        if (isValidImage(it.filePath()))
-            images.append(it.filePath());
-    }
-    images.sort(Qt::CaseInsensitive);
+        QStringList images;
+        QDirIterator it(request.wallDir, QDir::Files | QDir::Readable);
+        while (it.hasNext()) {
+            it.next();
+            if (isValidImage(it.filePath()))
+                images.append(it.filePath());
+        }
+        images.sort(Qt::CaseInsensitive);
 
-    QJsonArray result;
-    for (const auto &abs : images) {
-        QFileInfo fi(abs);
-        QString thumbFile = cacheDir + "/" + scanHash(abs) + ".jpg";
+        QJsonArray result;
+        for (const auto &abs : images) {
+            QFileInfo fi(abs);
+            QString thumbFile = request.cacheDir + "/" + scanHash(abs) + ".jpg";
 
-        QJsonObject rec;
-        rec.insert("path", abs);
-        rec.insert("name", fi.fileName());
-        rec.insert("baseName", fi.completeBaseName());
-        rec.insert("thumb", thumbFile);
-        rec.insert("thumbReady", isCurrentThumbnail(abs, thumbFile, thumbW, thumbH, quality));
-        result.append(rec);
-    }
-
-    emit scanDone(result);
-
-    if (serial == m_scanSerial)
-        emit scanFinished();
+            QJsonObject rec;
+            rec.insert("path", abs);
+            rec.insert("name", fi.fileName());
+            rec.insert("baseName", fi.completeBaseName());
+            rec.insert("thumb", thumbFile);
+            rec.insert("thumbReady", isCurrentThumbnail(abs, thumbFile, request.thumbW,
+                                                       request.thumbH, request.quality));
+            result.append(rec);
+        }
+        return result;
+    }));
 }
 
 void WallpaperScanner::generateThumb(const QString &sourcePath,

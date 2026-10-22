@@ -317,3 +317,75 @@ Botón principal conserva forma/giro aprobados y comparte musicAccent; símbolo
 blanco/negro según luminancia del relleno efectivo. La surface emite luz radial
 interior desde el disco, más tenue al pausar, sin borde exterior ni loop adicional.
 La paleta cancela trabajos obsoletos y reintenta fallos de forma finita.
+
+### CAVA pequeño y aro compacto (2026-10-18)
+
+CompactMediaStatus recibe progreso de MediaSession desde composición y lo entrega
+al aro de portada. El CAVA pequeño compartido emite neón con el acento musical
+y energía real sobre una única capa de las cinco barras; sin reloj adicional
+ni cambio de alturas/eje. Pausa, falta de señal, ocultación y movimiento reducido
+desactivan la capa. El recorte existente conserva la separación con portada.
+
+### Cambio de pista en reposo (2026-10-18)
+
+Por petición del usuario, portadas de reposo compacto/split acompañan cambios
+de título/artista con compresión discreta (máximo7%; impulso Motion.press y
+respuesta Motion.standardSmall desde valor actual). No transforma aro ni hit
+target; misma portada de álbum también recibe señal. Nueva portada conserva
+decodificación/fundido existentes y entra4·s desde abajo, sobre imagen retenida.
+Metadatos funden con traslado4·s de salida/entrada en Motion.standardSmall.
+ArtworkImage/CrossfadeLabel tienen desplazamiento0 por defecto; opt-in de reposo
+no cambia panel, calendario, overview ni fondos. Expanded, hidden, reduced y
+mediaTransitions desactivado cancelan compresión; reapertura no repite cambios
+antiguos. No se anima progreso MPRIS ni se añade reloj continuo.
+
+## Respuesta semántica y compañero (2026-10-21)
+
+La recepción se expresa mediante un lavado radial finito dentro de PillMaterial,
+con color Theme/Matugen, sin mover ni estirar texto. El pulso sigue confirmaciones
+reales de servicios; clicks no equivalen a éxito. Eventos consecutivos durante
+una onda se agrupan sin reset de radio. Hidden/reduced terminan el efecto.
+
+El compañero original junto al reloj mira dentro de la pill y cambia expresión
+por actividad/resultado. Parpadea sólo ante interacción con cooldown, sin loop idle
+ni lectura global de cursor. Movimiento reducido elimina mirada, blink y viaje;
+la actividad conserva texto. appearance.personality lo desactiva. Carga es aviso
+compacto sin apertura/foco; info ordinaria no interrumpe surfaces activas.
+
+La petición de Shelf se retiró: esta gramática se aplica a surfaces existentes.
+Evidencia: docs/personality-2026-10-21/REPORT.md; fixtures personalidad/focus y
+notificaciones, además de compacta/motion. No sustituye contratos Fluid previos.
+
+### Afinado por valoración del usuario (2026-10-21)
+
+El pulso anterior resultaba demasiado intenso. La recepción queda como luz tenue
+acotada al borde inferior, sin aro expansivo ni invasión de todo el panel. Entrada
+y salida sinusoidales. El hover de los ojos no muestra tooltip: luz local y
+expresión acompañan la presión del control, con foco visible y target fijo.
+
+### Grabación y actividades (2026-10-21)
+
+Enfoque y grabación comparten surface mediante cambio finito de pestaña. El botón
+de grabación transforma disco en detener; el estado confirmado gobierna la pill.
+REC es una marca estable, sin parpadeo continuo. Pausa y desconexión se distinguen
+sin depender sólo del color. Cuenta atrás cancelable al abandonar el panel; una
+grabación real continúa. Reduced motion completa las transformaciones sin viaje.
+La implementación OBS inicial fue sustituida por captura directa por GPU. No
+simular progreso ni afirmar guardado/detención antes de que el grabador finalice.
+Sin proceso auxiliar con controles cerrados y sin captura; sin animación continua
+decorativa. El micrófono se activa explícitamente y el encoder no cae a CPU.
+
+Afinado de grabación tras valoración (2026-10-21): el botón protagonista pasa a
+barra de acción; radio y símbolo conservan morph finito. Tiempo/estado juntos y
+audio agrupado persisten durante captura, sin reordenar el panel al empezar.
+No altera servicio ni pill. Propuesta visual pendiente de aprobación del usuario.
+
+### Gota de grabación izquierda (2026-10-21)
+
+Recording.engaged se presenta en gota izquierda con motor compartido; música
+permanece derecha. Datos por propiedades, mismo reloj de servicio. Nunca duplicar
+REC en gota y header: recordingDetached dura hasta absorción completa. Si falta
+espacio o sesión/settings ocupan ese lado, volver al header. Sesión espera antes
+de salir. En compact, centro vertical coincide con barra; compactY mantiene
+bodyY por defecto para otras gotas. Texto se revela al caber y se retira al
+contraerse. Input sigue visualX/yPos reales, sin foco/modalidad en reposo.

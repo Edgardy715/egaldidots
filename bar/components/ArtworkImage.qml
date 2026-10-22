@@ -16,6 +16,7 @@ ClippingRectangle {
     property bool preloadAmbient: false
     property bool reducedMotion: Flags.reduceMotion
     property int duration: Motion.standard
+    property real swapTravel: 0
     property int activeSlot: 0
     property bool initialized: false
     property real blend: 0
@@ -89,6 +90,10 @@ ClippingRectangle {
         cache: true
         smooth: true
         z: root.effectiveSlot === 0 ? 0 : 1
+        transform: Translate {
+            y: root.reducedMotion || !root.transitionsEnabled ? 0 : root.swapTravel
+                * (root.effectiveSlot === 0 ? 0 : 1 - root.effectiveBlend)
+        }
         opacity: root.effectiveSlot === 0 ? 1 : root.effectiveBlend
         onStatusChanged: root.accept(first)
     }
@@ -101,6 +106,10 @@ ClippingRectangle {
         cache: true
         smooth: true
         z: root.effectiveSlot === 1 ? 0 : 1
+        transform: Translate {
+            y: root.reducedMotion || !root.transitionsEnabled ? 0 : root.swapTravel
+                * (root.effectiveSlot === 1 ? 0 : 1 - root.effectiveBlend)
+        }
         opacity: root.effectiveSlot === 1 ? 1 : root.effectiveBlend
         onStatusChanged: root.accept(second)
     }

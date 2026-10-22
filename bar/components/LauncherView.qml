@@ -298,6 +298,7 @@ Item {
             highlightRangeMode: ListView.ApplyRange
 
             delegate: AppItem {
+                enabled: root.active && !root.searching
                 width: ListView.view ? ListView.view.width : 0
                 s: root.s
                 revealDelay: Math.min(220, ListView.index * 28) * Motion.mult
@@ -398,11 +399,13 @@ Item {
     }
 
     function launchCurrent() {
+        if (!root.active) return
         if (root.showCalculator && root.calcResult) {
             root.copyResultRequested(root.calcResult)
             root.requestClose()
             return
         }
+        if (root.searching) return
         if (listView.count === 0) return
         var item = listView.currentItem
         if (item && item.modelData) {

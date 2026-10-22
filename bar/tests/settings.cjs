@@ -90,13 +90,13 @@ assert.deepEqual(Array.from(catalog.optionalModules, item => item.setting), [
     'modules.workspaceRail', 'modules.systemStatus', 'modules.apps',
     'modules.audio', 'modules.network', 'modules.userAvatar', 'modules.battery'
 ]);
-assert.equal(catalog.surfaces.length, 15);
+assert.equal(catalog.surfaces.length, 17);
 assert.deepEqual(Array.from(catalog.surfaces, item => item.id).sort(),
     fs.readdirSync(__dirname + '/../surfaces').filter(file => file.endsWith('Surface.qml'))
         .map(file => file.slice(0, -11).toLowerCase()).sort(), 'catalog covers every routed surface');
 assert.deepEqual(Array.from(catalog.surfaces, item => item.id), [
-    'appearance', 'auth', 'calendar', 'clipboard', 'connectivity', 'launcher',
-    'media', 'mixer', 'notifs', 'overview', 'session', 'settings', 'utils', 'wallpaper', 'workspaces'
+    'appearance', 'auth', 'calendar', 'clipboard', 'connectivity', 'focus', 'launcher',
+    'media', 'mixer', 'notifs', 'overview', 'recording', 'session', 'settings', 'utils', 'wallpaper', 'workspaces'
 ]);
 assert.ok(catalog.surfaces.every(surface => surface.availability === 'routed'
     && Array.isArray(surface.dependsOn) && Array.isArray(surface.optionalDependsOn)));

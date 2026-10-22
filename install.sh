@@ -132,6 +132,13 @@ install_config() {
     post_fisher
     install_gtk
     build_plugin
+    if command -v cargo >/dev/null 2>&1 || [[ -x "$HOME/.local/share/isla/cargo/bin/cargo" ]]; then
+        bash "$REPO/scripts/build-cava-helper.sh" || printf 'CAVA Rust build failed; Python fallback is available.\n' >&2
+        bash "$REPO/scripts/build-audio-peak.sh" || printf 'Rust peak build failed; Python fallback is available.\n' >&2
+        bash "$REPO/scripts/build-clipboard-list.sh" || printf 'Rust clipboard list build failed; Python fallback is available.\n' >&2
+    else
+        printf 'Skipping optional Rust helpers (cargo unavailable); using Python.\n'
+    fi
     seed_palette
     post_neovim
     bat cache --build

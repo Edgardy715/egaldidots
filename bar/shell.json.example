@@ -5,6 +5,7 @@
     "glassAlpha": 0.34,
     "materialDepth": 0.25,
     "mediaTransitions": true,
+    "personality": true,
     "menuSelectionAnchor": true,
     "pillBlur": false,
     "topGap": 1.0,

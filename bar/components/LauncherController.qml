@@ -18,7 +18,7 @@ Item {
     function evaluateMath(expr) { return Calculator.evaluate(expr) }
 
     onQueryChanged: {
-        searchDebounce.restart()
+        if (open && !closing) searchDebounce.restart()
 
         // Check for calculator mode
         var trimmed = query.trim()
@@ -35,7 +35,8 @@ Item {
     onOpenChanged: {
         if (open) {
             searchResults = []
-            lastQuery = ""
+            lastQuery = "\u0000"
+            if (!closing) searchDebounce.restart()
         } else searchDebounce.stop()
     }
     onClosingChanged: {
@@ -46,6 +47,7 @@ Item {
         id: searchDebounce
         interval: 80
         onTriggered: {
+            if (!root.open || root.closing) return
             if (root.lastQuery === root.query) return
             root.lastQuery = root.query
             root.searchResults = root.appService.search(root.query)

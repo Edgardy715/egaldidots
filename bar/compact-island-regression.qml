@@ -59,7 +59,7 @@ ShellRoot {
             when: scene.visible
             property bool finished: false
             function check(ok, message) {
-                if (!ok) { console.error("FAIL:", message); throw new Error(message) }
+                if (!ok) { console.error("FAIL:", message); Qt.exit(1); throw new Error(message) }
             }
             function shot(name) {
                 const dir = Quickshell.env("ISLA_COMPACT_SHOTS")
@@ -67,11 +67,28 @@ ShellRoot {
             }
             function settle() {
                 wait(700)
-                if (!pill.surfaceOpen) tryVerify(() => Math.abs(pill.width - pill.restW) < 1, 2500)
+                if (!pill.surfaceOpen) {
+                    tryVerify(() => Math.abs(pill.width - pill.restW) < 1 && Math.abs(pill.height - pill.coreH) < 0.01, 2500)
+                    tryVerify(() => pill.restHeaderOpacity > 0.99, 2500)
+                }
+            }
+            function sampleMorph(name) {
+                const start = Date.now()
+                for (let frame = 0; frame < 18; frame++) {
+                    wait(24)
+                    if (Quickshell.env("ISLA_COMPACT_FRAMES")) {
+                        shot(name + "-" + frame)
+                        console.log("FRAME_SAMPLE", name, frame, Date.now() - start,
+                            pill.width, pill.height, modules.contentFits, modules.statusModule.exposure)
+                    }
+                    if (modules.statusModule.interactive)
+                        check(modules.statusModule.x >= modules.clockX + pill.restCenterWidth + 16,
+                            "sampled return keeps status clear of clock")
+                }
             }
             function checkBounds() {
                 check(pill.width <= scene.width + 1, "unit fits monitor: " + pill.width + "/" + scene.width)
-                check(Math.abs(pill.height - 56) < 0.01, "rest height")
+                check(Math.abs(pill.height - 56) < 0.01, "rest height: " + pill.height + " target=" + pill.targetH + " surface=" + pill.surface + " reduced=" + Flags.reduceMotion)
                 for (const module of [modules.workspaceModule, modules.statusModule, modules.userModule, modules.mediaModule]) {
                     if (!module.interactive) continue
                     check(module.x >= 0 && module.x + module.width <= pill.width, "module inside body horizontally")
@@ -107,9 +124,19 @@ ShellRoot {
                 checkBounds()
                 check(modules.mediaModule.interactive && modules.mediaModule.item.playing, "music integrated inside unit")
                 check(!findChild(modules.mediaModule.item, "compactMediaToggle"), "compact music has no transport button")
+                check(modules.mediaModule.item.hasProgress, "compact progress ring is enabled for a timed player")
+                check(modules.mediaModule.item.progress > 0.3, "compact progress ring receives the session clock")
                 player.isPlaying = false
+                player.position = 120
+                check(Math.abs(modules.mediaModule.item.progress - 0.5) < 0.001, "paused/external seek updates compact ring")
+                player.length = 0
+                check(!modules.mediaModule.item.hasProgress, "unknown duration hides compact ring")
+                player.length = 240
                 check(!modules.cavaActive, "paused music releases CAVA consumer")
-                modules.mediaModule.item.requestMedia()
+                const openHit = findChild(modules.mediaModule.item, "compactMediaOpen")
+                openHit.forceActiveFocus()
+                check(openHit.activeFocus, "integrated music accepts keyboard focus")
+                keyClick(Qt.Key_Return)
                 settle()
                 check(pill.surface === "media" && pill.surfaceItem && pill.surfaceContentProgress > 0.99, "music opens in main body")
                 pill.surface = ""
@@ -122,10 +149,18 @@ ShellRoot {
                 }
                 settle()
                 checkBounds()
+                mouseClick(modules.mediaModule.item, modules.mediaWidth - 2, 19)
+                settle()
+                check(pill.surface === "media", "entire compact media row opens with pointer")
+                pill.surface = ""
+                settle()
                 scene.width = 620
                 settle()
                 checkBounds()
                 check(modules.mediaModule.interactive, "music remains accessible on narrow monitor")
+                check(modules.mediaWidth >= 112 || modules.mediaWidth === 36, "narrow music reserves a readable line or just the cover")
+                const lens = findChild(modules.workspaceItem, "workspaceLens")
+                check(lens.width <= modules.workspaceItem.slot, "workspace selection stays inside its cell")
                 shot("music-narrow")
                 scene.width = 1100
                 settle()
@@ -134,6 +169,20 @@ ShellRoot {
                 player.trackArtist = "Ana"
                 settle()
                 check(modules.mediaWidth < longMediaWidth, "short metadata releases unused width")
+                const summary = findChild(modules.mediaModule.item, "compactMediaSummary")
+                check(summary.textWidth >= 64, "short metadata remains readable rather than reserving an empty column")
+                check(Config.update({appearance: {fontScale: 1.5}}).ok)
+                settle()
+                check(summary.titlePixelSize === Theme.fontSizeBodyLg, "compact title respects global text scale")
+                check(summary.artistPixelSize === Theme.fontSizeSmall, "compact artist respects global text scale")
+                shot("large-text")
+                check(Config.update({appearance: {fontScale: 1}}).ok)
+                modules.workspaceItem.count = 30
+                settle()
+                check(modules.workspaceWidth === 0, "oversized workspace rail withdraws")
+                check(modules.mediaWidth === modules.mediaNaturalWidth, "hidden rail releases music width")
+                modules.workspaceItem.count = 5
+                settle()
                 checkBounds()
                 shot("music-short")
                 player.trackTitle = "Una canción de título largo"
@@ -144,6 +193,17 @@ ShellRoot {
                 tryVerify(() => modules.cavaActive, 1000, "resume reactivates compact visualizer")
                 wait(100)
                 shot("music-playing")
+                if (Quickshell.env("ISLA_COMPACT_FRAMES")) {
+                    for (let pass = 0; pass < 2; pass++) {
+                        pill.surface = "calendar"
+                        sampleMorph("calendar-open-" + pass)
+                        settle()
+                        pill.surface = ""
+                        sampleMorph("calendar-close-" + pass)
+                        settle()
+                        checkBounds()
+                    }
+                }
                 for (const name of ["mixer", "workspaces", "calendar", "launcher"]) {
                     pill.surface = name
                     settle()
@@ -157,6 +217,27 @@ ShellRoot {
                 pill.surface = "connectivity"
                 settle()
                 check(pill.surfaceContentProgress > 0.99, "reduced motion reveals narrower surface")
+                pill.surface = ""
+                settle()
+                checkBounds()
+                check(Config.update({appearance: {reduceMotion: false}}).ok)
+                for (const delay of [60, 160, 330]) {
+                    const start = Date.now()
+                    pill.surface = "calendar"
+                    wait(delay)
+                    shot("opening-" + delay)
+                    console.log("MOTION_SAMPLE", delay, Date.now() - start, pill.width, pill.height)
+                    pill.surface = "mixer"
+                    wait(60)
+                    pill.surface = ""
+                    settle()
+                    checkBounds()
+                }
+                pill.surface = "calendar"
+                wait(100)
+                check(Config.update({appearance: {reduceMotion: true}}).ok)
+                settle()
+                check(Math.abs(pill.height - pill.targetH) < 0.01, "reduced motion completes an in-flight morph")
                 pill.surface = ""
                 settle()
                 checkBounds()

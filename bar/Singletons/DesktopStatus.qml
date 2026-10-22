@@ -13,6 +13,13 @@ Singleton {
     readonly property bool capsLockOn: _capsLockOn
     property bool _capsLockOn: false
     property bool monitorServices: true
+    readonly property string batteryStatus: {
+        const device = UPower.displayDevice
+        if (!device || !device.ready || !device.isLaptopBattery || !device.isPresent) return ""
+        return device.state === UPowerDeviceState.Charging
+            || device.state === UPowerDeviceState.FullyCharged && !UPower.onBattery ? "charging"
+            : device.state === UPowerDeviceState.PendingCharge ? "paused" : "discharging"
+    }
 
     signal volumeOSD(real progress, bool muted)
     signal micOSD(real progress, bool muted)
@@ -20,12 +27,12 @@ Singleton {
     signal batteryOSD(int percent, string status)
 
     function showVolumeOSD() {
-        var sink = Pipewire.defaultAudioSink
+        var sink = root._pwSink
         if (sink && sink.audio)
             root.volumeOSD(sink.audio.muted ? 0 : sink.audio.volume, sink.audio.muted)
     }
     function showSourceVolumeOSD() {
-        var source = Pipewire.defaultAudioSource
+        var source = root._pwSource
         if (source && source.audio)
             root.micOSD(source.audio.muted ? 0 : source.audio.volume, source.audio.muted)
     }
@@ -34,7 +41,7 @@ Singleton {
             root.brightnessOSD(Brightness.percent / 100)
     }
     function adjustVolume(delta) {
-        var sink = Pipewire.defaultAudioSink
+        var sink = root._pwSink
         if (sink && sink.audio && sink.ready) {
             sink.audio.volume = Math.max(0, Math.min(1, sink.audio.volume + delta))
             root.showVolumeOSD()
@@ -109,62 +116,24 @@ Singleton {
         function onPercentageChanged() { root.showBatteryOSD() }
     }
 
-    property var _pwSink: Pipewire.defaultAudioSink
-    property var _pwAudio: null
-    property var _pwSource: Pipewire.defaultAudioSource
-    property var _pwSourceAudio: null
-    function rebindSink() {
-        audioSinkConn.target = root._pwSink
-        var audio = root._pwSink ? root._pwSink.audio : null
-        audioAudioConn.target = audio
-        root._pwAudio = audio
-    }
-    function rebindSource() {
-        audioSourceConn.target = root._pwSource
-        var audio = root._pwSource ? root._pwSource.audio : null
-        audioSourceAudioConn.target = audio
-        root._pwSourceAudio = audio
-    }
-    on_PwSinkChanged: if (root.monitorServices) rebindSink()
-    on_PwSourceChanged: if (root.monitorServices) rebindSource()
-    Timer {
-        interval: 500
-        repeat: true
-        running: root.monitorServices
-        onTriggered: {
-            var sink = Pipewire.defaultAudioSink
-            var audio = sink ? sink.audio : null
-            if (sink !== root._pwSink || audio !== root._pwAudio) {
-                root._pwSink = sink
-                root.rebindSink()
-            }
-            var source = Pipewire.defaultAudioSource
-            var sourceAudio = source ? source.audio : null
-            if (source !== root._pwSource || sourceAudio !== root._pwSourceAudio) {
-                root._pwSource = source
-                root.rebindSource()
-            }
-        }
-    }
-    Component.onCompleted: {
-        if (!root.monitorServices) return
-        root.rebindSink()
-        root.rebindSource()
-        getKbdState.running = true
-    }
+    property var _pwSink: Pipewire.defaultAudioSink || null
+    property var _pwAudio: root._pwSink ? root._pwSink.audio : null
+    property var _pwSource: Pipewire.defaultAudioSource || null
+    property var _pwSourceAudio: root._pwSource ? root._pwSource.audio : null
+    Component.onCompleted: if (root.monitorServices) getKbdState.running = true
     PwObjectTracker {
         objects: root.monitorServices ? [root._pwSink, root._pwSource].filter(node => node) : []
     }
     Connections {
         id: audioSinkConn
-        target: null
+        target: root._pwSink || null
         enabled: root.monitorServices
         ignoreUnknownSignals: true
         function onPropertiesChanged() { root.showVolumeOSD() }
     }
     Connections {
         id: audioAudioConn
-        target: null
+        target: root._pwAudio || null
         enabled: root.monitorServices
         ignoreUnknownSignals: true
         function onVolumesChanged() { root.showVolumeOSD() }
@@ -172,14 +141,14 @@ Singleton {
     }
     Connections {
         id: audioSourceConn
-        target: null
+        target: root._pwSource || null
         enabled: root.monitorServices
         ignoreUnknownSignals: true
         function onPropertiesChanged() { root.showSourceVolumeOSD() }
     }
     Connections {
         id: audioSourceAudioConn
-        target: null
+        target: root._pwSourceAudio || null
         enabled: root.monitorServices
         ignoreUnknownSignals: true
         function onVolumesChanged() { root.showSourceVolumeOSD() }

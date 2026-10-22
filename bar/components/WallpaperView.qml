@@ -135,7 +135,7 @@ Item {
         Column {
             x: 68 * s
             y: 16 * s
-            width: Math.min(root.mediaHas && root.width > 1000 * root.s && !root.compact ? 300 * root.s : root.width, Math.max(0, refreshButton.x - x - 78 * root.s))
+            width: Math.max(0, (headerMedia.visible ? headerMedia.x : refreshButton.x - 62 * root.s) - x - 16 * root.s)
             spacing: 3 * s
 
             Text {
@@ -248,17 +248,19 @@ Item {
         }
 
         Row {
+            id: headerMedia
+            objectName: "wallpaperHeaderMedia"
             anchors.right: refreshButton.left
             anchors.rightMargin: 116 * root.s
             anchors.verticalCenter: refreshButton.verticalCenter
             spacing: 10 * root.s
-            visible: root.mediaHas && root.width > 1000 * root.s && !root.compact
+            visible: root.mediaHas
 
             IslandMediaSummary {
                 s: root.s
                 coverDiameter: 32 * root.s
-                textWidth: 200 * root.s
-                spacing: 10 * root.s
+                textWidth: Math.max(0, Math.min(200 * root.s, root.width - 650 * root.s))
+                spacing: textWidth > 0 ? 10 * root.s : 0
                 metadataSpacing: 2 * root.s
                 titlePixelSize: 12.5 * root.s
                 artistPixelSize: 11 * root.s

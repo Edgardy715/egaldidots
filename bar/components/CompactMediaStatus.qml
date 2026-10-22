@@ -9,14 +9,18 @@ Item {
     property string title: ""
     property string artist: ""
     property string artUrl: ""
+    property bool hasProgress: false
+    property real progress: 0
     property bool playing: false
     property bool hasFrame: false
     property var values: []
-    readonly property bool showVisualizer: width >= 130 * s
+    readonly property bool showVisualizer: width >= 146 * s
     signal requestMedia()
     height: 38 * s
 
     IslandMediaSummary {
+        objectName: "compactMediaSummary"
+        trackTransitions: true
         musicAccent: root.musicAccent
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
@@ -28,15 +32,17 @@ Item {
             return remaining >= 64 * root.s ? remaining : 0
         }
         artUrl: root.artUrl
-        hasProgress: false
+        hasProgress: root.hasProgress
+        progress: root.progress
         title: root.title
         artist: root.artist
-        titlePixelSize: 13 * root.s
-        artistPixelSize: 11 * root.s
+        titlePixelSize: Theme.fontSizeBodyLg * root.s
+        artistPixelSize: Theme.fontSizeSmall * root.s
         showArtist: textWidth >= 50 * root.s && root.artist.length > 0
     }
     MotionArea {
         id: openHit
+        objectName: "compactMediaOpen"
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -45,9 +51,20 @@ Item {
         accessibleName: qsTr("Abrir música: %1 · %2").arg(root.title).arg(root.artist)
         onClicked: root.requestMedia()
     }
+    Rectangle {
+        anchors.fill: parent
+        anchors.margins: -2 * root.s
+        radius: 8 * root.s
+        color: "transparent"
+        border.width: Theme.borderHairline
+        border.color: Theme.accent
+        visible: openHit.activeFocus
+        Accessible.ignored: true
+    }
     IslandMediaVisualizer {
         musicAccent: root.musicAccent
         id: visualizer
+        enabled: false // The whole summary is one keyboard/pointer target.
         x: root.width - width
         anchors.verticalCenter: parent.verticalCenter
         s: root.s

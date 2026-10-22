@@ -36,6 +36,9 @@ Singleton {
     property int currentSsidQueryIndex: 0
     property var pendingConnection: null
     property list<var> activeProcesses: []
+    property bool _networkRefreshRunning: false
+    property bool _networkRefreshPending: false
+    property var _networkCallbacks: []
 
     readonly property alias connectionCheckTimer: connectionCheckTimer
     readonly property alias immediateCheckTimer: immediateCheckTimer
@@ -116,6 +119,7 @@ Singleton {
         proc.processFinished.connect(() => {
             const index = activeProcesses.indexOf(proc)
             if (index >= 0) activeProcesses.splice(index, 1)
+            proc.destroy()
         })
 
         Qt.callLater(() => { proc.exec(proc.cmdArgs) })
@@ -123,38 +127,51 @@ Singleton {
 
     // ── Redes ────────────────────────────────────────────────────────────────
     function getNetworks(callback: var): void {
+        if (callback) _networkCallbacks.push(callback)
+        if (_networkRefreshRunning) {
+            _networkRefreshPending = true
+            return
+        }
+        _networkRefreshRunning = true
+        const callbacks = _networkCallbacks
+        _networkCallbacks = []
         executeCommand(["-g", "ACTIVE,SIGNAL,FREQ,SSID,BSSID,SECURITY", "d", "w"], result => {
-            if (!result.success) { if (callback) callback([]); return }
+            if (result.success) {
+                const allNetworks = parseNetworkOutput(result.output)
+                const networks = deduplicateNetworks(allNetworks)
+                const rNetworks = root.networks
 
-            const allNetworks = parseNetworkOutput(result.output)
-            const networks = deduplicateNetworks(allNetworks)
-            const rNetworks = root.networks
+                const newMap = new Map()
+                for (const n of networks)
+                    newMap.set(`${n.frequency}:${n.ssid}:${n.bssid}`, n)
 
-            const newMap = new Map()
-            for (const n of networks)
-                newMap.set(`${n.frequency}:${n.ssid}:${n.bssid}`, n)
-
-            for (let i = rNetworks.length - 1; i >= 0; i--) {
-                const rn = rNetworks[i]
-                const key = `${rn.frequency}:${rn.ssid}:${rn.bssid}`
-                if (!newMap.has(key)) {
-                    rNetworks.splice(i, 1)
-                    rn.destroy()
+                for (let i = rNetworks.length - 1; i >= 0; i--) {
+                    const rn = rNetworks[i]
+                    const key = `${rn.frequency}:${rn.ssid}:${rn.bssid}`
+                    if (!newMap.has(key)) {
+                        rNetworks.splice(i, 1)
+                        rn.destroy()
+                    }
                 }
+
+                const existingMap = new Map()
+                for (const rn of rNetworks)
+                    existingMap.set(`${rn.frequency}:${rn.ssid}:${rn.bssid}`, rn)
+
+                for (const [key, network] of newMap) {
+                    const match = existingMap.get(key)
+                    if (match) match.lastIpcObject = network
+                    else rNetworks.push(apComp.createObject(root, { lastIpcObject: network }))
+                }
+
+                checkPendingConnection()
             }
-
-            const existingMap = new Map()
-            for (const rn of rNetworks)
-                existingMap.set(`${rn.frequency}:${rn.ssid}:${rn.bssid}`, rn)
-
-            for (const [key, network] of newMap) {
-                const match = existingMap.get(key)
-                if (match) match.lastIpcObject = network
-                else rNetworks.push(apComp.createObject(root, { lastIpcObject: network }))
+            for (const done of callbacks) done(result.success ? root.networks : [])
+            _networkRefreshRunning = false
+            if (_networkRefreshPending) {
+                _networkRefreshPending = false
+                getNetworks()
             }
-
-            if (callback) callback(root.networks)
-            checkPendingConnection()
         })
     }
 
@@ -420,17 +437,19 @@ Singleton {
 
     // ── Estado pendiente / monitoreo de conexión ─────────────────────────────
     function checkPendingConnection(): void {
-        if (root.pendingConnection) {
+        const pending = root.pendingConnection
+        if (pending) {
             Qt.callLater(() => {
-                const connected = root.active && root.active.ssid === root.pendingConnection.ssid
+                if (root.pendingConnection !== pending) return
+                const connected = root.active && root.active.ssid === pending.ssid
                 if (connected) {
                     connectionCheckTimer.stop()
                     immediateCheckTimer.stop()
                     immediateCheckTimer.checkCount = 0
-                    if (root.pendingConnection.callback) {
-                        root.pendingConnection.callback({ success: true, output: "Connected", error: "", exitCode: 0 })
-                    }
                     root.pendingConnection = null
+                    if (pending.callback) {
+                        pending.callback({ success: true, output: "Connected", error: "", exitCode: 0 })
+                    }
                 } else {
                     if (!immediateCheckTimer.running) immediateCheckTimer.start()
                 }
@@ -513,10 +532,11 @@ Singleton {
                     connectionCheckTimer.stop()
                     immediateCheckTimer.stop()
                     immediateCheckTimer.checkCount = 0
-                    if (root.pendingConnection.callback) {
-                        root.pendingConnection.callback({ success: true, output: "Connected", error: "", exitCode: 0 })
-                    }
+                    const pending = root.pendingConnection
                     root.pendingConnection = null
+                    if (pending.callback) {
+                        pending.callback({ success: true, output: "Connected", error: "", exitCode: 0 })
+                    }
                 } else if (checkCount >= 6) {
                     immediateCheckTimer.stop()
                     immediateCheckTimer.checkCount = 0
@@ -537,7 +557,8 @@ Singleton {
     Process {
         id: monitorProc
         running: true
-        command: ["nmcli", "monitor"]
+        command: ["python3", decodeURIComponent(Qt.resolvedUrl("../services/nmcli_monitor.py").toString().replace(/^file:\/\//, "")),
+                  Quickshell.processId.toString()]
         environment: ({ LANG: "C.UTF-8", LC_ALL: "C.UTF-8" })
         stdout: SplitParser {
             onRead: root.getNetworks(() => {})

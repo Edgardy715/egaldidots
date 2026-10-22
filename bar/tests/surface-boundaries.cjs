@@ -10,8 +10,8 @@ for (const module of ['workspaceModule', 'userModule', 'statusModule', 'mediaMod
 }
 const views = {
   Appearance: 'AppearanceView', Auth: 'AuthPromptView', Calendar: 'CalendarView',
-  Clipboard: 'ClipboardView', Connectivity: 'ConnectivityView', Launcher: 'LauncherView',
-  Media: 'MediaView', Mixer: 'MixerView', Notifs: 'NotifsView', Overview: 'OverviewView',
+  Clipboard: 'ClipboardView', Connectivity: 'ConnectivityView', Focus: 'ActivityView', Launcher: 'LauncherView',
+  Media: 'MediaView', Mixer: 'MixerView', Notifs: 'NotifsView', Overview: 'OverviewView', Recording: 'ActivityView',
   Session: 'SessionView', Utils: 'QuickControlsView', Wallpaper: 'WallpaperView', Workspaces: 'WorkspacesView'
 };
 const surfaces = fs.readdirSync(path.join(root, 'surfaces')).filter(n => n.endsWith('Surface.qml')).map(n => n.slice(0, -11)).sort();
@@ -19,16 +19,16 @@ assert.deepEqual(surfaces, [...Object.keys(views), 'Settings'].sort(), 'Every su
 assert.ok(fs.readFileSync(path.join(root, 'surfaces', 'SettingsSurface.qml'), 'utf8').includes('EdotsWindow'),
   'Settings surface hosts the existing Config editor');
 const forbidden = [
-  /\b(?:Players|Cava|Hyprland|WinMap|Apps|AppSearch|Auth|Config|Session|Nmcli|Bluetooth|Pipewire|Notifs|Wallpapers|KeepAwake|Brightness)\./,
+  /\b(?:Players|Cava|Hyprland|WinMap|Apps|AppSearch|Auth|Config|Session|Nmcli|Bluetooth|Pipewire|Notifs|Wallpapers|KeepAwake|Brightness|Recording|FocusSession)\./,
   /\b(?:Process|FileView|StdioCollector|XMLHttpRequest)\s*[{(]/,
   /\b(?:execDetached|openUrlExternally)\s*\(/,
   /\b\w+(?:Controller|Adapter|Session|Data)\s*\{/,
   /\.(?:invoke|lock|unlock|execute)\s*\(/
 ];
-for (const view of new Set([...Object.values(views), 'NotifCardView', 'PillHeaderView', 'PillMorphMotion', 'OverlayInputPolicy', 'CompactMediaStatus'])) {
+for (const view of new Set([...Object.values(views), 'FocusTimerView', 'RecordingView', 'RecordingGlyph', 'FluidRecordingCompanion', 'NotifCardView', 'PillHeaderView', 'PillMorphMotion', 'OverlayInputPolicy', 'CompactMediaStatus'])) {
   const file = path.join(root, 'components', view + '.qml');
   assert.ok(fs.existsSync(file), view + ' is missing');
   const code = fs.readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
   for (const expression of forbidden) assert.ok(!expression.test(code), view + ' crosses its presentation boundary: ' + expression);
 }
-console.log('PASS: 14 shell surfaces, settings editor, pill header/motion and overlay policy have audited boundaries');
+console.log('PASS: 16 shell surfaces, settings editor, activity views, pill header/motion and overlay policy have audited boundaries');

@@ -2,6 +2,19 @@
 import math
 import sys
 from array import array
+import ctypes
+import os
+from pathlib import Path
+
+
+try:
+    _library = ctypes.CDLL(str(Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local/share")
+                               / "isla/lib/libisla_audio_peak.so"))
+    _native_peak = _library.isla_peak_f32_v1
+    _native_peak.argtypes = (ctypes.c_void_p, ctypes.c_size_t)
+    _native_peak.restype = ctypes.c_float
+except (OSError, AttributeError):
+    _native_peak = None
 
 
 INTERVAL = 1 / 30
@@ -25,7 +38,10 @@ class PeakMeter:
         samples.frombytes(data[:length])
         if sys.byteorder != "little":
             samples.byteswap()
-        self.pending = max(self.pending, max((abs(sample) for sample in samples if math.isfinite(sample)), default=0))
+        # buffer_info points to this owned array, retained until the call returns.
+        peak = (_native_peak(*samples.buffer_info()) if _native_peak is not None else
+                max((abs(sample) for sample in samples if math.isfinite(sample)), default=0))
+        self.pending = max(self.pending, peak)
 
     def value(self, now):
         elapsed = max(0, now - self.last_tick)

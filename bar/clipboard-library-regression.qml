@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import QtTest
 import "components"
 
 ShellRoot {
@@ -16,6 +17,7 @@ ShellRoot {
         property bool textRequested: false
         property string lastLibraryAction: ""
         function fail(message) { console.error("FAIL: " + message); Qt.exit(1) }
+        TestCase { id: checks; when: false }
         ClipboardController {
             id: first
             open: true
@@ -38,7 +40,7 @@ ShellRoot {
                 if (first.errorMessage || reopened.errorMessage) { scene.fail("controller error: " + first.errorMessage + " " + reopened.errorMessage); return }
                 switch (scene.step) {
                 case 0:
-                    if (!first.loading && !first.libraryBusy && first.entries.length === 2) {
+                    if (!first.loading && !first.libraryBusy && first.entries.length === 3) {
                         if (!scene.textRequested) {
                             scene.textRequested = true
                             first.requestText(first.entries[0].id)
@@ -60,6 +62,13 @@ ShellRoot {
                     break
                 case 1:
                     if (!first.libraryBusy && first.savedEntries.length === 1) {
+                        first.query = "tail-history"
+                        first.filterEntries()
+                        if (first.filteredEntries.length !== 1 || first.filteredEntries[0].id !== "3") {
+                            scene.fail("library refresh truncated unsaved history text"); return
+                        }
+                        first.query = ""
+                        first.filterEntries()
                         scene.textId = first.savedEntries[0].id
                         if (first.savedEntries[0].text !== "full untruncated text\n" || first.entries[0].text !== "full untruncated text\n"
                                 || first.entries[0].preview !== "short" || first.savedEntries[0].collectionId !== scene.collectionId
@@ -109,7 +118,8 @@ ShellRoot {
                     }
                     break
                 case 61:
-                    if (first.previewSources[scene.imageId + "|thumb"]) {
+                    if (first.previewSources[scene.imageId + "|thumb"]
+                            && checks.findChild(first, "clipboardPreviewJobs").count === 0) {
                         first.clearHistory()
                         scene.step = 7
                     }
@@ -132,7 +142,8 @@ ShellRoot {
                     break
                 case 9:
                     if (reopened.previewFailures[scene.imageId + "|thumb"] || reopened.previewFailures[scene.imageId + "|full"]) { scene.fail("saved preview failed"); return }
-                    if (reopened.previewSources[scene.imageId + "|thumb"] && reopened.previewSources[scene.imageId + "|full"]) {
+                    if (reopened.previewSources[scene.imageId + "|thumb"] && reopened.previewSources[scene.imageId + "|full"]
+                            && checks.findChild(reopened, "clipboardPreviewJobs").count === 0) {
                         reopened.copyEntry(reopened.savedEntries.find(function(e) { return e.id === scene.textId }))
                         scene.step++
                     }

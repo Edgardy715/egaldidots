@@ -8,6 +8,7 @@ ShellRoot {
     property real maxDrift: 0
     property int inspectedBars: 0
     Window {
+        id: scene
         visible: true
         width: 180; height: 100
         color: Theme.background
@@ -34,10 +35,24 @@ ShellRoot {
         onTriggered: {
             inspectedBars = 0
             inspect(wave)
+            const glow = wave.children.find(child => child.objectName === "smallCavaGlow")
+            if (!glow || glow.layer.enabled !== (glow.energy > 0.001)) {
+                console.error("FAIL: small CAVA glow follows audio energy"); Qt.exit(1); return
+            }
+            if (sample === 40 || sample === 100) {
+                const dir = Quickshell.env("ISLA_TEST_OUTPUT")
+                const capturedSample = sample
+                if (dir) scene.contentItem.grabToImage(result => result.saveToFile(dir + "/cava-neon-" + capturedSample + ".png"))
+            }
             if (++sample > 120) {
+                wave.isPlaying = false
+                if (glow.layer.enabled) { console.error("FAIL: paused glow remains active"); Qt.exit(1); return }
+                wave.isPlaying = true
+                Config.update({appearance: {reduceMotion: true}})
+                if (glow.layer.enabled) { console.error("FAIL: reduced-motion glow remains active"); Qt.exit(1); return }
                 console.log("center drift", maxDrift)
                 if (inspectedBars !== 5 || maxDrift > 0.001) { console.error("FAIL: spectrum center moves with height"); Qt.exit(1) }
-                else { console.log("PASS: spectrum center fixed across fractional heights"); Qt.quit() }
+                else { console.log("PASS: spectrum center fixed across fractional heights; neon follows audio, pause and reduced motion"); Qt.quit() }
                 return
             }
             wave.s = sample > 60 ? 1.25 : 1

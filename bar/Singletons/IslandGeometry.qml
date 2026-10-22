@@ -20,9 +20,10 @@ Singleton {
     readonly property size sessionSurface: Qt.size(640, 470)
     readonly property size authSurface: Qt.size(0, 0)
     readonly property size overviewSurface: Qt.size(1000, 340)
-    readonly property size connectivitySurface: Qt.size(360, 400)
+    readonly property size connectivitySurface: Qt.size(460, 520 + Math.max(0, Flags.fontScale - 1.2) * 160)
     readonly property size clipboardSurface: Qt.size(680, 600)
     readonly property size settingsSurface: Qt.size(1000, 700)
+    readonly property size focusSurface: Qt.size(440, 560 + Math.max(0, Flags.fontScale - 1.2) * 240)
 
     readonly property var surfaceSizes: ({
         mixer: mixerSurface,
@@ -39,6 +40,8 @@ Singleton {
         overview: overviewSurface,
         connectivity: connectivitySurface,
         clipboard: clipboardSurface,
-        settings: settingsSurface
+        settings: settingsSurface,
+        focus: focusSurface,
+        recording: focusSurface
     })
 }

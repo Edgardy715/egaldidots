@@ -26,6 +26,7 @@ ClippingRectangle {
 
     signal requestClose()
     signal requestPage(string name)
+    signal feedbackRequested(string kind)
 
     readonly property var loadedItem: surfaceLoader.status === Loader.Ready
         ? surfaceLoader.item : null
@@ -145,5 +146,6 @@ ClippingRectangle {
         ignoreUnknownSignals: true
         function onRequestClose() { root.requestClose() }
         function onRequestPage(name) { root.requestPage(name) }
+        function onFeedbackRequested(kind) { if (root.open && !root.suspended) root.feedbackRequested(kind) }
     }
 }

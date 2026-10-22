@@ -10,6 +10,7 @@ Item {
     property real reveal: 1
     property bool initialized: false
     property bool animated: true
+    property real swapTravel: 0
     property int reservedLines: 0
     property alias font: incoming.font
     property alias color: incoming.color
@@ -63,6 +64,7 @@ Item {
         wrapMode: incoming.wrapMode
         maximumLineCount: incoming.maximumLineCount
         lineHeight: incoming.lineHeight
+        transform: Translate { y: -root.swapTravel * root.reveal }
         opacity: 1 - root.reveal
         visible: opacity > 0
         Accessible.ignored: true
@@ -72,6 +74,7 @@ Item {
         objectName: "crossfadeText"
         anchors.fill: parent
         text: root.displayed
+        transform: Translate { y: root.swapTravel * (1 - root.reveal) }
         opacity: root.reveal
     }
     NumberAnimation {

@@ -29,6 +29,7 @@ Singleton {
     readonly property string wallpaperApplyScript: _effective.paths.wallpaperApplyScript
     readonly property bool dirty: JSON.stringify(_document) !== JSON.stringify(_diskDocument)
     readonly property bool saving: _saveStage !== ""
+    signal saved()
     property string error: ""
     property bool loaded: false
 
@@ -159,6 +160,7 @@ Singleton {
             // Atomic replacement changes the watched inode. Reload re-arms the
             // native watcher; an identical reload need not emit loaded again.
             reload()
+            root.saved()
         }
         onSaveFailed: function(reason) {
             root.error = "Could not save settings (" + reason + ")"

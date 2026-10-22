@@ -5,6 +5,7 @@ QtObject {
     id: root
     property bool surfaceOpen: false
     property bool blocked: false
+    property bool deferInformational: false
     property int collapseDuration: 0
     property int expandDuration: 0
     property int holdDuration: 0
@@ -13,7 +14,7 @@ QtObject {
     property bool notifAnimating: false
     property bool surfaceNotifSuspended: false
     property real surfaceReveal: 1
-    signal advanceRequested()
+    signal advanceRequested(var notification)
 
     // ---- State machine: morph notif Dynamic Island ----
     // Ciclo: rest -> collapse(circle) -> expand(notif pill) -> hold(1-2s) -> collapse(circle) -> return(rest)
@@ -43,6 +44,8 @@ QtObject {
     }
     function syncPopup() {
         if (blocked) return
+        // Reading or editing keeps its geometry; critical requests still interrupt.
+        if (deferInformational && surfaceOpen && popup && !popup.isCritical && notifState === "idle") return
         if (popup) {
             // Si había una restauración pendiente y entra otra notificación,
             // mantenemos la surface fuera hasta que termine toda la secuencia.
@@ -142,12 +145,14 @@ QtObject {
         repeat: false
         onTriggered: {
             if (root.notifState === "return") {
+                const completed = root.activeNotif
                 root.notifState = "idle"
                 root.notifAnimating = false
                 root.activeNotif = null
                 if (root.surfaceOpen) surfaceRestoreTimer.restart()
                 // avanzar la cola — si hay más popups, se asigna la siguiente
-                root.advanceRequested()
+                root.advanceRequested(completed)
+                Qt.callLater(root.syncPopup)
             }
         }
     }
@@ -172,6 +177,7 @@ QtObject {
             surfaceRestoreTimer.stop()
             surfaceNotifSuspended = false
             surfaceReveal = 1
+            syncPopup()
         } else if (notifAnimating) {
             surfaceReveal = 0
             surfaceNotifSuspended = true

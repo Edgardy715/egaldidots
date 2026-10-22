@@ -18,6 +18,40 @@ Item {
     property bool hovered: false
     property bool pressed: false
     property string artUrl: ""
+    property string trackKey: ""
+    property bool trackTransitions: false
+    readonly property bool trackMotionAllowed: trackTransitions && visible
+        && Flags.mediaTransitions && !Flags.reduceMotion
+    property real trackCompression: 0
+    property bool trackInitialized: false
+    onTrackKeyChanged: {
+        if (!trackInitialized || !trackKey || !trackMotionAllowed) return
+        trackResponse.to = 1
+        trackResponse.restart()
+        releaseTrack.restart()
+    }
+    onTrackMotionAllowedChanged: if (!trackMotionAllowed) {
+        releaseTrack.stop()
+        trackResponse.stop()
+        trackCompression = 0
+    }
+    Component.onCompleted: trackInitialized = true
+    SmoothedAnimation {
+        id: trackResponse
+        target: root
+        property: "trackCompression"
+        to: 0
+        duration: Motion.standardSmall
+        velocity: -1
+    }
+    Timer {
+        id: releaseTrack
+        interval: Motion.press
+        onTriggered: {
+            trackResponse.to = 0
+            trackResponse.restart()
+        }
+    }
 
     width: diameter
     height: diameter
@@ -69,7 +103,7 @@ Item {
         anchors.centerIn: parent
         width: root.diameter - 2 * (root.ringWidth + root.ringGap)
         height: width
-        scale: response.visualScale
+        scale: response.visualScale * (1 - 0.07 * root.trackCompression)
 
         ArtworkImage {
             id: artwork
@@ -78,6 +112,7 @@ Item {
             source: root.artUrl
             sourceSize: Qt.size(cover.width * 2, cover.height * 2)
             transitionsEnabled: Flags.mediaTransitions
+            swapTravel: root.trackTransitions ? 4 * root.s : 0
         }
         MaterialIcon {
             anchors.centerIn: parent

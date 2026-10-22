@@ -149,7 +149,7 @@ Item {
             id: wallpaperImage
             anchors.fill: parent
             anchors.margins: -64
-            source: root.wallpaper ? "file://" + root.wallpaper : ""
+            source: root.wallpaper ? "file://" + root.wallpaper.split("/").map(encodeURIComponent).join("/") : ""
             sourceSize: Qt.size(root.width + 128, root.height + 128)
             asynchronous: true
             fillMode: Image.PreserveAspectCrop
@@ -189,7 +189,7 @@ Item {
         spacing: 12 * root.unit
         opacity: root.entrance * (1 - root.smoothReveal(Math.min(1, root.presentation / 0.18), 0))
         MaterialIcon { iconName: root.authenticated ? "lock_open" : "lock"; font.pixelSize: 20 * root.unit; color: root.ink }
-        Text { text: qsTr("Bloqueado"); font.family: Theme.font; font.pixelSize: 13 * root.textScale; color: root.ink }
+        Text { text: qsTr("Bloqueado"); font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale; color: root.ink }
     }
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -197,9 +197,9 @@ Item {
         spacing: 12 * root.unit
         opacity: root.contextOpacity
         MaterialIcon { iconName: "lock"; font.pixelSize: 18 * root.unit; color: root.secondary }
-        Text { visible: !!root.weather.temp; text: root.weather.temp || ""; font.family: Theme.font; font.pixelSize: 13 * root.textScale; color: root.secondary }
-        Text { visible: UPower.displayDevice.isLaptopBattery; text: Math.round(UPower.displayDevice.percentage * 100) + "%"; font.family: Theme.font; font.pixelSize: 13 * root.textScale; color: root.secondary }
-        Text { visible: root.preview; text: qsTr("Vista previa"); font.family: Theme.font; font.pixelSize: 12 * root.textScale; color: root.secondary }
+        Text { visible: !!root.weather.temp; text: root.weather.temp || ""; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale; color: root.secondary }
+        Text { visible: UPower.displayDevice.isLaptopBattery; text: Math.round(UPower.displayDevice.percentage * 100) + "%"; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale; color: root.secondary }
+        Text { visible: root.preview; text: qsTr("Vista previa"); font.family: Theme.fontMedia; font.pixelSize: 12 * root.textScale; color: root.secondary }
     }
     Column {
         id: clock
@@ -210,17 +210,19 @@ Item {
         opacity: root.entrance * (1 - root.authProgress) * root.retirementOpacity
         transform: Translate { y: 18 * root.unit * (1 - root.entrance) }
         layer.enabled: true
-        layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#65000000"; shadowBlur: 0.35; shadowVerticalOffset: 1 }
+        layer.effect: MultiEffect { shadowEnabled: true; shadowColor: "#40000000"; shadowBlur: 0.25; shadowVerticalOffset: 2 }
         spacing: 8 * root.unit
         Text {
             id: clockTime
             width: parent.width
             horizontalAlignment: Text.AlignLeft
             text: Flags.time12h ? Qt.formatTime(root.now, "h:mm AP").replace(/\s*[AP]M$/, "") : Qt.formatTime(root.now, "HH:mm")
-            font.family: Theme.fontDisplay
+            font.family: Theme.fontMedia
             font.pixelSize: 124 * root.unit
-            font.weight: Font.Light
-            font.letterSpacing: -3 * root.unit
+            font.weight: Font.Medium
+            font.features: ({ "tnum": 1 })
+            font.letterSpacing: -2 * root.unit
+            renderType: Text.CurveRendering
             color: root.ink
         }
         Text {
@@ -229,8 +231,9 @@ Item {
             horizontalAlignment: Text.AlignLeft
             text: Qt.locale("es_DO").toString(root.now, "dddd, d 'de' MMMM")
             elide: Text.ElideRight
-            font.family: Theme.font
+            font.family: Theme.fontMedia
             font.pixelSize: 18 * root.textScale
+            font.weight: Font.Medium
             color: root.ink
         }
         Text {
@@ -238,7 +241,7 @@ Item {
             visible: root.secured
             width: parent.width
             text: qsTr("Escribe para desbloquear")
-            font.family: Theme.font
+            font.family: Theme.fontMedia
             font.pixelSize: 14 * root.textScale
             color: root.ink
         }
@@ -280,14 +283,14 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 84 * root.unit; height: width
                 name: root.displayName; source: root.avatarSource
-                fontFamily: Theme.font
+                fontFamily: Theme.fontMedia
             }
             Text {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 text: root.displayName
                 elide: Text.ElideRight
-                font.family: Theme.font; font.weight: Font.DemiBold
+                font.family: Theme.fontMedia; font.weight: Font.DemiBold
                 font.pixelSize: 17 * root.textScale; color: root.ink
             }
         }
@@ -351,7 +354,7 @@ Item {
                     motionActive: root.authActive && root.contentOpacity > 0.01 && !root.retiring
                 }
                 placeholderText: root.promptText
-                font.family: Theme.font; font.pixelSize: 15 * root.textScale
+                font.family: Theme.fontMedia; font.pixelSize: 15 * root.textScale
                 horizontalAlignment: TextInput.AlignHCenter
                 echoMode: root.responseVisible ? TextInput.Normal : TextInput.Password
                 passwordMaskDelay: 0
@@ -455,7 +458,7 @@ Item {
             opacity: root.contentExposure * Math.max(0, (root.successProgress - 0.25) / 0.75)
             scale: 0.85 + 0.15 * root.successProgress
             ConfirmationIndicator { width: 24 * root.unit; height: width; s: root.unit; status: root.authenticated ? "success" : "" }
-            Text { text: qsTr("Listo"); font.family: Theme.font; font.pixelSize: 16 * root.textScale; color: root.ink }
+            Text { text: qsTr("Listo"); font.family: Theme.fontMedia; font.pixelSize: 16 * root.textScale; color: root.ink }
         }
         ConfirmationIndicator {
             x: feedback.x - 20 * root.unit
@@ -473,7 +476,7 @@ Item {
             text: root.authenticated ? qsTr("Bienvenido") : root.errorText || (!root.secured ? qsTr("Protegiendo sesión…") : root.busy ? qsTr("Verificando…") : "")
             wrapMode: Text.WordWrap
             color: root.errorText ? "#ffc0c6" : root.secondary
-            font.family: Theme.font; font.pixelSize: 11 * root.textScale
+            font.family: Theme.fontMedia; font.pixelSize: 11 * root.textScale
         }
     }
     Item {
@@ -542,7 +545,7 @@ Item {
                 leftPadding: 12 * root.unit
                 text: qsTr("Energía")
                 color: root.secondary
-                font.family: Theme.font
+                font.family: Theme.fontMedia
                 font.pixelSize: 11 * root.textScale
                 font.weight: Font.Medium
                 verticalAlignment: Text.AlignVCenter
@@ -586,7 +589,7 @@ Item {
                                 width: parent.width
                                 text: powerOption.text
                                 color: powerOption.confirming ? Theme.accent : root.ink
-                                font.family: Theme.font; font.pixelSize: 13 * root.textScale
+                                font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale
                                 font.weight: Font.Medium
                                 elide: Text.ElideRight
                             }
@@ -594,7 +597,7 @@ Item {
                                 width: parent.width
                                 text: powerOption.confirming ? qsTr("Pulsa de nuevo para confirmar") : powerOption.modelData.hint
                                 color: root.secondary
-                                font.family: Theme.font; font.pixelSize: 10 * root.textScale
+                                font.family: Theme.fontMedia; font.pixelSize: 10 * root.textScale
                                 elide: Text.ElideRight
                             }
                         }

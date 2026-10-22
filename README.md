@@ -32,6 +32,17 @@ also builds the wallpaper plugin, sets up Fish and Neovim plugins, generates
 the initial palette, enables network and audio services, and selects Fish as
 the login shell. Use `--keep-shell` to keep your current shell.
 
+When cargo is available, installation also builds the optional Rust CAVA helper
+and in-process audio peak library. The shell keeps its QML/Qt interface and
+Python fallbacks. Build them separately with `sh scripts/build-cava-helper.sh`
+and `sh scripts/build-audio-peak.sh`; Rust is not required at runtime. See
+[CAVA measurements](docs/rust-cava-2026-10-21/REPORT.md) and
+[peak measurements](docs/rust-audio-peak-2026-10-21/REPORT.md).
+
+Saved clipboard lists also have an optional Rust reader, built with
+`sh scripts/build-clipboard-list.sh`. Python retains all clipboard writes and
+serves as fallback. See [clipboard measurements](docs/rust-clipboard-list-2026-10-21/REPORT.md).
+
 Backups live in `~/.egaldidots-backup-*`. Keep the checkout in place: the installed
 configuration links to it. The installer does not install the OS, GPU drivers
 or a display manager, or restore personal files and credentials.
@@ -86,6 +97,26 @@ bash ~/.config/hypr/scripts/apply-wallpaper.sh /path/to/image.png
 ```
 
 ## Development
+
+### Recording from Isla
+
+Open the eyes beside the clock, then **Grabación**, or use
+`quickshell -p bar ipc call island recording ''`. Install `gpu-screen-recorder`
+and a working Wayland ScreenCast portal. Python 3 is the only bridge dependency;
+OBS and Python websockets are no longer used.
+
+Start has a cancellable 3-second countdown, followed by the native screen/window
+picker. System audio and microphone are independent; microphone defaults off.
+The recorder uses hardware H.264, up to 30 fps and variable frame rate, with no
+CPU encoding fallback. Files are saved to `~/Videos/Recordings`. A separate droplet to the left of the pill shows elapsed time, pause and
+finalization. Clicking it opens recording controls. When space is insufficient
+or another left surface needs the area, status returns to the main pill. The file is
+only offered after the recorder exits successfully with a nonempty file.
+
+Leaving the controls during countdown cancels it. An active capture keeps running
+when the panel closes; exiting/reloading Isla finalizes its owned capture.
+It never signals unrelated recorder processes. With the controls closed and no capture, the bridge exits: no idle subprocess,
+status polling or OBS connection. `quickshell -p bar ipc call recording status` reports state.
 
 - [Shell architecture and settings API](docs/SHELL_ARCHITECTURE.md)
 - [Authentication and lockscreen setup](docs/AUTHENTICATION.md)

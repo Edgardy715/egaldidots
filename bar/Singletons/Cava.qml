@@ -45,11 +45,13 @@ Singleton {
 
     function reset() {
         root.hasFrame = false
+        root.envelopeActive = false
         root.targets = []
         root.values = Array(root.bars).fill(0)
     }
 
     property bool hasFrame: false
+    property bool envelopeActive: false
 
     // ---- probe: ¿cava está instalado? ----
     // Al cargar el singleton Y de forma perezosa: si algo pide el viz (wanted=true)
@@ -67,7 +69,8 @@ Singleton {
     Process {
         id: stream
         running: root.wanted && root.available && !sourceRestart.running
-        command: ["python3", decodeURIComponent(Qt.resolvedUrl("../services/cava_stream.py").toString().replace(/^file:\/\//, "")),
+        command: ["sh", decodeURIComponent(Qt.resolvedUrl("../services/cava-stream.sh").toString().replace(/^file:\/\//, "")),
+                  Quickshell.processId.toString(),
                   "--identity", root.playerIdentity, "--desktop", root.playerDesktop, "--bus", root.playerBus]
         stdout: SplitParser {
             splitMarker: "\n"
@@ -87,13 +90,16 @@ Singleton {
         root.targets = frame
         root.lastFrameAt = Date.now()
         root.hasFrame = true
+        if (frame.some(value => value > 0) || root.values.some(value => value > 0))
+            root.envelopeActive = true
     }
 
     FrameAnimation {
-        running: root.wanted && root.hasFrame
+        running: root.wanted && root.hasFrame && root.envelopeActive
         onTriggered: {
             var fresh = Date.now() - root.lastFrameAt < 250
             root.values = Spectrum.advance(root.values, fresh ? root.targets : [], frameTime)
+            if (root.values.every(value => value === 0)) root.envelopeActive = false
         }
     }
 

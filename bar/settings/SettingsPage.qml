@@ -11,6 +11,7 @@ Item {
     property string section: "appearance"
     property string query: ""
     property var fieldKeys: []
+    property var fieldSelection: ({ section: root.section, keys: root.fieldKeys, active: true })
     property bool showUnavailable: false
     property var drafts: ({})
     property var draftBases: ({})
@@ -62,8 +63,7 @@ Item {
     onVisibleChanged: if (!visible) closePicker()
 
 
-    onSectionChanged: resetScroll()
-    onFieldKeysChanged: resetScroll()
+    onFieldSelectionChanged: resetScroll()
     onQueryChanged: resetScroll()
 
     function resetScroll() {
@@ -80,9 +80,12 @@ Item {
         return config.snapshot().effective
     }
     readonly property var entries: {
+        const selection = fieldSelection
+        if (!selection.active) return []
+        const fieldKeys = selection.keys
         const terms = normalize(query).trim().split(/\s+/).filter(Boolean)
         const sections = config.schema.sections
-        const names = terms.length || fieldKeys.length ? Object.keys(sections) : [section]
+        const names = terms.length || fieldKeys.length ? Object.keys(sections) : [selection.section]
         const result = []
         for (const name of names) {
             const fields = sections[name] || {}

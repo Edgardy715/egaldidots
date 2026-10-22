@@ -50,7 +50,7 @@ with tempfile.TemporaryDirectory(prefix='isla-settings-') as directory:
             assert catalog['sections']['appearance']['pillBlur']['availability'] == 'inactive'
             assert catalog['sections']['appearance']['clockSeconds']['availability'] == 'partial'
             assert catalog['requiredModules'][0]['id'] == 'pill'
-            assert len(catalog['surfaces']) == 15
+            assert len(catalog['surfaces']) == 17
             assert any(surface['id'] == 'settings' for surface in catalog['surfaces'])
             assert catalog['optionalModules'][1]['dependencyMode'] == 'any'
             assert call('validate', '{"appearance":{"fontScale":0}}')['ok'] is False

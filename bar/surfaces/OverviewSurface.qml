@@ -14,7 +14,7 @@ OverviewView {
         return result
     }
     toplevelByAddress: WinMap.toplevelByAddress
-    wallpaperSource: Wallpapers.current ? "file://" + encodeURI(Wallpapers.current) : ""
+    wallpaperSource: Wallpapers.current ? Wallpapers.fileSource(Wallpapers.current, 0) : ""
     hasMedia: Players.has
     mediaArtUrl: Players.artUrl
     mediaHasProgress: !!Players.active && Players.active.length > 0

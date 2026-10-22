@@ -21,7 +21,7 @@ ComboBox {
     leftPadding: 14; rightPadding: 44
     font.family: Config.appearance.fontFamily
     font.pixelSize: Theme.fontSizeBodyLg
-    model: Qt.fontFamilies()
+    model: visible ? Qt.fontFamilies() : []
     focusPolicy: Qt.StrongFocus
 
     function syncText() {
@@ -30,6 +30,7 @@ ComboBox {
         editText = configuredText
     }
     onConfiguredTextChanged: Qt.callLater(syncText)
+    onModelChanged: Qt.callLater(syncText)
     Component.onCompleted: Qt.callLater(syncText)
     onVisibleChanged: if (!visible) popup.close()
     onEnabledChanged: if (!enabled) popup.close()
@@ -154,7 +155,7 @@ ComboBox {
             id: list
             objectName: "fontOptions"
             clip: true
-            model: root.delegateModel
+            model: root.popup.visible ? root.delegateModel : null
             currentIndex: root.highlightedIndex
             highlightMoveDuration: 0
             boundsBehavior: Flickable.StopAtBounds

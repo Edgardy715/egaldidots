@@ -45,13 +45,19 @@ Item {
 
     function focusEditor() {
         if (!root.editable) return false
-        if (fontPicker.visible) fontPicker.contentItem.forceActiveFocus()
-        else if (textEditor.visible) textEditor.forceActiveFocus()
-        else if (slider.visible) slider.forceActiveFocus()
-        else if (toggle.visible) toggle.forceActiveFocus()
-        else if (choiceRepeater.count > 0) choiceRepeater.itemAt(0).forceActiveFocus()
+        if (fontPicker.visible && fontPicker.status === Loader.Ready) fontPicker.item.contentItem.forceActiveFocus()
+        else if (textLoader.visible && textLoader.status === Loader.Ready) textLoader.item.editor.forceActiveFocus()
+        else if (sliderLoader.visible && sliderLoader.status === Loader.Ready) sliderLoader.item.editor.forceActiveFocus()
+        else if (toggleLoader.visible && toggleLoader.status === Loader.Ready) toggleLoader.item.forceActiveFocus()
+        else if (choiceLoader.visible && choiceLoader.status === Loader.Ready && choiceLoader.item.choices.count > 0)
+            choiceLoader.item.choices.itemAt(0).forceActiveFocus()
         else return false
         return true
+    }
+
+    function restoreDefault() {
+        resetRequested()
+        focusEditor()
     }
 
     function submitText(text) {
@@ -121,72 +127,80 @@ Item {
                 }
             }
 
-            Switch {
-                id: toggle
-                visible: root.field.control === "toggle"
-                enabled: root.editable
-                checked: !!root.value
-                focusPolicy: Qt.StrongFocus
-                Accessible.name: root.field.label
-                Accessible.description: root.field.description || ""
-                onToggled: root.changeRequested(checked)
-                implicitWidth: 64; implicitHeight: 44
-                indicator: Rectangle {
-                    x: 6; y: (toggle.height - height) / 2
-                    implicitWidth: 52; implicitHeight: 30
-                    radius: height / 2
-                    scale: root.reducedMotion ? 1 : toggle.down ? 0.94 : toggle.hovered ? 1.04 : 1
-                    Behavior on scale { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
-                    color: toggle.checked ? Theme.accent : Qt.alpha(Theme.foreground, 0.12)
-                    opacity: toggle.enabled ? 1 : 0.45
-                    border.width: 1
-                    border.color: Qt.alpha(Theme.foreground, toggle.hovered ? 0.24 : 0.10)
-                    Behavior on color { enabled: root.visible; ColorAnimation { duration: Motion.fast } }
-                    Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.fast } }
-                    Behavior on border.color { enabled: root.visible; ColorAnimation { duration: Motion.hover } }
-                    Rectangle {
-                        anchors.fill: parent; anchors.margins: -3; radius: parent.radius + 3
-                        color: "transparent"; border.width: 2; border.color: Theme.accent
-                        opacity: toggle.activeFocus ? 0.35 : 0
-                        Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.hover } }
-                    }
-                    Rectangle {
-                        x: toggle.checked ? 26 : 4; y: 4
-                        width: 22; height: 22; radius: 11
-                        color: toggle.checked ? Theme.primaryContent : Theme.foreground
-                        Behavior on x { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: 0.5; epsilon: 0.01 } }
-                        EdotsIcon {
-                            anchors.centerIn: parent; iconName: "check"; font.pixelSize: Theme.fontSizeBody
-                            color: Theme.accent; selected: toggle.checked
-                            controlHovered: toggle.hovered; controlPressed: toggle.down
-                            Accessible.ignored: true
-                            opacity: toggle.checked ? 1 : 0
-                            visible: opacity > 0.01
-                            Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.fast } }
+            Loader {
+                id: toggleLoader
+                active: root.field.control === "toggle"
+                visible: active
+                sourceComponent: Switch {
+                    id: toggle
+                    objectName: "settingToggle"
+                    enabled: root.editable
+                    checked: !!root.value
+                    focusPolicy: Qt.StrongFocus
+                    Accessible.name: root.field.label
+                    Accessible.description: root.field.description || ""
+                    onToggled: root.changeRequested(checked)
+                    implicitWidth: 64; implicitHeight: 44
+                    indicator: Rectangle {
+                        x: 6; y: (toggle.height - height) / 2
+                        implicitWidth: 52; implicitHeight: 30
+                        radius: height / 2
+                        scale: root.reducedMotion ? 1 : toggle.down ? 0.94 : toggle.hovered ? 1.04 : 1
+                        Behavior on scale { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
+                        color: toggle.checked ? Theme.accent : Qt.alpha(Theme.foreground, 0.12)
+                        opacity: toggle.enabled ? 1 : 0.45
+                        border.width: 1
+                        border.color: Qt.alpha(Theme.foreground, toggle.hovered ? 0.24 : 0.10)
+                        Behavior on color { enabled: root.visible; ColorAnimation { duration: Motion.fast } }
+                        Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.fast } }
+                        Behavior on border.color { enabled: root.visible; ColorAnimation { duration: Motion.hover } }
+                        Rectangle {
+                            anchors.fill: parent; anchors.margins: -3; radius: parent.radius + 3
+                            color: "transparent"; border.width: 2; border.color: Theme.accent
+                            opacity: toggle.activeFocus ? 0.35 : 0
+                            Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.hover } }
+                        }
+                        Rectangle {
+                            x: toggle.checked ? 26 : 4; y: 4
+                            width: 22; height: 22; radius: 11
+                            color: toggle.checked ? Theme.primaryContent : Theme.foreground
+                            Behavior on x { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: 0.5; epsilon: 0.01 } }
+                            EdotsIcon {
+                                anchors.centerIn: parent; iconName: "check"; font.pixelSize: Theme.fontSizeBody
+                                color: Theme.accent; selected: toggle.checked
+                                controlHovered: toggle.hovered; controlPressed: toggle.down
+                                Accessible.ignored: true
+                                opacity: toggle.checked ? 1 : 0
+                                visible: opacity > 0.01
+                                Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.fast } }
+                            }
                         }
                     }
                 }
             }
         }
 
-        RowLayout {
-            visible: root.modified
+        Loader {
+            active: root.modified
+            visible: active
             Layout.fillWidth: true
-            spacing: 10
-            Text {
-                text: qsTr("Personalizado")
-                color: Theme.foreground
-                font.family: Config.appearance.fontFamily
-                font.pixelSize: Theme.fontSizeBody
-            }
-            Item { Layout.fillWidth: true }
-            EdotsButton {
-                enabled: root.editable
-                text: qsTr("Restablecer")
-                symbol: "refresh"
-                implicitHeight: Math.max(44, Theme.fontSizeBody * 1.5 + 16)
-                font.pixelSize: Theme.fontSizeBody
-                onClicked: root.resetRequested()
+            sourceComponent: RowLayout {
+                spacing: 10
+                Text {
+                    text: qsTr("Personalizado")
+                    color: Theme.foreground
+                    font.family: Config.appearance.fontFamily
+                    font.pixelSize: Theme.fontSizeBody
+                }
+                Item { Layout.fillWidth: true }
+                EdotsButton {
+                    enabled: root.editable
+                    text: qsTr("Restablecer")
+                    symbol: "refresh"
+                    implicitHeight: Math.max(44, Theme.fontSizeBody * 1.5 + 16)
+                    font.pixelSize: Theme.fontSizeBody
+                    onClicked: root.restoreDefault()
+                }
             }
         }
 
@@ -201,142 +215,163 @@ Item {
             wrapMode: Text.WordWrap
         }
 
-        Flow {
-            visible: root.field.control === "choice"
+        Loader {
+            id: choiceLoader
+            active: root.field.control === "choice"
+            visible: active
             Layout.fillWidth: true
-            spacing: 8
-            Repeater {
-                id: choiceRepeater
-                model: root.field.options || []
-                EdotsButton {
-                    id: choice
-                    required property string modelData
-                    required property int index
-                    objectName: "choice-" + modelData
-                    text: root.field.optionLabels ? root.field.optionLabels[index] : modelData
-                    checkable: false
-                    checked: root.value === choice.modelData
-                    accent: root.value === choice.modelData
+            sourceComponent: Flow {
+                objectName: "settingChoices"
+                property alias choices: choiceRepeater
+                spacing: 8
+                Repeater {
+                    id: choiceRepeater
+                    model: root.field.options || []
+                    EdotsButton {
+                        id: choice
+                        required property string modelData
+                        required property int index
+                        objectName: "choice-" + modelData
+                        text: root.field.optionLabels ? root.field.optionLabels[index] : modelData
+                        checkable: false
+                        checked: root.value === choice.modelData
+                        accent: root.value === choice.modelData
+                        enabled: root.editable
+                        Accessible.name: root.field.label + ": " + text
+                        Accessible.role: Accessible.RadioButton
+                        Accessible.checkable: true
+                        Accessible.checked: root.value === choice.modelData
+                        Accessible.description: root.field.description || ""
+                        onClicked: root.changeRequested(choice.modelData)
+                    }
+                }
+            }
+        }
+
+        Loader {
+            id: sliderLoader
+            active: root.field.type === "number" && root.ranged
+            visible: active
+            Layout.fillWidth: true
+            sourceComponent: RowLayout {
+                property alias editor: slider
+                spacing: 16
+                Slider {
+                    id: slider
+                    objectName: "settingSlider"
+                    implicitHeight: 44
+                    Layout.fillWidth: true
                     enabled: root.editable
-                    Accessible.name: root.field.label + ": " + text
-                    Accessible.role: Accessible.RadioButton
-                    Accessible.checkable: true
-                    Accessible.checked: root.value === choice.modelData
+                    from: root.field.minimum ?? 0
+                    to: root.field.maximum ?? 1
+                    value: Number(root.value)
+                    stepSize: 0.01
+                    focusPolicy: Qt.StrongFocus
+                    Accessible.name: root.field.label
                     Accessible.description: root.field.description || ""
-                    onClicked: root.changeRequested(choice.modelData)
-                }
-            }
-        }
-
-        RowLayout {
-            visible: root.field.type === "number" && root.ranged
-            Layout.fillWidth: true
-            spacing: 16
-            Slider {
-                id: slider
-                implicitHeight: 44
-                Layout.fillWidth: true
-                enabled: root.editable
-                from: root.field.minimum ?? 0
-                to: root.field.maximum ?? 1
-                value: Number(root.value)
-                stepSize: 0.01
-                focusPolicy: Qt.StrongFocus
-                Accessible.name: root.field.label
-                Accessible.description: root.field.description || ""
-                onMoved: root.changeRequested(Math.round(value * 100) / 100)
-                background: Rectangle {
-                    x: slider.leftPadding
-                    y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                    width: slider.availableWidth
-                    height: slider.hovered || slider.pressed ? 7 : 5
-                    radius: height / 2
-                    Behavior on height { enabled: root.visible && !root.reducedMotion; NumberAnimation { duration: Motion.hover } }
-                    color: Qt.alpha(Theme.foreground, 0.18)
-                    Rectangle {
-                        width: slider.visualPosition * parent.width
-                        height: parent.height
-                        radius: parent.radius
-                        color: Theme.accent
+                    onMoved: root.changeRequested(Math.round(value * 100) / 100)
+                    background: Rectangle {
+                        x: slider.leftPadding
+                        y: slider.topPadding + slider.availableHeight / 2 - height / 2
+                        width: slider.availableWidth
+                        height: slider.hovered || slider.pressed ? 7 : 5
+                        radius: height / 2
+                        Behavior on height { enabled: root.visible && !root.reducedMotion; NumberAnimation { duration: Motion.hover } }
+                        color: Qt.alpha(Theme.foreground, 0.18)
+                        Rectangle {
+                            width: slider.visualPosition * parent.width
+                            height: parent.height
+                            radius: parent.radius
+                            color: Theme.accent
+                        }
+                    }
+                    handle: Rectangle {
+                        x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
+                        y: slider.topPadding + slider.availableHeight / 2 - height / 2
+                        scale: root.reducedMotion ? 1 : slider.pressed ? 1.22 : slider.hovered ? 1.12 : 1
+                        Behavior on scale { enabled: !root.reducedMotion && root.visible; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
+                        width: 20
+                        height: 20
+                        radius: 10
+                        color: Theme.foreground
+                        border.width: 1
+                        border.color: Qt.alpha(Theme.background, 0.15)
+                        Rectangle {
+                            anchors.fill: parent; anchors.margins: -4; radius: 14
+                            color: "transparent"; border.width: 2; border.color: Theme.accent
+                            opacity: slider.activeFocus ? 0.4 : 0
+                            Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.hover } }
+                        }
+                        Rectangle {
+                            anchors.centerIn: parent; width: 6; height: 6; radius: 3
+                            color: Theme.background
+                            opacity: slider.pressed ? 0.65 : slider.hovered ? 0.25 : 0
+                            Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.hover } }
+                        }
                     }
                 }
-                handle: Rectangle {
-                    x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
-                    y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                    scale: root.reducedMotion ? 1 : slider.pressed ? 1.22 : slider.hovered ? 1.12 : 1
-                    Behavior on scale { enabled: !root.reducedMotion && root.visible; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
-                    width: 20
-                    height: 20
-                    radius: 10
+                Text {
+                    text: Number(root.value).toFixed(2)
                     color: Theme.foreground
-                    border.width: 1
-                    border.color: Qt.alpha(Theme.background, 0.15)
-                    Rectangle {
-                        anchors.fill: parent; anchors.margins: -4; radius: 14
-                        color: "transparent"; border.width: 2; border.color: Theme.accent
-                        opacity: slider.activeFocus ? 0.4 : 0
-                        Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.hover } }
-                    }
-                    Rectangle {
-                        anchors.centerIn: parent; width: 6; height: 6; radius: 3
-                        color: Theme.background
-                        opacity: slider.pressed ? 0.65 : slider.hovered ? 0.25 : 0
-                        Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.hover } }
-                    }
+                    font.family: Config.appearance.fontFamily
+                    font.pixelSize: Theme.fontSizeBodyLg
+                    Layout.preferredWidth: Math.max(42, implicitWidth)
+                    horizontalAlignment: Text.AlignRight
                 }
             }
-            Text {
-                text: Number(root.value).toFixed(2)
-                color: Theme.foreground
-                font.family: Config.appearance.fontFamily
-                font.pixelSize: Theme.fontSizeBodyLg
-                Layout.preferredWidth: Math.max(42, implicitWidth)
-                horizontalAlignment: Text.AlignRight
+        }
+
+        Loader {
+            id: textLoader
+            active: (root.field.control === "text" && !root.fontField) || root.field.control === "path" || (root.field.type === "number" && !root.ranged)
+            visible: active
+            Layout.fillWidth: true
+            sourceComponent: RowLayout {
+                property alias editor: textEditor
+                spacing: 8
+                EdotsTextField {
+                    id: textEditor
+                    objectName: "settingTextEditor"
+                    enabled: root.editable
+                    Layout.fillWidth: true
+                    text: root.draftText !== undefined ? root.draftText : root.value === undefined ? "" : String(root.value)
+                    invalid: !!(root.validationMessage || root.localError)
+                    Accessible.name: root.field.label
+                    Accessible.description: root.validationMessage || root.localError || root.field.description || ""
+                    inputMethodHints: root.field.type === "number" ? Qt.ImhFormattedNumbersOnly : Qt.ImhNone
+                    onTextEdited: { root.localError = ""; root.draftChanged(text) }
+                    onEditingFinished: root.submitText(text)
+                }
+
+                EdotsButton {
+                    objectName: "browsePath"
+                    visible: !!root.field.path
+                    enabled: root.editable
+                    text: qsTr("Elegir…")
+                    symbol: "folder_open"
+                    Accessible.name: qsTr("Seleccionar %1").arg(root.field.label)
+                    onClicked: root.browseRequested()
+                }
             }
         }
 
-        RowLayout {
-            visible: (root.field.control === "text" && !root.fontField) || root.field.control === "path" || (root.field.type === "number" && !root.ranged)
-            Layout.fillWidth: true
-            spacing: 8
-        EdotsTextField {
-            id: textEditor
-            enabled: root.editable
-            Layout.fillWidth: true
-            text: root.draftText !== undefined ? root.draftText : root.value === undefined ? "" : String(root.value)
-            invalid: !!(root.validationMessage || root.localError)
-            Accessible.name: root.field.label
-            Accessible.description: root.validationMessage || root.localError || root.field.description || ""
-            inputMethodHints: root.field.type === "number" ? Qt.ImhFormattedNumbersOnly : Qt.ImhNone
-            onTextEdited: { root.localError = ""; root.draftChanged(text) }
-            onEditingFinished: root.submitText(text)
-        }
-
-            EdotsButton {
-                objectName: "browsePath"
-                visible: !!root.field.path
-                enabled: root.editable
-                text: qsTr("Elegir…")
-                symbol: "folder_open"
-                Accessible.name: qsTr("Seleccionar %1").arg(root.field.label)
-                onClicked: root.browseRequested()
-            }
-        }
-
-        EdotsComboBox {
+        Loader {
             id: fontPicker
+            active: root.fontField
             visible: root.fontField
-            enabled: root.editable
             Layout.fillWidth: true
-            configuredText: root.draftText !== undefined ? root.draftText : root.value === undefined ? "" : String(root.value)
-            popupBounds: root.popupBounds
-            invalid: !!(root.validationMessage || root.localError)
-            Accessible.name: root.field.label
-            Accessible.description: root.validationMessage || root.localError || root.field.description || ""
-            onActivated: index => root.submitText(textAt(index))
-            onAccepted: root.submitText(editText)
-            onTextEdited: text => { root.localError = ""; root.draftChanged(text) }
-            onEditingFinished: text => root.submitText(text)
+            sourceComponent: EdotsComboBox {
+                enabled: root.editable
+                configuredText: root.draftText !== undefined ? root.draftText : root.value === undefined ? "" : String(root.value)
+                popupBounds: root.popupBounds
+                invalid: !!(root.validationMessage || root.localError)
+                Accessible.name: root.field.label
+                Accessible.description: root.validationMessage || root.localError || root.field.description || ""
+                onActivated: index => root.submitText(textAt(index))
+                onAccepted: root.submitText(editText)
+                onTextEdited: text => { root.localError = ""; root.draftChanged(text) }
+                onEditingFinished: text => root.submitText(text)
+            }
         }
 
         Text {
