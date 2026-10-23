@@ -4,6 +4,7 @@
     "barLayout": "split",
     "glassAlpha": 0.34,
     "materialDepth": 0.25,
+    "ambientFps": 60,
     "mediaTransitions": true,
     "personality": true,
     "menuSelectionAnchor": true,

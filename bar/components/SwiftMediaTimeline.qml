@@ -38,7 +38,7 @@ Item {
     readonly property real playedGap: handleShown ? 6 * s : 0
     readonly property real tailGap: handleShown ? 6 * s
         : displayedProgress <= 0 || displayedProgress >= 1 ? 0 : 4 * s
-    readonly property bool motionAllowed: enabled && active && visible && Flags.mediaTransitions && !Flags.reduceMotion
+    readonly property bool motionAllowed: enabled && active && visible && opacity > 0 && Flags.mediaTransitions && !Flags.reduceMotion
     readonly property bool moving: motionAllowed && playing && !dragging
     property real waveAmount: 0
     property real phaseOffset: 0
@@ -85,12 +85,12 @@ Item {
         duration: 400 * Motion.mult
         easing.type: Motion.easeStandard
     }
-    FrameAnimation {
+    AmbientSubscription {
         id: waveClock
         objectName: "swiftTimelineClock"
         running: root.moving
-        onTriggered: root.phaseOffset = (root.phaseOffset
-            + root.wavelength * Math.min(frameTime, 0.05) / 1.6) % root.wavelength
+        onTriggered: dt => root.phaseOffset = (root.phaseOffset
+            + root.wavelength * dt / 1.6) % root.wavelength
     }
 
     Rectangle {

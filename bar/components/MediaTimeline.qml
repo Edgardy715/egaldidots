@@ -50,7 +50,7 @@ Item {
     readonly property real amplitude: 1.5 * s
     readonly property real strokeWidth: 2 * s
     readonly property real phaseSpeed: 8 * s
-    readonly property bool motionAllowed: active && visible && !Flags.reduceMotion
+    readonly property bool motionAllowed: active && visible && opacity > 0 && !Flags.reduceMotion
     readonly property bool moving: motionAllowed && playing && !dragging
     property real waveOffset: 0
     property real waveAmount: 0
@@ -106,7 +106,7 @@ Item {
     Timer {
         id: amplitudeDelay
         interval: 60
-        onTriggered: root.animateAmplitude()
+        onTriggered: dt => root.animateAmplitude()
     }
     NumberAnimation {
         id: amplitudeAnimation
@@ -114,9 +114,9 @@ Item {
         property: "waveAmount"
         easing.type: Easing.BezierSpline
     }
-    FrameAnimation {
+    AmbientSubscription {
         running: root.moving
-        onTriggered: root.waveOffset = (root.waveOffset + frameTime * root.phaseSpeed) % root.wavelength
+        onTriggered: dt => root.waveOffset = (root.waveOffset + dt * root.phaseSpeed) % root.wavelength
     }
     Rectangle {
         anchors.fill: parent

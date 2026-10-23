@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "Spectrum.js" as Spectrum
+import "../components"
 
 /** Real audio spectrum. Cava emits explicit ASCII frames, consumed on demand. */
 Singleton {
@@ -94,11 +95,11 @@ Singleton {
             root.envelopeActive = true
     }
 
-    FrameAnimation {
-        running: root.wanted && root.hasFrame && root.envelopeActive
-        onTriggered: {
+    AmbientSubscription {
+        running: root.wanted && root.hasFrame && root.envelopeActive && !Flags.reduceMotion
+        onTriggered: dt => {
             var fresh = Date.now() - root.lastFrameAt < 250
-            root.values = Spectrum.advance(root.values, fresh ? root.targets : [], frameTime)
+            root.values = Spectrum.advance(root.values, fresh ? root.targets : [], dt)
             if (root.values.every(value => value === 0)) root.envelopeActive = false
         }
     }

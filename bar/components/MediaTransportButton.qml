@@ -23,7 +23,7 @@ AbstractButton {
     property bool playing: false
     property bool dim: false
     property bool motionEnabled: true
-    readonly property bool moving: enabled && visible && motionEnabled && !Flags.reduceMotion && Flags.mediaTransitions
+    readonly property bool moving: enabled && visible && opacity > 0 && motionEnabled && !Flags.reduceMotion && Flags.mediaTransitions
     property real morph: playing ? 1 : 0
     property real angle: 0
     property real symbolScale: 1
@@ -51,9 +51,9 @@ AbstractButton {
         enabled: root.moving
         NumberAnimation { id: morphAnimation; duration: Motion.emphasizedLarge; easing.type: Easing.BezierSpline; easing.bezierCurve: Motion.emphasizedDecelCurve }
     }
-    FrameAnimation {
+    AmbientSubscription {
         running: root.primary && root.playing && root.moving
-        onTriggered: root.angle = (root.angle + Math.min(frameTime, 0.05) * 16) % 360
+        onTriggered: dt => root.angle = (root.angle + dt * 16) % 360
     }
     InteractionMotion {
         id: response

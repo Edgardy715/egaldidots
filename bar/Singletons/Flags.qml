@@ -6,6 +6,7 @@ import Quickshell
 Singleton {
     readonly property real glassAlpha: Config.appearance.glassAlpha
     readonly property real materialDepth: Config.appearance.materialDepth
+    readonly property real ambientFps: Config.appearance.ambientFps
     readonly property bool mediaTransitions: Config.appearance.mediaTransitions
     readonly property bool menuSelectionAnchor: Config.appearance.menuSelectionAnchor
     readonly property bool pillBlur: Config.appearance.pillBlur
