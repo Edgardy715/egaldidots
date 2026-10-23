@@ -1,0 +1,9 @@
+INFO: Launching config: "/home/zdito/.config/quickshell/bar/shell.qml"
+  INFO: Shell ID: "be929ca39a1b6350aa82474c1ae2952d" Path ID "be929ca39a1b6350aa82474c1ae2952d"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/qrobddfcnt/log.qslog"
+ DEBUG qml: [Auth] Polkit agent registered: false
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  WARN quickshell.io.socket: Deleted existing file at "/run/user/1000/isla-sudo-askpass.sock" to create socket
+  INFO: Configuration Loaded
+ DEBUG qml: [Auth] Polkit agent registered: true

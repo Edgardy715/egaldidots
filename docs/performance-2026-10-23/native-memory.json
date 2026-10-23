@@ -1,0 +1,65 @@
+[
+  {
+    "label": "initial",
+    "time": 19041.443529047,
+    "Rss_kib": 443284,
+    "Pss_kib": 332436,
+    "Private_Dirty_kib": 265268
+  },
+  {
+    "label": "0-media-after",
+    "time": 19082.307148835,
+    "Rss_kib": 452492,
+    "Pss_kib": 339756,
+    "Private_Dirty_kib": 272400
+  },
+  {
+    "label": "0-media-gc",
+    "time": 19083.358134508,
+    "Rss_kib": 452092,
+    "Pss_kib": 339356,
+    "Private_Dirty_kib": 272000
+  },
+  {
+    "label": "0-media-trim",
+    "time": 19084.165366681,
+    "Rss_kib": 451852,
+    "Pss_kib": 339116,
+    "Private_Dirty_kib": 271760
+  },
+  {
+    "label": "0-launcher-after",
+    "time": 19124.412253811,
+    "Rss_kib": 453528,
+    "Pss_kib": 340194,
+    "Private_Dirty_kib": 272816
+  },
+  {
+    "label": "0-launcher-gc",
+    "time": 19125.486564711,
+    "Rss_kib": 453340,
+    "Pss_kib": 340007,
+    "Private_Dirty_kib": 272628
+  },
+  {
+    "label": "0-launcher-trim",
+    "time": 19126.293971183,
+    "Rss_kib": 452752,
+    "Pss_kib": 339419,
+    "Private_Dirty_kib": 272040
+  },
+  {
+    "label": "1-media-after",
+    "time": 19166.614453591,
+    "Rss_kib": 456928,
+    "Pss_kib": 343751,
+    "Private_Dirty_kib": 276356
+  },
+  {
+    "label": "1-media-gc",
+    "time": 19167.663836477,
+    "Rss_kib": 456040,
+    "Pss_kib": 343175,
+    "Private_Dirty_kib": 275780
+  }
+]

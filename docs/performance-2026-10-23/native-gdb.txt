@@ -1,0 +1,784 @@
+=thread-group-added,id="i1"
+~"Reading symbols from qs...\n"
+~"\nThis GDB supports auto-downloading debuginfo from the following URLs:\n"
+~"  <https://debuginfod.archlinux.org>\n"
+~"  <https://debuginfod.cachyos.org>\n"
+~"Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]\n"
+~"Debuginfod has been disabled.\nTo make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.\n"
+~"(No debugging symbols found in qs)\n"
+(gdb) 
+1^done
+(gdb) 
+2^done
+(gdb) 
+3^done
+(gdb) 
+4^done
+(gdb) 
+~"Signal        Stop\tPrint\tPass to program\tDescription\n"
+~"SIGPIPE       No\tNo\tYes\t\tBroken pipe\n"
+5^done
+(gdb) 
+=thread-group-started,id="i1",pid="540386"
+=thread-created,id="1",group-id="i1"
+=library-loaded,id="/lib64/ld-linux-x86-64.so.2",target-name="/lib64/ld-linux-x86-64.so.2",host-name="/lib64/ld-linux-x86-64.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7fb8000",to="0x00007ffff7fff000"}]
+6^running
+*running,thread-id="all"
+(gdb) 
+=library-loaded,id="/usr/bin/../lib/libjemalloc.so.2",target-name="/usr/bin/../lib/libjemalloc.so.2",host-name="/usr/bin/../lib/libjemalloc.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7c00000",to="0x00007ffff7efa000"}]
+=library-loaded,id="/usr/bin/../lib/libcpptrace.so.1",target-name="/usr/bin/../lib/libcpptrace.so.1",host-name="/usr/bin/../lib/libcpptrace.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7efd000",to="0x00007ffff7f81000"}]
+=library-loaded,id="/usr/bin/../lib/libgbm.so.1",target-name="/usr/bin/../lib/libgbm.so.1",host-name="/usr/bin/../lib/libgbm.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7bfa000",to="0x00007ffff7c00000"}]
+=library-loaded,id="/usr/bin/../lib/libEGL.so.1",target-name="/usr/bin/../lib/libEGL.so.1",host-name="/usr/bin/../lib/libEGL.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7be8000",to="0x00007ffff7bfa000"}]
+=library-loaded,id="/usr/bin/../lib/libwayland-client.so.0",target-name="/usr/bin/../lib/libwayland-client.so.0",host-name="/usr/bin/../lib/libwayland-client.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7bd7000",to="0x00007ffff7be8000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6WaylandClient.so.6",target-name="/usr/bin/../lib/libQt6WaylandClient.so.6",host-name="/usr/bin/../lib/libQt6WaylandClient.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7ab5000",to="0x00007ffff7bd7000"}]
+=library-loaded,id="/usr/bin/../lib/libxcb.so.1",target-name="/usr/bin/../lib/libxcb.so.1",host-name="/usr/bin/../lib/libxcb.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7a88000",to="0x00007ffff7ab5000"}]
+=library-loaded,id="/usr/bin/../lib/libpipewire-0.3.so.0",target-name="/usr/bin/../lib/libpipewire-0.3.so.0",host-name="/usr/bin/../lib/libpipewire-0.3.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff79b8000",to="0x00007ffff7a88000"}]
+=library-loaded,id="/usr/bin/../lib/libpam.so.0",target-name="/usr/bin/../lib/libpam.so.0",host-name="/usr/bin/../lib/libpam.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff79a5000",to="0x00007ffff79b8000"}]
+=library-loaded,id="/usr/bin/../lib/libpolkit-agent-1.so.0",target-name="/usr/bin/../lib/libpolkit-agent-1.so.0",host-name="/usr/bin/../lib/libpolkit-agent-1.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7999000",to="0x00007ffff79a5000"}]
+=library-loaded,id="/usr/bin/../lib/libpolkit-gobject-1.so.0",target-name="/usr/bin/../lib/libpolkit-gobject-1.so.0",host-name="/usr/bin/../lib/libpolkit-gobject-1.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7977000",to="0x00007ffff7999000"}]
+=library-loaded,id="/usr/bin/../lib/libgio-2.0.so.0",target-name="/usr/bin/../lib/libgio-2.0.so.0",host-name="/usr/bin/../lib/libgio-2.0.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7600000",to="0x00007ffff7800000"}]
+=library-loaded,id="/usr/bin/../lib/libgobject-2.0.so.0",target-name="/usr/bin/../lib/libgobject-2.0.so.0",host-name="/usr/bin/../lib/libgobject-2.0.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7902000",to="0x00007ffff7975000"}]
+=library-loaded,id="/usr/bin/../lib/libglib-2.0.so.0",target-name="/usr/bin/../lib/libglib-2.0.so.0",host-name="/usr/bin/../lib/libglib-2.0.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff747a000",to="0x00007ffff7600000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6Widgets.so.6",target-name="/usr/bin/../lib/libQt6Widgets.so.6",host-name="/usr/bin/../lib/libQt6Widgets.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff6c00000",to="0x00007ffff73aa000"}]
+=library-loaded,id="/usr/bin/../lib/libdrm.so.2",target-name="/usr/bin/../lib/libdrm.so.2",host-name="/usr/bin/../lib/libdrm.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff78e9000",to="0x00007ffff7902000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6Quick.so.6",target-name="/usr/bin/../lib/libQt6Quick.so.6",host-name="/usr/bin/../lib/libQt6Quick.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff6400000",to="0x00007ffff6ba4000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6Gui.so.6",target-name="/usr/bin/../lib/libQt6Gui.so.6",host-name="/usr/bin/../lib/libQt6Gui.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff5800000",to="0x00007ffff620e000"}]
+=library-loaded,id="/usr/bin/../lib/libOpenGL.so.0",target-name="/usr/bin/../lib/libOpenGL.so.0",host-name="/usr/bin/../lib/libOpenGL.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff78c3000",to="0x00007ffff78e7000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6Qml.so.6",target-name="/usr/bin/../lib/libQt6Qml.so.6",host-name="/usr/bin/../lib/libQt6Qml.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff5200000",to="0x00007ffff57ef000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6Network.so.6",target-name="/usr/bin/../lib/libQt6Network.so.6",host-name="/usr/bin/../lib/libQt6Network.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff5001000",to="0x00007ffff5200000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6DBus.so.6",target-name="/usr/bin/../lib/libQt6DBus.so.6",host-name="/usr/bin/../lib/libQt6DBus.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff73aa000",to="0x00007ffff747a000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6Core.so.6",target-name="/usr/bin/../lib/libQt6Core.so.6",host-name="/usr/bin/../lib/libQt6Core.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4800000",to="0x00007ffff4f20000"}]
+=library-loaded,id="/usr/bin/../lib/libstdc++.so.6",target-name="/usr/bin/../lib/libstdc++.so.6",host-name="/usr/bin/../lib/libstdc++.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4400000",to="0x00007ffff472d000"}]
+=library-loaded,id="/usr/bin/../lib/libm.so.6",target-name="/usr/bin/../lib/libm.so.6",host-name="/usr/bin/../lib/libm.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff62f8000",to="0x00007ffff6400000"}]
+=library-loaded,id="/usr/bin/../lib/libgcc_s.so.1",target-name="/usr/bin/../lib/libgcc_s.so.1",host-name="/usr/bin/../lib/libgcc_s.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff788b000",to="0x00007ffff78c1000"}]
+=library-loaded,id="/usr/bin/../lib/libc.so.6",target-name="/usr/bin/../lib/libc.so.6",host-name="/usr/bin/../lib/libc.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4000000",to="0x00007ffff425a000"}]
+=library-loaded,id="/usr/lib/libdwarf.so.2",target-name="/usr/lib/libdwarf.so.2",host-name="/usr/lib/libdwarf.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff623b000",to="0x00007ffff62f8000"}]
+=library-loaded,id="/usr/lib/libunwind.so.8",target-name="/usr/lib/libunwind.so.8",host-name="/usr/lib/libunwind.so.8",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff786c000",to="0x00007ffff788b000"}]
+=library-loaded,id="/usr/lib/libexpat.so.1",target-name="/usr/lib/libexpat.so.1",host-name="/usr/lib/libexpat.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7833000",to="0x00007ffff786a000"}]
+=library-loaded,id="/usr/lib/libGLdispatch.so.0",target-name="/usr/lib/libGLdispatch.so.0",host-name="/usr/lib/libGLdispatch.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4f88000",to="0x00007ffff5001000"}]
+=library-loaded,id="/usr/lib/libffi.so.8",target-name="/usr/lib/libffi.so.8",host-name="/usr/lib/libffi.so.8",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7824000",to="0x00007ffff7833000"}]
+=library-loaded,id="/usr/bin/../lib/libwayland-cursor.so.0",target-name="/usr/bin/../lib/libwayland-cursor.so.0",host-name="/usr/bin/../lib/libwayland-cursor.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff781b000",to="0x00007ffff7824000"}]
+=library-loaded,id="/usr/bin/../lib/libxkbcommon.so.0",target-name="/usr/bin/../lib/libxkbcommon.so.0",host-name="/usr/bin/../lib/libxkbcommon.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4793000",to="0x00007ffff4800000"}]
+=library-loaded,id="/usr/lib/libXau.so.6",target-name="/usr/lib/libXau.so.6",host-name="/usr/lib/libXau.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7814000",to="0x00007ffff7819000"}]
+=library-loaded,id="/usr/lib/libXdmcp.so.6",target-name="/usr/lib/libXdmcp.so.6",host-name="/usr/lib/libXdmcp.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff780c000",to="0x00007ffff7814000"}]
+=library-loaded,id="/usr/lib/libaudit.so.1",target-name="/usr/lib/libaudit.so.1",host-name="/usr/lib/libaudit.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff6bcb000",to="0x00007ffff6c00000"}]
+=library-loaded,id="/usr/lib/libsystemd.so.0",target-name="/usr/lib/libsystemd.so.0",host-name="/usr/lib/libsystemd.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff42b7000",to="0x00007ffff4400000"}]
+=library-loaded,id="/usr/lib/libgmodule-2.0.so.0",target-name="/usr/lib/libgmodule-2.0.so.0",host-name="/usr/lib/libgmodule-2.0.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff7805000",to="0x00007ffff780c000"}]
+=library-loaded,id="/usr/lib/libz.so.1",target-name="/usr/lib/libz.so.1",host-name="/usr/lib/libz.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4f50000",to="0x00007ffff4f88000"}]
+=library-loaded,id="/usr/lib/libmount.so.1",target-name="/usr/lib/libmount.so.1",host-name="/usr/lib/libmount.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff3f97000",to="0x00007ffff4000000"}]
+=library-loaded,id="/usr/lib/libpcre2-8.so.0",target-name="/usr/lib/libpcre2-8.so.0",host-name="/usr/lib/libpcre2-8.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff3ec7000",to="0x00007ffff3f97000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6QmlMeta.so.6",target-name="/usr/bin/../lib/libQt6QmlMeta.so.6",host-name="/usr/bin/../lib/libQt6QmlMeta.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff6211000",to="0x00007ffff623b000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6QmlModels.so.6",target-name="/usr/bin/../lib/libQt6QmlModels.so.6",host-name="/usr/bin/../lib/libQt6QmlModels.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff3d93000",to="0x00007ffff3ec7000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6OpenGL.so.6",target-name="/usr/bin/../lib/libQt6OpenGL.so.6",host-name="/usr/bin/../lib/libQt6OpenGL.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff3cea000",to="0x00007ffff3d93000"}]
+=library-loaded,id="/usr/bin/../lib/libX11.so.6",target-name="/usr/bin/../lib/libX11.so.6",host-name="/usr/bin/../lib/libX11.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff3b72000",to="0x00007ffff3cea000"}]
+=library-loaded,id="/usr/bin/../lib/libGLX.so.0",target-name="/usr/bin/../lib/libGLX.so.0",host-name="/usr/bin/../lib/libGLX.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4761000",to="0x00007ffff4793000"}]
+=library-loaded,id="/usr/bin/../lib/libpng16.so.16",target-name="/usr/bin/../lib/libpng16.so.16",host-name="/usr/bin/../lib/libpng16.so.16",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4262000",to="0x00007ffff42b7000"}]
+=library-loaded,id="/usr/bin/../lib/libharfbuzz.so.0",target-name="/usr/bin/../lib/libharfbuzz.so.0",host-name="/usr/bin/../lib/libharfbuzz.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff39fc000",to="0x00007ffff3b72000"}]
+=library-loaded,id="/usr/bin/../lib/libmd4c.so.0",target-name="/usr/bin/../lib/libmd4c.so.0",host-name="/usr/bin/../lib/libmd4c.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff6bae000",to="0x00007ffff6bc9000"}]
+=library-loaded,id="/usr/bin/../lib/libfreetype.so.6",target-name="/usr/bin/../lib/libfreetype.so.6",host-name="/usr/bin/../lib/libfreetype.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff38cc000",to="0x00007ffff39fc000"}]
+=library-loaded,id="/usr/bin/../lib/libfontconfig.so.1",target-name="/usr/bin/../lib/libfontconfig.so.1",host-name="/usr/bin/../lib/libfontconfig.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff3845000",to="0x00007ffff38cc000"}]
+=library-loaded,id="/usr/bin/../lib/libgssapi_krb5.so.2",target-name="/usr/bin/../lib/libgssapi_krb5.so.2",host-name="/usr/bin/../lib/libgssapi_krb5.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff37de000",to="0x00007ffff3845000"}]
+=library-loaded,id="/usr/bin/../lib/libbrotlidec.so.1",target-name="/usr/bin/../lib/libbrotlidec.so.1",host-name="/usr/bin/../lib/libbrotlidec.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff57f0000",to="0x00007ffff5800000"}]
+=library-loaded,id="/usr/bin/../lib/libzstd.so.1",target-name="/usr/bin/../lib/libzstd.so.1",host-name="/usr/bin/../lib/libzstd.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff367b000",to="0x00007ffff37de000"}]
+=library-loaded,id="/usr/bin/../lib/libproxy.so.1",target-name="/usr/bin/../lib/libproxy.so.1",host-name="/usr/bin/../lib/libproxy.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff6ba7000",to="0x00007ffff6bac000"}]
+=library-loaded,id="/usr/bin/../lib/libcrypto.so.3",target-name="/usr/bin/../lib/libcrypto.so.3",host-name="/usr/bin/../lib/libcrypto.so.3",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff2e00000",to="0x00007ffff3492000"}]
+=library-loaded,id="/usr/bin/../lib/libdbus-1.so.3",target-name="/usr/bin/../lib/libdbus-1.so.3",host-name="/usr/bin/../lib/libdbus-1.so.3",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff3622000",to="0x00007ffff367b000"}]
+=library-loaded,id="/usr/bin/../lib/liburing.so.2",target-name="/usr/bin/../lib/liburing.so.2",host-name="/usr/bin/../lib/liburing.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4f48000",to="0x00007ffff4f50000"}]
+=library-loaded,id="/usr/bin/../lib/libicui18n.so.78",target-name="/usr/bin/../lib/libicui18n.so.78",host-name="/usr/bin/../lib/libicui18n.so.78",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff2a00000",to="0x00007ffff2dcc000"}]
+=library-loaded,id="/usr/bin/../lib/libicuuc.so.78",target-name="/usr/bin/../lib/libicuuc.so.78",host-name="/usr/bin/../lib/libicuuc.so.78",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff2600000",to="0x00007ffff284e000"}]
+=library-loaded,id="/usr/bin/../lib/libdouble-conversion.so.3",target-name="/usr/bin/../lib/libdouble-conversion.so.3",host-name="/usr/bin/../lib/libdouble-conversion.so.3",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4f2d000",to="0x00007ffff4f48000"}]
+=library-loaded,id="/usr/bin/../lib/libb2.so.1",target-name="/usr/bin/../lib/libb2.so.1",host-name="/usr/bin/../lib/libb2.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4745000",to="0x00007ffff4761000"}]
+=library-loaded,id="/usr/bin/../lib/libpcre2-16.so.0",target-name="/usr/bin/../lib/libpcre2-16.so.0",host-name="/usr/bin/../lib/libpcre2-16.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff3562000",to="0x00007ffff3622000"}]
+=library-loaded,id="/usr/lib/liblzma.so.5",target-name="/usr/lib/liblzma.so.5",host-name="/usr/lib/liblzma.so.5",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff352d000",to="0x00007ffff3562000"}]
+=library-loaded,id="/usr/lib/libcap-ng.so.0",target-name="/usr/lib/libcap-ng.so.0",host-name="/usr/lib/libcap-ng.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4f24000",to="0x00007ffff4f2d000"}]
+=library-loaded,id="/usr/lib/libblkid.so.1",target-name="/usr/lib/libblkid.so.1",host-name="/usr/lib/libblkid.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff34e3000",to="0x00007ffff352d000"}]
+=library-loaded,id="/usr/bin/../lib/libQt6QmlWorkerScript.so.6",target-name="/usr/bin/../lib/libQt6QmlWorkerScript.so.6",host-name="/usr/bin/../lib/libQt6QmlWorkerScript.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff4730000",to="0x00007ffff4745000"}]
+=library-loaded,id="/usr/lib/libgraphite2.so.3",target-name="/usr/lib/libgraphite2.so.3",host-name="/usr/lib/libgraphite2.so.3",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff34c0000",to="0x00007ffff34e3000"}]
+=library-loaded,id="/usr/lib/libbz2.so.1.0",target-name="/usr/lib/libbz2.so.1.0",host-name="/usr/lib/libbz2.so.1.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff34ad000",to="0x00007ffff34c0000"}]
+=library-loaded,id="/usr/lib/libkrb5.so.3",target-name="/usr/lib/libkrb5.so.3",host-name="/usr/lib/libkrb5.so.3",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff28fd000",to="0x00007ffff2a00000"}]
+=library-loaded,id="/usr/lib/libk5crypto.so.3",target-name="/usr/lib/libk5crypto.so.3",host-name="/usr/lib/libk5crypto.so.3",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff28c8000",to="0x00007ffff28fd000"}]
+=library-loaded,id="/usr/lib/libcom_err.so.2",target-name="/usr/lib/libcom_err.so.2",host-name="/usr/lib/libcom_err.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff425c000",to="0x00007ffff4262000"}]
+=library-loaded,id="/usr/lib/libkrb5support.so.0",target-name="/usr/lib/libkrb5support.so.0",host-name="/usr/lib/libkrb5support.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff349d000",to="0x00007ffff34ad000"}]
+=library-loaded,id="/usr/lib/libkeyutils.so.1",target-name="/usr/lib/libkeyutils.so.1",host-name="/usr/lib/libkeyutils.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff3496000",to="0x00007ffff349d000"}]
+=library-loaded,id="/usr/lib/libresolv.so.2",target-name="/usr/lib/libresolv.so.2",host-name="/usr/lib/libresolv.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff2dec000",to="0x00007ffff2e00000"}]
+=library-loaded,id="/usr/lib/libbrotlicommon.so.1",target-name="/usr/lib/libbrotlicommon.so.1",host-name="/usr/lib/libbrotlicommon.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff28a5000",to="0x00007ffff28c8000"}]
+=library-loaded,id="/usr/lib/libproxy/libpxbackend-1.0.so",target-name="/usr/lib/libproxy/libpxbackend-1.0.so",host-name="/usr/lib/libproxy/libpxbackend-1.0.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff2ddd000",to="0x00007ffff2dec000"}]
+=library-loaded,id="/usr/lib/libbrotlienc.so.1",target-name="/usr/lib/libbrotlienc.so.1",host-name="/usr/lib/libbrotlienc.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff2514000",to="0x00007ffff2600000"}]
+=library-loaded,id="/usr/lib/libicudata.so.78",target-name="/usr/lib/libicudata.so.78",host-name="/usr/lib/libicudata.so.78",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff0400000",to="0x00007ffff2395000"}]
+=library-loaded,id="/usr/lib/libgomp.so.1",target-name="/usr/lib/libgomp.so.1",host-name="/usr/lib/libgomp.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff24a7000",to="0x00007ffff2514000"}]
+=library-loaded,id="/usr/lib/libcurl.so.4",target-name="/usr/lib/libcurl.so.4",host-name="/usr/lib/libcurl.so.4",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff239c000",to="0x00007ffff24a7000"}]
+=library-loaded,id="/usr/lib/libduktape.so.207",target-name="/usr/lib/libduktape.so.207",host-name="/usr/lib/libduktape.so.207",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff2859000",to="0x00007ffff28a5000"}]
+=library-loaded,id="/usr/lib/libnghttp3.so.9",target-name="/usr/lib/libnghttp3.so.9",host-name="/usr/lib/libnghttp3.so.9",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff03d4000",to="0x00007ffff0400000"}]
+=library-loaded,id="/usr/lib/libngtcp2_crypto_ossl.so.0",target-name="/usr/lib/libngtcp2_crypto_ossl.so.0",host-name="/usr/lib/libngtcp2_crypto_ossl.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff2dd0000",to="0x00007ffff2ddd000"}]
+=library-loaded,id="/usr/lib/libngtcp2.so.16",target-name="/usr/lib/libngtcp2.so.16",host-name="/usr/lib/libngtcp2.so.16",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff0363000",to="0x00007ffff03d4000"}]
+=library-loaded,id="/usr/lib/libnghttp2.so.14",target-name="/usr/lib/libnghttp2.so.14",host-name="/usr/lib/libnghttp2.so.14",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff0334000",to="0x00007ffff0363000"}]
+=library-loaded,id="/usr/lib/libidn2.so.0",target-name="/usr/lib/libidn2.so.0",host-name="/usr/lib/libidn2.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff0311000",to="0x00007ffff0334000"}]
+=library-loaded,id="/usr/lib/libssh2.so.1",target-name="/usr/lib/libssh2.so.1",host-name="/usr/lib/libssh2.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff02b6000",to="0x00007ffff0311000"}]
+=library-loaded,id="/usr/lib/libpsl.so.5",target-name="/usr/lib/libpsl.so.5",host-name="/usr/lib/libpsl.so.5",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff02a2000",to="0x00007ffff02b6000"}]
+=library-loaded,id="/usr/lib/libssl.so.3",target-name="/usr/lib/libssl.so.3",host-name="/usr/lib/libssl.so.3",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff018a000",to="0x00007ffff02a2000"}]
+=library-loaded,id="/usr/lib/libunistring.so.5",target-name="/usr/lib/libunistring.so.5",host-name="/usr/lib/libunistring.so.5",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffeff92000",to="0x00007ffff018a000"}]
+~"[Thread debugging using libthread_db enabled]\n"
+~"Using host libthread_db library \"/usr/lib/libthread_db.so.1\".\n"
+=library-loaded,id="/usr/lib/libGLX_nvidia.so.0",target-name="/usr/lib/libGLX_nvidia.so.0",host-name="/usr/lib/libGLX_nvidia.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffefe67000",to="0x00007fffeff92000"}]
+=library-loaded,id="/usr/lib/libnvidia-glsi.so.615.78.08",target-name="/usr/lib/libnvidia-glsi.so.615.78.08",host-name="/usr/lib/libnvidia-glsi.so.615.78.08",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef564000",to="0x00007fffef600000"}]
+=library-loaded,id="/usr/lib/libnvidia-tls.so.615.78.08",target-name="/usr/lib/libnvidia-tls.so.615.78.08",host-name="/usr/lib/libnvidia-tls.so.615.78.08",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007ffff2396000",to="0x00007ffff239c000"}]
+=library-loaded,id="/usr/lib/libnvidia-glcore.so.615.78.08",target-name="/usr/lib/libnvidia-glcore.so.615.78.08",host-name="/usr/lib/libnvidia-glcore.so.615.78.08",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffecc00000",to="0x00007fffef417000"}]
+=library-loaded,id="/usr/lib/libXext.so.6",target-name="/usr/lib/libXext.so.6",host-name="/usr/lib/libXext.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffefe4f000",to="0x00007fffefe67000"}]
+=library-loaded,id="/usr/lib/libdl.so.2",target-name="/usr/lib/libdl.so.2",host-name="/usr/lib/libdl.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffefe4a000",to="0x00007fffefe4f000"}]
+=library-loaded,id="/usr/lib/libpthread.so.0",target-name="/usr/lib/libpthread.so.0",host-name="/usr/lib/libpthread.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffefe45000",to="0x00007fffefe4a000"}]
+=library-loaded,id="/usr/lib/librt.so.1",target-name="/usr/lib/librt.so.1",host-name="/usr/lib/librt.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffefe40000",to="0x00007fffefe45000"}]
+=library-loaded,id="/usr/lib/libnvidia-gpucomp.so.615.78.08",target-name="/usr/lib/libnvidia-gpucomp.so.615.78.08",host-name="/usr/lib/libnvidia-gpucomp.so.615.78.08",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe5600000",to="0x00007fffecacd000"}]
+  INFO: Launching config: "/tmp/isla-native-probe/bar/shell.qml"
+  INFO: Shell ID: "84099f03cf89cf0260f5e7414e8c91ab" Path ID "84099f03cf89cf0260f5e7414e8c91ab"
+=library-loaded,id="/usr/lib/qt6/plugins/platforms/libqwayland.so",target-name="/usr/lib/qt6/plugins/platforms/libqwayland.so",host-name="/usr/lib/qt6/plugins/platforms/libqwayland.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffefe2f000",to="0x00007fffefe35000"}]
+=thread-created,id="2",group-id="i1"
+~"[New Thread 0x7fffe45ff6c0 (LWP 540392) (id 2)]\n"
+*running,thread-id="2"
+=library-loaded,id="/usr/lib/qt6/plugins/wayland-shell-integration/libxdg-shell.so",target-name="/usr/lib/qt6/plugins/wayland-shell-integration/libxdg-shell.so",host-name="/usr/lib/qt6/plugins/wayland-shell-integration/libxdg-shell.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffefe12000",to="0x00007fffefe2f000"}]
+=thread-created,id="3",group-id="i1"
+~"[New Thread 0x7fffe37ff6c0 (LWP 540393) (id 3)]\n"
+*running,thread-id="3"
+=thread-created,id="4",group-id="i1"
+~"[New Thread 0x7fffe2ffe6c0 (LWP 540394) (id 4)]\n"
+*running,thread-id="4"
+=thread-created,id="5",group-id="i1"
+~"[New Thread 0x7fffe1fff6c0 (LWP 540395) (id 5)]\n"
+*running,thread-id="5"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/qykbn9fcnt/log.qslog"
+=library-loaded,id="/usr/lib/qt6/plugins/wayland-graphics-integration-client/libqt-plugin-wayland-egl.so",target-name="/usr/lib/qt6/plugins/wayland-graphics-integration-client/libqt-plugin-wayland-egl.so",host-name="/usr/lib/qt6/plugins/wayland-graphics-integration-client/libqt-plugin-wayland-egl.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef4f7000",to="0x00007fffef509000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/wayland-graphics-integration-client/../../../libwayland-egl.so.1",target-name="/usr/lib/qt6/plugins/wayland-graphics-integration-client/../../../libwayland-egl.so.1",host-name="/usr/lib/qt6/plugins/wayland-graphics-integration-client/../../../libwayland-egl.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffefe0a000",to="0x00007fffefe0f000"}]
+=library-loaded,id="/usr/lib/libEGL_nvidia.so.0",target-name="/usr/lib/libEGL_nvidia.so.0",host-name="/usr/lib/libEGL_nvidia.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffecad5000",to="0x00007fffecc00000"}]
+=library-loaded,id="/usr/lib/libnvidia-egl-wayland2.so.1",target-name="/usr/lib/libnvidia-egl-wayland2.so.1",host-name="/usr/lib/libnvidia-egl-wayland2.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef4e0000",to="0x00007fffef4f7000"}]
+=library-loaded,id="/usr/lib/libnvidia-eglcore.so.615.78.08",target-name="/usr/lib/libnvidia-eglcore.so.615.78.08",host-name="/usr/lib/libnvidia-eglcore.so.615.78.08",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdce00000",to="0x00007fffdf3a8000"}]
+=library-loaded,id="/usr/lib/libnvidia-egl-wayland.so.1",target-name="/usr/lib/libnvidia-egl-wayland.so.1",host-name="/usr/lib/libnvidia-egl-wayland.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef4c9000",to="0x00007fffef4e0000"}]
+=library-loaded,id="/usr/lib/libwayland-server.so.0",target-name="/usr/lib/libwayland-server.so.0",host-name="/usr/lib/libwayland-server.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef4b2000",to="0x00007fffef4c9000"}]
+=library-loaded,id="/usr/lib/libnvidia-egl-gbm.so.1",target-name="/usr/lib/libnvidia-egl-gbm.so.1",host-name="/usr/lib/libnvidia-egl-gbm.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffefe01000",to="0x00007fffefe0a000"}]
+=library-loaded,id="/usr/lib/libnvidia-egl-xcb.so.1",target-name="/usr/lib/libnvidia-egl-xcb.so.1",host-name="/usr/lib/libnvidia-egl-xcb.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef49c000",to="0x00007fffef4b2000"}]
+=library-loaded,id="/usr/lib/libxcb-present.so.0",target-name="/usr/lib/libxcb-present.so.0",host-name="/usr/lib/libxcb-present.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef497000",to="0x00007fffef49c000"}]
+=library-loaded,id="/usr/lib/libxcb-dri3.so.0",target-name="/usr/lib/libxcb-dri3.so.0",host-name="/usr/lib/libxcb-dri3.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef490000",to="0x00007fffef497000"}]
+=library-loaded,id="/usr/lib/libnvidia-egl-xlib.so.1",target-name="/usr/lib/libnvidia-egl-xlib.so.1",host-name="/usr/lib/libnvidia-egl-xlib.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef47a000",to="0x00007fffef490000"}]
+=library-loaded,id="/usr/lib/libX11-xcb.so.1",target-name="/usr/lib/libX11-xcb.so.1",host-name="/usr/lib/libX11-xcb.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef475000",to="0x00007fffef47a000"}]
+=library-loaded,id="/usr/lib/libEGL_mesa.so.0",target-name="/usr/lib/libEGL_mesa.so.0",host-name="/usr/lib/libEGL_mesa.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe4c9d000",to="0x00007fffe4d00000"}]
+=library-loaded,id="/usr/lib/libgallium-26.2.4-arch3.1.so",target-name="/usr/lib/libgallium-26.2.4-arch3.1.so",host-name="/usr/lib/libgallium-26.2.4-arch3.1.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffd9600000",to="0x00007fffdccbd000"}]
+=library-loaded,id="/usr/lib/libxcb-randr.so.0",target-name="/usr/lib/libxcb-randr.so.0",host-name="/usr/lib/libxcb-randr.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef463000",to="0x00007fffef475000"}]
+=library-loaded,id="/usr/lib/libxcb-xfixes.so.0",target-name="/usr/lib/libxcb-xfixes.so.0",host-name="/usr/lib/libxcb-xfixes.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef45a000",to="0x00007fffef463000"}]
+=library-loaded,id="/usr/lib/libxcb-shm.so.0",target-name="/usr/lib/libxcb-shm.so.0",host-name="/usr/lib/libxcb-shm.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef455000",to="0x00007fffef45a000"}]
+=library-loaded,id="/usr/lib/libLLVM.so.23.1",target-name="/usr/lib/libLLVM.so.23.1",host-name="/usr/lib/libLLVM.so.23.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffd0200000",to="0x00007fffd9544000"}]
+=library-loaded,id="/usr/lib/libSPIRV-Tools.so",target-name="/usr/lib/libSPIRV-Tools.so",host-name="/usr/lib/libSPIRV-Tools.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe3c0f000",to="0x00007fffe3dff000"}]
+=library-loaded,id="/usr/lib/libsensors.so.5",target-name="/usr/lib/libsensors.so.5",host-name="/usr/lib/libsensors.so.5",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef443000",to="0x00007fffef455000"}]
+=library-loaded,id="/usr/lib/libxcb-sync.so.1",target-name="/usr/lib/libxcb-sync.so.1",host-name="/usr/lib/libxcb-sync.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef43a000",to="0x00007fffef443000"}]
+=library-loaded,id="/usr/lib/libxshmfence.so.1",target-name="/usr/lib/libxshmfence.so.1",host-name="/usr/lib/libxshmfence.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef435000",to="0x00007fffef43a000"}]
+=library-loaded,id="/usr/lib/libelf.so.1",target-name="/usr/lib/libelf.so.1",host-name="/usr/lib/libelf.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffef417000",to="0x00007fffef435000"}]
+=library-loaded,id="/usr/lib/libdrm_amdgpu.so.1",target-name="/usr/lib/libdrm_amdgpu.so.1",host-name="/usr/lib/libdrm_amdgpu.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe4c8f000",to="0x00007fffe4c9d000"}]
+=library-loaded,id="/usr/lib/libdrm_intel.so.1",target-name="/usr/lib/libdrm_intel.so.1",host-name="/usr/lib/libdrm_intel.so.1",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe4c65000",to="0x00007fffe4c8f000"}]
+=library-loaded,id="/usr/lib/libedit.so.0",target-name="/usr/lib/libedit.so.0",host-name="/usr/lib/libedit.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe4c19000",to="0x00007fffe4c65000"}]
+=library-loaded,id="/usr/lib/libxml2.so.16",target-name="/usr/lib/libxml2.so.16",host-name="/usr/lib/libxml2.so.16",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe267f000",to="0x00007fffe27fe000"}]
+=library-loaded,id="/usr/lib/libpciaccess.so.0",target-name="/usr/lib/libpciaccess.so.0",host-name="/usr/lib/libpciaccess.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe4c0e000",to="0x00007fffe4c19000"}]
+=library-loaded,id="/usr/lib/libncursesw.so.6",target-name="/usr/lib/libncursesw.so.6",host-name="/usr/lib/libncursesw.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe4b8b000",to="0x00007fffe4c0e000"}]
+=library-loaded,id="/usr/lib/gbm/nvidia-drm_gbm.so",target-name="/usr/lib/gbm/nvidia-drm_gbm.so",host-name="/usr/lib/gbm/nvidia-drm_gbm.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe2657000",to="0x00007fffe267f000"}]
+=library-unloaded,id="/usr/lib/gbm/nvidia-drm_gbm.so",target-name="/usr/lib/gbm/nvidia-drm_gbm.so",host-name="/usr/lib/gbm/nvidia-drm_gbm.so",thread-group="i1",ranges=[{from="0x00007fffe2657000",to="0x00007fffe267f000"}],still-in-use="false"
+=library-loaded,id="/usr/lib/gbm/nvidia-drm_gbm.so",target-name="/usr/lib/gbm/nvidia-drm_gbm.so",host-name="/usr/lib/gbm/nvidia-drm_gbm.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe2657000",to="0x00007fffe267f000"}]
+=thread-created,id="6",group-id="i1"
+~"[New Thread 0x7fffd01ff6c0 (LWP 540396) (id 6)]\n"
+*running,thread-id="6"
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Window/libquickwindowplugin.so",target-name="/usr/lib/qt6/qml/QtQuick/Window/libquickwindowplugin.so",host-name="/usr/lib/qt6/qml/QtQuick/Window/libquickwindowplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe4b75000",to="0x00007fffe4b7b000"}]
+=library-loaded,id="/home/zdito/.local/share/isla/qml/Wpscan/libwpscanpluginplugin.so",target-name="/home/zdito/.local/share/isla/qml/Wpscan/libwpscanpluginplugin.so",host-name="/home/zdito/.local/share/isla/qml/Wpscan/libwpscanpluginplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe4b6f000",to="0x00007fffe4b75000"}]
+=library-loaded,id="/home/zdito/.local/share/isla/qml/Wpscan/libwpscanplugin.so",target-name="/home/zdito/.local/share/isla/qml/Wpscan/libwpscanplugin.so",host-name="/home/zdito/.local/share/isla/qml/Wpscan/libwpscanplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe263d000",to="0x00007fffe2657000"}]
+=library-loaded,id="/usr/lib/libQt6Concurrent.so.6",target-name="/usr/lib/libQt6Concurrent.so.6",host-name="/usr/lib/libQt6Concurrent.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe4b68000",to="0x00007fffe4b6f000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Effects/libeffectsplugin.so",target-name="/usr/lib/qt6/qml/QtQuick/Effects/libeffectsplugin.so",host-name="/usr/lib/qt6/qml/QtQuick/Effects/libeffectsplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe3c09000",to="0x00007fffe3c0f000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Effects/../../../../libQt6QuickEffects.so.6",target-name="/usr/lib/qt6/qml/QtQuick/Effects/../../../../libQt6QuickEffects.so.6",host-name="/usr/lib/qt6/qml/QtQuick/Effects/../../../../libQt6QuickEffects.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe17ab000",to="0x00007fffe17ff000"}]
+=library-loaded,id="/usr/lib/qt6/qml/Qt5Compat/GraphicalEffects/libqtgraphicaleffectsplugin.so",target-name="/usr/lib/qt6/qml/Qt5Compat/GraphicalEffects/libqtgraphicaleffectsplugin.so",host-name="/usr/lib/qt6/qml/Qt5Compat/GraphicalEffects/libqtgraphicaleffectsplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe16b2000",to="0x00007fffe17ab000"}]
+=library-loaded,id="/usr/lib/qt6/qml/Qt5Compat/GraphicalEffects/private/libqtgraphicaleffectsprivateplugin.so",target-name="/usr/lib/qt6/qml/Qt5Compat/GraphicalEffects/private/libqtgraphicaleffectsprivateplugin.so",host-name="/usr/lib/qt6/qml/Qt5Compat/GraphicalEffects/private/libqtgraphicaleffectsprivateplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe162c000",to="0x00007fffe16b2000"}]
+=library-loaded,id="/usr/lib/qt6/qml/Qt5Compat/GraphicalEffects/private/../../../../../libQt6ShaderTools.so.6",target-name="/usr/lib/qt6/qml/Qt5Compat/GraphicalEffects/private/../../../../../libQt6ShaderTools.so.6",host-name="/usr/lib/qt6/qml/Qt5Compat/GraphicalEffects/private/../../../../../libQt6ShaderTools.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffce000000",to="0x00007fffcec92000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Shapes/libqmlshapesplugin.so",target-name="/usr/lib/qt6/qml/QtQuick/Shapes/libqmlshapesplugin.so",host-name="/usr/lib/qt6/qml/QtQuick/Shapes/libqmlshapesplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe3c03000",to="0x00007fffe3c09000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Shapes/../../../../libQt6QuickShapes.so.6",target-name="/usr/lib/qt6/qml/QtQuick/Shapes/../../../../libQt6QuickShapes.so.6",host-name="/usr/lib/qt6/qml/QtQuick/Shapes/../../../../libQt6QuickShapes.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe0fa7000",to="0x00007fffe1000000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Controls/Basic/libqtquickcontrols2basicstyleplugin.so",target-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/libqtquickcontrols2basicstyleplugin.so",host-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/libqtquickcontrols2basicstyleplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe2637000",to="0x00007fffe263d000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Controls/Basic/../../../../../libQt6QuickControls2Basic.so.6",target-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/../../../../../libQt6QuickControls2Basic.so.6",host-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/../../../../../libQt6QuickControls2Basic.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffcd800000",to="0x00007fffcdade000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Controls/Basic/../../../../../libQt6QuickControls2.so.6",target-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/../../../../../libQt6QuickControls2.so.6",host-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/../../../../../libQt6QuickControls2.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe261e000",to="0x00007fffe2637000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Controls/Basic/../../../../../libQt6QuickTemplates2.so.6",target-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/../../../../../libQt6QuickTemplates2.so.6",host-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/../../../../../libQt6QuickTemplates2.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffcd400000",to="0x00007fffcd688000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Layouts/libqquicklayoutsplugin.so",target-name="/usr/lib/qt6/qml/QtQuick/Layouts/libqquicklayoutsplugin.so",host-name="/usr/lib/qt6/qml/QtQuick/Layouts/libqquicklayoutsplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe2618000",to="0x00007fffe261e000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Layouts/../../../../libQt6QuickLayouts.so.6",target-name="/usr/lib/qt6/qml/QtQuick/Layouts/../../../../libQt6QuickLayouts.so.6",host-name="/usr/lib/qt6/qml/QtQuick/Layouts/../../../../libQt6QuickLayouts.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe0f4d000",to="0x00007fffe0fa7000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Templates/libqtquicktemplates2plugin.so",target-name="/usr/lib/qt6/qml/QtQuick/Templates/libqtquicktemplates2plugin.so",host-name="/usr/lib/qt6/qml/QtQuick/Templates/libqtquicktemplates2plugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe2612000",to="0x00007fffe2618000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Controls/impl/libqtquickcontrols2implplugin.so",target-name="/usr/lib/qt6/qml/QtQuick/Controls/impl/libqtquickcontrols2implplugin.so",host-name="/usr/lib/qt6/qml/QtQuick/Controls/impl/libqtquickcontrols2implplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe260c000",to="0x00007fffe2612000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Controls/impl/../../../../../libQt6QuickControls2Impl.so.6",target-name="/usr/lib/qt6/qml/QtQuick/Controls/impl/../../../../../libQt6QuickControls2Impl.so.6",host-name="/usr/lib/qt6/qml/QtQuick/Controls/impl/../../../../../libQt6QuickControls2Impl.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe0eee000",to="0x00007fffe0f4d000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Controls/Basic/impl/libqtquickcontrols2basicstyleimplplugin.so",target-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/impl/libqtquickcontrols2basicstyleimplplugin.so",host-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/impl/libqtquickcontrols2basicstyleimplplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe2606000",to="0x00007fffe260c000"}]
+=library-loaded,id="/usr/lib/qt6/qml/QtQuick/Controls/Basic/impl/../../../../../../libQt6QuickControls2BasicStyleImpl.so.6",target-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/impl/../../../../../../libQt6QuickControls2BasicStyleImpl.so.6",host-name="/usr/lib/qt6/qml/QtQuick/Controls/Basic/impl/../../../../../../libQt6QuickControls2BasicStyleImpl.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe1610000",to="0x00007fffe162c000"}]
+=library-loaded,id="/usr/lib/qt6/qml/Qt/labs/folderlistmodel/libqmlfolderlistmodelplugin.so",target-name="/usr/lib/qt6/qml/Qt/labs/folderlistmodel/libqmlfolderlistmodelplugin.so",host-name="/usr/lib/qt6/qml/Qt/labs/folderlistmodel/libqmlfolderlistmodelplugin.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe2600000",to="0x00007fffe2606000"}]
+=library-loaded,id="/usr/lib/qt6/qml/Qt/labs/folderlistmodel/../../../../../libQt6LabsFolderListModel.so.6",target-name="/usr/lib/qt6/qml/Qt/labs/folderlistmodel/../../../../../libQt6LabsFolderListModel.so.6",host-name="/usr/lib/qt6/qml/Qt/labs/folderlistmodel/../../../../../libQt6LabsFolderListModel.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe0ece000",to="0x00007fffe0eee000"}]
+=thread-created,id="7",group-id="i1"
+~"[New Thread 0x7fffccbff6c0 (LWP 540399) (id 7)]\n"
+*running,thread-id="7"
+=library-loaded,id="/usr/lib/spa-0.2/support/libspa-support.so",target-name="/usr/lib/spa-0.2/support/libspa-support.so",host-name="/usr/lib/spa-0.2/support/libspa-support.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe083f000",to="0x00007fffe086c000"}]
+=library-loaded,id="/usr/lib/spa-0.2/support/libspa-journal.so",target-name="/usr/lib/spa-0.2/support/libspa-journal.so",host-name="/usr/lib/spa-0.2/support/libspa-journal.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe0e42000",to="0x00007fffe0e48000"}]
+=library-loaded,id="/usr/lib/spa-0.2/support/libspa-dbus.so",target-name="/usr/lib/spa-0.2/support/libspa-dbus.so",host-name="/usr/lib/spa-0.2/support/libspa-dbus.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe0838000",to="0x00007fffe083f000"}]
+=library-loaded,id="/usr/lib/pipewire-0.3/libpipewire-module-rt.so",target-name="/usr/lib/pipewire-0.3/libpipewire-module-rt.so",host-name="/usr/lib/pipewire-0.3/libpipewire-module-rt.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe082e000",to="0x00007fffe0838000"}]
+=library-loaded,id="/usr/lib/pipewire-0.3/libpipewire-module-protocol-native.so",target-name="/usr/lib/pipewire-0.3/libpipewire-module-protocol-native.so",host-name="/usr/lib/pipewire-0.3/libpipewire-module-protocol-native.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe00f1000",to="0x00007fffe0129000"}]
+=library-loaded,id="/usr/lib/pipewire-0.3/libpipewire-module-client-node.so",target-name="/usr/lib/pipewire-0.3/libpipewire-module-client-node.so",host-name="/usr/lib/pipewire-0.3/libpipewire-module-client-node.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe0808000",to="0x00007fffe082e000"}]
+=library-loaded,id="/usr/lib/pipewire-0.3/libpipewire-module-client-device.so",target-name="/usr/lib/pipewire-0.3/libpipewire-module-client-device.so",host-name="/usr/lib/pipewire-0.3/libpipewire-module-client-device.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe00e0000",to="0x00007fffe00f1000"}]
+=library-loaded,id="/usr/lib/pipewire-0.3/libpipewire-module-adapter.so",target-name="/usr/lib/pipewire-0.3/libpipewire-module-adapter.so",host-name="/usr/lib/pipewire-0.3/libpipewire-module-adapter.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe00d6000",to="0x00007fffe00e0000"}]
+=library-loaded,id="/usr/lib/pipewire-0.3/libpipewire-module-metadata.so",target-name="/usr/lib/pipewire-0.3/libpipewire-module-metadata.so",host-name="/usr/lib/pipewire-0.3/libpipewire-module-metadata.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe00c7000",to="0x00007fffe00d6000"}]
+=library-loaded,id="/usr/lib/pipewire-0.3/libpipewire-module-session-manager.so",target-name="/usr/lib/pipewire-0.3/libpipewire-module-session-manager.so",host-name="/usr/lib/pipewire-0.3/libpipewire-module-session-manager.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffe009e000",to="0x00007fffe00c7000"}]
+=thread-created,id="8",group-id="i1"
+~"[New Thread 0x7fffc93ff6c0 (LWP 540400) (id 8)]\n"
+*running,thread-id="8"
+=thread-created,id="9",group-id="i1"
+~"[New Thread 0x7fffc7bff6c0 (LWP 540401) (id 9)]\n"
+*running,thread-id="9"
+=thread-created,id="10",group-id="i1"
+~"[New Thread 0x7fffc6fff6c0 (LWP 540402) (id 10)]\n"
+*running,thread-id="10"
+=thread-created,id="11",group-id="i1"
+~"[New Thread 0x7fffc61ff6c0 (LWP 540403) (id 11)]\n"
+*running,thread-id="11"
+ DEBUG qml: [Auth] Polkit agent registered: false
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+~"[Detaching after vfork from child process 540404]\n"
+~"[Detaching after vfork from child process 540405]\n"
+~"[Detaching after vfork from child process 540409]\n"
+~"[Detaching after vfork from child process 540410]\n"
+~"[Detaching after vfork from child process 540411]\n"
+~"[Detaching after vfork from child process 540412]\n"
+  INFO: Configuration Loaded
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/libqsvg.so",target-name="/usr/lib/qt6/plugins/imageformats/libqsvg.so",host-name="/usr/lib/qt6/plugins/imageformats/libqsvg.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdfa67000",to="0x00007fffdfa6f000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/../../../libQt6Svg.so.6",target-name="/usr/lib/qt6/plugins/imageformats/../../../libQt6Svg.so.6",host-name="/usr/lib/qt6/plugins/imageformats/../../../libQt6Svg.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdcd5a000",to="0x00007fffdce00000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/libqicns.so",target-name="/usr/lib/qt6/plugins/imageformats/libqicns.so",host-name="/usr/lib/qt6/plugins/imageformats/libqicns.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdfa5a000",to="0x00007fffdfa66000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/libqtga.so",target-name="/usr/lib/qt6/plugins/imageformats/libqtga.so",host-name="/usr/lib/qt6/plugins/imageformats/libqtga.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdfa52000",to="0x00007fffdfa59000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/libqtiff.so",target-name="/usr/lib/qt6/plugins/imageformats/libqtiff.so",host-name="/usr/lib/qt6/plugins/imageformats/libqtiff.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdfa45000",to="0x00007fffdfa50000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/../../../libtiff.so.6",target-name="/usr/lib/qt6/plugins/imageformats/../../../libtiff.so.6",host-name="/usr/lib/qt6/plugins/imageformats/../../../libtiff.so.6",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffcf928000",to="0x00007fffcf9ff000"}]
+=library-loaded,id="/usr/lib/libdeflate.so.0",target-name="/usr/lib/libdeflate.so.0",host-name="/usr/lib/libdeflate.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdfa27000",to="0x00007fffdfa45000"}]
+=library-loaded,id="/usr/lib/libjpeg.so.8",target-name="/usr/lib/libjpeg.so.8",host-name="/usr/lib/libjpeg.so.8",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffd9558000",to="0x00007fffd9600000"}]
+=library-loaded,id="/usr/lib/libjbig.so.2.2",target-name="/usr/lib/libjbig.so.2.2",host-name="/usr/lib/libjbig.so.2.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdfa16000",to="0x00007fffdfa27000"}]
+=library-loaded,id="/usr/lib/libwebp.so.7",target-name="/usr/lib/libwebp.so.7",host-name="/usr/lib/libwebp.so.7",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffcf844000",to="0x00007fffcf928000"}]
+=library-loaded,id="/usr/lib/libsharpyuv.so.0",target-name="/usr/lib/libsharpyuv.so.0",host-name="/usr/lib/libsharpyuv.so.0",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdfa09000",to="0x00007fffdfa16000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/libqwbmp.so",target-name="/usr/lib/qt6/plugins/imageformats/libqwbmp.so",host-name="/usr/lib/qt6/plugins/imageformats/libqwbmp.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdf3f9000",to="0x00007fffdf400000"}]
+~"[Detaching after vfork from child process 540413]\n"
+~"[Detaching after vfork from child process 540414]\n"
+~"[Detaching after vfork from child process 540415]\n"
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/libqwebp.so",target-name="/usr/lib/qt6/plugins/imageformats/libqwebp.so",host-name="/usr/lib/qt6/plugins/imageformats/libqwebp.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdf3f0000",to="0x00007fffdf3f9000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/../../../libwebpdemux.so.2",target-name="/usr/lib/qt6/plugins/imageformats/../../../libwebpdemux.so.2",host-name="/usr/lib/qt6/plugins/imageformats/../../../libwebpdemux.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdf3e9000",to="0x00007fffdf3f0000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/../../../libwebpmux.so.3",target-name="/usr/lib/qt6/plugins/imageformats/../../../libwebpmux.so.3",host-name="/usr/lib/qt6/plugins/imageformats/../../../libwebpmux.so.3",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdf3dc000",to="0x00007fffdf3e9000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/libqgif.so",target-name="/usr/lib/qt6/plugins/imageformats/libqgif.so",host-name="/usr/lib/qt6/plugins/imageformats/libqgif.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdf3d1000",to="0x00007fffdf3da000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/libqico.so",target-name="/usr/lib/qt6/plugins/imageformats/libqico.so",host-name="/usr/lib/qt6/plugins/imageformats/libqico.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdf3c7000",to="0x00007fffdf3d1000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/imageformats/libqjpeg.so",target-name="/usr/lib/qt6/plugins/imageformats/libqjpeg.so",host-name="/usr/lib/qt6/plugins/imageformats/libqjpeg.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdf3b9000",to="0x00007fffdf3c6000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/tls/libqcertonlybackend.so",target-name="/usr/lib/qt6/plugins/tls/libqcertonlybackend.so",host-name="/usr/lib/qt6/plugins/tls/libqcertonlybackend.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdcd42000",to="0x00007fffdcd5a000"}]
+=library-loaded,id="/usr/lib/qt6/plugins/tls/libqopensslbackend.so",target-name="/usr/lib/qt6/plugins/tls/libqopensslbackend.so",host-name="/usr/lib/qt6/plugins/tls/libqopensslbackend.so",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffdccfe000",to="0x00007fffdcd42000"}]
+=thread-created,id="12",group-id="i1"
+~"[New Thread 0x7fffc487f6c0 (LWP 540432) (id 12)]\n"
+*running,thread-id="12"
+ DEBUG qml: [Auth] Polkit agent registered: true
+=thread-created,id="13",group-id="i1"
+~"[New Thread 0x7fffc3bff6c0 (LWP 540440) (id 13)]\n"
+*running,thread-id="13"
+=thread-created,id="14",group-id="i1"
+~"[New Thread 0x7fffc2dff6c0 (LWP 540441) (id 14)]\n"
+*running,thread-id="14"
+=library-loaded,id="/usr/lib/libnss_mymachines.so.2",target-name="/usr/lib/libnss_mymachines.so.2",host-name="/usr/lib/libnss_mymachines.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffceccc000",to="0x00007fffced40000"}]
+=library-loaded,id="/usr/lib/libnss_resolve.so.2",target-name="/usr/lib/libnss_resolve.so.2",host-name="/usr/lib/libnss_resolve.so.2",symbols-loaded="0",thread-group="i1",ranges=[{from="0x00007fffcdc28000",to="0x00007fffcdc80000"}]
+=thread-created,id="15",group-id="i1"
+~"[New Thread 0x7fffc1fff6c0 (LWP 540444) (id 15)]\n"
+*running,thread-id="15"
+=thread-created,id="16",group-id="i1"
+~"[New Thread 0x7fffc0a7f6c0 (LWP 540446) (id 16)]\n"
+*running,thread-id="16"
+=thread-created,id="17",group-id="i1"
+~"[New Thread 0x7fffbf57f6c0 (LWP 540448) (id 17)]\n"
+*running,thread-id="17"
+=thread-created,id="18",group-id="i1"
+~"[New Thread 0x7fffbadff6c0 (LWP 540450) (id 18)]\n"
+*running,thread-id="18"
+=thread-created,id="19",group-id="i1"
+~"[New Thread 0x7fffba5fe6c0 (LWP 540451) (id 19)]\n"
+*running,thread-id="19"
+~"[Detaching after vfork from child process 540453]\n"
+~"[Detaching after vfork from child process 540454]\n"
+=thread-created,id="20",group-id="i1"
+~"[New Thread 0x7fffb89ff6c0 (LWP 540455) (id 20)]\n"
+*running,thread-id="20"
+=thread-created,id="21",group-id="i1"
+~"[New Thread 0x7fffb81fe6c0 (LWP 540456) (id 21)]\n"
+*running,thread-id="21"
+=thread-created,id="22",group-id="i1"
+~"[New Thread 0x7fffb73ff6c0 (LWP 540457) (id 22)]\n"
+*running,thread-id="22"
+=thread-created,id="23",group-id="i1"
+~"[New Thread 0x7fffb67ff6c0 (LWP 540458) (id 23)]\n"
+*running,thread-id="23"
+~"[Detaching after vfork from child process 540459]\n"
+~"[Detaching after vfork from child process 540460]\n"
+~"[Detaching after vfork from child process 540469]\n"
+=thread-created,id="24",group-id="i1"
+~"[New Thread 0x7fffb1bff6c0 (LWP 540475) (id 24)]\n"
+*running,thread-id="24"
+~"[Detaching after vfork from child process 540478]\n"
+~"[Detaching after vfork from child process 540479]\n"
+~"[Detaching after vfork from child process 540509]\n"
+~"[Detaching after vfork from child process 540569]\n"
+~"[Detaching after vfork from child process 540594]\n"
+~"[Detaching after vfork from child process 540601]\n"
+~"[Detaching after vfork from child process 540614]\n"
+~"[Detaching after vfork from child process 540673]\n"
+7^done,groups=[{id="i1",type="process",pid="540386",executable="/usr/bin/qs",cores=["11","5","0","2","4","3","1","9"]}]
+(gdb) 
+8^done
+(gdb) 
+~"\nThread "
+~"1 \"qs\" received signal SIGINT, Interrupt.\n"
+~"0x00007ffff40b5a22 in ?? () from /usr/bin/../lib/libc.so.6\n"
+*stopped,reason="signal-received",signal-name="SIGINT",signal-meaning="Interrupt",frame={addr="0x00007ffff40b5a22",func="??",args=[],from="/usr/bin/../lib/libc.so.6",arch="i386:x86-64"},thread-id="1",stopped-threads="all",core="2"
+~"NATIVE_MARK initial\n"
+9^done
+(gdb) 
+Arena 0:
+system bytes     =          0
+in use bytes     =          0
+Total (incl. mmap):
+system bytes     =          0
+in use bytes     =          0
+max mmap regions =          0
+max mmap bytes   =          0
+10^done,value="void"
+(gdb) 
+11^running
+*running,thread-id="all"
+(gdb) 
+~"[Detaching after vfork from child process 540677]\n"
+~"[Detaching after vfork from child process 540706]\n"
+~"[Detaching after vfork from child process 540707]\n"
+~"[Detaching after vfork from child process 540708]\n"
+~"[Detaching after vfork from child process 540709]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 540713]\n"
+~"[Detaching after vfork from child process 540714]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 540734]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 540746]\n"
+~"[Detaching after vfork from child process 540747]\n"
+~"[Detaching after vfork from child process 540760]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 540777]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 540842]\n"
+~"[Detaching after vfork from child process 540845]\n"
+~"[Detaching after vfork from child process 540852]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 540887]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 540889]\n"
+~"[Detaching after vfork from child process 540890]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 540901]\n"
+~"[Detaching after vfork from child process 540919]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 540981]\n"
+~"[Detaching after vfork from child process 540982]\n"
+~"[Detaching after vfork from child process 540993]\n"
+~"[Thread 0x7fffc61ff6c0 (LWP 540403) (id 11) exited]\n"
+=thread-exited,id="11",group-id="i1"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541030]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541032]\n"
+~"[Detaching after vfork from child process 541033]\n"
+~"[Detaching after vfork from child process 541044]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541062]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541124]\n"
+~"[Detaching after vfork from child process 541125]\n"
+~"[Detaching after vfork from child process 541136]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541173]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541176]\n"
+~"[Detaching after vfork from child process 541177]\n"
+~"[Detaching after vfork from child process 541192]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541211]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541217]\n"
+~"[Detaching after vfork from child process 541218]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541284]\n"
+~"[Detaching after vfork from child process 541314]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541315]\n"
+~"[Detaching after vfork from child process 541316]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541336]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541355]\n"
+~"[Detaching after vfork from child process 541356]\n"
+~"[Detaching after vfork from child process 541360]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541428]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541458]\n"
+~"[Detaching after vfork from child process 541459]\n"
+~"[Detaching after vfork from child process 541469]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541476]\n"
+~"[Thread 0x7fffc2dff6c0 (LWP 540441) (id 14) exited]\n"
+=thread-exited,id="14",group-id="i1"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541492]\n"
+~"[Detaching after vfork from child process 541493]\n"
+~"[Thread 0x7fffb67ff6c0 (LWP 540458) (id 23) exited]\n"
+=thread-exited,id="23",group-id="i1"
+~"[Thread 0x7fffb89ff6c0 (LWP 540455) (id 20) exited]\n"
+=thread-exited,id="20",group-id="i1"
+~"[Thread 0x7fffba5fe6c0 (LWP 540451) (id 19) exited]\n"
+=thread-exited,id="19",group-id="i1"
+~"[Detaching after vfork from child process 541504]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Thread 0x7fffccbff6c0 (LWP 540399) (id 7) exited]\n"
+=thread-exited,id="7",group-id="i1"
+~"[Detaching after vfork from child process 541571]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541577]\n"
+~"[Detaching after vfork from child process 541585]\n"
+~"[Detaching after vfork from child process 541618]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541625]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541631]\n"
+~"[Detaching after vfork from child process 541632]\n"
+~"[Detaching after vfork from child process 541660]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541720]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541722]\n"
+~"[Detaching after vfork from child process 541723]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541762]\n"
+~"[Thread 0x7fffb73ff6c0 (LWP 540457) (id 22) exited]\n"
+=thread-exited,id="22",group-id="i1"
+~"[Thread 0x7fffb81fe6c0 (LWP 540456) (id 21) exited]\n"
+=thread-exited,id="21",group-id="i1"
+~"[Thread 0x7fffbadff6c0 (LWP 540450) (id 18) exited]\n"
+=thread-exited,id="18",group-id="i1"
+~"[Detaching after vfork from child process 541792]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541796]\n"
+~"[Detaching after vfork from child process 541797]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541822]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541888]\n"
+~"[Detaching after vfork from child process 541889]\n"
+~"[Detaching after vfork from child process 541901]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541939]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541947]\n"
+~"[Detaching after vfork from child process 541948]\n"
+~"[Detaching after vfork from child process 541959]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541979]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 541983]\n"
+~"[Detaching after vfork from child process 542037]\n"
+~"[Detaching after vfork from child process 542048]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 542080]\n"
+~"[Detaching after vfork from child process 542085]\n"
+~"[Detaching after vfork from child process 542093]\n"
+~"[Detaching after vfork from child process 542110]\n"
+~"[Detaching after vfork from child process 542170]\n"
+12^done
+(gdb) 
+~"\nThread "
+~"1 \"qs\" received signal SIGINT, Interrupt.\n"
+~"0x00007ffff40b5a22 in ?? () from /usr/bin/../lib/libc.so.6\n"
+*stopped,reason="signal-received",signal-name="SIGINT",signal-meaning="Interrupt",frame={addr="0x00007ffff40b5a22",func="??",args=[],from="/usr/bin/../lib/libc.so.6",arch="i386:x86-64"},thread-id="1",stopped-threads="all",core="10"
+~"NATIVE_MARK 0-media\n"
+13^done
+(gdb) 
+Arena 0:
+system bytes     =          0
+in use bytes     =          0
+Total (incl. mmap):
+system bytes     =          0
+in use bytes     =          0
+max mmap regions =          0
+max mmap bytes   =          0
+14^done,value="void"
+(gdb) 
+15^done,value="0"
+(gdb) 
+16^running
+*running,thread-id="all"
+(gdb) 
+~"[Detaching after vfork from child process 542201]\n"
+~"[Detaching after vfork from child process 542215]\n"
+~"[Detaching after vfork from child process 542223]\n"
+~"[Detaching after vfork from child process 542243]\n"
+~"[Detaching after vfork from child process 542306]\n"
+~"[Detaching after vfork from child process 542315]\n"
+~"[Detaching after vfork from child process 542347]\n"
+~"[Detaching after vfork from child process 542363]\n"
+~"[Detaching after vfork from child process 542372]\n"
+~"[Detaching after vfork from child process 542399]\n"
+~"[Detaching after vfork from child process 542403]\n"
+~"[Detaching after vfork from child process 542465]\n"
+~"[Detaching after vfork from child process 542498]\n"
+~"[Detaching after vfork from child process 542504]\n"
+~"[Detaching after vfork from child process 542515]\n"
+~"[Detaching after vfork from child process 542537]\n"
+~"[Detaching after vfork from child process 542541]\n"
+~"[Detaching after vfork from child process 542552]\n"
+~"[Detaching after vfork from child process 542619]\n"
+~"[Detaching after vfork from child process 542649]\n"
+~"[Detaching after vfork from child process 542675]\n"
+~"[Detaching after vfork from child process 542682]\n"
+~"[Detaching after vfork from child process 542701]\n"
+~"[Detaching after vfork from child process 542712]\n"
+~"[Detaching after vfork from child process 542773]\n"
+~"[Detaching after vfork from child process 542775]\n"
+~"[Detaching after vfork from child process 542811]\n"
+~"[Detaching after vfork from child process 542818]\n"
+~"[Detaching after vfork from child process 542824]\n"
+~"[Detaching after vfork from child process 542854]\n"
+~"[Detaching after vfork from child process 542925]\n"
+~"[Detaching after vfork from child process 542927]\n"
+~"[Detaching after vfork from child process 542966]\n"
+~"[Detaching after vfork from child process 542977]\n"
+~"[Detaching after vfork from child process 542980]\n"
+~"[Detaching after vfork from child process 543006]\n"
+~"[Detaching after vfork from child process 543066]\n"
+~"[Detaching after vfork from child process 543068]\n"
+~"[Detaching after vfork from child process 543109]\n"
+~"[Detaching after vfork from child process 543117]\n"
+~"[Detaching after vfork from child process 543123]\n"
+~"[Detaching after vfork from child process 543153]\n"
+~"[Detaching after vfork from child process 543189]\n"
+~"[Detaching after vfork from child process 543221]\n"
+~"[Detaching after vfork from child process 543235]\n"
+~"[Detaching after vfork from child process 543264]\n"
+~"[Detaching after vfork from child process 543275]\n"
+~"[Detaching after vfork from child process 543292]\n"
+~"[Detaching after vfork from child process 543326]\n"
+~"[Detaching after vfork from child process 543339]\n"
+~"[Detaching after vfork from child process 543403]\n"
+~"[Detaching after vfork from child process 543434]\n"
+~"[Detaching after vfork from child process 543443]\n"
+~"[Detaching after vfork from child process 543446]\n"
+~"[Detaching after vfork from child process 543448]\n"
+~"[Detaching after vfork from child process 543450]\n"
+~"[Detaching after vfork from child process 543452]\n"
+~"[Detaching after vfork from child process 543455]\n"
+~"[Detaching after vfork from child process 543457]\n"
+~"[Detaching after vfork from child process 543459]\n"
+~"[Detaching after vfork from child process 543461]\n"
+~"[Detaching after vfork from child process 543464]\n"
+~"[Detaching after vfork from child process 543466]\n"
+~"[Detaching after vfork from child process 543468]\n"
+~"[Detaching after vfork from child process 543470]\n"
+~"[Detaching after vfork from child process 543472]\n"
+~"[Detaching after vfork from child process 543474]\n"
+~"[Detaching after vfork from child process 543477]\n"
+~"[Detaching after vfork from child process 543478]\n"
+~"[Detaching after vfork from child process 543488]\n"
+~"[Detaching after vfork from child process 543493]\n"
+=thread-created,id="25",group-id="i1"
+~"[New Thread 0x7fffccbff6c0 (LWP 543504) (id 25)]\n"
+*running,thread-id="25"
+~"[Detaching after vfork from child process 543510]\n"
+~"[Detaching after vfork from child process 543528]\n"
+~"[Detaching after vfork from child process 543593]\n"
+~"[Detaching after vfork from child process 543629]\n"
+~"[Detaching after vfork from child process 543640]\n"
+~"[Detaching after vfork from child process 543645]\n"
+~"[Detaching after vfork from child process 543663]\n"
+~"[Detaching after vfork from child process 543734]\n"
+17^done
+(gdb) 
+~"\nThread "
+~"1 \"qs\" received signal SIGINT, Interrupt.\n"
+~"0x00007ffff40b5a22 in ?? () from /usr/bin/../lib/libc.so.6\n"
+*stopped,reason="signal-received",signal-name="SIGINT",signal-meaning="Interrupt",frame={addr="0x00007ffff40b5a22",func="??",args=[],from="/usr/bin/../lib/libc.so.6",arch="i386:x86-64"},thread-id="1",stopped-threads="all",core="8"
+~"NATIVE_MARK 0-launcher\n"
+18^done
+(gdb) 
+Arena 0:
+system bytes     =          0
+in use bytes     =          0
+Total (incl. mmap):
+system bytes     =          0
+in use bytes     =          0
+max mmap regions =          0
+max mmap bytes   =          0
+19^done,value="void"
+(gdb) 
+20^done,value="0"
+(gdb) 
+21^running
+*running,thread-id="all"
+(gdb) 
+~"[Detaching after vfork from child process 543770]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 543772]\n"
+~"[Detaching after vfork from child process 543774]\n"
+~"[Detaching after vfork from child process 543788]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 543808]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 543814]\n"
+~"[Detaching after vfork from child process 543815]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 543885]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 543912]\n"
+~"[Detaching after vfork from child process 543913]\n"
+~"[Detaching after vfork from child process 543916]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 543930]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 543949]\n"
+~"[Detaching after vfork from child process 543950]\n"
+~"[Detaching after vfork from child process 543955]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544043]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544084]\n"
+~"[Detaching after vfork from child process 544085]\n"
+~"[Detaching after vfork from child process 544096]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544112]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544133]\n"
+~"[Detaching after vfork from child process 544134]\n"
+~"[Detaching after vfork from child process 544146]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544205]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544211]\n"
+~"[Detaching after vfork from child process 544212]\n"
+~"[Detaching after vfork from child process 544252]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544260]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544262]\n"
+~"[Detaching after vfork from child process 544263]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544298]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544356]\n"
+~"[Detaching after vfork from child process 544357]\n"
+~"[Detaching after vfork from child process 544358]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544403]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544412]\n"
+~"[Detaching after vfork from child process 544413]\n"
+~"[Detaching after vfork from child process 544425]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544450]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544510]\n"
+~"[Detaching after vfork from child process 544511]\n"
+~"[Detaching after vfork from child process 544521]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544558]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544560]\n"
+~"[Detaching after vfork from child process 544561]\n"
+~"[Detaching after vfork from child process 544582]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Thread 0x7fffccbff6c0 (LWP 543504) (id 25) exited]\n"
+=thread-exited,id="25",group-id="i1"
+~"[Detaching after vfork from child process 544604]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544650]\n"
+~"[Detaching after vfork from child process 544664]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544689]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544716]\n"
+~"[Detaching after vfork from child process 544717]\n"
+~"[Detaching after vfork from child process 544721]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544735]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544752]\n"
+~"[Detaching after vfork from child process 544753]\n"
+~"[Detaching after vfork from child process 544756]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544830]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544860]\n"
+~"[Detaching after vfork from child process 544861]\n"
+~"[Detaching after vfork from child process 544872]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544885]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544899]\n"
+~"[Detaching after vfork from child process 544900]\n"
+~"[Detaching after vfork from child process 544911]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 544978]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 545008]\n"
+~"[Detaching after vfork from child process 545009]\n"
+~"[Detaching after vfork from child process 545020]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 545027]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 545045]\n"
+~"[Detaching after vfork from child process 545046]\n"
+~"[Detaching after vfork from child process 545059]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 545119]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 545128]\n"
+~"[Detaching after vfork from child process 545129]\n"
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fffc7cfb1c0 but 0x0 is focused
+~"[Detaching after vfork from child process 545172]\n"
+~"[Detaching after vfork from child process 545182]\n"
+~"[Detaching after vfork from child process 545183]\n"
+~"[Detaching after vfork from child process 545187]\n"
+~"[Detaching after vfork from child process 545212]\n"
+~"[Detaching after vfork from child process 545272]\n"
+22^done
+(gdb) 
+~"\nThread "
+~"1 \"qs\" received signal SIGINT, Interrupt.\n"
+~"0x00007ffff40b5a22 in ?? () from /usr/bin/../lib/libc.so.6\n"
+*stopped,reason="signal-received",signal-name="SIGINT",signal-meaning="Interrupt",frame={addr="0x00007ffff40b5a22",func="??",args=[],from="/usr/bin/../lib/libc.so.6",arch="i386:x86-64"},thread-id="1",stopped-threads="all",core="1"
+~"NATIVE_MARK 1-media\n"
+23^done
+(gdb) 
+Arena 0:
+system bytes     =          0
+in use bytes     =          0
+Total (incl. mmap):
+system bytes     =          0
+in use bytes     =          0
+max mmap regions =          0
+max mmap bytes   =          0
+24^done,value="void"
+(gdb) 
+25^done,value="0"
+(gdb) 
+26^running
+*running,thread-id="all"
+(gdb) 
+~"[Detaching after vfork from child process 545305]\n"
+27^exit
+=thread-exited,id="1",group-id="i1"
+=thread-exited,id="2",group-id="i1"
+=thread-exited,id="3",group-id="i1"
+=thread-exited,id="4",group-id="i1"
+=thread-exited,id="5",group-id="i1"
+=thread-exited,id="6",group-id="i1"
+=thread-exited,id="8",group-id="i1"
+=thread-exited,id="9",group-id="i1"
+=thread-exited,id="10",group-id="i1"
+=thread-exited,id="12",group-id="i1"
+=thread-exited,id="13",group-id="i1"
+=thread-exited,id="15",group-id="i1"
+=thread-exited,id="16",group-id="i1"
+=thread-exited,id="17",group-id="i1"
+=thread-exited,id="24",group-id="i1"
+=thread-group-exited,id="i1"
