@@ -1,0 +1,88 @@
+top - 23:37:30 up  4:22,  1 user,  load average: 1.59, 0.96, 0.93
+Threads: 14 total, 0 running, 14 sleep, 0 d-sleep, 0 stopped, 0 zombie
+%Cpu(s):  4.5 us,  0.8 sy,  0.0 ni, 94.3 id,  0.0 wa,  0.4 hi,  0.0 si,  0.0 st 
+MiB Mem :  23838.5 total,   1990.2 free,  16177.6 used,   8063.8 buff/cache     
+MiB Swap:  23838.0 total,  23651.8 free,    186.2 used.   7660.9 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 426056 zdito     30  10 1147460 457528 231264 S  10.0   1.9   0:18.23 QSGRend+
+ 425948 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:08.03 qs
+ 425994 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.00 QDBusCo+
+ 425998 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:01.96 Wayland+
+ 425999 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:01.76 Wayland+
+ 426000 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.01 QThread
+ 426008 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.35 QQmlThr+
+ 426010 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.01 QQuickP+
+ 426011 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.00 pool-sp+
+ 426012 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.00 gmain
+ 426042 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.00 gdbus
+ 426052 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.03 QSGRend+
+ 426054 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.03 CPMMLis+
+ 426080 zdito     30  10 1147460 457528 231264 S   0.0   1.9   0:00.00 FileInf+
+
+top - 23:37:33 up  4:22,  1 user,  load average: 1.59, 0.96, 0.93
+Threads: 14 total, 0 running, 14 sleep, 0 d-sleep, 0 stopped, 0 zombie
+%Cpu(s):  3.1 us,  1.3 sy,  0.4 ni, 94.4 id,  0.3 wa,  0.4 hi,  0.1 si,  0.0 st 
+MiB Mem :  23838.5 total,   1981.1 free,  16186.5 used,   8064.1 buff/cache     
+MiB Swap:  23838.0 total,  23651.8 free,    186.2 used.   7652.0 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 426056 zdito     30  10 1147460 457552 231264 S   2.3   1.9   0:18.30 QSGRend+
+ 425948 zdito     30  10 1147460 457552 231264 S   1.3   1.9   0:08.07 qs
+ 425998 zdito     30  10 1147460 457552 231264 S   0.3   1.9   0:01.97 Wayland+
+ 425994 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.00 QDBusCo+
+ 425999 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:01.76 Wayland+
+ 426000 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.01 QThread
+ 426008 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.35 QQmlThr+
+ 426010 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.01 QQuickP+
+ 426011 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.00 pool-sp+
+ 426012 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.00 gmain
+ 426042 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.00 gdbus
+ 426052 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.03 QSGRend+
+ 426054 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.03 CPMMLis+
+ 426080 zdito     30  10 1147460 457552 231264 S   0.0   1.9   0:00.00 FileInf+
+
+top - 23:37:36 up  4:22,  1 user,  load average: 1.55, 0.96, 0.93
+Threads: 14 total, 0 running, 14 sleep, 0 d-sleep, 0 stopped, 0 zombie
+%Cpu(s):  9.1 us,  1.5 sy,  0.2 ni, 88.7 id,  0.1 wa,  0.3 hi,  0.1 si,  0.0 st 
+MiB Mem :  23838.5 total,   1732.9 free,  16534.6 used,   7964.2 buff/cache     
+MiB Swap:  23838.0 total,  23639.2 free,    198.8 used.   7303.9 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 426056 zdito     30  10 1147460 457532 231264 S   2.3   1.9   0:18.37 QSGRend+
+ 425999 zdito     30  10 1147460 457532 231264 S   0.7   1.9   0:01.78 Wayland+
+ 425948 zdito     30  10 1147460 457532 231264 S   0.3   1.9   0:08.08 qs
+ 425998 zdito     30  10 1147460 457532 231264 S   0.3   1.9   0:01.98 Wayland+
+ 425994 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.00 QDBusCo+
+ 426000 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.01 QThread
+ 426008 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.35 QQmlThr+
+ 426010 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.01 QQuickP+
+ 426011 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.00 pool-sp+
+ 426012 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.00 gmain
+ 426042 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.00 gdbus
+ 426052 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.03 QSGRend+
+ 426054 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.03 CPMMLis+
+ 426080 zdito     30  10 1147460 457532 231264 S   0.0   1.9   0:00.00 FileInf+
+
+top - 23:37:39 up  4:22,  1 user,  load average: 1.42, 0.94, 0.92
+Threads: 14 total, 0 running, 14 sleep, 0 d-sleep, 0 stopped, 0 zombie
+%Cpu(s):  1.7 us,  0.8 sy,  0.2 ni, 96.8 id,  0.1 wa,  0.3 hi,  0.1 si,  0.0 st 
+MiB Mem :  23838.5 total,   1741.6 free,  16525.9 used,   7964.2 buff/cache     
+MiB Swap:  23838.0 total,  23639.2 free,    198.8 used.   7312.6 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 426056 zdito     30  10 1147460 457628 231264 S   2.0   1.9   0:18.43 QSGRend+
+ 425948 zdito     30  10 1147460 457628 231264 S   1.0   1.9   0:08.11 qs
+ 425994 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.00 QDBusCo+
+ 425998 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:01.98 Wayland+
+ 425999 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:01.78 Wayland+
+ 426000 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.01 QThread
+ 426008 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.35 QQmlThr+
+ 426010 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.01 QQuickP+
+ 426011 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.00 pool-sp+
+ 426012 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.00 gmain
+ 426042 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.00 gdbus
+ 426052 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.03 QSGRend+
+ 426054 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.03 CPMMLis+
+ 426080 zdito     30  10 1147460 457628 231264 S   0.0   1.9   0:00.00 FileInf+
+

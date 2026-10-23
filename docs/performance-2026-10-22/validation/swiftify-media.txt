@@ -1,0 +1,5 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/swiftify-media-regression.qml"
+  INFO: Shell ID: "6f16bfb1a488f5587178b8a0b02cca09" Path ID "6f16bfb1a488f5587178b8a0b02cca09"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/m4v9p4dcnt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: playback shape/cover retarget, lyrics wave/seek/keyboard/capabilities/manual/reduced/hidden

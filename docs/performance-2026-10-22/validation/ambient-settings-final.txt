@@ -1,0 +1,1 @@
+PASS: frecuencia ambiental validada y default 60 Hz

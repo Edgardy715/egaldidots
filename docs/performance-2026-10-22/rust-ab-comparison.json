@@ -1,0 +1,1486 @@
+[
+  {
+    "variant": "A",
+    "pid": 476569,
+    "seconds": 12.820869330000278,
+    "before": {
+      "476569": {
+        "cpu_ticks": 406,
+        "child_cpu_ticks": 101,
+        "start_ticks": 1678763,
+        "threads": 24,
+        "rss_kib": 483148,
+        "Rss_kib": 450564,
+        "Pss_kib": 337147,
+        "Private_Dirty_kib": 268320,
+        "comm": "qs"
+      },
+      "476586": {
+        "cpu_ticks": 4,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1678830,
+        "threads": 5,
+        "rss_kib": 10244,
+        "Rss_kib": 10596,
+        "Pss_kib": 3428,
+        "Private_Dirty_kib": 1376,
+        "comm": "nmcli"
+      },
+      "476797": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 2,
+        "start_ticks": 1679296,
+        "threads": 1,
+        "rss_kib": 2708,
+        "Rss_kib": 2980,
+        "Pss_kib": 860,
+        "Private_Dirty_kib": 456,
+        "comm": "isla-cava-strea"
+      },
+      "476798": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1679297,
+        "threads": 1,
+        "rss_kib": 5104,
+        "Rss_kib": 5244,
+        "Pss_kib": 864,
+        "Private_Dirty_kib": 552,
+        "comm": "pactl"
+      },
+      "476802": {
+        "cpu_ticks": 56,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1679299,
+        "threads": 2,
+        "rss_kib": 50068,
+        "Rss_kib": 50208,
+        "Pss_kib": 17025,
+        "Private_Dirty_kib": 10032,
+        "comm": "cava"
+      },
+      "476804": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1679303,
+        "threads": 1,
+        "rss_kib": 5400,
+        "Rss_kib": 5540,
+        "Pss_kib": 889,
+        "Private_Dirty_kib": 572,
+        "comm": "parec"
+      }
+    },
+    "samples": [
+      {
+        "elapsed_s": 3.1947810029996617,
+        "processes": {
+          "476569": {
+            "cpu_ticks": 462,
+            "child_cpu_ticks": 103,
+            "start_ticks": 1678763,
+            "threads": 24,
+            "rss_kib": 482396,
+            "Rss_kib": 449704,
+            "Pss_kib": 336287,
+            "Private_Dirty_kib": 267460,
+            "comm": "qs"
+          },
+          "476586": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1678830,
+            "threads": 5,
+            "rss_kib": 10244,
+            "Rss_kib": 10596,
+            "Pss_kib": 3428,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "476797": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 2,
+            "start_ticks": 1679296,
+            "threads": 1,
+            "rss_kib": 2708,
+            "Rss_kib": 2980,
+            "Pss_kib": 860,
+            "Private_Dirty_kib": 456,
+            "comm": "isla-cava-strea"
+          },
+          "476798": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679297,
+            "threads": 1,
+            "rss_kib": 5104,
+            "Rss_kib": 5244,
+            "Pss_kib": 864,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "476802": {
+            "cpu_ticks": 61,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679299,
+            "threads": 2,
+            "rss_kib": 50068,
+            "Rss_kib": 50208,
+            "Pss_kib": 17025,
+            "Private_Dirty_kib": 10032,
+            "comm": "cava"
+          },
+          "476804": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679303,
+            "threads": 1,
+            "rss_kib": 5400,
+            "Rss_kib": 5540,
+            "Pss_kib": 889,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 6.364242596999247,
+        "processes": {
+          "476569": {
+            "cpu_ticks": 511,
+            "child_cpu_ticks": 103,
+            "start_ticks": 1678763,
+            "threads": 24,
+            "rss_kib": 481960,
+            "Rss_kib": 449348,
+            "Pss_kib": 335931,
+            "Private_Dirty_kib": 267104,
+            "comm": "qs"
+          },
+          "476586": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1678830,
+            "threads": 5,
+            "rss_kib": 10244,
+            "Rss_kib": 10596,
+            "Pss_kib": 3428,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "476797": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 2,
+            "start_ticks": 1679296,
+            "threads": 1,
+            "rss_kib": 2708,
+            "Rss_kib": 2980,
+            "Pss_kib": 860,
+            "Private_Dirty_kib": 456,
+            "comm": "isla-cava-strea"
+          },
+          "476798": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679297,
+            "threads": 1,
+            "rss_kib": 5104,
+            "Rss_kib": 5244,
+            "Pss_kib": 864,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "476802": {
+            "cpu_ticks": 66,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679299,
+            "threads": 2,
+            "rss_kib": 50068,
+            "Rss_kib": 50208,
+            "Pss_kib": 17025,
+            "Private_Dirty_kib": 10032,
+            "comm": "cava"
+          },
+          "476804": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679303,
+            "threads": 1,
+            "rss_kib": 5400,
+            "Rss_kib": 5540,
+            "Pss_kib": 889,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 9.479103990001022,
+        "processes": {
+          "476569": {
+            "cpu_ticks": 554,
+            "child_cpu_ticks": 105,
+            "start_ticks": 1678763,
+            "threads": 23,
+            "rss_kib": 483760,
+            "Rss_kib": 450916,
+            "Pss_kib": 337499,
+            "Private_Dirty_kib": 268676,
+            "comm": "qs"
+          },
+          "476586": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1678830,
+            "threads": 4,
+            "rss_kib": 10372,
+            "Rss_kib": 10660,
+            "Pss_kib": 3429,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "476797": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 2,
+            "start_ticks": 1679296,
+            "threads": 1,
+            "rss_kib": 2708,
+            "Rss_kib": 2980,
+            "Pss_kib": 860,
+            "Private_Dirty_kib": 456,
+            "comm": "isla-cava-strea"
+          },
+          "476798": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679297,
+            "threads": 1,
+            "rss_kib": 5104,
+            "Rss_kib": 5244,
+            "Pss_kib": 864,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "476802": {
+            "cpu_ticks": 69,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679299,
+            "threads": 2,
+            "rss_kib": 50068,
+            "Rss_kib": 50208,
+            "Pss_kib": 17025,
+            "Private_Dirty_kib": 10032,
+            "comm": "cava"
+          },
+          "476804": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679303,
+            "threads": 1,
+            "rss_kib": 5400,
+            "Rss_kib": 5540,
+            "Pss_kib": 889,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 12.648358153997833,
+        "processes": {
+          "476569": {
+            "cpu_ticks": 611,
+            "child_cpu_ticks": 106,
+            "start_ticks": 1678763,
+            "threads": 23,
+            "rss_kib": 481292,
+            "Rss_kib": 448432,
+            "Pss_kib": 337163,
+            "Private_Dirty_kib": 268340,
+            "comm": "qs"
+          },
+          "476586": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1678830,
+            "threads": 4,
+            "rss_kib": 10372,
+            "Rss_kib": 10660,
+            "Pss_kib": 3429,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "476797": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 2,
+            "start_ticks": 1679296,
+            "threads": 1,
+            "rss_kib": 2708,
+            "Rss_kib": 2980,
+            "Pss_kib": 860,
+            "Private_Dirty_kib": 456,
+            "comm": "isla-cava-strea"
+          },
+          "476798": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679297,
+            "threads": 1,
+            "rss_kib": 5104,
+            "Rss_kib": 5244,
+            "Pss_kib": 864,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "476802": {
+            "cpu_ticks": 74,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679299,
+            "threads": 2,
+            "rss_kib": 50068,
+            "Rss_kib": 50208,
+            "Pss_kib": 17025,
+            "Private_Dirty_kib": 10032,
+            "comm": "cava"
+          },
+          "476804": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1679303,
+            "threads": 1,
+            "rss_kib": 5400,
+            "Rss_kib": 5540,
+            "Pss_kib": 889,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      }
+    ],
+    "cpu_by_pid": {
+      "476569": 15.989555366601303,
+      "476586": 0.0,
+      "476797": 0.23399349316977516,
+      "476798": 0.0,
+      "476802": 1.403960959018651,
+      "476804": 0.23399349316977516
+    },
+    "cpu_total": 17.861503311959506,
+    "cpu_qs": 15.989555366601303,
+    "state": "{\"hasFrame\":true,\"signal\":true,\"subscribers\":3,\"playing\":true,\"frames\":1089}",
+    "state_before": "{\"hasFrame\":true,\"signal\":true,\"subscribers\":3,\"playing\":true,\"frames\":331}"
+  },
+  {
+    "variant": "B",
+    "pid": 477290,
+    "seconds": 12.727810591000889,
+    "before": {
+      "477290": {
+        "cpu_ticks": 420,
+        "child_cpu_ticks": 100,
+        "start_ticks": 1680976,
+        "threads": 24,
+        "rss_kib": 484732,
+        "Rss_kib": 451496,
+        "Pss_kib": 337966,
+        "Private_Dirty_kib": 268836,
+        "comm": "qs"
+      },
+      "477317": {
+        "cpu_ticks": 3,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1681040,
+        "threads": 5,
+        "rss_kib": 10204,
+        "Rss_kib": 10620,
+        "Pss_kib": 3457,
+        "Private_Dirty_kib": 1376,
+        "comm": "nmcli"
+      },
+      "477498": {
+        "cpu_ticks": 1,
+        "child_cpu_ticks": 1,
+        "start_ticks": 1681509,
+        "threads": 1,
+        "rss_kib": 3324,
+        "Rss_kib": 3468,
+        "Pss_kib": 913,
+        "Private_Dirty_kib": 896,
+        "comm": "isla-cava-strea"
+      },
+      "477499": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1681510,
+        "threads": 1,
+        "rss_kib": 5104,
+        "Rss_kib": 5276,
+        "Pss_kib": 869,
+        "Private_Dirty_kib": 552,
+        "comm": "pactl"
+      },
+      "477503": {
+        "cpu_ticks": 57,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1681513,
+        "threads": 2,
+        "rss_kib": 49880,
+        "Rss_kib": 50124,
+        "Pss_kib": 16938,
+        "Private_Dirty_kib": 10016,
+        "comm": "cava"
+      },
+      "477505": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1681517,
+        "threads": 1,
+        "rss_kib": 5380,
+        "Rss_kib": 5484,
+        "Pss_kib": 882,
+        "Private_Dirty_kib": 568,
+        "comm": "parec"
+      }
+    },
+    "samples": [
+      {
+        "elapsed_s": 3.1672504430025583,
+        "processes": {
+          "477290": {
+            "cpu_ticks": 484,
+            "child_cpu_ticks": 101,
+            "start_ticks": 1680976,
+            "threads": 24,
+            "rss_kib": 486456,
+            "Rss_kib": 453128,
+            "Pss_kib": 339598,
+            "Private_Dirty_kib": 270468,
+            "comm": "qs"
+          },
+          "477317": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681040,
+            "threads": 5,
+            "rss_kib": 10204,
+            "Rss_kib": 10620,
+            "Pss_kib": 3457,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "477498": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 1,
+            "start_ticks": 1681509,
+            "threads": 1,
+            "rss_kib": 3324,
+            "Rss_kib": 3468,
+            "Pss_kib": 913,
+            "Private_Dirty_kib": 896,
+            "comm": "isla-cava-strea"
+          },
+          "477499": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681510,
+            "threads": 1,
+            "rss_kib": 5104,
+            "Rss_kib": 5276,
+            "Pss_kib": 869,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "477503": {
+            "cpu_ticks": 62,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681513,
+            "threads": 2,
+            "rss_kib": 49880,
+            "Rss_kib": 50124,
+            "Pss_kib": 16938,
+            "Private_Dirty_kib": 10016,
+            "comm": "cava"
+          },
+          "477505": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681517,
+            "threads": 1,
+            "rss_kib": 5380,
+            "Rss_kib": 5484,
+            "Pss_kib": 882,
+            "Private_Dirty_kib": 568,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 6.3387302000010095,
+        "processes": {
+          "477290": {
+            "cpu_ticks": 531,
+            "child_cpu_ticks": 102,
+            "start_ticks": 1680976,
+            "threads": 24,
+            "rss_kib": 487372,
+            "Rss_kib": 454024,
+            "Pss_kib": 340494,
+            "Private_Dirty_kib": 271368,
+            "comm": "qs"
+          },
+          "477317": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681040,
+            "threads": 5,
+            "rss_kib": 10204,
+            "Rss_kib": 10620,
+            "Pss_kib": 3457,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "477498": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 1,
+            "start_ticks": 1681509,
+            "threads": 1,
+            "rss_kib": 3324,
+            "Rss_kib": 3468,
+            "Pss_kib": 913,
+            "Private_Dirty_kib": 896,
+            "comm": "isla-cava-strea"
+          },
+          "477499": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681510,
+            "threads": 1,
+            "rss_kib": 5104,
+            "Rss_kib": 5276,
+            "Pss_kib": 869,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "477503": {
+            "cpu_ticks": 65,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681513,
+            "threads": 2,
+            "rss_kib": 49880,
+            "Rss_kib": 50124,
+            "Pss_kib": 16938,
+            "Private_Dirty_kib": 10016,
+            "comm": "cava"
+          },
+          "477505": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681517,
+            "threads": 1,
+            "rss_kib": 5380,
+            "Rss_kib": 5484,
+            "Pss_kib": 882,
+            "Private_Dirty_kib": 568,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 9.451724976999685,
+        "processes": {
+          "477290": {
+            "cpu_ticks": 585,
+            "child_cpu_ticks": 103,
+            "start_ticks": 1680976,
+            "threads": 23,
+            "rss_kib": 487072,
+            "Rss_kib": 453668,
+            "Pss_kib": 340138,
+            "Private_Dirty_kib": 271016,
+            "comm": "qs"
+          },
+          "477317": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681040,
+            "threads": 4,
+            "rss_kib": 10204,
+            "Rss_kib": 10684,
+            "Pss_kib": 3457,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "477498": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 1,
+            "start_ticks": 1681509,
+            "threads": 1,
+            "rss_kib": 3324,
+            "Rss_kib": 3468,
+            "Pss_kib": 913,
+            "Private_Dirty_kib": 896,
+            "comm": "isla-cava-strea"
+          },
+          "477499": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681510,
+            "threads": 1,
+            "rss_kib": 5104,
+            "Rss_kib": 5276,
+            "Pss_kib": 869,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "477503": {
+            "cpu_ticks": 70,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681513,
+            "threads": 2,
+            "rss_kib": 49880,
+            "Rss_kib": 50124,
+            "Pss_kib": 16938,
+            "Private_Dirty_kib": 10016,
+            "comm": "cava"
+          },
+          "477505": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681517,
+            "threads": 1,
+            "rss_kib": 5380,
+            "Rss_kib": 5484,
+            "Pss_kib": 882,
+            "Private_Dirty_kib": 568,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 12.61878684399926,
+        "processes": {
+          "477290": {
+            "cpu_ticks": 644,
+            "child_cpu_ticks": 104,
+            "start_ticks": 1680976,
+            "threads": 23,
+            "rss_kib": 484520,
+            "Rss_kib": 451152,
+            "Pss_kib": 340082,
+            "Private_Dirty_kib": 270964,
+            "comm": "qs"
+          },
+          "477317": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681040,
+            "threads": 4,
+            "rss_kib": 10204,
+            "Rss_kib": 10684,
+            "Pss_kib": 3457,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "477498": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 1,
+            "start_ticks": 1681509,
+            "threads": 1,
+            "rss_kib": 3324,
+            "Rss_kib": 3468,
+            "Pss_kib": 913,
+            "Private_Dirty_kib": 896,
+            "comm": "isla-cava-strea"
+          },
+          "477499": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681510,
+            "threads": 1,
+            "rss_kib": 5104,
+            "Rss_kib": 5276,
+            "Pss_kib": 869,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "477503": {
+            "cpu_ticks": 74,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681513,
+            "threads": 2,
+            "rss_kib": 49880,
+            "Rss_kib": 50124,
+            "Pss_kib": 16938,
+            "Private_Dirty_kib": 10016,
+            "comm": "cava"
+          },
+          "477505": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1681517,
+            "threads": 1,
+            "rss_kib": 5380,
+            "Rss_kib": 5484,
+            "Pss_kib": 882,
+            "Private_Dirty_kib": 568,
+            "comm": "parec"
+          }
+        }
+      }
+    ],
+    "cpu_by_pid": {
+      "477290": 17.599256242733347,
+      "477317": 0.0,
+      "477498": 0.23570432467946445,
+      "477499": 0.0,
+      "477503": 1.3356578398502985,
+      "477505": 0.23570432467946445
+    },
+    "cpu_total": 19.406322731942574,
+    "cpu_qs": 17.599256242733347,
+    "state": "{\"hasFrame\":true,\"signal\":true,\"subscribers\":2,\"playing\":true,\"frames\":1096}",
+    "state_before": "{\"hasFrame\":true,\"signal\":true,\"subscribers\":2,\"playing\":true,\"frames\":330}"
+  },
+  {
+    "variant": "B",
+    "pid": 477972,
+    "seconds": 12.840460426999925,
+    "before": {
+      "477972": {
+        "cpu_ticks": 351,
+        "child_cpu_ticks": 80,
+        "start_ticks": 1683177,
+        "threads": 24,
+        "rss_kib": 484668,
+        "Rss_kib": 451696,
+        "Pss_kib": 338311,
+        "Private_Dirty_kib": 269320,
+        "comm": "qs"
+      },
+      "478002": {
+        "cpu_ticks": 2,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1683218,
+        "threads": 5,
+        "rss_kib": 10420,
+        "Rss_kib": 10640,
+        "Pss_kib": 3475,
+        "Private_Dirty_kib": 1372,
+        "comm": "nmcli"
+      },
+      "478189": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 1,
+        "start_ticks": 1683710,
+        "threads": 1,
+        "rss_kib": 3024,
+        "Rss_kib": 3404,
+        "Pss_kib": 865,
+        "Private_Dirty_kib": 848,
+        "comm": "isla-cava-strea"
+      },
+      "478190": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1683710,
+        "threads": 1,
+        "rss_kib": 5224,
+        "Rss_kib": 5264,
+        "Pss_kib": 869,
+        "Private_Dirty_kib": 552,
+        "comm": "pactl"
+      },
+      "478194": {
+        "cpu_ticks": 56,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1683713,
+        "threads": 2,
+        "rss_kib": 50168,
+        "Rss_kib": 50188,
+        "Pss_kib": 17009,
+        "Private_Dirty_kib": 10024,
+        "comm": "cava"
+      },
+      "478205": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1683717,
+        "threads": 1,
+        "rss_kib": 5384,
+        "Rss_kib": 5520,
+        "Pss_kib": 881,
+        "Private_Dirty_kib": 572,
+        "comm": "parec"
+      }
+    },
+    "samples": [
+      {
+        "elapsed_s": 3.1696439450024627,
+        "processes": {
+          "477972": {
+            "cpu_ticks": 413,
+            "child_cpu_ticks": 80,
+            "start_ticks": 1683177,
+            "threads": 24,
+            "rss_kib": 486240,
+            "Rss_kib": 453092,
+            "Pss_kib": 339707,
+            "Private_Dirty_kib": 270716,
+            "comm": "qs"
+          },
+          "478002": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683218,
+            "threads": 5,
+            "rss_kib": 10420,
+            "Rss_kib": 10640,
+            "Pss_kib": 3475,
+            "Private_Dirty_kib": 1372,
+            "comm": "nmcli"
+          },
+          "478189": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 1,
+            "start_ticks": 1683710,
+            "threads": 1,
+            "rss_kib": 3024,
+            "Rss_kib": 3404,
+            "Pss_kib": 865,
+            "Private_Dirty_kib": 848,
+            "comm": "isla-cava-strea"
+          },
+          "478190": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683710,
+            "threads": 1,
+            "rss_kib": 5224,
+            "Rss_kib": 5264,
+            "Pss_kib": 869,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "478194": {
+            "cpu_ticks": 61,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683713,
+            "threads": 2,
+            "rss_kib": 50168,
+            "Rss_kib": 50188,
+            "Pss_kib": 17009,
+            "Private_Dirty_kib": 10024,
+            "comm": "cava"
+          },
+          "478205": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683717,
+            "threads": 1,
+            "rss_kib": 5384,
+            "Rss_kib": 5520,
+            "Pss_kib": 881,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 6.337892110001121,
+        "processes": {
+          "477972": {
+            "cpu_ticks": 477,
+            "child_cpu_ticks": 82,
+            "start_ticks": 1683177,
+            "threads": 24,
+            "rss_kib": 485224,
+            "Rss_kib": 452056,
+            "Pss_kib": 338671,
+            "Private_Dirty_kib": 269680,
+            "comm": "qs"
+          },
+          "478002": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683218,
+            "threads": 5,
+            "rss_kib": 10420,
+            "Rss_kib": 10640,
+            "Pss_kib": 3475,
+            "Private_Dirty_kib": 1372,
+            "comm": "nmcli"
+          },
+          "478189": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 1,
+            "start_ticks": 1683710,
+            "threads": 1,
+            "rss_kib": 3024,
+            "Rss_kib": 3404,
+            "Pss_kib": 865,
+            "Private_Dirty_kib": 848,
+            "comm": "isla-cava-strea"
+          },
+          "478190": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683710,
+            "threads": 1,
+            "rss_kib": 5224,
+            "Rss_kib": 5264,
+            "Pss_kib": 869,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "478194": {
+            "cpu_ticks": 65,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683713,
+            "threads": 2,
+            "rss_kib": 50168,
+            "Rss_kib": 50188,
+            "Pss_kib": 17009,
+            "Private_Dirty_kib": 10024,
+            "comm": "cava"
+          },
+          "478205": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683717,
+            "threads": 1,
+            "rss_kib": 5384,
+            "Rss_kib": 5520,
+            "Pss_kib": 881,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 9.506682388000627,
+        "processes": {
+          "477972": {
+            "cpu_ticks": 540,
+            "child_cpu_ticks": 84,
+            "start_ticks": 1683177,
+            "threads": 23,
+            "rss_kib": 485056,
+            "Rss_kib": 451840,
+            "Pss_kib": 338455,
+            "Private_Dirty_kib": 269464,
+            "comm": "qs"
+          },
+          "478002": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683218,
+            "threads": 4,
+            "rss_kib": 10548,
+            "Rss_kib": 10704,
+            "Pss_kib": 3475,
+            "Private_Dirty_kib": 1372,
+            "comm": "nmcli"
+          },
+          "478189": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 1,
+            "start_ticks": 1683710,
+            "threads": 1,
+            "rss_kib": 3024,
+            "Rss_kib": 3404,
+            "Pss_kib": 865,
+            "Private_Dirty_kib": 848,
+            "comm": "isla-cava-strea"
+          },
+          "478190": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683710,
+            "threads": 1,
+            "rss_kib": 5224,
+            "Rss_kib": 5264,
+            "Pss_kib": 869,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "478194": {
+            "cpu_ticks": 71,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683713,
+            "threads": 2,
+            "rss_kib": 50168,
+            "Rss_kib": 50188,
+            "Pss_kib": 17009,
+            "Private_Dirty_kib": 10024,
+            "comm": "cava"
+          },
+          "478205": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683717,
+            "threads": 1,
+            "rss_kib": 5384,
+            "Rss_kib": 5520,
+            "Pss_kib": 881,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 12.67379662500025,
+        "processes": {
+          "477972": {
+            "cpu_ticks": 603,
+            "child_cpu_ticks": 86,
+            "start_ticks": 1683177,
+            "threads": 23,
+            "rss_kib": 482720,
+            "Rss_kib": 449368,
+            "Pss_kib": 338447,
+            "Private_Dirty_kib": 269456,
+            "comm": "qs"
+          },
+          "478002": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683218,
+            "threads": 4,
+            "rss_kib": 10548,
+            "Rss_kib": 10704,
+            "Pss_kib": 3475,
+            "Private_Dirty_kib": 1372,
+            "comm": "nmcli"
+          },
+          "478189": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 1,
+            "start_ticks": 1683710,
+            "threads": 1,
+            "rss_kib": 3024,
+            "Rss_kib": 3404,
+            "Pss_kib": 865,
+            "Private_Dirty_kib": 848,
+            "comm": "isla-cava-strea"
+          },
+          "478190": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683710,
+            "threads": 1,
+            "rss_kib": 5224,
+            "Rss_kib": 5264,
+            "Pss_kib": 869,
+            "Private_Dirty_kib": 552,
+            "comm": "pactl"
+          },
+          "478194": {
+            "cpu_ticks": 76,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683713,
+            "threads": 2,
+            "rss_kib": 50168,
+            "Rss_kib": 50188,
+            "Pss_kib": 17009,
+            "Private_Dirty_kib": 10024,
+            "comm": "cava"
+          },
+          "478205": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1683717,
+            "threads": 1,
+            "rss_kib": 5384,
+            "Rss_kib": 5520,
+            "Pss_kib": 881,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      }
+    ],
+    "cpu_by_pid": {
+      "477972": 19.625464478681305,
+      "478002": 0.0,
+      "478189": 0.31151530918541753,
+      "478190": 0.0,
+      "478194": 1.5575765459270876,
+      "478205": 0.23363648188906314
+    },
+    "cpu_total": 21.728192815682874,
+    "cpu_qs": 19.625464478681305,
+    "state": "{\"hasFrame\":true,\"signal\":true,\"subscribers\":2,\"playing\":true,\"frames\":1135}",
+    "state_before": "{\"hasFrame\":true,\"signal\":true,\"subscribers\":2,\"playing\":true,\"frames\":361}"
+  },
+  {
+    "variant": "A",
+    "pid": 478696,
+    "seconds": 12.7893301969998,
+    "before": {
+      "478696": {
+        "cpu_ticks": 362,
+        "child_cpu_ticks": 85,
+        "start_ticks": 1685392,
+        "threads": 24,
+        "rss_kib": 491016,
+        "Rss_kib": 458216,
+        "Pss_kib": 344901,
+        "Private_Dirty_kib": 275904,
+        "comm": "qs"
+      },
+      "478723": {
+        "cpu_ticks": 4,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1685455,
+        "threads": 5,
+        "rss_kib": 10048,
+        "Rss_kib": 10528,
+        "Pss_kib": 2969,
+        "Private_Dirty_kib": 1376,
+        "comm": "nmcli"
+      },
+      "478942": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 2,
+        "start_ticks": 1685915,
+        "threads": 1,
+        "rss_kib": 2636,
+        "Rss_kib": 2964,
+        "Pss_kib": 860,
+        "Private_Dirty_kib": 456,
+        "comm": "isla-cava-strea"
+      },
+      "478943": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1685915,
+        "threads": 1,
+        "rss_kib": 5136,
+        "Rss_kib": 5180,
+        "Pss_kib": 868,
+        "Private_Dirty_kib": 556,
+        "comm": "pactl"
+      },
+      "478947": {
+        "cpu_ticks": 56,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1685918,
+        "threads": 2,
+        "rss_kib": 50048,
+        "Rss_kib": 50056,
+        "Pss_kib": 16945,
+        "Private_Dirty_kib": 10012,
+        "comm": "cava"
+      },
+      "478949": {
+        "cpu_ticks": 0,
+        "child_cpu_ticks": 0,
+        "start_ticks": 1685922,
+        "threads": 1,
+        "rss_kib": 5428,
+        "Rss_kib": 5528,
+        "Pss_kib": 901,
+        "Private_Dirty_kib": 572,
+        "comm": "parec"
+      }
+    },
+    "samples": [
+      {
+        "elapsed_s": 3.1697415559974615,
+        "processes": {
+          "478696": {
+            "cpu_ticks": 407,
+            "child_cpu_ticks": 86,
+            "start_ticks": 1685392,
+            "threads": 24,
+            "rss_kib": 486360,
+            "Rss_kib": 453632,
+            "Pss_kib": 340317,
+            "Private_Dirty_kib": 271328,
+            "comm": "qs"
+          },
+          "478723": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685455,
+            "threads": 5,
+            "rss_kib": 10048,
+            "Rss_kib": 10528,
+            "Pss_kib": 2969,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "478942": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 2,
+            "start_ticks": 1685915,
+            "threads": 1,
+            "rss_kib": 2636,
+            "Rss_kib": 2964,
+            "Pss_kib": 860,
+            "Private_Dirty_kib": 456,
+            "comm": "isla-cava-strea"
+          },
+          "478943": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685915,
+            "threads": 1,
+            "rss_kib": 5136,
+            "Rss_kib": 5180,
+            "Pss_kib": 868,
+            "Private_Dirty_kib": 556,
+            "comm": "pactl"
+          },
+          "478947": {
+            "cpu_ticks": 60,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685918,
+            "threads": 2,
+            "rss_kib": 50048,
+            "Rss_kib": 50056,
+            "Pss_kib": 16946,
+            "Private_Dirty_kib": 10012,
+            "comm": "cava"
+          },
+          "478949": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685922,
+            "threads": 1,
+            "rss_kib": 5428,
+            "Rss_kib": 5528,
+            "Pss_kib": 901,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 6.2806928969985165,
+        "processes": {
+          "478696": {
+            "cpu_ticks": 454,
+            "child_cpu_ticks": 88,
+            "start_ticks": 1685392,
+            "threads": 24,
+            "rss_kib": 485548,
+            "Rss_kib": 452800,
+            "Pss_kib": 339488,
+            "Private_Dirty_kib": 270496,
+            "comm": "qs"
+          },
+          "478723": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685455,
+            "threads": 5,
+            "rss_kib": 10048,
+            "Rss_kib": 10528,
+            "Pss_kib": 3359,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "478942": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 2,
+            "start_ticks": 1685915,
+            "threads": 1,
+            "rss_kib": 2636,
+            "Rss_kib": 2964,
+            "Pss_kib": 860,
+            "Private_Dirty_kib": 456,
+            "comm": "isla-cava-strea"
+          },
+          "478943": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685915,
+            "threads": 1,
+            "rss_kib": 5136,
+            "Rss_kib": 5180,
+            "Pss_kib": 868,
+            "Private_Dirty_kib": 556,
+            "comm": "pactl"
+          },
+          "478947": {
+            "cpu_ticks": 65,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685918,
+            "threads": 2,
+            "rss_kib": 50048,
+            "Rss_kib": 50056,
+            "Pss_kib": 16946,
+            "Private_Dirty_kib": 10012,
+            "comm": "cava"
+          },
+          "478949": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685922,
+            "threads": 1,
+            "rss_kib": 5428,
+            "Rss_kib": 5528,
+            "Pss_kib": 902,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 9.452019492997351,
+        "processes": {
+          "478696": {
+            "cpu_ticks": 512,
+            "child_cpu_ticks": 89,
+            "start_ticks": 1685392,
+            "threads": 23,
+            "rss_kib": 485548,
+            "Rss_kib": 452608,
+            "Pss_kib": 339296,
+            "Private_Dirty_kib": 270304,
+            "comm": "qs"
+          },
+          "478723": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685455,
+            "threads": 4,
+            "rss_kib": 10048,
+            "Rss_kib": 10592,
+            "Pss_kib": 3360,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "478942": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 2,
+            "start_ticks": 1685915,
+            "threads": 1,
+            "rss_kib": 2636,
+            "Rss_kib": 2964,
+            "Pss_kib": 860,
+            "Private_Dirty_kib": 456,
+            "comm": "isla-cava-strea"
+          },
+          "478943": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685915,
+            "threads": 1,
+            "rss_kib": 5136,
+            "Rss_kib": 5180,
+            "Pss_kib": 868,
+            "Private_Dirty_kib": 556,
+            "comm": "pactl"
+          },
+          "478947": {
+            "cpu_ticks": 70,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685918,
+            "threads": 2,
+            "rss_kib": 50048,
+            "Rss_kib": 50056,
+            "Pss_kib": 16946,
+            "Private_Dirty_kib": 10012,
+            "comm": "cava"
+          },
+          "478949": {
+            "cpu_ticks": 1,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685922,
+            "threads": 1,
+            "rss_kib": 5428,
+            "Rss_kib": 5528,
+            "Pss_kib": 902,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      },
+      {
+        "elapsed_s": 12.619441026999993,
+        "processes": {
+          "478696": {
+            "cpu_ticks": 567,
+            "child_cpu_ticks": 91,
+            "start_ticks": 1685392,
+            "threads": 23,
+            "rss_kib": 485548,
+            "Rss_kib": 452524,
+            "Pss_kib": 339212,
+            "Private_Dirty_kib": 270220,
+            "comm": "qs"
+          },
+          "478723": {
+            "cpu_ticks": 4,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685455,
+            "threads": 4,
+            "rss_kib": 10048,
+            "Rss_kib": 10592,
+            "Pss_kib": 3360,
+            "Private_Dirty_kib": 1376,
+            "comm": "nmcli"
+          },
+          "478942": {
+            "cpu_ticks": 2,
+            "child_cpu_ticks": 2,
+            "start_ticks": 1685915,
+            "threads": 1,
+            "rss_kib": 2636,
+            "Rss_kib": 2964,
+            "Pss_kib": 860,
+            "Private_Dirty_kib": 456,
+            "comm": "isla-cava-strea"
+          },
+          "478943": {
+            "cpu_ticks": 0,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685915,
+            "threads": 1,
+            "rss_kib": 5136,
+            "Rss_kib": 5180,
+            "Pss_kib": 868,
+            "Private_Dirty_kib": 556,
+            "comm": "pactl"
+          },
+          "478947": {
+            "cpu_ticks": 74,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685918,
+            "threads": 2,
+            "rss_kib": 50048,
+            "Rss_kib": 50056,
+            "Pss_kib": 16946,
+            "Private_Dirty_kib": 10012,
+            "comm": "cava"
+          },
+          "478949": {
+            "cpu_ticks": 3,
+            "child_cpu_ticks": 0,
+            "start_ticks": 1685922,
+            "threads": 1,
+            "rss_kib": 5428,
+            "Rss_kib": 5528,
+            "Pss_kib": 902,
+            "Private_Dirty_kib": 572,
+            "comm": "parec"
+          }
+        }
+      }
+    ],
+    "cpu_by_pid": {
+      "478696": 16.028986416199512,
+      "478723": 0.0,
+      "478942": 0.15638035527999522,
+      "478943": 0.0,
+      "478947": 1.4074231975199571,
+      "478949": 0.23457053291999286
+    },
+    "cpu_total": 17.827360501919458,
+    "cpu_qs": 16.028986416199512,
+    "state": "{\"hasFrame\":true,\"signal\":true,\"subscribers\":3,\"playing\":true,\"frames\":1097}",
+    "state_before": "{\"hasFrame\":true,\"signal\":true,\"subscribers\":3,\"playing\":true,\"frames\":341}"
+  }
+]

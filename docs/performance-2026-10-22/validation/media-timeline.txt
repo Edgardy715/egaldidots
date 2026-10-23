@@ -1,0 +1,15 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/media-timeline-regression.qml"
+  INFO: Shell ID: "59244384a2409ce0468be9fe50ba3ca0" Path ID "59244384a2409ce0468be9fe50ba3ca0"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/5xu9h4dcnt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PIXEL_FRAME pause 55 0.5664828623364829
+ DEBUG qml: PIXEL_FRAME pause 110 0.381845560568965
+ DEBUG qml: PIXEL_FRAME pause 166 0.26100937474791963
+ DEBUG qml: PIXEL_FRAME pause 221 0.1752769583040108
+ DEBUG qml: PIXEL_FRAME pause 277 0.11105442275541555
+ DEBUG qml: PIXEL_FRAME pause 333 0.06654097222019617
+ DEBUG qml: PIXEL_FRAME pause 388 0.03487949547712943
+ DEBUG qml: PIXEL_FRAME pause 444 0.014399551572952363
+ DEBUG qml: PIXEL_FRAME pause 500 0.003362557066501015
+ DEBUG qml: PIXEL_FRAME pause 556 0
+ DEBUG qml: PASS: Android16 dimensions, phase velocity, delayed amplitude, pause/resume interruption, scrub, track reset, reduced/hidden/closed

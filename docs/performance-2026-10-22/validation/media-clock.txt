@@ -1,0 +1,5 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/media-clock-regression.qml"
+  INFO: Shell ID: "325d30822a1834cfbf0fb4cb60b4404d" Path ID "325d30822a1834cfbf0fb4cb60b4404d"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/fcv9w4dcnt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: sparse-signal clock, pause, seek, rate, track change and reopen

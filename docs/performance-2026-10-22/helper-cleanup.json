@@ -1,0 +1,74 @@
+[
+  {
+    "variant": "A",
+    "pid": "476797",
+    "comm": "isla-cava-strea",
+    "state": "absent"
+  },
+  {
+    "variant": "A",
+    "pid": "476802",
+    "comm": "cava",
+    "state": "absent"
+  },
+  {
+    "variant": "A",
+    "pid": "476804",
+    "comm": "parec",
+    "state": "absent"
+  },
+  {
+    "variant": "B",
+    "pid": "477498",
+    "comm": "isla-cava-strea",
+    "state": "absent"
+  },
+  {
+    "variant": "B",
+    "pid": "477503",
+    "comm": "cava",
+    "state": "absent"
+  },
+  {
+    "variant": "B",
+    "pid": "477505",
+    "comm": "parec",
+    "state": "absent"
+  },
+  {
+    "variant": "B",
+    "pid": "478189",
+    "comm": "isla-cava-strea",
+    "state": "absent"
+  },
+  {
+    "variant": "B",
+    "pid": "478194",
+    "comm": "cava",
+    "state": "absent"
+  },
+  {
+    "variant": "B",
+    "pid": "478205",
+    "comm": "parec",
+    "state": "absent"
+  },
+  {
+    "variant": "A",
+    "pid": "478942",
+    "comm": "isla-cava-strea",
+    "state": "absent"
+  },
+  {
+    "variant": "A",
+    "pid": "478947",
+    "comm": "cava",
+    "state": "absent"
+  },
+  {
+    "variant": "A",
+    "pid": "478949",
+    "comm": "parec",
+    "state": "absent"
+  }
+]

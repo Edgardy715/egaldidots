@@ -1,0 +1,275 @@
+[
+  {
+    "label": "initial",
+    "time": 16246.083646754,
+    "Rss_kib": 440456,
+    "Pss_kib": 330917,
+    "Private_Dirty_kib": 262208
+  },
+  {
+    "label": "0-media-before",
+    "time": 16246.086705011,
+    "Rss_kib": 440456,
+    "Pss_kib": 330917,
+    "Private_Dirty_kib": 262208
+  },
+  {
+    "label": "0-media-after",
+    "time": 16291.236829715,
+    "Rss_kib": 458908,
+    "Pss_kib": 345888,
+    "Private_Dirty_kib": 276500
+  },
+  {
+    "label": "0-media-gc",
+    "time": 16292.309863902,
+    "Rss_kib": 458732,
+    "Pss_kib": 345712,
+    "Private_Dirty_kib": 276324
+  },
+  {
+    "label": "0-wallpaper-before",
+    "time": 16292.313508422,
+    "Rss_kib": 458732,
+    "Pss_kib": 345712,
+    "Private_Dirty_kib": 276324
+  },
+  {
+    "label": "0-wallpaper-after",
+    "time": 16337.613332403,
+    "Rss_kib": 456444,
+    "Pss_kib": 344952,
+    "Private_Dirty_kib": 275700
+  },
+  {
+    "label": "0-wallpaper-gc",
+    "time": 16338.665267073,
+    "Rss_kib": 456240,
+    "Pss_kib": 344748,
+    "Private_Dirty_kib": 275496
+  },
+  {
+    "label": "0-launcher-before",
+    "time": 16338.668941882,
+    "Rss_kib": 456240,
+    "Pss_kib": 344748,
+    "Private_Dirty_kib": 275496
+  },
+  {
+    "label": "0-launcher-after",
+    "time": 16383.854985103,
+    "Rss_kib": 464680,
+    "Pss_kib": 352799,
+    "Private_Dirty_kib": 283332
+  },
+  {
+    "label": "0-launcher-gc",
+    "time": 16384.927109701,
+    "Rss_kib": 465060,
+    "Pss_kib": 352859,
+    "Private_Dirty_kib": 283392
+  },
+  {
+    "label": "0-settings-before",
+    "time": 16384.930894667,
+    "Rss_kib": 465060,
+    "Pss_kib": 352859,
+    "Private_Dirty_kib": 283392
+  },
+  {
+    "label": "0-settings-after",
+    "time": 16430.118970899,
+    "Rss_kib": 475156,
+    "Pss_kib": 363403,
+    "Private_Dirty_kib": 294296
+  },
+  {
+    "label": "0-settings-gc",
+    "time": 16431.193024479,
+    "Rss_kib": 474656,
+    "Pss_kib": 362903,
+    "Private_Dirty_kib": 293796
+  },
+  {
+    "label": "0-tracks-before",
+    "time": 16431.196823118,
+    "Rss_kib": 474656,
+    "Pss_kib": 362903,
+    "Private_Dirty_kib": 293796
+  },
+  {
+    "label": "0-tracks-after",
+    "time": 16464.391112737,
+    "Rss_kib": 478052,
+    "Pss_kib": 364507,
+    "Private_Dirty_kib": 295148
+  },
+  {
+    "label": "0-tracks-gc",
+    "time": 16465.463699882,
+    "Rss_kib": 478008,
+    "Pss_kib": 364463,
+    "Private_Dirty_kib": 295104
+  },
+  {
+    "label": "0-notifications-before",
+    "time": 16465.467639421,
+    "Rss_kib": 478008,
+    "Pss_kib": 364463,
+    "Private_Dirty_kib": 295104
+  },
+  {
+    "label": "0-notifications-after",
+    "time": 16488.571726161,
+    "Rss_kib": 479648,
+    "Pss_kib": 366103,
+    "Private_Dirty_kib": 296744
+  },
+  {
+    "label": "0-notifications-gc",
+    "time": 16489.643282453,
+    "Rss_kib": 479328,
+    "Pss_kib": 365783,
+    "Private_Dirty_kib": 296424
+  },
+  {
+    "label": "1-media-before",
+    "time": 16489.647382049,
+    "Rss_kib": 479328,
+    "Pss_kib": 365783,
+    "Private_Dirty_kib": 296424
+  },
+  {
+    "label": "1-media-after",
+    "time": 16534.953549421,
+    "Rss_kib": 491312,
+    "Pss_kib": 377035,
+    "Private_Dirty_kib": 307668
+  },
+  {
+    "label": "1-media-gc",
+    "time": 16536.032413008,
+    "Rss_kib": 490680,
+    "Pss_kib": 376403,
+    "Private_Dirty_kib": 307036
+  },
+  {
+    "label": "1-wallpaper-before",
+    "time": 16536.036607233,
+    "Rss_kib": 490680,
+    "Pss_kib": 376403,
+    "Private_Dirty_kib": 307036
+  },
+  {
+    "label": "1-wallpaper-after",
+    "time": 16581.383071531,
+    "Rss_kib": 489244,
+    "Pss_kib": 376163,
+    "Private_Dirty_kib": 306632
+  },
+  {
+    "label": "1-wallpaper-gc",
+    "time": 16582.460166933,
+    "Rss_kib": 489200,
+    "Pss_kib": 376119,
+    "Private_Dirty_kib": 306588
+  },
+  {
+    "label": "1-launcher-before",
+    "time": 16582.464179224,
+    "Rss_kib": 489200,
+    "Pss_kib": 376119,
+    "Private_Dirty_kib": 306588
+  },
+  {
+    "label": "1-launcher-after",
+    "time": 16627.716682529,
+    "Rss_kib": 498504,
+    "Pss_kib": 383210,
+    "Private_Dirty_kib": 313604
+  },
+  {
+    "label": "1-launcher-gc",
+    "time": 16628.78958703,
+    "Rss_kib": 498408,
+    "Pss_kib": 383113,
+    "Private_Dirty_kib": 313508
+  },
+  {
+    "label": "1-settings-before",
+    "time": 16628.793824501,
+    "Rss_kib": 498408,
+    "Pss_kib": 383113,
+    "Private_Dirty_kib": 313508
+  },
+  {
+    "label": "1-settings-after",
+    "time": 16674.100842586,
+    "Rss_kib": 500228,
+    "Pss_kib": 385548,
+    "Private_Dirty_kib": 315992
+  },
+  {
+    "label": "1-settings-gc",
+    "time": 16675.172427112,
+    "Rss_kib": 501956,
+    "Pss_kib": 385740,
+    "Private_Dirty_kib": 316184
+  },
+  {
+    "label": "1-tracks-before",
+    "time": 16675.176542885,
+    "Rss_kib": 501956,
+    "Pss_kib": 385740,
+    "Private_Dirty_kib": 316184
+  },
+  {
+    "label": "1-tracks-after",
+    "time": 16708.377634545,
+    "Rss_kib": 500236,
+    "Pss_kib": 385172,
+    "Private_Dirty_kib": 315492
+  },
+  {
+    "label": "1-tracks-gc",
+    "time": 16709.4538806,
+    "Rss_kib": 499576,
+    "Pss_kib": 384512,
+    "Private_Dirty_kib": 314832
+  },
+  {
+    "label": "1-notifications-before",
+    "time": 16709.458775497,
+    "Rss_kib": 499576,
+    "Pss_kib": 384512,
+    "Private_Dirty_kib": 314832
+  },
+  {
+    "label": "1-notifications-after",
+    "time": 16732.546987477,
+    "Rss_kib": 501852,
+    "Pss_kib": 386724,
+    "Private_Dirty_kib": 317044
+  },
+  {
+    "label": "1-notifications-gc",
+    "time": 16733.619913376,
+    "Rss_kib": 501668,
+    "Pss_kib": 386540,
+    "Private_Dirty_kib": 316860
+  },
+  {
+    "label": "settled-30s",
+    "time": 16763.624220034,
+    "Rss_kib": 503448,
+    "Pss_kib": 388320,
+    "Private_Dirty_kib": 318640
+  },
+  {
+    "label": "settled-gc",
+    "time": 16764.677608785,
+    "Rss_kib": 505624,
+    "Pss_kib": 390496,
+    "Private_Dirty_kib": 320816
+  }
+]

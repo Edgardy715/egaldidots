@@ -1,0 +1,11 @@
+  INFO: Launching config: "/tmp/isla-envelope-5yzn_844/bar/cava-envelope-regression.qml"
+  INFO: Shell ID: "44a39b237370a1b3f1c5d60847f7f90b" Path ID "44a39b237370a1b3f1c5d60847f7f90b"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/77z9e9dcnt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ DEBUG qml: CAVA_SILENCE_UPDATES 0
+ DEBUG qml: CAVA_SETTLED_UPDATES 0
+ DEBUG qml: PASS: silence suspends envelope, attack/release/resume/reset preserved
+

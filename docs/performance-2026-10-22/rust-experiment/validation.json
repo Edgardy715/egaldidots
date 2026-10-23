@@ -1,0 +1,13 @@
+{
+  "binary": "/tmp/isla-cava-b/target/release/isla-cava-stream",
+  "sha256": "39379af666120e3c02366f77a1205fb440b9665f2851f5a59b4b2ad77ed98bdf",
+  "cargo_test": "10 passed",
+  "clippy": "locked all-targets -D warnings PASS",
+  "release": "locked PASS",
+  "runtime": "5 lifecycle + synthetic protocol PASS",
+  "observed_hz_synthetic": 60.03285770207925,
+  "reconstruction": "patch produces exact tested main.rs",
+  "cpu_savings": "not measured",
+  "visual_qa": "not performed",
+  "scope": "isolated prototype only"
+}

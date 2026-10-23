@@ -1,0 +1,56 @@
+[
+  {
+    "label": "initial",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 445108,
+    "Pss_kib": 335727,
+    "Private_Dirty_kib": 267416
+  },
+  {
+    "label": "0-media-after",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 551880,
+    "Pss_kib": 440656,
+    "Private_Dirty_kib": 371728
+  },
+  {
+    "label": "0-media-gc",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 551592,
+    "Pss_kib": 440368,
+    "Private_Dirty_kib": 371440
+  },
+  {
+    "label": "0-launcher-after",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 566348,
+    "Pss_kib": 455472,
+    "Private_Dirty_kib": 386712
+  },
+  {
+    "label": "0-launcher-gc",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 568428,
+    "Pss_kib": 457552,
+    "Private_Dirty_kib": 388792
+  },
+  {
+    "label": "settled",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 570744,
+    "Pss_kib": 459868,
+    "Private_Dirty_kib": 391108
+  }
+]

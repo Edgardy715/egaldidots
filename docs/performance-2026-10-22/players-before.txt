@@ -1,0 +1,20 @@
+  INFO: Launching config: "/tmp/isla-players-1vr84wh5/shell.qml"
+  INFO: Shell ID: "9dccbe19e311e545b5c862362694772b" Path ID "9dccbe19e311e545b5c862362694772b"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/h4o93xccnt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ ERROR qml: FAIL: live paused manual wins without replacing recent
+  WARN scene: QML Players at @Singletons/Players.qml[10:1]: Binding loop detected for property "active":
+qs:@/qs/Singletons/Players.qml:32:5
+  WARN scene: QML Players at @Singletons/Players.qml[10:1]: Binding loop detected for property "active":
+qs:@/qs/Singletons/Players.qml:32:5
+ ERROR qml: FAIL: paused replacement must not become recent
+  WARN scene: @Singletons/Players.qml[52:5]: Unable to assign [undefined] to bool
+
+Traceback (most recent call last):
+  File "/home/zdito/.config/quickshell/bar/tests/players.py", line 144, in <module>
+    assert result.returncode == 0 and "PASS: Players" in output and "FAIL:" not in output
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

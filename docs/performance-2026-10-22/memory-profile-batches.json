@@ -1,0 +1,128 @@
+[
+  {
+    "label": "initial",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 445732,
+    "Pss_kib": 336195,
+    "Private_Dirty_kib": 266652
+  },
+  {
+    "label": "0-media-after",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 541336,
+    "Pss_kib": 430034,
+    "Private_Dirty_kib": 360160
+  },
+  {
+    "label": "0-media-gc",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 540256,
+    "Pss_kib": 428954,
+    "Private_Dirty_kib": 359080
+  },
+  {
+    "label": "0-launcher-after",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 552136,
+    "Pss_kib": 443010,
+    "Private_Dirty_kib": 373296
+  },
+  {
+    "label": "0-launcher-gc",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 554104,
+    "Pss_kib": 444978,
+    "Private_Dirty_kib": 375264
+  },
+  {
+    "label": "1-media-after",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 640000,
+    "Pss_kib": 528994,
+    "Private_Dirty_kib": 459284
+  },
+  {
+    "label": "1-media-gc",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 641544,
+    "Pss_kib": 530538,
+    "Private_Dirty_kib": 460828
+  },
+  {
+    "label": "1-launcher-after",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 655820,
+    "Pss_kib": 544907,
+    "Private_Dirty_kib": 475208
+  },
+  {
+    "label": "1-launcher-gc",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 655932,
+    "Pss_kib": 545019,
+    "Private_Dirty_kib": 475320
+  },
+  {
+    "label": "2-media-after",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 738932,
+    "Pss_kib": 627986,
+    "Private_Dirty_kib": 558288
+  },
+  {
+    "label": "2-media-gc",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 739096,
+    "Pss_kib": 627834,
+    "Private_Dirty_kib": 558136
+  },
+  {
+    "label": "2-launcher-after",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 752956,
+    "Pss_kib": 643514,
+    "Private_Dirty_kib": 573832
+  },
+  {
+    "label": "2-launcher-gc",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 754972,
+    "Pss_kib": 645530,
+    "Private_Dirty_kib": 575848
+  },
+  {
+    "label": "settled",
+    "nodes": 2542,
+    "subscribers": 1,
+    "surface": "",
+    "Rss_kib": 755388,
+    "Pss_kib": 645946,
+    "Private_Dirty_kib": 576264
+  }
+]

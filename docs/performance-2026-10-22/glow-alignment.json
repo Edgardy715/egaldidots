@@ -1,0 +1,314 @@
+[
+  {
+    "variant": "independent",
+    "timing": false,
+    "measurement": {
+      "pid": 512228,
+      "clock_ticks": 100,
+      "memory_before": {
+        "Rss_kib": 438984,
+        "Pss_kib": 329871,
+        "Private_Dirty_kib": 260900
+      },
+      "samples": [
+        {
+          "elapsed_s": 3.0001881909993244,
+          "cpu_percent": 4.999686368008699,
+          "child_cpu_percent": 0.33331242453391324,
+          "rss_kib": 465544,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 6.000471696999739,
+          "cpu_percent": 4.332923863361799,
+          "child_cpu_percent": 0.6666036712864306,
+          "rss_kib": 464720,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 9.000701314998878,
+          "cpu_percent": 4.333001688274024,
+          "child_cpu_percent": 0.0,
+          "rss_kib": 466916,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 12.000235495997913,
+          "cpu_percent": 4.0006211884550815,
+          "child_cpu_percent": 0.6667701980758469,
+          "rss_kib": 466756,
+          "threads": 23
+        }
+      ],
+      "duration_s": 12.000235495997913,
+      "cpu_percent": 4.416579992757271,
+      "child_cpu_percent": 0.41665848988276133,
+      "memory_after": {
+        "Rss_kib": 433760,
+        "Pss_kib": 324647,
+        "Private_Dirty_kib": 255676
+      }
+    },
+    "rendered_frames": 0
+  },
+  {
+    "variant": "shared",
+    "timing": false,
+    "measurement": {
+      "pid": 512755,
+      "clock_ticks": 100,
+      "memory_before": {
+        "Rss_kib": 445176,
+        "Pss_kib": 336255,
+        "Private_Dirty_kib": 267132
+      },
+      "samples": [
+        {
+          "elapsed_s": 3.000173390002601,
+          "cpu_percent": 2.3331984822363654,
+          "child_cpu_percent": 0.6666281377818187,
+          "rss_kib": 465832,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 6.000353926003299,
+          "cpu_percent": 2.666506199878279,
+          "child_cpu_percent": 0.33331327498478486,
+          "rss_kib": 465832,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 9.000538998003321,
+          "cpu_percent": 2.6665021683702124,
+          "child_cpu_percent": 0.6666255420925531,
+          "rss_kib": 465752,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 12.00020215600307,
+          "cpu_percent": 2.666966115400305,
+          "child_cpu_percent": 0.0,
+          "rss_kib": 467528,
+          "threads": 23
+        }
+      ],
+      "duration_s": 12.00020215600307,
+      "cpu_percent": 2.583289814371363,
+      "child_cpu_percent": 0.4166596474792521,
+      "memory_after": {
+        "Rss_kib": 434352,
+        "Pss_kib": 325431,
+        "Private_Dirty_kib": 256336
+      }
+    },
+    "rendered_frames": 0
+  },
+  {
+    "variant": "shared",
+    "timing": false,
+    "measurement": {
+      "pid": 513347,
+      "clock_ticks": 100,
+      "memory_before": {
+        "Rss_kib": 440296,
+        "Pss_kib": 331358,
+        "Private_Dirty_kib": 262336
+      },
+      "samples": [
+        {
+          "elapsed_s": 3.0002652619987202,
+          "cpu_percent": 2.666430899070088,
+          "child_cpu_percent": 0.666607724767522,
+          "rss_kib": 466664,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 6.000442507000116,
+          "cpu_percent": 2.3331954842543787,
+          "child_cpu_percent": 0.0,
+          "rss_kib": 466236,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 9.000618754998868,
+          "cpu_percent": 2.666510010982304,
+          "child_cpu_percent": 0.666627502745576,
+          "rss_kib": 468372,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 12.00018248500055,
+          "cpu_percent": 2.667054518623451,
+          "child_cpu_percent": 0.3333818148279314,
+          "rss_kib": 468372,
+          "threads": 23
+        }
+      ],
+      "duration_s": 12.00018248500055,
+      "cpu_percent": 2.5832940489653375,
+      "child_cpu_percent": 0.41666033047828027,
+      "memory_after": {
+        "Rss_kib": 435536,
+        "Pss_kib": 326598,
+        "Private_Dirty_kib": 257604
+      }
+    },
+    "rendered_frames": 0
+  },
+  {
+    "variant": "independent",
+    "timing": false,
+    "measurement": {
+      "pid": 513933,
+      "clock_ticks": 100,
+      "memory_before": {
+        "Rss_kib": 441952,
+        "Pss_kib": 333047,
+        "Private_Dirty_kib": 264104
+      },
+      "samples": [
+        {
+          "elapsed_s": 3.000309407001623,
+          "cpu_percent": 4.332886458197532,
+          "child_cpu_percent": 0.6665979166457742,
+          "rss_kib": 468628,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 6.000486045002617,
+          "cpu_percent": 4.333078204575931,
+          "child_cpu_percent": 0.6666274160886048,
+          "rss_kib": 468500,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 9.000665143001243,
+          "cpu_percent": 4.333074651667331,
+          "child_cpu_percent": 0.33331343474364084,
+          "rss_kib": 468336,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 12.000214296000195,
+          "cpu_percent": 4.000601219687428,
+          "child_cpu_percent": 0.33338343497395234,
+          "rss_kib": 468464,
+          "threads": 23
+        }
+      ],
+      "duration_s": 12.000214296000195,
+      "cpu_percent": 4.249924104855267,
+      "child_cpu_percent": 0.49999107115944313,
+      "memory_after": {
+        "Rss_kib": 435444,
+        "Pss_kib": 326539,
+        "Private_Dirty_kib": 257640
+      }
+    },
+    "rendered_frames": 0
+  },
+  {
+    "variant": "independent",
+    "timing": true,
+    "measurement": {
+      "pid": 514471,
+      "clock_ticks": 100,
+      "memory_before": {
+        "Rss_kib": 438996,
+        "Pss_kib": 329976,
+        "Private_Dirty_kib": 261032
+      },
+      "samples": [
+        {
+          "elapsed_s": 3.0001830059991335,
+          "cpu_percent": 6.332947010901604,
+          "child_cpu_percent": 0.6666260011475372,
+          "rss_kib": 465436,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 6.000361998001608,
+          "cpu_percent": 6.666268930391705,
+          "child_cpu_percent": 0.6666268930391704,
+          "rss_kib": 465028,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 9.000520736000908,
+          "cpu_percent": 6.332998237510069,
+          "child_cpu_percent": 0.3333156967110563,
+          "rss_kib": 465028,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 12.000131377000798,
+          "cpu_percent": 5.33402561696026,
+          "child_cpu_percent": 0.33337660106001626,
+          "rss_kib": 465156,
+          "threads": 23
+        }
+      ],
+      "duration_s": 12.000131377000798,
+      "cpu_percent": 6.166599154224833,
+      "child_cpu_percent": 0.4999945260182297,
+      "memory_after": {
+        "Rss_kib": 432184,
+        "Pss_kib": 323164,
+        "Private_Dirty_kib": 254268
+      }
+    },
+    "rendered_frames": 578
+  },
+  {
+    "variant": "shared",
+    "timing": true,
+    "measurement": {
+      "pid": 515112,
+      "clock_ticks": 100,
+      "memory_before": {
+        "Rss_kib": 447420,
+        "Pss_kib": 338278,
+        "Private_Dirty_kib": 268976
+      },
+      "samples": [
+        {
+          "elapsed_s": 3.0002124029997503,
+          "cpu_percent": 3.3330973467083664,
+          "child_cpu_percent": 0.6666194693416733,
+          "rss_kib": 466608,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 6.0003904160003,
+          "cpu_percent": 3.666449108130966,
+          "child_cpu_percent": 0.0,
+          "rss_kib": 466324,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 9.000618677000602,
+          "cpu_percent": 3.6663877022251983,
+          "child_cpu_percent": 0.666615945859127,
+          "rss_kib": 466324,
+          "threads": 24
+        },
+        {
+          "elapsed_s": 12.00021428800028,
+          "cpu_percent": 4.000539258023768,
+          "child_cpu_percent": 0.6667565430039615,
+          "rss_kib": 466324,
+          "threads": 23
+        }
+      ],
+      "duration_s": 12.00021428800028,
+      "cpu_percent": 3.6666011909469143,
+      "child_cpu_percent": 0.499991071492761,
+      "memory_after": {
+        "Rss_kib": 433216,
+        "Pss_kib": 324074,
+        "Private_Dirty_kib": 254804
+      }
+    },
+    "rendered_frames": 288
+  }
+]

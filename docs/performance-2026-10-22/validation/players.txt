@@ -1,0 +1,10 @@
+  INFO: Launching config: "/tmp/isla-players-m6n5xpcq/shell.qml"
+  INFO: Shell ID: "c810d548dd694398bc0fac6eb2fbfa82" Path ID "c810d548dd694398bc0fac6eb2fbfa82"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/37z9d9dcnt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: Players priority, recency, filtering, cycling and removal
+  WARN scene: @Singletons/Players.qml[53:5]: Unable to assign [undefined] to bool
+

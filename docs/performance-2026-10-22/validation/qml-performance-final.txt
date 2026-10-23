@@ -1,0 +1,13 @@
+  INFO: Launching config: "/tmp/isla-qml-perf-qqn5eo1o/bar/qml-performance-regression.qml"
+  INFO: Shell ID: "6d23dfe34d79778dfe8de78c26743956" Path ID "6d23dfe34d79778dfe8de78c26743956"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/r26b7pecnt/log.qslog"
+ ERROR: Failed to load configuration
+ ERROR:   caused by @qml-performance-regression.qml[38:5]: Type IslandOverlay unavailable
+ ERROR:   caused by @windows/IslandOverlay.qml[16:9]: id is not unique
+
+exit 255
+Traceback (most recent call last):
+  File "/home/zdito/.config/quickshell/bar/tests/qml-performance.py", line 113, in <module>
+    assert process.returncode == 0 and "FAIL" not in output and "PASS: QML performance" in output
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

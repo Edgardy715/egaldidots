@@ -1,0 +1,34 @@
+{
+  "memory-profile.qtd.gz": {
+    "events_by_type": {
+      "DebugMessage": 8
+    },
+    "ranges": 382,
+    "memory_or_pixmap_trace_valid": false
+  },
+  "memory-profile-v2.qtd.gz": {
+    "events_by_type": {
+      "DebugMessage": 8
+    },
+    "ranges": 382,
+    "memory_or_pixmap_trace_valid": false
+  },
+  "minimal_probe_memory_events": 3,
+  "conclusion": "Los dos primeros perfiles se truncaron por SIGTERM y son inválidos. El tercero, con cierre Qt.quit, incluye memoria y pixmaps y es válido. Véase memory-profile-summary.json.",
+  "memory-profile-complete.qtd.gz": {
+    "events_by_type": {
+      "Creating": 1477,
+      "PixmapCache": 44,
+      "DebugMessage": 8,
+      "MemoryAllocation": 3
+    },
+    "range_counts": {
+      "DebugMessage": 3610,
+      "MemoryAllocation": 4207015,
+      "Creating": 89597,
+      "PixmapCache": 329
+    },
+    "memory_or_pixmap_trace_valid": true,
+    "shutdown": "IPC Qt.callLater(Qt.quit), sin SIGTERM antes de flush"
+  }
+}

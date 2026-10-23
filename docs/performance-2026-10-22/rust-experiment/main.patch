@@ -1,0 +1,105 @@
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -1,4 +1,5 @@
+ mod identity;
++mod spectrum;
+ 
+ use nix::{
+     fcntl::{fcntl, FcntlArg, OFlag},
+@@ -276,9 +277,7 @@
+         match self.cava.read(&mut bytes)? {
+             Some(0) => return Err(io::Error::other("cava EOF")),
+             Some(n) => self.lines.push(&bytes[..n], |line| {
+-                if let Some(frame) = frame(line) {
+-                    output.queue(frame);
+-                }
++                output.ingest(line);
+             }),
+             None => (),
+         }
+@@ -289,6 +288,7 @@
+     current: Vec<u8>,
+     offset: usize,
+     next: Option<Vec<u8>>,
++    smoother: Option<spectrum::Smoother>,
+ }
+ impl Output {
+     fn new() -> Self {
+@@ -296,6 +296,19 @@
+             current: Vec::new(),
+             offset: 0,
+             next: None,
++            smoother: None,
++        }
++    }
++    fn ingest(&mut self, line: &[u8]) {
++        if let Some(smoother) = &mut self.smoother {
++            smoother.ingest(line);
++        } else if let Some(frame) = frame(line) {
++            self.queue(frame);
++        }
++    }
++    fn tick(&mut self) {
++        if let Some(frame) = self.smoother.as_mut().and_then(|s| s.tick(Instant::now())) {
++            self.queue(frame);
+         }
+     }
+     fn queue(&mut self, frame: Vec<u8>) {
+@@ -334,11 +347,16 @@
+     let mut desktop = String::new();
+     let mut bus = String::new();
+     let mut expected_parent = None;
++    let mut smooth = false;
+     let mut it = args.iter();
+     while let Some(arg) = it.next() {
+         if arg == "--help" || arg == "-h" {
+-            println!("isla-cava-stream [--identity NAME] [--desktop FILE] [--bus MPRIS_BUS] [--parent PID]");
++            println!("isla-cava-stream [--identity NAME] [--desktop FILE] [--bus MPRIS_BUS] [--parent PID] [--smooth]");
+             return Ok(());
++        }
++        if arg == "--smooth" {
++            smooth = true;
++            continue;
+         }
+         if arg == "--parent" {
+             let pid: i32 = it
+@@ -391,6 +409,9 @@
+     let mut stdout = io::stdout();
+     nonblocking(&stdout)?;
+     let mut output = Output::new();
++    if smooth {
++        output.smoother = Some(spectrum::Smoother::new());
++    }
+     let mut subscription: Option<Process> = None;
+     let mut query: Option<Snapshot> = None;
+     let mut capture: Option<Capture> = None;
+@@ -504,9 +525,10 @@
+             refresh_at = retry_at;
+         }
+         if capture.is_none() && last_zero.elapsed() >= Duration::from_millis(500) {
+-            output.queue(ZERO.as_bytes().to_vec());
++            output.ingest(ZERO.as_bytes());
+             last_zero = Instant::now();
+         }
++        output.tick();
+         output.flush(&mut stdout)?;
+         let mut fds = Vec::new();
+         if let Some(p) = &subscription {
+@@ -535,6 +557,9 @@
+             fds.push(PollFd::new(stdout.as_fd(), PollFlags::POLLOUT));
+         }
+         let mut deadline = Instant::now() + Duration::from_millis(100);
++        if let Some(tick) = output.smoother.as_ref().and_then(|s| s.deadline) {
++            deadline = deadline.min(tick);
++        }
+         if query.is_none() {
+             deadline = deadline.min(refresh_at);
+         }
+@@ -549,6 +574,7 @@
+         let timeout = deadline
+             .saturating_duration_since(Instant::now())
+             .as_millis()
++            .saturating_add(1)
+             .min(100) as u16;
+         match poll(&mut fds, timeout) {
+             Ok(_) | Err(nix::errno::Errno::EINTR) => (),

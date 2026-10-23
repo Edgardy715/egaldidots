@@ -1,0 +1,5 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/inner-glow-regression.qml"
+  INFO: Shell ID: "2d75cf7bf74b1651980eb4b64ba3f7bb" Path ID "2d75cf7bf74b1651980eb4b64ba3f7bb"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/nxsaq8ecnt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: subtle glow drift, hidden pause, reduced motion and resume

@@ -1,0 +1,20 @@
+{
+  "bar/Singletons/AmbientClock.qml": "3e8d0fde355d84e28529a10e75f6858888c2ae6661e103169e6ba4f71348cc15",
+  "bar/components/AmbientSubscription.qml": "feb0f783c28b3baf547f262de2aa354790d08ac14e3cc977a991eb3fbe333e50",
+  "bar/Singletons/Cava.qml": "41cec2cc09122d1dd8b404b70c6df95f1dd7062c283c06cdae538fb5d2a5da46",
+  "bar/Singletons/Spectrum.js": "6cacbfe21dbdfc5fb288979c948340447ef9fc3504efa16929f980aa49fb00e6",
+  "bar/Singletons/Players.qml": "d8fb97c9bbae73031c855a8972c510cca95e263ca58e60a711be121916577840",
+  "bar/Singletons/Settings.js": "b77f930bfe27eb658eb5c32d65a354846b8fd2d9055c69a9ee548675d1cda622",
+  "bar/Singletons/Flags.qml": "e0692a26bfb6838eee7c1a17624c3caedcdc5e4094787dfb47e43bdeb56df70d",
+  "bar/components/MediaTimeline.qml": "996e131c575e44889596b594f5da22882ebc37567ac56d8fe83d7655fcb2b60a",
+  "bar/components/SwiftMediaTimeline.qml": "d9f543b581fd3017a595864329f4c8376ba0cb2d4c152eeb1969b5ff5b456bd7",
+  "bar/components/MediaTransportButton.qml": "2c6f70db669d744beeba3f90b0b7ed19a92b7661afa8d95b0b50287c3ea1bd4f",
+  "bar/shell.json.example": "4f91dd2ababd71e88b876c6e467350fe34ef1d608c0031edf1aa20c7889c7c9c",
+  "quickshell": "Quickshell 0.3.2 (revision , distributed by Arch Linux)",
+  "native_helper_sha256": "fc1449e66e05622dbba50f4e5f9b0e473da3660df662af8a4397bb4f1a63bda4",
+  "configuration_sha256": "4358b82d062f8761026011b9db9f7ae483646f423b9e02d807853e5b33d774f2",
+  "bar/Singletons/GlowClock.qml": "868ce7c34c49144f743dde19d2a5d806660f838e613604c51eceffa58298666c",
+  "bar/tests/pss-watch.py": "c4cf427199ac0f1879c7106800a1509a43d9bbbc14503a18910334c3f6728972",
+  "bar/ambient-clock-regression.qml": "402ecfda2fc359178912f83aabe16025a80d7935a23984a636d677216cf7e00c",
+  "user_config_unchanged": true
+}

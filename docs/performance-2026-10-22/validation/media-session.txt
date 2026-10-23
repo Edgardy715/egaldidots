@@ -1,0 +1,5 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/media-session-regression.qml"
+  INFO: Shell ID: "4bcda41267aa0e3349bd736b762d3afa" Path ID "4bcda41267aa0e3349bd736b762d3afa"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/gfv9z4dcnt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: media session capabilities, seek, track/player interruption, repeat and clock lifecycle

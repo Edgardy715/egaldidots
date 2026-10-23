@@ -1,0 +1,5 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/swift-media-timeline-regression.qml"
+  INFO: Shell ID: "87025289c03bc3d29ee399e4596ca726" Path ID "87025289c03bc3d29ee399e4596ca726"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/avu9f4dcnt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: Swift timeline exact progress, elapsed wave phase, scrub cancellation and endpoints

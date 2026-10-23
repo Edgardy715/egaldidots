@@ -1,0 +1,8 @@
+{
+  "rust/cava-stream/Cargo.toml": "a2e1f5cef3a063a290bbd92bbdc05868f76739b1f5293eebb85da24ca677b5ae",
+  "rust/cava-stream/Cargo.lock": "9b3eda6e77f6e34f264f1676f17e7732c3eed99eb67f08b2c04ed3b6e18b9f14",
+  "rust/cava-stream/src/main.rs": "b4c64e64f87445db979052399aec1c47152deb93acacfe3ba2645a28206d58ed",
+  "rust/cava-stream/src/identity.rs": "604167ee5d4d918c780727e65c5e4515ae87fad8c48ab4c79f190833022271bf",
+  "rust/cava-stream/src/tests.rs": "be1b36590f33cc978a03775d4e6aacdf0c4d1cab16157fac01b5a5077691940d",
+  "bar/Singletons/Spectrum.js": "6cacbfe21dbdfc5fb288979c948340447ef9fc3504efa16929f980aa49fb00e6"
+}

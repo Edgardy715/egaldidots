@@ -1,0 +1,5 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/ambient-clock-regression.qml"
+  INFO: Shell ID: "92fc497974b2ed4c565414a33389f04d" Path ID "92fc497974b2ed4c565414a33389f04d"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/5wsap8ecnt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: reloj compartido, cadencia, dt, suspensión y reanudación

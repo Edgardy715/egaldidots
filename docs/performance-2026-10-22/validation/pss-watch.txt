@@ -1,0 +1,1 @@
+PASS: PSS real, cadencia, salida JSONL y final acotado

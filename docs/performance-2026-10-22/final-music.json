@@ -1,0 +1,96 @@
+{
+  "compact": {
+    "pid": 518008,
+    "clock_ticks": 100,
+    "memory_before": {
+      "Rss_kib": 441928,
+      "Pss_kib": 332528,
+      "Private_Dirty_kib": 264052
+    },
+    "samples": [
+      {
+        "elapsed_s": 3.0002266359988425,
+        "cpu_percent": 10.665860910652999,
+        "child_cpu_percent": 0.3333081534579062,
+        "rss_kib": 467672,
+        "threads": 24
+      },
+      {
+        "elapsed_s": 6.000461890998849,
+        "cpu_percent": 12.998980641603023,
+        "child_cpu_percent": 0.3333071959385391,
+        "rss_kib": 467236,
+        "threads": 24
+      },
+      {
+        "elapsed_s": 9.000641112001176,
+        "cpu_percent": 13.332536843127805,
+        "child_cpu_percent": 0.6666268421563902,
+        "rss_kib": 467236,
+        "threads": 24
+      },
+      {
+        "elapsed_s": 12.000155535999511,
+        "cpu_percent": 13.002104503305983,
+        "child_cpu_percent": 0.6667745899131273,
+        "rss_kib": 467236,
+        "threads": 23
+      }
+    ],
+    "duration_s": 12.000155535999511,
+    "cpu_percent": 12.499837985433768,
+    "child_cpu_percent": 0.4999935194173507,
+    "memory_after": {
+      "Rss_kib": 433988,
+      "Pss_kib": 324588,
+      "Private_Dirty_kib": 256112
+    }
+  },
+  "media": {
+    "pid": 518008,
+    "clock_ticks": 100,
+    "memory_before": {
+      "Rss_kib": 452912,
+      "Pss_kib": 339525,
+      "Private_Dirty_kib": 270752
+    },
+    "samples": [
+      {
+        "elapsed_s": 3.0001812119990063,
+        "cpu_percent": 16.998973194028817,
+        "child_cpu_percent": 0.333313199882918,
+        "rss_kib": 485028,
+        "threads": 23
+      },
+      {
+        "elapsed_s": 6.000410167001974,
+        "cpu_percent": 17.998626374814982,
+        "child_cpu_percent": 0.6666157916598142,
+        "rss_kib": 483004,
+        "threads": 23
+      },
+      {
+        "elapsed_s": 9.000597687001573,
+        "cpu_percent": 18.332187449405613,
+        "child_cpu_percent": 0.333312499080102,
+        "rss_kib": 482848,
+        "threads": 23
+      },
+      {
+        "elapsed_s": 12.000180693001312,
+        "cpu_percent": 18.002502311817906,
+        "child_cpu_percent": 0.3333796724410723,
+        "rss_kib": 479512,
+        "threads": 18
+      }
+    ],
+    "duration_s": 12.000180693001312,
+    "cpu_percent": 17.833064807499778,
+    "child_cpu_percent": 0.41666039269859295,
+    "memory_after": {
+      "Rss_kib": 446220,
+      "Pss_kib": 335301,
+      "Private_Dirty_kib": 266568
+    }
+  }
+}

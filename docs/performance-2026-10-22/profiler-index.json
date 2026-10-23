@@ -1,0 +1,384 @@
+{
+  "events": {
+    "8": {
+      "displayname": "MemoryAllocation:0",
+      "type": "MemoryAllocation",
+      "memoryEventType": "0"
+    },
+    "9": {
+      "displayname": "MemoryAllocation:2",
+      "type": "MemoryAllocation",
+      "memoryEventType": "2"
+    },
+    "10": {
+      "displayname": "MemoryAllocation:1",
+      "type": "MemoryAllocation",
+      "memoryEventType": "1"
+    },
+    "662": {
+      "displayname": ".face:2",
+      "type": "PixmapCache",
+      "filename": "file:///home/zdito/.face",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "2"
+    },
+    "663": {
+      "displayname": ".face:3",
+      "type": "PixmapCache",
+      "filename": "file:///home/zdito/.face",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "3"
+    },
+    "743": {
+      "displayname": ".face:1",
+      "type": "PixmapCache",
+      "filename": "file:///home/zdito/.face",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "1"
+    },
+    "744": {
+      "displayname": ".face:5",
+      "type": "PixmapCache",
+      "filename": "file:///home/zdito/.face",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "5"
+    },
+    "745": {
+      "displayname": "killuapfp.jpg:2",
+      "type": "PixmapCache",
+      "filename": "file:///home/zdito/Descargas/killuapfp.jpg",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "2"
+    },
+    "746": {
+      "displayname": "killuapfp.jpg:3",
+      "type": "PixmapCache",
+      "filename": "file:///home/zdito/Descargas/killuapfp.jpg",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "3"
+    },
+    "747": {
+      "displayname": "ab67616d0000b273af1e2e143561cf4df9941f5b:2",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b273af1e2e143561cf4df9941f5b",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "2"
+    },
+    "748": {
+      "displayname": "ab67616d0000b273af1e2e143561cf4df9941f5b:3",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b273af1e2e143561cf4df9941f5b",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "3"
+    },
+    "1170": {
+      "displayname": "killuapfp.jpg:0",
+      "type": "PixmapCache",
+      "filename": "file:///home/zdito/Descargas/killuapfp.jpg",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "0"
+    },
+    "1171": {
+      "displayname": "killuapfp.jpg:4",
+      "type": "PixmapCache",
+      "filename": "file:///home/zdito/Descargas/killuapfp.jpg",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "4"
+    },
+    "1184": {
+      "displayname": "ab67616d0000b273af1e2e143561cf4df9941f5b:0",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b273af1e2e143561cf4df9941f5b",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "0"
+    },
+    "1185": {
+      "displayname": "ab67616d0000b273af1e2e143561cf4df9941f5b:4",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b273af1e2e143561cf4df9941f5b",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "4"
+    },
+    "1191": {
+      "displayname": "chatgpt:3",
+      "type": "PixmapCache",
+      "filename": "image://icon/chatgpt",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "3"
+    },
+    "1192": {
+      "displayname": "chatgpt:0",
+      "type": "PixmapCache",
+      "filename": "image://icon/chatgpt",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "0"
+    },
+    "1193": {
+      "displayname": "chatgpt:4",
+      "type": "PixmapCache",
+      "filename": "image://icon/chatgpt",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "4"
+    },
+    "1194": {
+      "displayname": "chatgpt:2",
+      "type": "PixmapCache",
+      "filename": "image://icon/chatgpt",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "2"
+    },
+    "1247": {
+      "displayname": "killuapfp.jpg:1",
+      "type": "PixmapCache",
+      "filename": "file:///home/zdito/Descargas/killuapfp.jpg",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "1"
+    },
+    "1257": {
+      "displayname": "edots.png:3",
+      "type": "PixmapCache",
+      "filename": "file:///tmp/isla-memory-profile-complete/bar/settings/assets/edots.png",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "3"
+    },
+    "1258": {
+      "displayname": "edots.png:0",
+      "type": "PixmapCache",
+      "filename": "file:///tmp/isla-memory-profile-complete/bar/settings/assets/edots.png",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "0"
+    },
+    "1259": {
+      "displayname": "edots.png:4",
+      "type": "PixmapCache",
+      "filename": "file:///tmp/isla-memory-profile-complete/bar/settings/assets/edots.png",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "4"
+    },
+    "1260": {
+      "displayname": "edots.png:2",
+      "type": "PixmapCache",
+      "filename": "file:///tmp/isla-memory-profile-complete/bar/settings/assets/edots.png",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "2"
+    },
+    "1499": {
+      "displayname": "ab67616d0000b273af1e2e143561cf4df9941f5b:1",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b273af1e2e143561cf4df9941f5b",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "1"
+    },
+    "1503": {
+      "displayname": "spotify:2",
+      "type": "PixmapCache",
+      "filename": "image://icon/spotify",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "2"
+    },
+    "1504": {
+      "displayname": "spotify:3",
+      "type": "PixmapCache",
+      "filename": "image://icon/spotify",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "3"
+    },
+    "1505": {
+      "displayname": "spotify:0",
+      "type": "PixmapCache",
+      "filename": "image://icon/spotify",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "0"
+    },
+    "1506": {
+      "displayname": "spotify:4",
+      "type": "PixmapCache",
+      "filename": "image://icon/spotify",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "4"
+    },
+    "1508": {
+      "displayname": "spotify:1",
+      "type": "PixmapCache",
+      "filename": "image://icon/spotify",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "1"
+    },
+    "1509": {
+      "displayname": "claude-desktop:3",
+      "type": "PixmapCache",
+      "filename": "image://icon/claude-desktop",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "3"
+    },
+    "1510": {
+      "displayname": "claude-desktop:0",
+      "type": "PixmapCache",
+      "filename": "image://icon/claude-desktop",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "0"
+    },
+    "1511": {
+      "displayname": "claude-desktop:4",
+      "type": "PixmapCache",
+      "filename": "image://icon/claude-desktop",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "4"
+    },
+    "1512": {
+      "displayname": "claude-desktop:2",
+      "type": "PixmapCache",
+      "filename": "image://icon/claude-desktop",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "2"
+    },
+    "1513": {
+      "displayname": "org.quickshell:3",
+      "type": "PixmapCache",
+      "filename": "image://icon/org.quickshell",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "3"
+    },
+    "1514": {
+      "displayname": "org.quickshell:0",
+      "type": "PixmapCache",
+      "filename": "image://icon/org.quickshell",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "0"
+    },
+    "1515": {
+      "displayname": "org.quickshell:4",
+      "type": "PixmapCache",
+      "filename": "image://icon/org.quickshell",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "4"
+    },
+    "1516": {
+      "displayname": "org.quickshell:2",
+      "type": "PixmapCache",
+      "filename": "image://icon/org.quickshell",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "2"
+    },
+    "1521": {
+      "displayname": "org.quickshell:1",
+      "type": "PixmapCache",
+      "filename": "image://icon/org.quickshell",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "1"
+    },
+    "1522": {
+      "displayname": "ab67616d0000b2735ba14cdbd09aec573bb5ec82:2",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b2735ba14cdbd09aec573bb5ec82",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "2"
+    },
+    "1523": {
+      "displayname": "ab67616d0000b2735ba14cdbd09aec573bb5ec82:3",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b2735ba14cdbd09aec573bb5ec82",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "3"
+    },
+    "1524": {
+      "displayname": "ab67616d0000b2735ba14cdbd09aec573bb5ec82:0",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b2735ba14cdbd09aec573bb5ec82",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "0"
+    },
+    "1525": {
+      "displayname": "ab67616d0000b2735ba14cdbd09aec573bb5ec82:4",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b2735ba14cdbd09aec573bb5ec82",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "4"
+    },
+    "1528": {
+      "displayname": "chatgpt:1",
+      "type": "PixmapCache",
+      "filename": "image://icon/chatgpt",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "1"
+    },
+    "1529": {
+      "displayname": "claude-desktop:1",
+      "type": "PixmapCache",
+      "filename": "image://icon/claude-desktop",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "1"
+    },
+    "1530": {
+      "displayname": "ab67616d0000b2735ba14cdbd09aec573bb5ec82:1",
+      "type": "PixmapCache",
+      "filename": "https://i.scdn.co/image/ab67616d0000b2735ba14cdbd09aec573bb5ec82",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "1"
+    },
+    "1531": {
+      "displayname": "edots.png:1",
+      "type": "PixmapCache",
+      "filename": "file:///tmp/isla-memory-profile-complete/bar/settings/assets/edots.png",
+      "line": "0",
+      "column": "0",
+      "cacheEventType": "1"
+    }
+  },
+  "marks": [],
+  "range_counts": {
+    "DebugMessage": 3610,
+    "MemoryAllocation": 4207015,
+    "Creating": 89597,
+    "PixmapCache": 329
+  },
+  "examples": {
+    "DebugMessage": "<range startTime=\"1393129493\" eventIndex=\"0\" />\n        ",
+    "MemoryAllocation": "<range startTime=\"1392786269\" eventIndex=\"10\" amount=\"0\" />\n        ",
+    "Creating": "<range startTime=\"1842138670\" duration=\"239007\" eventIndex=\"11\" />\n        ",
+    "PixmapCache": "<range startTime=\"1911251695\" eventIndex=\"662\" refCount=\"0\" />\n        "
+  }
+}
