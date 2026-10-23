@@ -36,7 +36,8 @@ Singleton {
         if (root.recent && l.indexOf(root.recent) >= 0) return root.recent
         return l.length > 0 ? l[0] : null
     }
-    onActiveChanged: if (root.playing) root.recent = root.active
+    // playing aún puede conservar el valor del player anterior durante esta señal.
+    onActiveChanged: if (root.active && root.active.isPlaying) root.recent = root.active
 
     /** ciclo manual entre players (dir ±1) — para el switcher del media surface. */
     function cycleManual(dir) {
