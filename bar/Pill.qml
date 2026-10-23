@@ -168,6 +168,7 @@ Item {
         restW: pill.restW
         coreH: pill.coreH
         surfaceOpen: pill.surfaceOpen
+        surfaceName: pill.surface
         workspaceAnimating: header.workspaceAnimating
         notifAnimating: pill.notifAnimating
         notifHolding: pill.notifAnimating && pill.notifState === "hold"
@@ -202,7 +203,7 @@ Item {
     }
     readonly property string notifState: notificationMotion.notifState
 
-    property alias notifBreath: morph.breath
+    readonly property real notifBreath: morph.breathLevel
     readonly property real notifBreathRadius: morph.breathRadius
     readonly property real notifBreathGlow: morph.breathGlow
 

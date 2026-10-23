@@ -68,8 +68,12 @@ ClippingRectangle {
                 swapOpacity = 1
             } else if (!swapTimer.running) swapTimer.start()
         } else {
+            // Cerrar con un swap pendiente: el contenido saliente ya se retiraba;
+            // restaurarlo haría reaparecer la surface anterior mientras la pill
+            // se contrae. Se conserva retirado hasta descargar o reabrir.
+            const withdrawn = surface.length === 0 && swapTimer.running
             swapTimer.stop()
-            swapOpacity = 1
+            if (!withdrawn) swapOpacity = 1
             if (surface.length > 0) displayedSurface = surface
             else if (morphCloseness <= 0.01) displayedSurface = ""
         }
@@ -77,7 +81,10 @@ ClippingRectangle {
     onMorphClosenessChanged: {
         // Unload after geometry evaluation; loader teardown changes target height.
         if (!open && morphCloseness <= 0.01) Qt.callLater(() => {
-            if (!root.open && root.morphCloseness <= 0.01) root.displayedSurface = ""
+            if (!root.open && root.morphCloseness <= 0.01) {
+                root.displayedSurface = ""
+                root.swapOpacity = 1
+            }
         })
     }
 

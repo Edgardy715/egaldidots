@@ -109,6 +109,19 @@ PanelWindow {
      * es click-through. (defensivo: si lastIpcObject falta → false)
      */
     readonly property bool monFullscreen: inputPolicy.monFullscreen
+    // Un solo progreso para retirar pill y gotas en fullscreen: antes la pill
+    // se deslizaba/desvanecía y las gotas desaparecían de golpe, quedando
+    // sueltas. Con reduceMotion se resuelve sin recorrido.
+    property real fullscreenHide: monFullscreen ? 1 : 0
+    Behavior on fullscreenHide {
+        enabled: !Flags.reduceMotion
+        NumberAnimation {
+            duration: Motion.morph
+            easing.type: Motion.easeMorph
+            easing.bezierCurve: Motion.morphCurve
+        }
+    }
+    readonly property real fullscreenLift: -fullscreenHide * (pill.height + topGap)
 
     onMonFullscreenChanged: if (monFullscreen) {
         if (router.openMon === modelData.name) router.close();
@@ -391,25 +404,9 @@ PanelWindow {
             fluidCaptureExtra: settingsCompanion.active ? settingsCompanion.captureExtra
                 : overlay.compact || overlay.surfaceOpen && !overlay.sessionOpen ? 0 : fluidCompanion.captureExtra
             fluidCaptureLeftExtra: Math.max(sessionCompanion.captureExtra, recordingCompanion.captureExtra)
-            opacity: overlay.monFullscreen ? 0 : 1
+            opacity: 1 - overlay.fullscreenHide
             visible: opacity > 0.005
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: Motion.morph
-                    easing.type: Motion.easeMorph
-                    easing.bezierCurve: Motion.morphCurve
-                }
-            }
-            transform: Translate {
-                y: overlay.monFullscreen ? -(pill.height + overlay.topGap) : 0
-                Behavior on y {
-                    NumberAnimation {
-                        duration: Motion.morph
-                        easing.type: Motion.easeMorph
-                        easing.bezierCurve: Motion.morphCurve
-                    }
-                }
-            }
+            transform: Translate { y: overlay.fullscreenLift }
 
             onRequestSurface: (name) => router.toggleSurface(overlay.modelData.name, name)
             onRequestClose: router.close()
@@ -437,7 +434,8 @@ PanelWindow {
                 && overlay.recordingHasRoom && !overlay.sessionOpen && sessionCompanion.phase === "idle"
                 && !overlay.settingsOpen && settingsCompanion.phase === "idle"
             bodyBusy: pill.surfaceOpen || pill.notifAnimating
-            opacity: overlay.monFullscreen ? 0 : 1
+            opacity: 1 - overlay.fullscreenHide
+            transform: Translate { y: overlay.fullscreenLift }
             onRequestRecording: router.toggleSurface(overlay.modelData.name, "recording")
         }
 
@@ -454,7 +452,8 @@ PanelWindow {
             bodyBusy: pill.surfaceOpen || pill.notifAnimating
             s: overlay.s
             screenName: overlay.modelData.name
-            opacity: overlay.monFullscreen ? 0 : 1
+            opacity: 1 - overlay.fullscreenHide
+            transform: Translate { y: overlay.fullscreenLift }
             onRequestToggle: { if (overlay.sessionOpen) router.close() }
         }
 
@@ -483,7 +482,8 @@ PanelWindow {
             bodyBusy: pill.surfaceOpen || pill.notifAnimating
             s: overlay.s
             screenName: overlay.modelData.name
-            opacity: overlay.monFullscreen ? 0 : 1
+            opacity: 1 - overlay.fullscreenHide
+            transform: Translate { y: overlay.fullscreenLift }
             onRequestToggle: { if (overlay.settingsOpen) router.close() }
         }
 
@@ -491,7 +491,8 @@ PanelWindow {
             id: fluidCompanion
             objectName: "islandMediaCompanion"
             z: fluidCompanion.cardFraction > 0.05 ? 3 : 1
-            opacity: overlay.monFullscreen || overlay.compact ? 0 : 1
+            opacity: overlay.compact ? 0 : 1 - overlay.fullscreenHide
+            transform: Translate { y: overlay.fullscreenLift }
             visible: opacity > 0.005
             anchors.fill: parent
             body: pill

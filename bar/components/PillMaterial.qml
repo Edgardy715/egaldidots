@@ -191,7 +191,7 @@ Item {
             color: "transparent"
             border.width: Theme.borderEmphasis * root.s
             border.color: Qt.alpha(root.materialAccent, root.notifBreathGlow + 0.08)
-            visible: root.notifBreathGlow > 0 || root.notifState === "hold"
+            visible: root.notifBreathGlow > 0.001
         }
 
         Rectangle {

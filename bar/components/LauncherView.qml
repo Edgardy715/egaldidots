@@ -260,11 +260,13 @@ Item {
         ListView {
             id: listView
             width: parent.width
-            height: root.resultsVisible ? Math.max(0,
+            // Espacio restante de la pill: hereda su movimiento (PillMorphMotion)
+            // sin segunda animación; antes un Behavior propio lo hacía ir detrás
+            // de la masa y empujaba el hint fuera del borde al crecer.
+            height: Math.max(0,
                 parent.height - searchBox.height - parent.spacing
                 - (root.showCalculator ? calcResultArea.height + parent.spacing : 0)
                 - resultsDivider.height - parent.spacing - hintRow.height - parent.spacing)
-                : 0
             clip: true
             boundsBehavior: Flickable.StopAtBounds
             spacing: Theme.spacingSm * root.s
@@ -274,10 +276,6 @@ Item {
             Behavior on opacity {
                 enabled: !Flags.reduceMotion
                 Anim { type: Anim.DefaultEffects }
-            }
-            Behavior on height {
-                enabled: !Flags.reduceMotion
-                NumberAnimation { duration: Motion.morph; easing.type: Motion.easeMorph; easing.bezierCurve: Motion.morphCurve }
             }
             model: ScriptModel {
                 values: root.searchResults

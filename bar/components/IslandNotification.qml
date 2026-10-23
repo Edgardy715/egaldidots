@@ -20,8 +20,9 @@ Item {
     opacity: closeness
     visible: opacity > 0.01
     clip: true
-    scale: holding ? 1.0 + breath * 0.025 : 1.0
-    Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.InOutSine } }
+    // breath ya llega modulado por el nivel de hold (PillMorphMotion); no se
+    // anima otra vez un valor que ya está animado.
+    scale: 1.0 + breath * 0.025
 
     Row {
         anchors.centerIn: parent
@@ -41,7 +42,6 @@ Item {
                 radius: width / 2
                 color: root.notification?.isCritical ? Theme.accentStrong : Theme.accent
                 opacity: root.breath * 0.15 + 0.04
-                Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.InOutSine } }
             }
             Rectangle {
                 anchors.centerIn: parent
@@ -63,7 +63,6 @@ Item {
                 border.color: Qt.alpha(root.notification?.isCritical ? Theme.accentStrong : Theme.accent, Theme.alphaCritical)
                 border.width: Theme.borderHairlineSoft * root.s
                 scale: 1.0 + root.breath * 0.06
-                Behavior on scale { NumberAnimation { duration: 300 } }
             }
             Image {
                 anchors.centerIn: parent

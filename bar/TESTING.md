@@ -139,6 +139,14 @@ ISLA_CONFIG=/tmp/isla-motion-test.json QT_QPA_PLATFORM=offscreen \
 30/60/144/240 Hz, delayed frames, capture/reopen, geometric neck pinching,
 continuous return edges and switching reduced motion during a transition.
 
+Pill motion edge cases (offscreen unless noted):
+`content-hold-regression.qml` keeps content while the same surface resizes;
+`surface-swap-close-regression.qml` closes during a pending swap without the
+previous surface reappearing; `notification-breath-regression.qml` checks the
+continuous breath and that the reading hold is unscaled;
+`fullscreen-hide-regression.qml` (Wayland) checks that the pill and drops share
+one fullscreen withdrawal and that reduced motion resolves it directly.
+
 `bar/settings-navigation-regression.qml` checks atomic page selection, hidden
 composition rows, font editors only on font fields, resize, search, drafts,
 rapid retargeting and reduced motion. Run on Wayland with a temporary ISLA_CONFIG.

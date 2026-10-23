@@ -90,6 +90,8 @@ Singleton {
     // Duraciones clave del ciclo notif (para timers/hold, NO para la anim del spring)
     readonly property int notifCollapse:  Math.round(350 * mult)   // pill -> circle
     readonly property int notifExpand:    Math.round(350 * mult)   // circle -> notif pill
-    readonly property int notifHoldMin:   Math.round(1000 * mult)  // hold mínimo
-    readonly property int notifHoldMax:   Math.round(2000 * mult)  // hold máximo
+    // El hold es tiempo de lectura, no movimiento: reduceMotion y motionScale
+    // no deben acortarlo (con reduceMotion quedaba en ~420 ms).
+    readonly property int notifHoldMin:   1000  // hold mínimo
+    readonly property int notifHoldMax:   2000  // hold máximo
 }
