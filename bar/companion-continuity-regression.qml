@@ -72,9 +72,12 @@ ShellRoot {
                 const fraction = i / 100
                 drop.wPos = drop.moduleH + (drop.cardW - drop.moduleH) * fraction
                 drop.hPos = drop.moduleH + (drop.cardH - drop.moduleH) * fraction
-                check(drop.cardRadius <= 24 * drop.s
-                    && drop.cardRadius <= Math.min(drop.wPos, drop.hPos) / 2,
-                    "contraction never inflates card corners")
+                // Only a bud-sized card may round past 24, while content is still faint.
+                const inflated = drop.cardRadius > 24 * drop.s + 1e-9
+                check(drop.cardRadius <= Math.min(drop.wPos, drop.hPos) / 2 + 1e-9
+                    && (!inflated || (Math.min(drop.wPos, drop.hPos) < 208 * drop.s
+                        && drop.cardContentProgress < 0.25)),
+                    "contraction never inflates corners over legible content")
             }
             drop.wPos = drop.collapsedW + (drop.cardW - drop.collapsedW) * 0.4
             drop.hPos = drop.moduleH + (drop.cardH - drop.moduleH) * 0.4

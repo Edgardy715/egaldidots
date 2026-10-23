@@ -208,9 +208,21 @@ sin reiniciar nacimiento. Activar reduceMotion durante el viaje resuelve destino
 
 El cuello se pinza por smoothstep entre stretch1.02 y1.30 hasta grosor cero;
 al retornar nace en1.30 y crece hacia1.02. Borde/brillo de ambos cuerpos siguen
-ese mismo progreso. El puente procesa su geometría síncronamente para acompañar
-los cuerpos en el mismo frame y evita acos fuera de dominio. La ocultación exige
-contención en la cápsula completa con tolerancia0.08·s, no margen visible de3·s.
+ese mismo progreso. El cuello es GPU (`FluidNeck`, `shaders/fluid_neck.frag`):
+unión smin de las dos SDF de rounded box (k=neckBlend, 32→10·s según la
+cintura), pintada sólo fuera de ambos cuerpos y recortada al casco convexo
+exacto de ambos rounded box (búsqueda ternaria sobre la interpolación); smin no
+infla lados convexos, no cuadra el extremo con la gota dentro y una tarjeta
+centrada ancha recibe menisco a todo el ancho de la pill, no una columna. Cada
+extremo del cuello lleva el vidrio de su cuerpo (alfa por readingExposure,
+degradado y banda de acento) y se funde por d1/(d1+d2). Mientras la gota solapa
+al cuerpo receptor (unida o en nacimiento/separación/retorno/absorción, no
+asentada), `fluid_cut.frag` recorta esa parte con la misma SDF. Los bordes AA
+contiguos compensan el alfa del vecino, x=(1-c)/(1-c·a): sin vidrio doble ni
+línea de fondo. Halo, borde y brillo de la gota se apagan en los 7·s previos al
+contacto (edgeClearance), así el layer del recorte nunca los corta. Sin
+CurveRenderer ni teselado CPU; FluidMetaballBridge queda sólo para FluidIslandDemo.
+La ocultación exige contención en la cápsula completa con tolerancia0.08·s.
 
 Regresión: companion-continuity, absorption, centered/session/settings-companion.
 Capturas nativas y límites de medición: informe shell-smooth de2026-10-12.
@@ -228,8 +240,8 @@ Las surfaces que hacen layout dinámico conservan su ventana anterior0.45–0.80
 
 ## Captura de panel centrado (2026-10-12)
 
-El editor vuelve como cápsula inscrita en la pill receptora, limitada al ancho
-de la tarjeta: no forzar38×38 antes de ocultarlo. Seguir ancho y alto derivados
+(Sustituido 2026-10-22, ver «Brote y recogida».) El editor volvía como cápsula
+inscrita en la pill receptora. Seguir ancho y alto derivados
 al cambiar layout sin reiniciar velocidades. Al contacto, recortar del módulo
 la región recibida por la pill; apilar vidrios translúcidos no oculta ese contenido.
 El recorte se activa sólo durante retorno unido y se retira al retargetear.
@@ -389,3 +401,11 @@ espacio o sesión/settings ocupan ese lado, volver al header. Sesión espera ant
 de salir. En compact, centro vertical coincide con barra; compactY mantiene
 bodyY por defecto para otras gotas. Texto se revela al caber y se retira al
 contraerse. Input sigue visualX/yPos reales, sin foco/modalidad en reposo.
+
+## Brote y recogida de tarjetas (2026-10-22)
+
+Una tarjeta expandida (settings, sesión) nace como yema redonda separada de la
+pill y sólo florece tras pellizcar el cuello; al cerrar se recoge a esa yema,
+ya sin contenido, y vuelve redonda: nunca una tarjeta ni una cápsula del ancho
+de la pill unida por el cuello (se lee como bloque o trapecio). Esquinas sobre
+24 sólo en mancha vacía; con contenido >0.25, 24. docs/drop-gather-2026-10-22/.

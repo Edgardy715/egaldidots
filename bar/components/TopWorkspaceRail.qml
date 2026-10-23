@@ -113,9 +113,9 @@ Item {
             xScale: 1 + lens.stretch / lens.width
             yScale: 1 - lens.stretch / (lens.height * 4)
         }
-        layer.enabled: true
+        layer.enabled: !root.integrated
         layer.effect: MultiEffect {
-            shadowEnabled: !root.integrated
+            shadowEnabled: true
             shadowColor: Qt.alpha(Theme.accent, 0.60)
             shadowBlur: 0.75
             shadowVerticalOffset: 2 * root.s

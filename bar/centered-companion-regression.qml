@@ -21,19 +21,34 @@ ShellRoot {
                 body.height = width === 100 ? 38 : 56
                 drop.start()
                 check(Math.abs(drop.xPos + drop.wPos / 2 - (body.x + body.width / 2)) < 0.01, "birth at pill center")
+                check(drop.phase === "brotando" && drop.targetW === drop.budSize, "card buds as a droplet first")
+                let budded = false
+                for (let i = 0; i < 40 && drop.phase === "brotando"; i++) {
+                    check(drop.wPos <= drop.budSize + 0.5, "bud does not grow while joined")
+                    drop.advanceMotion(1 / 60)
+                    budded = budded || drop.joined
+                }
+                check(budded && drop.phase === "media" && !drop.joined, "card blooms only after the bud pinches off")
                 check(Math.abs(drop.capX - (body.x + body.width / 2)) < 0.01, "bridge uses centered origin")
                 for (let i = 0; i < 150; i++) drop.advanceMotion(1 / 60)
                 check(Math.abs(drop.xPos + drop.wPos / 2 - 960) < 0.1, "card centered horizontally")
                 check(Math.abs(drop.yPos + drop.hPos / 2 - 540) < 0.1, "card centered vertically")
                 drop.close()
+                check(drop.phase === "recogiendo" && drop.targetW === drop.budSize
+                    && drop.targetY > body.y + body.height, "card gathers into a bud clear of the pill")
+                for (let i = 0; i < 60 && drop.phase === "recogiendo"; i++) drop.advanceMotion(1 / 60)
+                check(drop.phase === "retornando" && !drop.joined
+                    && Math.min(drop.wPos, drop.hPos) < drop.gatherSize, "bud is gathered before it rejoins")
                 check(drop.targetW === drop.returnW && drop.targetH === drop.returnH
-                    && drop.targetW >= body.width - body.height, "return lands as pill capsule instead of a ball")
+                    && drop.targetW === drop.targetH && drop.targetW <= body.height,
+                    "return sinks round, never a pill-wide block under the neck")
                 for (let i = 0; i < 10; i++) drop.advanceMotion(1 / 60)
                 const x = drop.xPos, vx = drop.vx
                 drop.retarget("media", drop.cardX, drop.cardY, drop.cardW, drop.cardH)
                 check(drop.xPos === x && drop.vx === vx, "reopen preserves current position and velocity")
                 for (let i = 0; i < 150; i++) drop.advanceMotion(1 / 60)
                 drop.close()
+                for (let i = 0; i < 60 && drop.phase === "recogiendo"; i++) drop.advanceMotion(1 / 60)
                 body.width = width === 100 ? 760 : 100
                 body.height = width === 100 ? 56 : 38
                 check(drop.targetW === drop.returnW && drop.targetH === drop.returnH, "return dimensions follow changing pill")
@@ -56,6 +71,14 @@ ShellRoot {
             const after = [drop.xPos, drop.yPos, drop.wPos, drop.hPos, drop.vx, drop.vy, drop.vw, drop.vh]
             check(before.every((value, index) => value === after[index]) && !drop.concealed,
                 "reopen at contact preserves shape and all velocities")
+            check(drop.phase === "brotando", "reopen while joined buds off instead of blooming")
+            let blockJoined = false
+            for (let i = 0; i < 90 && drop.phase === "brotando"; i++) {
+                drop.advanceMotion(1 / 60)
+                if (drop.joined && Math.min(drop.wPos, drop.hPos) > drop.gatherSize) blockJoined = true
+            }
+            check(drop.phase === "media" && !drop.joined && !blockJoined,
+                "reopened card blooms only clear of the neck")
             drop.open = false
             for (let i = 0; i < 240 && drop.phase !== "idle"; i++) drop.advanceMotion(1 / 60)
             check(drop.phase === "idle" && drop.coveredByBody, "wide receiving pill finishes capture")

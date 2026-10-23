@@ -1,5 +1,4 @@
 import QtQuick
-import Qt5Compat.GraphicalEffects
 import Quickshell.Widgets
 import "../fluid" as Fluid
 import "../Singletons"
@@ -52,7 +51,9 @@ Item {
     readonly property real moduleH: IslandGeometry.restHeight * s
     readonly property real collapsedW: 42 * s
     readonly property real returnH: centered ? Math.min(moduleH, bodyH) : moduleH
-    readonly property real returnW: centered ? Math.min(cardW, Math.max(returnH, bodyW - (bodyH - returnH))) : moduleH
+    // Every droplet sinks home round: a pill-wide capsule joined below the pill
+    // reads as a flat-bottomed trapezoid through the neck hull.
+    readonly property real returnW: returnH
     readonly property real cardW: centered ? Math.min(surfaceSize.width * s, width - 32 * s)
         : Math.max(280 * s, Math.min(surfaceSize.width * s,
             (leftSide ? bodyX - gap : width - cardX) - 12 * s))
@@ -95,6 +96,28 @@ Item {
         return 0.42 * (1 - tension * tension * (3 - 2 * tension))
     }
     readonly property real edgeExposure: joined ? 1 - neckWaist / 0.42 : 1
+    // Smooth-union radius: generous at contact, pinching with the same tension
+    // as the waist so the neck reaches zero thickness before the bond breaks.
+    readonly property real neckBlend: (10 + 22 * neckWaist / 0.42) * s
+    // PillMaterial reads more opaque as it grows; each neck end copies its body.
+    function readingExposure(height) { return Math.max(0, Math.min(1, (height / s - 38) / 58)) }
+    function glassAlpha(exposure) { return Flags.glassAlpha + (1 - Flags.glassAlpha) * (0.15 + 0.25 * exposure) }
+    readonly property real bodyExposure: readingExposure(bodyH)
+    readonly property real dropExposure: readingExposure(hPos)
+    // Part of the droplet inside the receiving pill is hidden, not stacked.
+    readonly property bool overlapsBody: {
+        const left = bodyX - (leftSide ? captureExtra : 0)
+        const right = bodyX + bodyW + (leftSide || centered ? 0 : captureExtra)
+        return visualX < right && visualX + wPos > left && yPos < bodyY + bodyH && yPos + hPos > bodyY
+    }
+    // Halo, border and sheen sit outside the droplet; they fade out before any
+    // overlap so the cut layer never clips them.
+    readonly property real edgeClearance: {
+        const left = bodyX - (leftSide ? captureExtra : 0)
+        const right = bodyX + bodyW + (leftSide || centered ? 0 : captureExtra)
+        const gap = Math.max(left - visualX - wPos, visualX - right, bodyY - yPos - hPos, yPos - bodyY - bodyH)
+        return Math.max(0, Math.min(1, gap / (7 * s)))
+    }
     readonly property real titleProgress: expanded || cardFraction > 0.05 ? 0
         : Math.max(0, Math.min(1, (wPos - 100 * s) / (80 * s)))
     readonly property real cardFraction: Math.max(0, Math.min(1,
@@ -112,11 +135,25 @@ Item {
         const separation = Math.max(0, Math.min(1, (stretch - 0.75) / 0.53))
         return bodyBusy ? center : Math.min(center, separation)
     }
-    readonly property real cardRadius: Math.min(Math.min(wPos, hPos) / 2, 24 * s)
+    // A bud or gathering card stays a blob; corners settle to 24 before any
+    // content is more than faint, so the editor is never clipped by blob corners.
+    readonly property real cardRadius: {
+        const round = Math.min(wPos, hPos) / 2
+        if (round <= 24 * s) return round
+        // Squared size term: an empty mid-size card reads as a blob, not a tile.
+        const size = Math.min(1, (2 * round - 48 * s) / (160 * s))
+        return round + (24 * s - round) * Math.min(1, Math.max(size * size, 4 * cardContentProgress))
+    }
+    // Expanded cards bud off and gather back as a round droplet clear of the
+    // body, so the pill never carries a card-sized block through the neck.
+    readonly property real budSize: moduleH
+    readonly property real budX: centered ? capX - budSize / 2
+        : capX + 1.45 * (bodyRadius + budSize / 2) - budSize / 2
+    readonly property real budY: centered ? capY + 1.45 * (bodyRadius + budSize / 2) - budSize / 2
+        : bodyY + (bodyH - budSize) / 2
     // Start the trailing contraction while the return still has velocity.
-    // Centered panels land as an inset capsule matching the receiving pill.
     readonly property bool coveredByBody: {
-        if (wPos > (centered ? bodyW : moduleH) + 3 * s
+        if (wPos > returnW + 3 * s
                 || hPos > returnH + 3 * s || contentExposure >= 0.01) return false
         const left = bodyX + bodyRadius
         const right = bodyX + bodyW + captureExtra - bodyRadius
@@ -156,7 +193,11 @@ Item {
         yPos = bodyY + (bodyH - 34 * s) / 2
         wPos = 34 * s; hPos = 34 * s
         vx = 0; vy = 0; vw = 0; vh = 0
-        if (expanded) {
+        if (expanded && !Flags.reduceMotion) {
+            retarget("brotando", budX, budY, budSize, budSize)
+            if (centered) vy += 1200 * s
+            else vx += 1200 * s
+        } else if (expanded) {
             retarget("media", cardX, cardY, cardW, cardH)
         } else {
             retarget("nacimiento", xPos, yPos, wPos, hPos)
@@ -165,17 +206,37 @@ Item {
     }
 
     function close(): void {
-        if (phase === "idle" || phase === "retornando" || phase === "absorbiendo") return
+        if (phase === "idle" || phase === "retornando" || phase === "absorbiendo"
+                || phase === "recogiendo") return
         captureTarget = 0
+        if (phase === "media" && !Flags.reduceMotion && Math.min(wPos, hPos) > gatherSize) {
+            retarget("recogiendo", budX, budY, budSize, budSize)
+            return
+        }
+        returnHome()
+    }
+
+    // Below this the gathering card is a blob well inside the pill width.
+    readonly property real gatherSize: 66 * s
+    function returnHome(): void {
         retarget("retornando", centered ? bodyX + (bodyW - returnW) / 2 : bodyX + bodyW - 20 * s,
                  bodyY + (bodyH - returnH) / 2, returnW, returnH)
     }
 
+    // A card blooms only clear of the pill; reopening while joined or inside
+    // it buds off again with the current velocity instead of growing in the neck.
+    function bloom(): void {
+        birthTimer.stop()
+        if (!Flags.reduceMotion && phase !== "media" && (bond || overlapsBody || concealed))
+            retarget("brotando", budX, budY, budSize, budSize)
+        else
+            retarget("media", cardX, cardY, cardW, cardH)
+    }
     function syncHoverSize(): void {
         if (phase === "idle") return
+        if (phase === "brotando" && expanded) return
         if (expanded) {
-            birthTimer.stop()
-            retarget("media", cardX, cardY, cardW, cardH)
+            bloom()
             return
         }
         if (phase === "nacimiento" || phase === "retornando" || phase === "absorbiendo") return
@@ -187,6 +248,8 @@ Item {
         let omega = 16
         let damping = 0.92
         if (phase === "separando") { omega = 11; damping = 0.84 }
+        else if (phase === "brotando") { omega = 26; damping = 0.96 }
+        else if (phase === "recogiendo") { omega = 19; damping = 0.98 }
         else if (phase === "retornando" || phase === "absorbiendo") { omega = 15.5; damping = 0.98 }
         if (Flags.reduceMotion) { omega = 28; damping = 1.15 }
         // Exact damped motion keeps the same trajectory at every refresh rate.
@@ -212,12 +275,10 @@ Item {
         if (open && phase === "idle") Qt.callLater(() => {
             if (root.open && root.phase === "idle") root.start()
         })
-        else if (open && (phase === "retornando" || phase === "absorbiendo"))
-            retarget(expanded ? "media" : "companion",
-                     expanded ? cardX : bodyX + bodyW + gap,
-                     expanded ? cardY : compactY,
-                     expanded ? cardW : compactWidth,
-                     expanded ? cardH : moduleH)
+        else if (open && expanded && (phase === "retornando" || phase === "absorbiendo" || phase === "recogiendo"))
+            bloom()
+        else if (open && (phase === "retornando" || phase === "absorbiendo" || phase === "recogiendo"))
+            retarget("companion", bodyX + bodyW + gap, compactY, compactWidth, moduleH)
         else if (open) syncHoverSize()
         else close()
     }
@@ -235,6 +296,8 @@ Item {
             targetY = bodyY + (bodyH - returnH) / 2
             targetW = returnW
             targetH = returnH
+        } else if (phase === "brotando" || phase === "recogiendo") {
+            targetX = budX; targetY = budY
         } else if (phase === "companion" || phase === "media") syncHoverSize()
     }
     onBodyXChanged: followBody()
@@ -281,7 +344,8 @@ Item {
 
     FrameAnimation {
         running: !Flags.reduceMotion && root.phase !== "idle"
-            && (!root.settled || root.phase === "separando"
+            && (!root.settled || root.phase === "separando" || root.phase === "brotando"
+                || root.phase === "recogiendo"
                 || root.phase === "retornando" || root.phase === "absorbiendo")
         onTriggered: root.advanceMotion(frameTime)
     }
@@ -295,7 +359,12 @@ Item {
         if (!root.centered && root.phase === "retornando" && root.stretch < 1.10) root.captureTarget = 20 * root.s
         next = root.spring(root.captureExtra, root.captureV, root.captureTarget, dt)
         root.captureExtra = next[0]; root.captureV = next[1]
-        if (root.phase === "separando" && root.settled) {
+        if (root.phase === "brotando" && ((!root.bond && root.stretch >= 1.30) || root.settled)) {
+            root.retarget("media", root.cardX, root.cardY, root.cardW, root.cardH)
+        } else if (root.phase === "recogiendo"
+                && (Math.min(root.wPos, root.hPos) < root.gatherSize || root.settled)) {
+            root.returnHome()
+        } else if (root.phase === "separando" && root.settled) {
             root.phase = "companion"
         } else if (root.phase === "retornando" && root.coveredByBody) {
             root.concealed = true
@@ -307,13 +376,32 @@ Item {
         }
     }
 
-    Fluid.FluidMetaballBridge {
+    Fluid.FluidNeck {
         z: 0
-        visible: root.joined
-        x1: root.visualCapX; y1: root.capY; r1: root.bodyRadius
-        x2: root.visualX + root.wPos / 2; y2: root.yPos + root.hPos / 2; r2: root.dropRadius
-        waist: root.neckWaist
-        fill: Qt.lighter(Theme.cardBot, 1.10)
+        visible: root.joined && root.neckBlend > 0.5
+        bodyLeft: root.bodyX - (root.leftSide ? root.captureExtra : 0)
+        bodyTop: root.bodyY
+        bodyWidth: root.bodyW + (root.centered ? 0 : root.captureExtra)
+        bodyHeight: root.bodyH
+        bodyCorner: root.bodyRadius
+        dropLeft: root.visualX; dropTop: root.yPos
+        dropWidth: root.wPos; dropHeight: root.hPos
+        dropCorner: root.cardRadius
+        blend: root.neckBlend
+        readonly property real bodyAlpha: root.glassAlpha(root.bodyExposure)
+        readonly property real dropAlpha: root.glassAlpha(root.dropExposure)
+        bodyColor0: Qt.alpha(Theme.cardTop, Math.min(1, bodyAlpha + 0.08 * root.bodyExposure))
+        bodyColor1: Qt.alpha(Theme.cardBot, bodyAlpha)
+        bodyColor2: Qt.alpha(Qt.darker(Theme.cardBot, 1 + 0.16 * root.bodyExposure), Math.min(1, bodyAlpha + 0.04 * root.bodyExposure))
+        dropColor0: Qt.alpha(Theme.cardTop, Math.min(1, dropAlpha + 0.08 * root.dropExposure))
+        dropColor1: Qt.alpha(Theme.cardBot, dropAlpha)
+        dropColor2: Qt.alpha(Qt.darker(Theme.cardBot, 1 + 0.16 * root.dropExposure), Math.min(1, dropAlpha + 0.04 * root.dropExposure))
+        accent: Theme.accent
+        // Accent band of a resting pill and of the awake droplet material.
+        bodyBand: 0.028 * 0.62 * (1 - 0.65 * root.bodyExposure)
+        bodyBandHeight: Math.max(30 * root.s, 0.22 * root.bodyH)
+        dropBand: 0.075 * 0.88 * (1 - 0.65 * root.dropExposure)
+        dropBandHeight: Math.max(30 * root.s, 0.22 * root.hPos)
     }
 
     Item {
@@ -322,20 +410,19 @@ Item {
         x: root.visualX; y: root.yPos; width: root.wPos; height: root.hPos
         visible: root.active
         // Remove the received portion; translucent glass cannot occlude another layer.
-        layer.enabled: root.centered && root.phase === "retornando" && root.joined
-        layer.effect: OpacityMask {
-            invert: true
-            maskSource: Item {
-                layer.enabled: true
-                width: module.width; height: module.height
-                Rectangle {
-                    visible: root.phase === "retornando" && root.joined
-                    x: root.bodyX - module.x; y: root.bodyY - module.y
-                    width: root.bodyW; height: root.bodyH
-                    radius: root.bodyRadius
-                    color: "white"
-                }
-            }
+        // Also while crossing unbonded: a wide droplet overlaps before it joins.
+        layer.enabled: root.overlapsBody && (root.joined || root.phase === "nacimiento" || root.phase === "brotando"
+            || root.phase === "separando" || root.phase === "retornando" || root.phase === "absorbiendo")
+        layer.smooth: true
+        layer.effect: ShaderEffect {
+            readonly property real bodyLeft: root.bodyX - (root.leftSide ? root.captureExtra : 0) - module.x
+            readonly property real bodyWidth: root.bodyW + (root.centered ? 0 : root.captureExtra)
+            readonly property size itemSize: Qt.size(module.width, module.height)
+            readonly property vector4d bodyBox: Qt.vector4d(bodyLeft + bodyWidth / 2,
+                root.bodyY - module.y + root.bodyH / 2, bodyWidth / 2, root.bodyH / 2)
+            readonly property real bodyRadius: Math.min(root.bodyRadius, bodyWidth / 2, root.bodyH / 2)
+            readonly property real bodyAlpha: root.glassAlpha(root.bodyExposure)
+            fragmentShader: Qt.resolvedUrl("../fluid/shaders/fluid_cut.frag.qsb")
         }
 
         PillMaterial {
@@ -352,8 +439,8 @@ Item {
             mediaPlaying: root.mediaPlaying
             mediaSettled: root.expanded && root.cardContentProgress > 0.95
             suppressEdge: root.joined || (!root.centered && root.contentExposure < 0.3)
-            edgeExposure: root.joined ? root.edgeExposure
-                : !root.centered && root.contentExposure < 0.3 ? 0 : 1
+            edgeExposure: root.edgeClearance * (root.joined ? root.edgeExposure
+                : !root.centered && root.contentExposure < 0.3 ? 0 : 1)
         }
 
         Loader {

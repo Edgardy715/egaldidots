@@ -52,7 +52,8 @@ Item {
         color: Theme.cardBot
         // Compact shadows otherwise make compositor blur sample the app outside the glass.
         opacity: root.surface === "auth" ? 0 : 0.32 * root.readingExposure * root.edgeExposure
-        layer.enabled: true
+        // Compact pills, rails and idle droplets keep no shadow FBO or MultiEffect.
+        layer.enabled: opacity > 0.001
         layer.effect: MultiEffect {
             shadowEnabled: true
             shadowColor: Qt.rgba(0, 0, 0, 0.72)
