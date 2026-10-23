@@ -33,7 +33,12 @@ ShellRoot {
                 wait(500)
                 verify(first.ticks > 10 && first.ticks < 40, "cadencia acotada")
                 verify(first.largestDt <= 0.05)
+                first.clock = GlowClock
+                compare(AmbientClock.subscribers, 1)
+                compare(GlowClock.subscribers, 1)
                 first.running = false
+                compare(GlowClock.subscribers, 0)
+                first.clock = AmbientClock
                 second.running = false
                 verify(!AmbientClock.running)
                 const count = first.ticks

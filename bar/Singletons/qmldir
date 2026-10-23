@@ -27,3 +27,4 @@ singleton FocusSession FocusSession.qml
 singleton Recording Recording.qml
 
 singleton AmbientClock AmbientClock.qml
+singleton GlowClock GlowClock.qml

@@ -12,10 +12,11 @@ Item {
     readonly property real driftX: Flags.reduceMotion ? 0 : Math.sin(driftPhase) * 0.06
     readonly property real driftY: Flags.reduceMotion ? 0 : (Math.cos(driftPhase) - 1) * 0.02
 
-    FrameAnimation {
+    AmbientSubscription {
+        clock: GlowClock
         running: root.visible && root.opacity > 0.005 && root.width > 0 && root.height > 0 && !Flags.reduceMotion
-        onTriggered: root.driftPhase = (root.driftPhase
-            + Math.min(frameTime, 0.05) * 1000 * Math.PI * 2 / (Motion.breathe * 4)) % (Math.PI * 2)
+        onTriggered: dt => root.driftPhase = (root.driftPhase
+            + dt * 1000 * Math.PI * 2 / (Motion.breathe * 4)) % (Math.PI * 2)
     }
 
     RadialGradient {
