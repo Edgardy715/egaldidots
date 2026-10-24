@@ -1,0 +1,38 @@
+{
+ "doze precedes sleep": true,
+ "wake plays from sleep": true,
+ "pet shows love": true,
+ "_right_x": 1008,
+ "gaze follows pointer": true,
+ "_looks": {
+  "left": "look_left",
+  "left_gaze": {
+   "dir": "left",
+   "hovered": true,
+   "pointer": [
+    20,
+    16
+   ],
+   "body": [
+    109.296875,
+    4
+   ],
+   "pillW": 149.296875
+  },
+  "right": "look_right",
+  "right_gaze": {
+   "dir": "right",
+   "hovered": true,
+   "pointer": [
+    123,
+    16
+   ],
+   "body": [
+    109.296875,
+    4
+   ],
+   "pillW": 149.296875
+  },
+  "away": "idle"
+ }
+}

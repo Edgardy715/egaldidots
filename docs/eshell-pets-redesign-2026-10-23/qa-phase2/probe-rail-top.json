@@ -1,0 +1,442 @@
+[
+  {
+    "at_s": 0.13361153899859346,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "crouch",
+    "flying": true,
+    "anim": "hop",
+    "px": 2,
+    "coding": false,
+    "animating": false,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      110,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.24101184199935233,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "flight",
+    "flying": true,
+    "anim": "hop",
+    "px": 2,
+    "coding": false,
+    "animating": false,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      133.09682693333332,
+      131.30672242214132
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.3028156209984445,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "flight",
+    "flying": true,
+    "anim": "hop",
+    "px": 2,
+    "coding": false,
+    "animating": false,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      150.79838346666668,
+      127.36016167148041
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.3660934339986852,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "flight",
+    "flying": true,
+    "anim": "hop",
+    "px": 2,
+    "coding": false,
+    "animating": false,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      168.58556480000001,
+      127.77815404260416
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.426988793999044,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "flight",
+    "flying": true,
+    "anim": "hop",
+    "px": 2,
+    "coding": false,
+    "animating": false,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      182.0019312,
+      131.00064375923287
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.4892985859987675,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "flight",
+    "flying": true,
+    "anim": "hop",
+    "px": 2,
+    "coding": false,
+    "animating": false,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      199.52105759999998,
+      138.97220989043416
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.5484566929990251,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "land",
+    "flying": true,
+    "anim": "hop",
+    "px": 2,
+    "coding": false,
+    "animating": false,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.6108780579997983,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.6729079540000384,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.7331522179993044,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.7918115539996506,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.8503620219998993,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.9081962989985186,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 0.96246749599959,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 1.0202115889987908,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 1.076607018998402,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 1.133414128998993,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 1.1880903949986532,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 1.2464497289984138,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 1.302518529999361,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 1.3573871279986633,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  },
+  {
+    "at_s": 1.41501665999931,
+    "loaded": true,
+    "perch": "rail",
+    "phase": "",
+    "flying": false,
+    "anim": "idle",
+    "px": 2,
+    "coding": false,
+    "animating": true,
+    "compact": false,
+    "layoutChanging": false,
+    "surface": "",
+    "activeId": 5,
+    "feet": [
+      206,
+      143
+    ],
+    "music": false
+  }
+]

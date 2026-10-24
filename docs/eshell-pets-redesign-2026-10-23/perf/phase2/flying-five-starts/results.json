@@ -1,0 +1,354 @@
+{
+  "runs": [
+    {
+      "impl": "mimo",
+      "scenario": "flying",
+      "frames": 160,
+      "framesPerSecond": 32,
+      "flightStarts": 5,
+      "state": {
+        "shown": true,
+        "anim": "idle",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "flying",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 5.002534941002523,
+      "tree_cpu_percent": 1.8539916969747603,
+      "tree_cpu_percent_ticks": 1.8661692444165068,
+      "tree_cpu_percent_including_markers": 1.7288007983941913,
+      "tree_pss_kib_median": 114831.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.2519072340001003,
+          "pss_kib": 114887,
+          "cpu_ticks": 34,
+          "cpu_ns": 348397145,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5037058529997012,
+          "pss_kib": 114903,
+          "cpu_ticks": 35,
+          "cpu_ns": 355082852,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7556716260005487,
+          "pss_kib": 114907,
+          "cpu_ticks": 35,
+          "cpu_ns": 355758074,
+          "processes": 1
+        },
+        {
+          "at_s": 1.007484370002203,
+          "pss_kib": 114915,
+          "cpu_ticks": 35,
+          "cpu_ns": 356511686,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2591582300010487,
+          "pss_kib": 114923,
+          "cpu_ticks": 36,
+          "cpu_ns": 363196111,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5109228630026337,
+          "pss_kib": 114807,
+          "cpu_ticks": 36,
+          "cpu_ns": 370665146,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7632642410026165,
+          "pss_kib": 114811,
+          "cpu_ticks": 36,
+          "cpu_ns": 371428217,
+          "processes": 1
+        },
+        {
+          "at_s": 2.015270915002475,
+          "pss_kib": 114827,
+          "cpu_ticks": 36,
+          "cpu_ns": 372221522,
+          "processes": 1
+        },
+        {
+          "at_s": 2.267035298002156,
+          "pss_kib": 114835,
+          "cpu_ticks": 37,
+          "cpu_ns": 378832970,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5191419860020687,
+          "pss_kib": 114839,
+          "cpu_ticks": 38,
+          "cpu_ns": 386899184,
+          "processes": 1
+        },
+        {
+          "at_s": 2.771472612999787,
+          "pss_kib": 114839,
+          "cpu_ticks": 38,
+          "cpu_ns": 387712643,
+          "processes": 1
+        },
+        {
+          "at_s": 3.024008035001316,
+          "pss_kib": 114847,
+          "cpu_ticks": 38,
+          "cpu_ns": 388807973,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2764625730014814,
+          "pss_kib": 114847,
+          "cpu_ticks": 39,
+          "cpu_ns": 398150775,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5288874070029124,
+          "pss_kib": 114731,
+          "cpu_ticks": 40,
+          "cpu_ns": 407809952,
+          "processes": 1
+        },
+        {
+          "at_s": 3.7813165340012347,
+          "pss_kib": 114731,
+          "cpu_ticks": 40,
+          "cpu_ns": 408750195,
+          "processes": 1
+        },
+        {
+          "at_s": 4.033682086999761,
+          "pss_kib": 114735,
+          "cpu_ticks": 40,
+          "cpu_ns": 409576083,
+          "processes": 1
+        },
+        {
+          "at_s": 4.2861844030012435,
+          "pss_kib": 114743,
+          "cpu_ticks": 41,
+          "cpu_ns": 419200287,
+          "processes": 1
+        },
+        {
+          "at_s": 4.538763865002693,
+          "pss_kib": 114747,
+          "cpu_ticks": 42,
+          "cpu_ns": 427875111,
+          "processes": 1
+        },
+        {
+          "at_s": 4.791280594999989,
+          "pss_kib": 114747,
+          "cpu_ticks": 42,
+          "cpu_ns": 428779105,
+          "processes": 1
+        },
+        {
+          "at_s": 5.002527221000491,
+          "pss_kib": 114747,
+          "cpu_ticks": 42,
+          "cpu_ns": 429013601,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "impl": "mimo",
+      "scenario": "flying",
+      "frames": 160,
+      "framesPerSecond": 32,
+      "flightStarts": 5,
+      "state": {
+        "shown": true,
+        "anim": "idle",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "flying",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 5.00267118299962,
+      "tree_cpu_percent": 2.078566180543521,
+      "tree_cpu_percent_ticks": 2.0955865343757205,
+      "tree_cpu_percent_including_markers": 1.9744532348171222,
+      "tree_pss_kib_median": 116214.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.2528595639996638,
+          "pss_kib": 116354,
+          "cpu_ticks": 47,
+          "cpu_ns": 477262507,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5055273539983318,
+          "pss_kib": 116366,
+          "cpu_ticks": 47,
+          "cpu_ns": 485307657,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7581617910000205,
+          "pss_kib": 116370,
+          "cpu_ticks": 47,
+          "cpu_ns": 486328480,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0108862529996259,
+          "pss_kib": 116378,
+          "cpu_ticks": 47,
+          "cpu_ns": 487432330,
+          "processes": 1
+        },
+        {
+          "at_s": 1.263447099001496,
+          "pss_kib": 116386,
+          "cpu_ticks": 49,
+          "cpu_ns": 495409784,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5159662939986447,
+          "pss_kib": 116270,
+          "cpu_ticks": 50,
+          "cpu_ns": 505175825,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7685780700012401,
+          "pss_kib": 116278,
+          "cpu_ticks": 50,
+          "cpu_ns": 506214125,
+          "processes": 1
+        },
+        {
+          "at_s": 2.021197842001129,
+          "pss_kib": 116294,
+          "cpu_ticks": 50,
+          "cpu_ns": 507321628,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2738189330011664,
+          "pss_kib": 116190,
+          "cpu_ticks": 50,
+          "cpu_ns": 515634077,
+          "processes": 1
+        },
+        {
+          "at_s": 2.526689031001297,
+          "pss_kib": 116190,
+          "cpu_ticks": 51,
+          "cpu_ns": 524215048,
+          "processes": 1
+        },
+        {
+          "at_s": 2.779268336998939,
+          "pss_kib": 116190,
+          "cpu_ticks": 51,
+          "cpu_ns": 525203939,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0317669869982637,
+          "pss_kib": 116198,
+          "cpu_ticks": 51,
+          "cpu_ns": 526226692,
+          "processes": 1
+        },
+        {
+          "at_s": 3.284335166998062,
+          "pss_kib": 116198,
+          "cpu_ticks": 53,
+          "cpu_ns": 536964408,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5368046539988427,
+          "pss_kib": 116198,
+          "cpu_ticks": 53,
+          "cpu_ns": 545743237,
+          "processes": 1
+        },
+        {
+          "at_s": 3.7895518639998045,
+          "pss_kib": 116198,
+          "cpu_ticks": 53,
+          "cpu_ns": 546680625,
+          "processes": 1
+        },
+        {
+          "at_s": 4.042103580999537,
+          "pss_kib": 116202,
+          "cpu_ticks": 53,
+          "cpu_ns": 547762599,
+          "processes": 1
+        },
+        {
+          "at_s": 4.294980781000049,
+          "pss_kib": 116210,
+          "cpu_ticks": 55,
+          "cpu_ns": 558596542,
+          "processes": 1
+        },
+        {
+          "at_s": 4.547599892001017,
+          "pss_kib": 116214,
+          "cpu_ticks": 56,
+          "cpu_ns": 566531527,
+          "processes": 1
+        },
+        {
+          "at_s": 4.800188633998914,
+          "pss_kib": 116214,
+          "cpu_ticks": 56,
+          "cpu_ns": 567470534,
+          "processes": 1
+        },
+        {
+          "at_s": 5.002663725997991,
+          "pss_kib": 116214,
+          "cpu_ticks": 56,
+          "cpu_ns": 567694723,
+          "processes": 1
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "flying": {
+      "tree_cpu_percent": 1.9662789387591406,
+      "tree_pss_kib_median": 115522.5,
+      "max_processes": 1.0,
+      "framesPerSecond": 32.0
+    }
+  }
+}
