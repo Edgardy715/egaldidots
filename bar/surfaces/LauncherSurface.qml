@@ -26,6 +26,8 @@ PillSurface {
         id: view
         anchors.fill: parent
         s: root.s
+        petLayer: root.petContext
+        petAvailable: root.petEligible
         open: root.open
         closing: root.closing
         searchResults: controller.searchResults

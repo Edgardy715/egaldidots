@@ -35,6 +35,22 @@
   "profile": {
     "displayName": ""
   },
+  "pets": {
+    "enabled": false,
+    "pack": "mimo",
+    "name": "Mimo",
+    "scale": "normal",
+    "barSurface": true,
+    "launcherSurface": true,
+    "mediaSurface": true,
+    "jumps": true,
+    "mischief": "normal",
+    "codingReaction": true,
+    "musicReaction": true,
+    "nightReaction": true,
+    "sleepEnabled": true,
+    "sleepAfter": 2
+  },
   "modules": {
     "workspaceRail": true,
     "systemStatus": true,

@@ -24,6 +24,10 @@ Item {
     property bool closing: false
     property real morphCloseness: 1
     property string screenName: ""
+    property var petContext: null
+    property bool petPresented: false
+    readonly property bool petEligible: petContext !== null && petContext.enabled
+        && petContext.monitorActive && petPresented && active && visible && morphCloseness > 0.99
     property real morphRadius: 0
     property real mTop: Theme.marginNone
     property real mLeft: Theme.marginNone

@@ -20,6 +20,7 @@ ClippingRectangle {
     property bool suspended: false
     property real reveal: 1
     property var artworkTransition: null
+    property var petContext: null
     property string displayedSurface: ""
     property real swapOpacity: 1
     property real loadReveal: 0
@@ -120,6 +121,10 @@ ClippingRectangle {
             if ("artworkTransition" in item) item.artworkTransition = Qt.binding(() => root.artworkTransition)
             if ("contextWidth" in item) item.contextWidth = Qt.binding(() => root.authContextWidth)
             if ("capsLockOn" in item) item.capsLockOn = Qt.binding(() => root.capsLockOn)
+            if ("petContext" in item) item.petContext = Qt.binding(() => root.petContext)
+            if ("petPresented" in item) item.petPresented = Qt.binding(() => root.open && !root.closing
+                && !root.suspended && root.surface === root.displayedSurface && root.visible
+                && root.opacity > 0.99 && root.reveal > 0.99)
             item.s = Qt.binding(() => root.scaleFactor)
             item.open = Qt.binding(() => root.displayedSurface.length > 0)
             item.closing = Qt.binding(() => root.closing || !root.open)

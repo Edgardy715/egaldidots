@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Shapes
 import "../Singletons"
+import "../pets"
 
 Item {
     id: root
@@ -15,6 +16,14 @@ Item {
     property string style: "numbers"
     property real availableWidth: 320
     property int hoverId: 0
+    property Item petLayer: null
+    property bool presented: true
+    property int previousActiveId: 1
+    property int hopDelta: 0
+    // The cell the pet perch points at; follows activeId only after the pet detaches.
+    property int petCell: 1
+    Component.onCompleted: petCell = activeId
+    readonly property bool lensAnimating: lensMotion.running
     onVisibleChanged: if (!visible) {
         hoverId = 0
         root.finishResize()
@@ -29,7 +38,22 @@ Item {
     }
     signal requestWorkspaces()
     signal workspaceRequested(int id)
-    onActiveIdChanged: hoverId = 0
+    onActiveIdChanged: {
+        hoverId = 0
+        const delta = activeId - previousActiveId
+        previousActiveId = activeId
+        // Detach at the old cell before the perch moves, so no frame shows it there.
+        if (delta !== 0 && railPerch.occupied) {
+            hopDelta = delta
+            petLayer.prepareHop()
+            hopTimer.restart()
+        }
+        petCell = activeId
+    }
+    onHoverIdChanged: {
+        if (railPerch.occupied) petLayer.lookAt(hoverId === 0 ? 0 : hoverId - activeId)
+    }
+    onStyleChanged: if (style === "pet") { lens.lensX = lens.targetX; lens.velocityX = 0 }
     readonly property real navWidth: (integrated ? 40 : 68) * s
     readonly property real slot: Math.min((style === "numbers" ? (integrated ? 28 : 38) : (integrated ? 22 : 24)) * s, Math.max(19 * s, (availableWidth - navWidth - 8 * s) / count))
     readonly property real inset: 4 * s
@@ -45,6 +69,32 @@ Item {
     height: 48 * s
     visible: fits
 
+    // Coalesce workspace and cell-bound bindings before reading the landing point.
+    Timer {
+        id: hopTimer
+        interval: 0
+        onTriggered: if (!railPerch.occupied) { if (root.petLayer) root.petLayer.cancelHop() }
+            else root.petLayer.hop(200 + 40 * Math.min(Math.abs(root.hopDelta), 6),
+                (8 + 2 * Math.min(Math.abs(root.hopDelta), 6)) * root.s, root.hopDelta)
+    }
+
+    PetPerch {
+        id: railPerch
+        objectName: "railPetPerch"
+        z: 2
+        petLayer: root.petLayer
+        perchId: "rail"
+        priority: 1
+        kind: "niche"
+        interactive: false
+        width: root.width
+        height: root.height
+        headroom: height
+        minX: root.navWidth + root.inset + (Math.max(1, root.petCell) - 0.5) * root.slot
+        maxX: minX
+        available: root.style === "pet" && root.visible && root.fits && root.presented && root.opacity > 0.95
+    }
+
     Item {
         x: root.navWidth
         y: 5 * root.s
@@ -54,6 +104,7 @@ Item {
     }
 
     Item {
+        id: navButton
         x: 0
         anchors.verticalCenter: parent.verticalCenter
         width: (root.integrated ? 36 : 44) * root.s
@@ -79,6 +130,7 @@ Item {
         }
         MotionArea {
             id: navHit
+            objectName: "workspaceNavigationHit"
             anchors.fill: parent
             feedbackEnabled: false
             accessibleName: qsTr("Abrir espacios de trabajo")
@@ -98,7 +150,7 @@ Item {
         readonly property real stretch: Math.min(7 * root.s, Math.abs(velocityX) * 0.025)
         readonly property real travel: Math.min(1, Math.abs(velocityX) / 320)
         Component.onCompleted: lensX = targetX
-        onTargetXChanged: if (Flags.reduceMotion || !root.visible) {
+        onTargetXChanged: if (Flags.reduceMotion || !root.visible || root.style === "pet") {
             lensX = targetX
             velocityX = 0
         }
@@ -130,7 +182,7 @@ Item {
         border.color: Qt.alpha(Theme.accent, root.integrated ? 0.26 : 0.70)
         FrameAnimation {
             id: lensMotion
-            running: root.visible && !Flags.reduceMotion
+            running: root.visible && root.style !== "pet" && !Flags.reduceMotion
                 && (lens.distance > 0.5 || Math.abs(lens.velocityX) > 10)
             onTriggered: {
                 const dt = Math.min(0.05, frameTime)

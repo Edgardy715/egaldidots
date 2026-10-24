@@ -12,7 +12,10 @@ Item {
     property real s: 1
     property bool layoutChanging: false
     property bool recordingDetached: false
+    property bool petVisible: false
+    property var petContext: null
     readonly property real restHeaderOpacity: header.restOpacity
+    readonly property bool petNicheAnimating: header.petNicheAnimating
     property real restLeftWidth: 0
     property real restRightWidth: 0
     property real restHeight: IslandGeometry.restHeight
@@ -169,7 +172,7 @@ Item {
         coreH: pill.coreH
         surfaceOpen: pill.surfaceOpen
         surfaceName: pill.surface
-        workspaceAnimating: header.workspaceAnimating
+        workspaceAnimating: header.workspaceAnimating || pill.petNicheAnimating
         notifAnimating: pill.notifAnimating
         notifHolding: pill.notifAnimating && pill.notifState === "hold"
         reduceMotion: Flags.reduceMotion
@@ -283,7 +286,8 @@ Item {
             notifAnimating: pill.notifAnimating
             capsLockOn: statusAdapter.capsLockOn
             now: pill.now
-            companionEnabled: Config.appearance.personality
+            companionEnabled: Config.appearance.personality && !pill.petVisible
+            petLayer: pill.petContext
             recordingPhase: !pill.recordingDetached && Recording.engaged ? (Recording.uncertain ? "unknown" : Recording.phase) : ""
             recordingCountdown: Recording.countdown
             activityText: !pill.recordingDetached && Recording.engaged ? Recording.uncertain ? qsTr("Grabador sin conexión")
@@ -348,6 +352,7 @@ Item {
     // El contenido es hermano del fondo: necesita su propio recorte redondeado.
     PillSurfaceHost {
         id: surfaceHost
+        petContext: pill.petContext
         artworkTransition: sharedArtwork
         open: pill.surfaceOpen
         surface: pill.surface

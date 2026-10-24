@@ -4,6 +4,7 @@ import Quickshell
 import "../"
 import "../Singletons"
 import "../components"
+import "../pets"
 /**
  * Isla · LauncherSurface. Center "Spotlight" morfeano desde la pill (igual que
  * notifs/calendar): la pill se colapsa en círculo → morph a rect 620×460
@@ -31,6 +32,8 @@ Item {
     activeFocusOnTab: true
 
     property real s: 1
+    property Item petLayer: null
+    property bool petAvailable: false
     property bool open: false
     property bool closing: false
     readonly property bool active: open && !closing
@@ -70,6 +73,27 @@ Item {
             listView.currentIndex = 0
             focusTimer.restart()
         }
+    }
+
+    // The pet stands on the search field's rim, in the empty glass right of
+    // the header's clock; the perch sits above the column and adds no input.
+    PetPerch {
+        objectName: "launcherPetPerch"
+        x: Math.round(parent.width * 0.66)
+        y: searchBox.y - height
+        width: parent.width - x - 24 * root.s
+        height: 44 * root.s
+        petLayer: root.petLayer
+        perchId: "launcher"
+        priority: 3
+        kind: "edge"
+        available: root.petAvailable && root.active && Config.pets.launcherSurface
+        floorY: height
+        headroom: height
+        readonly property real half: petLayer ? petLayer.bodyWidth / 2 : 0
+        minX: half
+        maxX: width - half
+        restX: maxX
     }
 
     // ── logical layout ────────────────────────────────────────────────

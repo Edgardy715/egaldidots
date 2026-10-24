@@ -31,6 +31,7 @@ Item {
     property string artist: ""
     readonly property real restContentWidth: restContent.implicitWidth
     readonly property bool workspaceAnimating: restStatus.workspaceAnimating
+    readonly property bool petNicheAnimating: restStatus.petNicheAnimating
     signal requestCalendar()
     signal requestFocus()
     property bool companionEnabled: true
@@ -38,6 +39,7 @@ Item {
     property string activityMood: "rest"
     property string recordingPhase: ""
     property int recordingCountdown: 0
+    property Item petLayer: null
     property real lookX: 0
     property real lookY: 0
 
@@ -68,10 +70,12 @@ Item {
         // el reloj se desliza PURAMENTE siguiendo el width animado del chip.
         spacing: 0
         z: 3
-        opacity: root.layoutChanging ? 0 : root.launcherHeaderVisible ? 1 : root.surface === "auth" ? 1
+        // Where the fade is heading; the pet's niche follows this, not the fade's lag.
+        readonly property real targetOpacity: root.layoutChanging ? 0 : root.launcherHeaderVisible ? 1 : root.surface === "auth" ? 1
             : ((root.surfaceOpen && !root.launcherReturning) || (root.hasNotification && root.notifAnimating)) ? 0
             : Math.pow(root.morphCloseness, 1.2)
                 * (root.width >= root.restWidth - 1 ? 1 : 0)
+        opacity: targetOpacity
         visible: opacity > 0.01
         enabled: !root.layoutChanging
         Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: root.surfaceOpen ? Motion.fast : Motion.standard; easing.type: Motion.easeStandard } }
@@ -88,6 +92,9 @@ Item {
             recordingPhase: root.recordingPhase
             recordingCountdown: root.recordingCountdown
             lookX: root.lookX; lookY: root.lookY
+            petLayer: root.petLayer
+            // Clear of 0.99, where the fade hovers while the pill settles.
+            petAvailable: restContent.opacity > 0.95 && restContent.targetOpacity > 0.95
             onRequestCalendar: root.requestCalendar()
             onRequestFocus: root.requestFocus()
         }

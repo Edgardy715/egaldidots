@@ -10,6 +10,7 @@ Item {
     property real topGap: compact ? (height - 48 * s) / 2 : 8 * s
     property real availableWidth: 360
     property bool presented: true
+    property Item petLayer: null
     property real centerWidth: 0
     readonly property real contentWidth: centerWidth + leftWidth + rightWidth + 36 * s
         + (leftWidth > 0 ? 18 * s : 0) + (rightWidth > 0 ? 18 * s : 0)
@@ -74,6 +75,8 @@ Item {
         presented: root.presented && root.contentFits && (!root.workspaceItem || root.workspaceItem.fits)
         animateChanges: Config.modules.animateChanges
         sourceComponent: TopWorkspaceRail {
+            petLayer: root.petLayer
+            presented: workspaceLoader.interactive && workspaceLoader.exposure > 0.95 && root.opacity > 0.95
             s: root.s
             integrated: root.compact
             style: Config.appearance.workspaceStyle

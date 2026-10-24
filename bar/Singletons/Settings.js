@@ -7,7 +7,7 @@ var version = 1
 var fields = {
     appearance: {
         barLayout: { type: "string", default: "split", options: ["split", "compact"], optionLabels: ["Separada", "Compacta"], label: "Diseño de la barra", control: "choice", description: "Elige la barra separada o la Isla compacta centrada." },
-        workspaceStyle: { type: "string", default: "numbers", options: ["numbers", "dots", "bars", "capsules", "pacman"], optionLabels: ["Números", "Puntos", "Barras", "Cápsulas", "Pac-Man"], label: "Estilo de espacios de trabajo", control: "choice", description: "Representación visual de los escritorios, compartida por ambos diseños de barra." },
+        workspaceStyle: { type: "string", default: "numbers", options: ["numbers", "dots", "bars", "capsules", "pacman", "pet"], optionLabels: ["Números", "Puntos", "Barras", "Cápsulas", "Pac-Man", "Mascota"], label: "Estilo de espacios de trabajo", control: "choice", description: "Representación visual de los escritorios, compartida por ambos diseños de barra. Mascota requiere Eshell Pets activado; sin mascota se ve como Puntos." },
         glassAlpha: { type: "number", default: 0.34, minimum: 0.15, maximum: 1, label: "Opacidad del vidrio", control: "number", description: "Ajusta la opacidad del material de vidrio." },
         materialDepth: { type: "number", default: 0.25, minimum: 0, maximum: 1, label: "Profundidad del material", control: "number", description: "Intensidad de la luz direccional y la sombra interior del vidrio de Isla." },
         ambientFps: { type: "number", default: 60, minimum: 30, maximum: 240, label: "Frecuencia ambiental", control: "number", description: "Frecuencia máxima del espectro, ondas y giro multimedia; no limita el movimiento interactivo." },
@@ -43,6 +43,23 @@ var fields = {
     },
     profile: {
         displayName: { type: "string", default: "", minLength: 0, label: "Nombre visible", control: "text", description: "Nombre mostrado en la vista de sesión; vacío usa el nombre de la sesión." }
+    },
+    pets: {
+        enabled: { type: "boolean", default: false, label: "Eshell Pets", control: "toggle", options: [false, true], description: "Una mascota pixel art que vive en la barra y salta a las superficies abiertas. Nunca tapa contenido ni recibe clics fuera de su cuerpo." },
+        pack: { type: "string", default: "mimo", options: ["mimo"], optionLabels: ["Mimo"], label: "Mascota", control: "choice", description: "Paquete de mascota. Los paquetes son datos validados: paleta, fotogramas y animaciones." },
+        name: { type: "string", default: "Mimo", minLength: 1, label: "Nombre de la mascota", control: "text", description: "Nombre guardado para identificar tu mascota." },
+        scale: { type: "string", default: "normal", options: ["small", "normal", "large"], optionLabels: ["Pequeña ×1", "Normal ×2", "Grande ×3"], label: "Tamaño de píxel", control: "choice", description: "Escala entera de cada píxel. Donde no cabe, como en la barra, usa la mayor escala que entra." },
+        palette: { type: "string", default: "marea", options: ["marea", "coral", "lavanda", "arena", "matugen"], optionLabels: ["Marea", "Coral", "Lavanda", "Arena", "Matugen"], label: "Paleta", control: "choice", description: "Colores de Mimo sobre el vidrio de Isla." },
+        barSurface: { type: "boolean", default: true, label: "Mascota en la barra", control: "toggle", options: [false, true], description: "Reserva un nicho tras el reloj para que viva en la barra en reposo." },
+        launcherSurface: { type: "boolean", default: true, label: "Mascota en el lanzador", control: "toggle", options: [false, true], description: "Se posa sobre el buscador del lanzador." },
+        mediaSurface: { type: "boolean", default: true, label: "Mascota en música", control: "toggle", options: [false, true], description: "Se posa en la línea de tiempo y baila mientras suena música." },
+        jumps: { type: "boolean", default: true, label: "Saltos entre superficies", control: "toggle", options: [false, true], description: "Salta entre las superficies disponibles." },
+        mischief: { type: "string", default: "normal", options: ["never", "rare", "normal", "frequent"], optionLabels: ["Nunca", "Rara (~15 min)", "Normal (~6 min)", "Frecuente (~2 min)"], label: "Travesuras", control: "choice", description: "Pequeñas travesuras al descansar, sin interrumpir el lanzador ni los desplazamientos." },
+        codingReaction: { type: "boolean", default: true, label: "Programa con terminal/editor", control: "toggle", options: [false, true], description: "Programa en casa al enfocar una terminal o un editor." },
+        musicReaction: { type: "boolean", default: true, label: "Baila al empezar la música", control: "toggle", options: [false, true], description: "Celebra la música en la barra durante ocho segundos." },
+        nightReaction: { type: "boolean", default: true, label: "Bosteza y duerme antes de noche", control: "toggle", options: [false, true], description: "Descansa antes entre las once de la noche y las seis de la mañana." },
+        sleepEnabled: { type: "boolean", default: true, label: "Sueño", control: "toggle", options: [false, true], description: "Se duerme tras un rato sin interacción y queda inmóvil, sin consumo." },
+        sleepAfter: { type: "number", default: 2, minimum: 1, maximum: 30, label: "Dormir tras (minutos)", control: "number", description: "Minutos sin interacción antes de dormirse." }
     },
     paths: {
         userAvatar: { type: "string", path: true, base: "home", suffix: "/.face", label: "Avatar", control: "path", description: "Ruta de la imagen de usuario para sesión y bloqueo." },
@@ -89,6 +106,7 @@ var sectionCatalog = [
     { id: "appearance", label: "Apariencia", description: "Escala, tipografía, color y movimiento." },
     { id: "modules", label: "Módulos de la barra", description: "Entradas laterales opcionales y sus controles." },
     { id: "profile", label: "Perfil", description: "Datos de presentación de la sesión." },
+    { id: "pets", label: "Eshell Pets", description: "Preferencias de la mascota integrada." },
     { id: "paths", label: "Rutas", description: "Archivos y carpetas que consumen servicios del shell." }
 ]
 
@@ -233,6 +251,7 @@ function validate(document, context) {
                 return
             }
             if (rule.options && rule.options.indexOf(value) === -1) {
+                if (name === "pets.palette") return
                 errors.push(name + " must be one of: " + rule.options.join(", "))
                 return
             }

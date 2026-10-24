@@ -6,11 +6,49 @@ import "../"
 import "../components"
 import "../Singletons"
 import "../surfaces"
+import "../pets"
+import "../pets/PetApps.js" as PetApps
 
 PanelWindow {
     id: overlay
     required property SurfaceRouter router
     required property var modelData
+    // One pet per monitor, only while enabled; surfaces offer perches through petContext.
+    Loader {
+        id: petLoader
+        z: 100
+        active: Config.pets.enabled
+        sourceComponent: PetLayer {
+            monitorActive: overlay.router.focusedMonitorName === overlay.modelData.name
+                && !overlay.layoutChanging && !overlay.monFullscreen && overlay.visible
+            s: overlay.s
+            coding: PetApps.isCoding(ToplevelManager.activeToplevel ? ToplevelManager.activeToplevel.appId : "")
+        }
+    }
+    readonly property Item petLayer: petLoader.item
+    Connections {
+        target: ToplevelManager
+        function onActiveToplevelChanged() {
+            const window = ToplevelManager.activeToplevel
+            if (petLoader.item && Config.pets.codingReaction && window && PetApps.isCoding(window.appId))
+                petLoader.item.notify("codingFocus")
+        }
+    }
+    Connections {
+        target: Players
+        function onPlayingChanged() {
+            if (Players.playing && petLoader.item) petLoader.item.notify("musicStart")
+        }
+        function onActiveChanged() {
+            if (Players.active && Players.active.isPlaying && petLoader.item) petLoader.item.notify("musicStart")
+        }
+    }
+    Connections {
+        target: Players.active
+        function onPostTrackChanged() {
+            if (Players.playing && petLoader.item) petLoader.item.notify("musicStart")
+        }
+    }
     readonly property real s: modelData ? (modelData.height / 1080) * Flags.uiScale : 1
     readonly property real topGap: 8 * Flags.topGap * s
     readonly property bool compact: layoutTransition.compact
@@ -61,6 +99,14 @@ PanelWindow {
     readonly property bool mediaDocking: router.mediaDockPendingMon === modelData.name
     readonly property bool launcherClosing: launcherOpen && router.launcherClosePhase !== 0
     readonly property bool launcherReturning: launcherOpen && router.launcherClosePhase === 2
+    onLauncherClosingChanged: {
+        if (!petLoader.item) return
+        if (launcherClosing) petLoader.item.holdForHome()
+        else if (launcherOpen) petLoader.item.cancelHomeReturn(true)
+    }
+    onSurfaceChanged: {
+        if (petLoader.item && surface && surface !== "launcher") petLoader.item.cancelHomeReturn()
+    }
     OverlayInputPolicy {
         id: inputPolicy
         objectName: "islandInputPolicy"
@@ -267,15 +313,20 @@ PanelWindow {
 
         HoverHandler {
             parent: pill
-            onHoveredChanged: pill.hovered = hovered
+            onHoveredChanged: {
+                pill.hovered = hovered
+                if (petLoader.item) petLoader.item.pillLook(point.position.x, point.position.y, pill, hovered)
+            }
             onPointChanged: {
                 pill.pointerX = point.position.x
                 pill.pointerY = point.position.y
+                if (hovered && petLoader.item) petLoader.item.pillLook(pill.pointerX, pill.pointerY, pill, true)
             }
         }
 
         TopBarModules {
             id: sideModules
+            petLayer: petLoader.item
             objectName: "islandModules"
             x: overlay.compact ? pill.x : 0
             y: overlay.compact ? pill.y : 0
@@ -387,6 +438,8 @@ PanelWindow {
             s: overlay.s
             screenName: overlay.modelData.name
             recordingDetached: recordingCompanion.open || recordingCompanion.active
+            petContext: petLoader.item
+            petVisible: petLoader.item !== null && petLoader.item.petVisible
             layoutChanging: overlay.layoutChanging
             interactionOpen: overlay.surfaceOpen
             restHeight: overlay.compact ? IslandGeometry.compactRestHeight : IslandGeometry.restHeight
@@ -489,6 +542,7 @@ PanelWindow {
 
         FluidMediaCompanion {
             id: fluidCompanion
+            petContext: petLoader.item
             objectName: "islandMediaCompanion"
             z: fluidCompanion.cardFraction > 0.05 ? 3 : 1
             opacity: overlay.compact ? 0 : 1 - overlay.fullscreenHide

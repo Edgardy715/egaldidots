@@ -1,6 +1,7 @@
 import QtQuick
 import "../"
 import "../Singletons"
+import "../pets"
 
 /** The compact status section shown before the optional media chip. */
 Row {
@@ -19,8 +20,12 @@ Row {
     property int recordingCountdown: 0
     property real lookX: 0
     property real lookY: 0
+    property Item petLayer: null
+    property bool petAvailable: false
 
     readonly property bool workspaceAnimating: workspaceFlash.shown || workspaceFlash.width > 0.01
+    // The pet's niche animates its own width; the pill follows it like the flash chip.
+    readonly property bool petNicheAnimating: Math.abs(barPerch.width - (barPerch.occupied ? barPerch.target : 0)) > 0.01
 
     spacing: 0
 
@@ -168,6 +173,31 @@ Row {
             anchors.margins: -6 * root.s
             cursorShape: Qt.PointingHandCursor
             onClicked: root.requestCalendar()
+        }
+    }
+
+    // The pet's home at rest: a niche after the clock that opens only while it
+    // is here, past the clock's hit margin so it never takes the clock's clicks.
+    PetPerch {
+        id: barPerch
+        objectName: "barPetPerch"
+        readonly property real gap: 8 * root.s
+        // Room for the body's left half and the furthest right any pose reaches (sleep's Zs).
+        readonly property real target: petLayer ? gap + petLayer.bodyWidth / 2 + petLayer.reachRight + 2 * root.s : 0
+        petLayer: root.petLayer
+        perchId: "bar"
+        priority: 0
+        kind: "niche"
+        available: root.petAvailable && Config.pets.barSurface
+        width: occupied ? target : 0
+        height: root.coreH
+        headroom: root.coreH
+        minX: gap + (petLayer ? petLayer.bodyWidth / 2 : 0)
+        maxX: minX
+        reveal: target > 0 ? Math.pow(Math.min(1, width / target), 2) : 0
+        Behavior on width {
+            enabled: !Flags.reduceMotion
+            SmoothedAnimation { duration: Motion.morph; velocity: -1 }
         }
     }
 }
