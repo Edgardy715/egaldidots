@@ -1,0 +1,514 @@
+[
+  {
+    "impl": "mimo",
+    "scenario": "disabled",
+    "frames": 2,
+    "framesPerSecond": 0.4,
+    "state": {
+      "shown": false,
+      "anim": "",
+      "asleep": false,
+      "settled": false
+    },
+    "ready": {
+      "impl": "mimo",
+      "scenario": "disabled",
+      "state": {
+        "shown": false,
+        "anim": "",
+        "asleep": false,
+        "settled": false
+      }
+    },
+    "seconds": 5.001420805001544,
+    "tree_cpu_percent": 0.0,
+    "tree_pss_kib_median": 106188.0,
+    "max_processes": 1,
+    "samples": [
+      {
+        "at_s": 0.2520949310001015,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 0.5042071960015164,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 0.7562731739999435,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 1.0084326080013852,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 1.2605461690000084,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 1.512621638001292,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 1.7647236170014367,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 2.016881720001038,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 2.2690603589999228,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 2.5211367210013123,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 2.7732131330012635,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 3.0253222660012398,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 3.2780341890011186,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 3.530148262001603,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 3.7820574950001173,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 4.034104654001567,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 4.285605755001598,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 4.537386056001196,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 4.788817128001028,
+        "pss_kib": 106188,
+        "processes": 1
+      },
+      {
+        "at_s": 5.001415821001501,
+        "pss_kib": 106188,
+        "processes": 1
+      }
+    ]
+  },
+  {
+    "impl": "mimo",
+    "scenario": "idle",
+    "frames": 6,
+    "framesPerSecond": 1.2,
+    "state": {
+      "shown": true,
+      "anim": "idle",
+      "asleep": false,
+      "settled": false
+    },
+    "ready": {
+      "impl": "mimo",
+      "scenario": "idle",
+      "state": {
+        "shown": true,
+        "anim": "idle",
+        "asleep": false,
+        "settled": false
+      }
+    },
+    "seconds": 5.002089711000735,
+    "tree_cpu_percent": 0.0,
+    "tree_pss_kib_median": 116837.0,
+    "max_processes": 1,
+    "samples": [
+      {
+        "at_s": 0.25183794000076887,
+        "pss_kib": 116829,
+        "processes": 1
+      },
+      {
+        "at_s": 0.5035112189998472,
+        "pss_kib": 116829,
+        "processes": 1
+      },
+      {
+        "at_s": 0.7552408780011319,
+        "pss_kib": 116829,
+        "processes": 1
+      },
+      {
+        "at_s": 1.0068016690001969,
+        "pss_kib": 116833,
+        "processes": 1
+      },
+      {
+        "at_s": 1.2585452880011871,
+        "pss_kib": 116833,
+        "processes": 1
+      },
+      {
+        "at_s": 1.5103095570011646,
+        "pss_kib": 116833,
+        "processes": 1
+      },
+      {
+        "at_s": 1.761969864999628,
+        "pss_kib": 116833,
+        "processes": 1
+      },
+      {
+        "at_s": 2.0142104719998315,
+        "pss_kib": 116833,
+        "processes": 1
+      },
+      {
+        "at_s": 2.266297897000186,
+        "pss_kib": 116833,
+        "processes": 1
+      },
+      {
+        "at_s": 2.518501128000935,
+        "pss_kib": 116833,
+        "processes": 1
+      },
+      {
+        "at_s": 2.770570654000039,
+        "pss_kib": 116841,
+        "processes": 1
+      },
+      {
+        "at_s": 3.022688843000651,
+        "pss_kib": 116845,
+        "processes": 1
+      },
+      {
+        "at_s": 3.274869408000086,
+        "pss_kib": 116845,
+        "processes": 1
+      },
+      {
+        "at_s": 3.527075355001216,
+        "pss_kib": 116845,
+        "processes": 1
+      },
+      {
+        "at_s": 3.779136463001123,
+        "pss_kib": 116845,
+        "processes": 1
+      },
+      {
+        "at_s": 4.031325304000347,
+        "pss_kib": 116845,
+        "processes": 1
+      },
+      {
+        "at_s": 4.283569450999494,
+        "pss_kib": 116845,
+        "processes": 1
+      },
+      {
+        "at_s": 4.535817560999931,
+        "pss_kib": 116845,
+        "processes": 1
+      },
+      {
+        "at_s": 4.788236938000409,
+        "pss_kib": 116845,
+        "processes": 1
+      },
+      {
+        "at_s": 5.002081946000544,
+        "pss_kib": 116843,
+        "processes": 1
+      }
+    ]
+  },
+  {
+    "impl": "mimo",
+    "scenario": "flying",
+    "frames": 170,
+    "framesPerSecond": 34,
+    "state": {
+      "shown": true,
+      "anim": "idle",
+      "asleep": false,
+      "settled": false
+    },
+    "ready": {
+      "impl": "mimo",
+      "scenario": "flying",
+      "state": {
+        "shown": true,
+        "anim": "idle",
+        "asleep": false,
+        "settled": false
+      }
+    },
+    "seconds": 5.002342338000744,
+    "tree_cpu_percent": 1.5992508028143695,
+    "tree_pss_kib_median": 118731.0,
+    "max_processes": 1,
+    "samples": [
+      {
+        "at_s": 0.25177991300006397,
+        "pss_kib": 118781,
+        "processes": 1
+      },
+      {
+        "at_s": 0.5034673379996093,
+        "pss_kib": 118781,
+        "processes": 1
+      },
+      {
+        "at_s": 0.755417522001153,
+        "pss_kib": 118781,
+        "processes": 1
+      },
+      {
+        "at_s": 1.0071167280002555,
+        "pss_kib": 118789,
+        "processes": 1
+      },
+      {
+        "at_s": 1.2589504700008547,
+        "pss_kib": 118797,
+        "processes": 1
+      },
+      {
+        "at_s": 1.510675617000743,
+        "pss_kib": 118813,
+        "processes": 1
+      },
+      {
+        "at_s": 1.762508458999946,
+        "pss_kib": 118817,
+        "processes": 1
+      },
+      {
+        "at_s": 2.0143380379995506,
+        "pss_kib": 118825,
+        "processes": 1
+      },
+      {
+        "at_s": 2.266270975000225,
+        "pss_kib": 118709,
+        "processes": 1
+      },
+      {
+        "at_s": 2.5181962240003486,
+        "pss_kib": 118725,
+        "processes": 1
+      },
+      {
+        "at_s": 2.7702394839998306,
+        "pss_kib": 118725,
+        "processes": 1
+      },
+      {
+        "at_s": 3.0219734080001217,
+        "pss_kib": 118737,
+        "processes": 1
+      },
+      {
+        "at_s": 3.273891786000604,
+        "pss_kib": 118737,
+        "processes": 1
+      },
+      {
+        "at_s": 3.52562827499969,
+        "pss_kib": 118625,
+        "processes": 1
+      },
+      {
+        "at_s": 3.77797592800016,
+        "pss_kib": 118625,
+        "processes": 1
+      },
+      {
+        "at_s": 4.030418279000514,
+        "pss_kib": 118637,
+        "processes": 1
+      },
+      {
+        "at_s": 4.282920924000791,
+        "pss_kib": 118645,
+        "processes": 1
+      },
+      {
+        "at_s": 4.535168780999811,
+        "pss_kib": 118417,
+        "processes": 1
+      },
+      {
+        "at_s": 4.787679926001147,
+        "pss_kib": 118417,
+        "processes": 1
+      },
+      {
+        "at_s": 5.002336169000046,
+        "pss_kib": 118417,
+        "processes": 1
+      }
+    ]
+  },
+  {
+    "impl": "mimo",
+    "scenario": "rail-idle",
+    "frames": 6,
+    "framesPerSecond": 1.2,
+    "state": {
+      "shown": true,
+      "anim": "idle",
+      "asleep": false,
+      "settled": false
+    },
+    "ready": {
+      "impl": "mimo",
+      "scenario": "rail-idle",
+      "state": {
+        "shown": true,
+        "anim": "idle",
+        "asleep": false,
+        "settled": false
+      }
+    },
+    "seconds": 5.0024086280009215,
+    "tree_cpu_percent": 0.19990370126952686,
+    "tree_pss_kib_median": 136786.0,
+    "max_processes": 1,
+    "samples": [
+      {
+        "at_s": 0.2524437480005872,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 0.5049748649998946,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 0.7575495569999475,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 1.009959680000975,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 1.2624543860001722,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 1.5148792569998477,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 1.7674781760015321,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 2.019827947000522,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 2.2724091649997717,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 2.524797957001283,
+        "pss_kib": 136786,
+        "processes": 1
+      },
+      {
+        "at_s": 2.7772967030014115,
+        "pss_kib": 136794,
+        "processes": 1
+      },
+      {
+        "at_s": 3.0297937949999323,
+        "pss_kib": 136734,
+        "processes": 1
+      },
+      {
+        "at_s": 3.2821375929997885,
+        "pss_kib": 136734,
+        "processes": 1
+      },
+      {
+        "at_s": 3.5346227760001057,
+        "pss_kib": 136734,
+        "processes": 1
+      },
+      {
+        "at_s": 3.7871348730004684,
+        "pss_kib": 136734,
+        "processes": 1
+      },
+      {
+        "at_s": 4.039681394000581,
+        "pss_kib": 136734,
+        "processes": 1
+      },
+      {
+        "at_s": 4.292110264999792,
+        "pss_kib": 136734,
+        "processes": 1
+      },
+      {
+        "at_s": 4.545467904001271,
+        "pss_kib": 136734,
+        "processes": 1
+      },
+      {
+        "at_s": 4.797842906000369,
+        "pss_kib": 136734,
+        "processes": 1
+      },
+      {
+        "at_s": 5.0024023599999055,
+        "pss_kib": 136734,
+        "processes": 1
+      }
+    ]
+  }
+]

@@ -1,0 +1,2759 @@
+{
+ "environment": {
+  "utc": "2026-10-24T02:37:08Z",
+  "platform": "Linux-7.3.0-3-cachyos-x86_64-with-glibc2.44",
+  "quickshell": {
+   "exit": 0,
+   "stdout": "Quickshell 0.3.2 (revision , distributed by Arch Linux)\n",
+   "stderr": ""
+  },
+  "hyprland": {
+   "exit": 0,
+   "stdout": "Hyprland 0.56.2 built from branch v0.56.2 at commit efb50993780079460b0cbed1363e2166a2de1d9f clean ([gha] Nix: update inputs).\nDate: Wed Aug 5 14:13:21 2026\nTag: v0.56.2, commits: 7661\n\nLibraries:\nHyprgraphics: built against 0.5.1, system has 0.5.1\nHyprutils: built against 0.14.2, system has 0.14.3\nHyprcursor: built against 0.1.13, system has 0.1.13\nHyprlang: built against 0.6.8, system has 0.6.8\nAquamarine: built against 0.15.1, system has 0.15.1\n\nVersion ABI string: efb50993780079460b0cbed1363e2166a2de1d9f_aq_0.15_hu_0.14_hg_0.5_hc_0.1_hlg_0.6\nno flags were set\n\n",
+   "stderr": ""
+  },
+  "monitors": {
+   "exit": 0,
+   "stdout": "[{\n    \"id\": 0,\n    \"name\": \"DP-1\",\n    \"description\": \"Microstep MSI MAG251RX 0x000003CE\",\n    \"make\": \"Microstep\",\n    \"model\": \"MSI MAG251RX\",\n    \"serial\": \"0x000003CE\",\n    \"width\": 1920,\n    \"height\": 1080,\n    \"physicalWidth\": 540,\n    \"physicalHeight\": 300,\n    \"refreshRate\": 239.96400,\n    \"x\": 0,\n    \"y\": 0,\n    \"activeWorkspace\": {\n        \"id\": 1,\n        \"name\": \"1\"\n    },\n    \"specialWorkspace\": {\n        \"id\": 0,\n        \"name\": \"\"\n    },\n    \"reserved\": [0, 46, 0, 0],\n    \"scale\": 1,\n    \"transform\": 0,\n    \"focused\": true,\n    \"dpmsStatus\": true,\n    \"vrr\": false,\n    \"solitary\": \"0\",\n    \"solitaryBlockedBy\": [\"WINDOWED\",\"CANDIDATE\"],\n    \"activelyTearing\": false,\n    \"tearingBlockedBy\": [\"NOT_TORN\",\"USER\",\"CANDIDATE\"],\n    \"directScanoutTo\": \"0\",\n    \"directScanoutBlockedBy\": [\"USER\",\"SW\",\"CANDIDATE\"],\n    \"disabled\": false,\n    \"currentFormat\": \"XRGB8888\",\n    \"mirrorOf\": \"none\",\n    \"availableModes\": [\"1920x1080@60.00Hz\",\"1920x1080@239.96Hz\",\"1920x1080@144.00Hz\",\"1920x1080@119.88Hz\",\"1920x1080@119.98Hz\",\"1920x1080@99.93Hz\",\"1920x1080@59.94Hz\",\"1920x1080@50.00Hz\",\"1680x1050@59.88Hz\",\"1280x1024@75.03Hz\",\"1280x1024@60.02Hz\",\"1280x720@59.94Hz\",\"1280x720@50.00Hz\",\"1024x768@119.99Hz\",\"1024x768@99.97Hz\",\"1024x768@75.03Hz\",\"1024x768@70.07Hz\",\"1024x768@60.00Hz\",\"800x600@119.97Hz\",\"800x600@99.66Hz\",\"800x600@75.00Hz\",\"800x600@72.19Hz\",\"800x600@60.32Hz\",\"800x600@56.25Hz\",\"720x576@50.00Hz\",\"720x480@59.94Hz\",\"640x480@119.52Hz\",\"640x480@99.77Hz\",\"640x480@75.00Hz\",\"640x480@72.81Hz\",\"640x480@59.94Hz\",\"640x480@59.93Hz\"],\n    \"colorManagementPreset\": \"srgb\",\n    \"sdrBrightness\": 1,\n    \"sdrSaturation\": 1,\n    \"sdrMinLuminance\": 0.2,\n    \"sdrMaxLuminance\": 80,\n    \"hardwareCursorsInUse\": false\n}]\n",
+   "stderr": ""
+  },
+  "source_sha256": {
+   "bar/pets/PetActor.qml": "26db8219e6a097941c45980d31f4a5cc60268a8947c712707d5472465f430a89",
+   "bar/pets/PetLayer.qml": "b14e82e7fef20e5095ae88ebf550b2957d1f504e786777a3a4c037b5fbf05fd7",
+   "bar/pets/PetPack.qml": "f9794207ca81f21e6a4f622e7285fc73a510f14509dd13a820c787e9b191ef81",
+   "bar/pets/PetPerch.qml": "94d73396ae1adfef0d24b74af4b9076c5da19abad5574ba3e1d60fceda23861f",
+   "bar/pets/PetSprite.qml": "560e2882f9a180242db9b651ae021fac42677e83239b9dd802fde0f0254ad5bc",
+   "bar/pets/PetApps.js": "6cc409af9c4a582184fca6575e29354a673cedff8744933d6bfabfcb44f82c2e",
+   "bar/pets/packs/mimo/atlas.json": "9c6091cdea67411fdf7c89686ae604f016436eedcfed76eb0ff8d9f5739ed9a6",
+   "bar/pets/packs/mimo/atlas.png": "f0ee9e15f1f59de4e22e688584e2809a205eb542f072bc0f1c8e417554b47deb",
+   "bar/components/TopWorkspaceRail.qml": "81e57c722ca6839efbc04331dc3a71db75844fdfaf302036fd7d769d07758bbb",
+   "bar/pets-performance.qml": "f420f56d202db9ab447d7bed3e3ed70d75d1f2f90b4ad3d3dbcb39b3e9911c1d",
+   "bar/tests/pets-performance.py": "f63e8df4af852ae332777fb7fda590c1e7b6edd90175712d8d53b2767d8f2a77",
+   "bar/tests/sample-process.py": "f1224a42e68c32605322f8339de99e73c4ef79c6075b28d45faf2b314188d60a"
+  },
+  "seconds_per_scenario": 3.5,
+  "rounds": 2,
+  "impl": "mimo",
+  "method": "same 200x100 Wayland surface; Mimo line perch x2, rail-idle real compact rail; idle/rail-idle fixed RNG0.99 exclude spontaneous reactions/walking; flying changes perch once/second; coding/sleeping settle before measuring; Window.frameSwapped (no render driver); CPU one core via per-thread schedstat nanoseconds, stable thread tree, excludes first/last250ms probe markers (full-window and quantized tick CPU retained); zero CPU reported to one decimal; no offscreen processes"
+ },
+ "runs": [
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "disabled",
+   "frames": 2,
+   "framesPerSecond": 0.5714285714285714,
+   "flightStarts": 0,
+   "state": {
+    "shown": false,
+    "anim": "",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "disabled",
+    "state": {
+     "shown": false,
+     "anim": "",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5025490799998806,
+   "tree_cpu_percent": 0.0067865773027354324,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.010214846154276078,
+   "tree_pss_kib_median": 101928.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.25270308300059696,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336148463,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5054607550009678,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336148463,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7609334900007525,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336148463,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0139190379995853,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336148463,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2667962870000338,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336237476,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5192294040007255,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336237476,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7718719330005115,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336237476,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0244375660004152,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336237476,
+     "processes": 1
+    },
+    {
+     "at_s": 2.277006952999727,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336237476,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5300180120011646,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336237476,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7826152050001838,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336337310,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0353576020006585,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336337310,
+     "processes": 1
+    },
+    {
+     "at_s": 3.287914959000773,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336337310,
+     "processes": 1
+    },
+    {
+     "at_s": 3.50254119300007,
+     "pss_kib": 101928,
+     "cpu_ticks": 33,
+     "cpu_ns": 336337310,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "idle",
+   "frames": 3,
+   "framesPerSecond": 0.8571428571428571,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "idle",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "idle",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5027260740007478,
+   "tree_cpu_percent": 0.06400137381645751,
+   "tree_cpu_percent_ticks": 0.35946316349133184,
+   "tree_cpu_percent_including_markers": 0.09130671175628212,
+   "tree_pss_kib_median": 110097.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2527306090014463,
+     "pss_kib": 110093,
+     "cpu_ticks": 46,
+     "cpu_ns": 473592316,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5055592340013391,
+     "pss_kib": 110093,
+     "cpu_ticks": 46,
+     "cpu_ns": 473673659,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7584156259999872,
+     "pss_kib": 110093,
+     "cpu_ticks": 46,
+     "cpu_ns": 473673659,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0119190799996431,
+     "pss_kib": 110097,
+     "cpu_ticks": 47,
+     "cpu_ns": 474416121,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2651974270011124,
+     "pss_kib": 110097,
+     "cpu_ticks": 47,
+     "cpu_ns": 474441543,
+     "processes": 1
+    },
+    {
+     "at_s": 1.518018374001258,
+     "pss_kib": 110096,
+     "cpu_ticks": 47,
+     "cpu_ns": 474441543,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7709889320012735,
+     "pss_kib": 110097,
+     "cpu_ticks": 47,
+     "cpu_ns": 474537602,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0237951260005502,
+     "pss_kib": 110097,
+     "cpu_ticks": 47,
+     "cpu_ns": 474644109,
+     "processes": 1
+    },
+    {
+     "at_s": 2.276557151000816,
+     "pss_kib": 110097,
+     "cpu_ticks": 47,
+     "cpu_ns": 474644109,
+     "processes": 1
+    },
+    {
+     "at_s": 2.529361561000769,
+     "pss_kib": 110097,
+     "cpu_ticks": 47,
+     "cpu_ns": 474644109,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7824009760006447,
+     "pss_kib": 110105,
+     "cpu_ticks": 47,
+     "cpu_ns": 475372787,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0346568300010404,
+     "pss_kib": 110105,
+     "cpu_ticks": 47,
+     "cpu_ns": 475372787,
+     "processes": 1
+    },
+    {
+     "at_s": 3.286879506000332,
+     "pss_kib": 110105,
+     "cpu_ticks": 47,
+     "cpu_ns": 475372787,
+     "processes": 1
+    },
+    {
+     "at_s": 3.502720542001043,
+     "pss_kib": 110105,
+     "cpu_ticks": 47,
+     "cpu_ns": 476113800,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "walking",
+   "frames": 23,
+   "framesPerSecond": 6.571428571428571,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "walk",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "walking",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.502280245000293,
+   "tree_cpu_percent": 0.3705534070928289,
+   "tree_cpu_percent_ticks": 0.360059648662388,
+   "tree_cpu_percent_including_markers": 0.39064395316539996,
+   "tree_pss_kib_median": 110177.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2520756520007126,
+     "pss_kib": 110169,
+     "cpu_ticks": 35,
+     "cpu_ns": 353544358,
+     "processes": 1
+    },
+    {
+     "at_s": 0.504278141001123,
+     "pss_kib": 110169,
+     "cpu_ticks": 35,
+     "cpu_ns": 354220042,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7570243530008156,
+     "pss_kib": 110176,
+     "cpu_ticks": 35,
+     "cpu_ns": 355261380,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0095180780008377,
+     "pss_kib": 110177,
+     "cpu_ticks": 35,
+     "cpu_ns": 356520274,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2616264290008985,
+     "pss_kib": 110177,
+     "cpu_ticks": 35,
+     "cpu_ns": 357142735,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5140097319999768,
+     "pss_kib": 110177,
+     "cpu_ticks": 35,
+     "cpu_ns": 358341157,
+     "processes": 1
+    },
+    {
+     "at_s": 1.76627725400067,
+     "pss_kib": 110177,
+     "cpu_ticks": 35,
+     "cpu_ns": 359272473,
+     "processes": 1
+    },
+    {
+     "at_s": 2.018448439999702,
+     "pss_kib": 110177,
+     "cpu_ticks": 35,
+     "cpu_ns": 359862933,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2707724009997037,
+     "pss_kib": 110177,
+     "cpu_ticks": 35,
+     "cpu_ns": 361161316,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5232103489997826,
+     "pss_kib": 110177,
+     "cpu_ticks": 35,
+     "cpu_ns": 362215298,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7757668160011235,
+     "pss_kib": 110177,
+     "cpu_ticks": 35,
+     "cpu_ns": 362747887,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0293932540007518,
+     "pss_kib": 110181,
+     "cpu_ticks": 36,
+     "cpu_ns": 363835803,
+     "processes": 1
+    },
+    {
+     "at_s": 3.2819524580008874,
+     "pss_kib": 110081,
+     "cpu_ticks": 36,
+     "cpu_ns": 365186466,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5022759620005672,
+     "pss_kib": 110081,
+     "cpu_ticks": 36,
+     "cpu_ns": 365916343,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "reacting",
+   "frames": 19,
+   "framesPerSecond": 5.428571428571429,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "react",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "reacting",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5031216370007314,
+   "tree_cpu_percent": 0.32923427299646246,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.332466160380647,
+   "tree_pss_kib_median": 110112.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.25454968200028816,
+     "pss_kib": 110108,
+     "cpu_ticks": 36,
+     "cpu_ns": 362684654,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5070943999999145,
+     "pss_kib": 110105,
+     "cpu_ticks": 36,
+     "cpu_ns": 362684654,
+     "processes": 1
+    },
+    {
+     "at_s": 0.759616688999813,
+     "pss_kib": 110109,
+     "cpu_ticks": 36,
+     "cpu_ns": 363927411,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0118658610008424,
+     "pss_kib": 110109,
+     "cpu_ticks": 36,
+     "cpu_ns": 363927411,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2640746340002806,
+     "pss_kib": 110104,
+     "cpu_ticks": 36,
+     "cpu_ns": 365194468,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5163413919999584,
+     "pss_kib": 110107,
+     "cpu_ticks": 36,
+     "cpu_ns": 366836788,
+     "processes": 1
+    },
+    {
+     "at_s": 1.768548649000877,
+     "pss_kib": 110112,
+     "cpu_ticks": 36,
+     "cpu_ns": 367276749,
+     "processes": 1
+    },
+    {
+     "at_s": 2.020969637000235,
+     "pss_kib": 110112,
+     "cpu_ticks": 36,
+     "cpu_ns": 368342363,
+     "processes": 1
+    },
+    {
+     "at_s": 2.27304086300137,
+     "pss_kib": 110112,
+     "cpu_ticks": 36,
+     "cpu_ns": 368946814,
+     "processes": 1
+    },
+    {
+     "at_s": 2.525364413000716,
+     "pss_kib": 110112,
+     "cpu_ticks": 36,
+     "cpu_ns": 369457073,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7784240279997903,
+     "pss_kib": 110112,
+     "cpu_ticks": 36,
+     "cpu_ns": 371059384,
+     "processes": 1
+    },
+    {
+     "at_s": 3.030736352000531,
+     "pss_kib": 110112,
+     "cpu_ticks": 36,
+     "cpu_ns": 371824812,
+     "processes": 1
+    },
+    {
+     "at_s": 3.28292585500094,
+     "pss_kib": 110116,
+     "cpu_ticks": 37,
+     "cpu_ns": 372953678,
+     "processes": 1
+    },
+    {
+     "at_s": 3.503116885000054,
+     "pss_kib": 110116,
+     "cpu_ticks": 37,
+     "cpu_ns": 373662963,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "dancing",
+   "frames": 15,
+   "framesPerSecond": 4.285714285714286,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "dance",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "dancing",
+    "state": {
+     "shown": true,
+     "anim": "dance",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.501865001999249,
+   "tree_cpu_percent": 0.2426109451073754,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.25188820799671396,
+   "tree_pss_kib_median": 112371.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2521187500005908,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 360939627,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5039930860002642,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 361326925,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7559341399992263,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 361923101,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0078120170001057,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 362343090,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2599216279995744,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 363353983,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5118702380004834,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 363908476,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7639692880002258,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 364598117,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0170606470001076,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 365308104,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2689810850006324,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 365903343,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5211720200004493,
+     "pss_kib": 112371,
+     "cpu_ticks": 35,
+     "cpu_ns": 366646681,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7731239259992435,
+     "pss_kib": 112375,
+     "cpu_ticks": 35,
+     "cpu_ns": 367149346,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0254466379992664,
+     "pss_kib": 112375,
+     "cpu_ticks": 35,
+     "cpu_ns": 367668024,
+     "processes": 1
+    },
+    {
+     "at_s": 3.2776251249997586,
+     "pss_kib": 112375,
+     "cpu_ticks": 36,
+     "cpu_ns": 368235490,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5018607910005812,
+     "pss_kib": 112375,
+     "cpu_ticks": 36,
+     "cpu_ns": 369045244,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "hidden",
+   "frames": 2,
+   "framesPerSecond": 0.5714285714285714,
+   "flightStarts": 0,
+   "state": {
+    "shown": false,
+    "anim": "",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "hidden",
+    "state": {
+     "shown": false,
+     "anim": "",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5029726430002484,
+   "tree_cpu_percent": 0.0034377198130717337,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.010755579286434447,
+   "tree_pss_kib_median": 107598.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2525301589994342,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340596386,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5046068190004007,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340596386,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7569514459992206,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340596386,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0095888699997886,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340596386,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2622869669994543,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340596386,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5148397419998219,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340596386,
+     "processes": 1
+    },
+    {
+     "at_s": 1.767020749999574,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340691866,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0198885810004867,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340691866,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2719398279987217,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340691866,
+     "processes": 1
+    },
+    {
+     "at_s": 2.525229617998775,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340691866,
+     "processes": 1
+    },
+    {
+     "at_s": 2.777886355999726,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340691866,
+     "processes": 1
+    },
+    {
+     "at_s": 3.029952554999909,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340691866,
+     "processes": 1
+    },
+    {
+     "at_s": 3.282450124999741,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340767229,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5029655399994226,
+     "pss_kib": 107598,
+     "cpu_ticks": 33,
+     "cpu_ns": 340767229,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "sleeping",
+   "frames": 2,
+   "framesPerSecond": 0.5714285714285714,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "sleep",
+    "asleep": true,
+    "settled": true
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "sleeping",
+    "state": {
+     "shown": true,
+     "anim": "sleep",
+     "asleep": true,
+     "settled": true
+    }
+   },
+   "seconds": 3.503774300999794,
+   "tree_cpu_percent": 0.00554044400941621,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.03937990525263805,
+   "tree_pss_kib_median": 109992.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2528536259997054,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498062410,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5057441499993729,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498062410,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7585678029990959,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498062410,
+     "processes": 1
+    },
+    {
+     "at_s": 1.011590169999181,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498062410,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2654825409990735,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498062410,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5183374359985464,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498138712,
+     "processes": 1
+    },
+    {
+     "at_s": 1.771120063998751,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498138712,
+     "processes": 1
+    },
+    {
+     "at_s": 2.024490085999787,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498138712,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2774127479988238,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498138712,
+     "processes": 1
+    },
+    {
+     "at_s": 2.530332966998685,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498138712,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7831550419996347,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498138712,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0368723749998026,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498216657,
+     "processes": 1
+    },
+    {
+     "at_s": 3.289682530999926,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498216657,
+     "processes": 1
+    },
+    {
+     "at_s": 3.503764584998862,
+     "pss_kib": 109992,
+     "cpu_ticks": 49,
+     "cpu_ns": 498986717,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "flying",
+   "frames": 127,
+   "framesPerSecond": 36.285714285714285,
+   "flightStarts": 4,
+   "state": {
+    "shown": true,
+    "anim": "hop",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "flying",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5023299470012716,
+   "tree_cpu_percent": 1.4401448147409475,
+   "tree_cpu_percent_ticks": 1.801851785494284,
+   "tree_cpu_percent_including_markers": 1.7826918635538063,
+   "tree_pss_kib_median": 111952.5,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2530875049997121,
+     "pss_kib": 112029,
+     "cpu_ticks": 48,
+     "cpu_ns": 498542865,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5052459569997154,
+     "pss_kib": 112025,
+     "cpu_ticks": 50,
+     "cpu_ns": 505461806,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7575813130006281,
+     "pss_kib": 112029,
+     "cpu_ticks": 50,
+     "cpu_ns": 506142060,
+     "processes": 1
+    },
+    {
+     "at_s": 1.009913977000906,
+     "pss_kib": 112029,
+     "cpu_ticks": 50,
+     "cpu_ns": 507058620,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2619806050006446,
+     "pss_kib": 112033,
+     "cpu_ticks": 50,
+     "cpu_ns": 513188585,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5143358429995715,
+     "pss_kib": 111909,
+     "cpu_ticks": 51,
+     "cpu_ns": 520872311,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7667136979998759,
+     "pss_kib": 111913,
+     "cpu_ticks": 51,
+     "cpu_ns": 521625566,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0192187459997513,
+     "pss_kib": 111925,
+     "cpu_ticks": 51,
+     "cpu_ns": 522495222,
+     "processes": 1
+    },
+    {
+     "at_s": 2.271245298001304,
+     "pss_kib": 111929,
+     "cpu_ticks": 52,
+     "cpu_ns": 529164961,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5232582190001267,
+     "pss_kib": 111937,
+     "cpu_ticks": 53,
+     "cpu_ns": 536960796,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7755159250009456,
+     "pss_kib": 111941,
+     "cpu_ticks": 53,
+     "cpu_ns": 537747847,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0280105260007986,
+     "pss_kib": 111957,
+     "cpu_ticks": 53,
+     "cpu_ns": 538505775,
+     "processes": 1
+    },
+    {
+     "at_s": 3.280915589999495,
+     "pss_kib": 111948,
+     "cpu_ticks": 54,
+     "cpu_ns": 545942559,
+     "processes": 1
+    },
+    {
+     "at_s": 3.502323067001271,
+     "pss_kib": 111957,
+     "cpu_ticks": 55,
+     "cpu_ns": 552887294,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "coding",
+   "frames": 0,
+   "framesPerSecond": 0,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "code",
+    "asleep": false,
+    "settled": true
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "coding",
+    "state": {
+     "shown": true,
+     "anim": "code",
+     "asleep": false,
+     "settled": true
+    }
+   },
+   "seconds": 3.502951489001134,
+   "tree_cpu_percent": 0.006603874257468479,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.013072519029676226,
+   "tree_pss_kib_median": 112829.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.25281021000046167,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351680641,
+     "processes": 1
+    },
+    {
+     "at_s": 0.505643267000778,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351680641,
+     "processes": 1
+    },
+    {
+     "at_s": 0.758566067999709,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351680641,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0112992860013037,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351767250,
+     "processes": 1
+    },
+    {
+     "at_s": 1.264322439001262,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351767250,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5173414760010928,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351767250,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7703788180006086,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351767250,
+     "processes": 1
+    },
+    {
+     "at_s": 2.02315336600077,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351767250,
+     "processes": 1
+    },
+    {
+     "at_s": 2.276383436001197,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351767250,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5294216180009244,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351864381,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7822365400006674,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351864381,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0351163659997837,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351864381,
+     "processes": 1
+    },
+    {
+     "at_s": 3.2879501460010943,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 351864381,
+     "processes": 1
+    },
+    {
+     "at_s": 3.502943576000689,
+     "pss_kib": 112829,
+     "cpu_ticks": 34,
+     "cpu_ns": 352138565,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 1,
+   "impl": "mimo",
+   "scenario": "rail-idle",
+   "frames": 4,
+   "framesPerSecond": 1.1428571428571428,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "idle",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "rail-idle",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5024158119995263,
+   "tree_cpu_percent": 0.06480827801189185,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.09923424820355026,
+   "tree_pss_kib_median": 135136.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2530684859993926,
+     "pss_kib": 135144,
+     "cpu_ticks": 65,
+     "cpu_ns": 659546342,
+     "processes": 1
+    },
+    {
+     "at_s": 0.506191315000251,
+     "pss_kib": 135144,
+     "cpu_ticks": 65,
+     "cpu_ns": 659641219,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7602467840006284,
+     "pss_kib": 135132,
+     "cpu_ticks": 65,
+     "cpu_ns": 659641219,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0140177329994913,
+     "pss_kib": 135136,
+     "cpu_ticks": 65,
+     "cpu_ns": 660504988,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2665971669994178,
+     "pss_kib": 135136,
+     "cpu_ticks": 65,
+     "cpu_ns": 660531251,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5190273520001938,
+     "pss_kib": 135136,
+     "cpu_ticks": 65,
+     "cpu_ns": 660531251,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7717987920004816,
+     "pss_kib": 135136,
+     "cpu_ticks": 65,
+     "cpu_ns": 660600802,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0247660820004967,
+     "pss_kib": 135136,
+     "cpu_ticks": 65,
+     "cpu_ns": 660661165,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2772137239990116,
+     "pss_kib": 135136,
+     "cpu_ticks": 65,
+     "cpu_ns": 660661165,
+     "processes": 1
+    },
+    {
+     "at_s": 2.529826120000507,
+     "pss_kib": 135136,
+     "cpu_ticks": 65,
+     "cpu_ns": 660661165,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7821208389996173,
+     "pss_kib": 135144,
+     "cpu_ticks": 65,
+     "cpu_ns": 661349002,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0345958699999755,
+     "pss_kib": 135144,
+     "cpu_ticks": 65,
+     "cpu_ns": 661349002,
+     "processes": 1
+    },
+    {
+     "at_s": 3.2870008339996275,
+     "pss_kib": 135144,
+     "cpu_ticks": 65,
+     "cpu_ns": 661414374,
+     "processes": 1
+    },
+    {
+     "at_s": 3.502410951999991,
+     "pss_kib": 135144,
+     "cpu_ticks": 65,
+     "cpu_ns": 662134722,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "rail-idle",
+   "frames": 4,
+   "framesPerSecond": 1.1428571428571428,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "idle",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "rail-idle",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5029419179991237,
+   "tree_cpu_percent": 0.06984003799010986,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.1066246054725745,
+   "tree_pss_kib_median": 134980.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2520674829993368,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 466495221,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5049874519991135,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 466495221,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7585209349999786,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 466495221,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0116406379984255,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 467124344,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2646135889990546,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 467150382,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5176186129992857,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 467245483,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7704958389986132,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 467335878,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0235535579995485,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 467335878,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2764728989986907,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 467335878,
+     "processes": 1
+    },
+    {
+     "at_s": 2.530816236998362,
+     "pss_kib": 134980,
+     "cpu_ticks": 46,
+     "cpu_ns": 467335878,
+     "processes": 1
+    },
+    {
+     "at_s": 2.784490508998715,
+     "pss_kib": 134920,
+     "cpu_ticks": 46,
+     "cpu_ns": 468350139,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0375513629987836,
+     "pss_kib": 134920,
+     "cpu_ticks": 46,
+     "cpu_ns": 468440604,
+     "processes": 1
+    },
+    {
+     "at_s": 3.29043182499845,
+     "pss_kib": 134920,
+     "cpu_ticks": 46,
+     "cpu_ns": 468440604,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5029349029991863,
+     "pss_kib": 134920,
+     "cpu_ticks": 46,
+     "cpu_ns": 469390925,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "coding",
+   "frames": 0,
+   "framesPerSecond": 0,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "code",
+    "asleep": false,
+    "settled": true
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "coding",
+    "state": {
+     "shown": true,
+     "anim": "code",
+     "asleep": false,
+     "settled": true
+    }
+   },
+   "seconds": 3.5032110309985,
+   "tree_cpu_percent": 0.0072450283982260525,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.005751922970582992,
+   "tree_pss_kib_median": 112075.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2527954179986409,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487142921,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5057355139997526,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487142921,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7585943069989298,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487142921,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0113700469992182,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487142921,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2640485929987335,
+     "pss_kib": 112074,
+     "cpu_ticks": 47,
+     "cpu_ns": 487252437,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5169450889989093,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487252437,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7698713959998713,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487252437,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0226440289989114,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487252437,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2753002359986567,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487252437,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5281971209988114,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487252437,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7812315089995536,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487344423,
+     "processes": 1
+    },
+    {
+     "at_s": 3.034040554999592,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487344423,
+     "processes": 1
+    },
+    {
+     "at_s": 3.2868122319996473,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487344423,
+     "processes": 1
+    },
+    {
+     "at_s": 3.503203267999197,
+     "pss_kib": 112075,
+     "cpu_ticks": 47,
+     "cpu_ns": 487344423,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "flying",
+   "frames": 127,
+   "framesPerSecond": 36.285714285714285,
+   "flightStarts": 4,
+   "state": {
+    "shown": true,
+    "anim": "hop",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "flying",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5028139280002506,
+   "tree_cpu_percent": 1.7361785630896314,
+   "tree_cpu_percent_ticks": 1.7965070669033116,
+   "tree_cpu_percent_including_markers": 2.0980276574940793,
+   "tree_pss_kib_median": 109988.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2528060499989806,
+     "pss_kib": 110074,
+     "cpu_ticks": 47,
+     "cpu_ns": 483367031,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5061083429991413,
+     "pss_kib": 110078,
+     "cpu_ticks": 48,
+     "cpu_ns": 492442980,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7589668599994184,
+     "pss_kib": 110082,
+     "cpu_ticks": 48,
+     "cpu_ns": 493299735,
+     "processes": 1
+    },
+    {
+     "at_s": 1.011961844000325,
+     "pss_kib": 110082,
+     "cpu_ticks": 49,
+     "cpu_ns": 494251333,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2648018889995,
+     "pss_kib": 110086,
+     "cpu_ticks": 49,
+     "cpu_ns": 502049345,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5177451359995757,
+     "pss_kib": 109958,
+     "cpu_ticks": 50,
+     "cpu_ns": 511075882,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7708053289989039,
+     "pss_kib": 109962,
+     "cpu_ticks": 50,
+     "cpu_ns": 512060850,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0237364120002894,
+     "pss_kib": 109974,
+     "cpu_ticks": 50,
+     "cpu_ns": 513060859,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2769302500000776,
+     "pss_kib": 109982,
+     "cpu_ticks": 51,
+     "cpu_ns": 521691597,
+     "processes": 1
+    },
+    {
+     "at_s": 2.529846309998902,
+     "pss_kib": 109986,
+     "cpu_ticks": 52,
+     "cpu_ns": 529833073,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7829312279991427,
+     "pss_kib": 109990,
+     "cpu_ticks": 52,
+     "cpu_ns": 530675803,
+     "processes": 1
+    },
+    {
+     "at_s": 3.035984636999274,
+     "pss_kib": 110006,
+     "cpu_ticks": 52,
+     "cpu_ns": 531687981,
+     "processes": 1
+    },
+    {
+     "at_s": 3.2889089489999606,
+     "pss_kib": 109906,
+     "cpu_ticks": 53,
+     "cpu_ns": 540584941,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5028071500000806,
+     "pss_kib": 109918,
+     "cpu_ticks": 53,
+     "cpu_ns": 549012164,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "sleeping",
+   "frames": 2,
+   "framesPerSecond": 0.5714285714285714,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "sleep",
+    "asleep": true,
+    "settled": true
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "sleeping",
+    "state": {
+     "shown": true,
+     "anim": "sleep",
+     "asleep": true,
+     "settled": true
+    }
+   },
+   "seconds": 3.502971369000079,
+   "tree_cpu_percent": 0.006554918680826621,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.05113989842604277,
+   "tree_pss_kib_median": 112686.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.252803772000334,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473158733,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5055674109989923,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473231516,
+     "processes": 1
+    },
+    {
+     "at_s": 0.759264225998777,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473231516,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0120254769990424,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473231516,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2649394199997914,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473231516,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5186072559990862,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473231516,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7714128389998223,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473231516,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0241080959985993,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473341148,
+     "processes": 1
+    },
+    {
+     "at_s": 2.276890425999227,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473341148,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5297166709988232,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473341148,
+     "processes": 1
+    },
+    {
+     "at_s": 2.782744467000157,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473341148,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0356758239995543,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473341148,
+     "processes": 1
+    },
+    {
+     "at_s": 3.289209643999129,
+     "pss_kib": 112686,
+     "cpu_ticks": 46,
+     "cpu_ns": 473341148,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5029638599989994,
+     "pss_kib": 112686,
+     "cpu_ticks": 47,
+     "cpu_ns": 474524281,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "hidden",
+   "frames": 2,
+   "framesPerSecond": 0.5714285714285714,
+   "flightStarts": 0,
+   "state": {
+    "shown": false,
+    "anim": "",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "hidden",
+    "state": {
+     "shown": false,
+     "anim": "",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5027621290009847,
+   "tree_cpu_percent": 0.006578409266918604,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.026540197871362185,
+   "tree_pss_kib_median": 109472.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.25277667500085954,
+     "pss_kib": 109471,
+     "cpu_ticks": 45,
+     "cpu_ns": 463820421,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5057571939996706,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 463820421,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7584805110000161,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 463820421,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0115764950005541,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 463820421,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2644322180003655,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 463820421,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5172670530009782,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 463928728,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7700272950005456,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 463928728,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0229278580009122,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 463928728,
+     "processes": 1
+    },
+    {
+     "at_s": 2.27601671299999,
+     "pss_kib": 109471,
+     "cpu_ticks": 45,
+     "cpu_ns": 463928728,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5289188550013932,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 463928728,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7819246369999746,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 463928728,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0349386320012854,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 464003443,
+     "processes": 1
+    },
+    {
+     "at_s": 3.2877154140005587,
+     "pss_kib": 109472,
+     "cpu_ticks": 45,
+     "cpu_ns": 464003443,
+     "processes": 1
+    },
+    {
+     "at_s": 3.502755686000455,
+     "pss_kib": 109480,
+     "cpu_ticks": 45,
+     "cpu_ns": 464649844,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "dancing",
+   "frames": 15,
+   "framesPerSecond": 4.285714285714286,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "dance",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "dancing",
+    "state": {
+     "shown": true,
+     "anim": "dance",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5027051669985667,
+   "tree_cpu_percent": 0.2804203005587793,
+   "tree_cpu_percent_ticks": 0.3593125436086966,
+   "tree_cpu_percent_including_markers": 0.289728467460366,
+   "tree_pss_kib_median": 112111.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2529090139996697,
+     "pss_kib": 112111,
+     "cpu_ticks": 47,
+     "cpu_ns": 478499814,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5056409919998259,
+     "pss_kib": 112111,
+     "cpu_ticks": 47,
+     "cpu_ns": 479045190,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7584772449990851,
+     "pss_kib": 112111,
+     "cpu_ticks": 47,
+     "cpu_ns": 479787300,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0113150959987252,
+     "pss_kib": 112111,
+     "cpu_ticks": 47,
+     "cpu_ns": 480472576,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2643411209992337,
+     "pss_kib": 112111,
+     "cpu_ticks": 47,
+     "cpu_ns": 481620224,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5172399219991348,
+     "pss_kib": 112111,
+     "cpu_ticks": 47,
+     "cpu_ns": 482355111,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7702211949999764,
+     "pss_kib": 112111,
+     "cpu_ticks": 47,
+     "cpu_ns": 483032833,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0231118430001516,
+     "pss_kib": 112111,
+     "cpu_ticks": 47,
+     "cpu_ns": 483663836,
+     "processes": 1
+    },
+    {
+     "at_s": 2.275959888000216,
+     "pss_kib": 112111,
+     "cpu_ticks": 47,
+     "cpu_ns": 484325367,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5288463389988465,
+     "pss_kib": 112111,
+     "cpu_ticks": 48,
+     "cpu_ns": 485057493,
+     "processes": 1
+    },
+    {
+     "at_s": 2.781769927998539,
+     "pss_kib": 112111,
+     "cpu_ticks": 48,
+     "cpu_ns": 485681188,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0360013879999315,
+     "pss_kib": 112111,
+     "cpu_ticks": 48,
+     "cpu_ns": 486304170,
+     "processes": 1
+    },
+    {
+     "at_s": 3.288769095999669,
+     "pss_kib": 112111,
+     "cpu_ticks": 48,
+     "cpu_ns": 486979048,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5026983879997715,
+     "pss_kib": 112111,
+     "cpu_ticks": 48,
+     "cpu_ns": 487881422,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "reacting",
+   "frames": 19,
+   "framesPerSecond": 5.428571428571429,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "react",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "reacting",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5028289609999774,
+   "tree_cpu_percent": 0.3567439023037907,
+   "tree_cpu_percent_ticks": 0.3596368934016926,
+   "tree_cpu_percent_including_markers": 0.37014876102596217,
+   "tree_pss_kib_median": 112595.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.252875619000406,
+     "pss_kib": 112579,
+     "cpu_ticks": 47,
+     "cpu_ns": 476098948,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5056245110008604,
+     "pss_kib": 112579,
+     "cpu_ticks": 47,
+     "cpu_ns": 476098948,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7584217010007706,
+     "pss_kib": 112587,
+     "cpu_ticks": 47,
+     "cpu_ns": 477492923,
+     "processes": 1
+    },
+    {
+     "at_s": 1.011210699000003,
+     "pss_kib": 112587,
+     "cpu_ticks": 47,
+     "cpu_ns": 477492923,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2640232220001053,
+     "pss_kib": 112587,
+     "cpu_ticks": 47,
+     "cpu_ns": 478062902,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5168768280000222,
+     "pss_kib": 112595,
+     "cpu_ticks": 47,
+     "cpu_ns": 480103362,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7696215699997992,
+     "pss_kib": 112595,
+     "cpu_ticks": 47,
+     "cpu_ns": 480723960,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0223531370011187,
+     "pss_kib": 112595,
+     "cpu_ticks": 47,
+     "cpu_ns": 482033201,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2751067520002834,
+     "pss_kib": 112595,
+     "cpu_ticks": 47,
+     "cpu_ns": 482712102,
+     "processes": 1
+    },
+    {
+     "at_s": 2.52790471300068,
+     "pss_kib": 112595,
+     "cpu_ticks": 47,
+     "cpu_ns": 483328002,
+     "processes": 1
+    },
+    {
+     "at_s": 2.780721519000508,
+     "pss_kib": 112595,
+     "cpu_ticks": 48,
+     "cpu_ns": 485383919,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0334579740010668,
+     "pss_kib": 112595,
+     "cpu_ticks": 48,
+     "cpu_ns": 486018506,
+     "processes": 1
+    },
+    {
+     "at_s": 3.2862788740003452,
+     "pss_kib": 112603,
+     "cpu_ticks": 48,
+     "cpu_ns": 487502238,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5028211480002938,
+     "pss_kib": 112603,
+     "cpu_ticks": 48,
+     "cpu_ns": 488357543,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "walking",
+   "frames": 23,
+   "framesPerSecond": 6.571428571428571,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "walk",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "walking",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5029199269993114,
+   "tree_cpu_percent": 0.45356896877654457,
+   "tree_cpu_percent_ticks": 0.359671335584931,
+   "tree_cpu_percent_including_markers": 0.4714790615881311,
+   "tree_pss_kib_median": 114327.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.2528959049996047,
+     "pss_kib": 114319,
+     "cpu_ticks": 47,
+     "cpu_ns": 474546350,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5055930569997145,
+     "pss_kib": 114319,
+     "cpu_ticks": 47,
+     "cpu_ns": 475277324,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7583070019991283,
+     "pss_kib": 114327,
+     "cpu_ticks": 47,
+     "cpu_ns": 476693973,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0109803319992352,
+     "pss_kib": 114327,
+     "cpu_ticks": 47,
+     "cpu_ns": 477956154,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2638225800001237,
+     "pss_kib": 114327,
+     "cpu_ticks": 47,
+     "cpu_ns": 478897317,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5165435929993691,
+     "pss_kib": 114327,
+     "cpu_ticks": 47,
+     "cpu_ns": 480275934,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7692215650004073,
+     "pss_kib": 114327,
+     "cpu_ticks": 47,
+     "cpu_ns": 481585002,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0218994110000494,
+     "pss_kib": 114327,
+     "cpu_ticks": 47,
+     "cpu_ns": 482278049,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2745716980007273,
+     "pss_kib": 114331,
+     "cpu_ticks": 47,
+     "cpu_ns": 483623732,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5273186180002085,
+     "pss_kib": 114331,
+     "cpu_ticks": 48,
+     "cpu_ns": 485023758,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7800933349990373,
+     "pss_kib": 114331,
+     "cpu_ticks": 48,
+     "cpu_ns": 485858923,
+     "processes": 1
+    },
+    {
+     "at_s": 3.0332119909999165,
+     "pss_kib": 114331,
+     "cpu_ticks": 48,
+     "cpu_ns": 487157001,
+     "processes": 1
+    },
+    {
+     "at_s": 3.28607868600011,
+     "pss_kib": 114211,
+     "cpu_ticks": 48,
+     "cpu_ns": 488562581,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5029123869990144,
+     "pss_kib": 114211,
+     "cpu_ticks": 48,
+     "cpu_ns": 489398522,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "idle",
+   "frames": 4,
+   "framesPerSecond": 1.1428571428571428,
+   "flightStarts": 0,
+   "state": {
+    "shown": true,
+    "anim": "idle",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "idle",
+    "state": {
+     "shown": true,
+     "anim": "idle",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.5025110120004683,
+   "tree_cpu_percent": 0.052627406232281806,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.07419000228969594,
+   "tree_pss_kib_median": 110173.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.25197081500118657,
+     "pss_kib": 110169,
+     "cpu_ticks": 47,
+     "cpu_ns": 479789215,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5041319980009575,
+     "pss_kib": 110169,
+     "cpu_ticks": 47,
+     "cpu_ns": 479789215,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7568787910004176,
+     "pss_kib": 110169,
+     "cpu_ticks": 47,
+     "cpu_ns": 479916546,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0094238559995574,
+     "pss_kib": 110173,
+     "cpu_ticks": 47,
+     "cpu_ns": 480529636,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2630627660000755,
+     "pss_kib": 110173,
+     "cpu_ticks": 47,
+     "cpu_ns": 480552333,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5151229700004478,
+     "pss_kib": 110173,
+     "cpu_ticks": 47,
+     "cpu_ns": 480552333,
+     "processes": 1
+    },
+    {
+     "at_s": 1.767914562000442,
+     "pss_kib": 110173,
+     "cpu_ticks": 47,
+     "cpu_ns": 480615222,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0201462730001367,
+     "pss_kib": 110173,
+     "cpu_ticks": 47,
+     "cpu_ns": 480615222,
+     "processes": 1
+    },
+    {
+     "at_s": 2.2722145540010388,
+     "pss_kib": 110173,
+     "cpu_ticks": 47,
+     "cpu_ns": 480682740,
+     "processes": 1
+    },
+    {
+     "at_s": 2.5244996580004226,
+     "pss_kib": 110173,
+     "cpu_ticks": 47,
+     "cpu_ns": 480682740,
+     "processes": 1
+    },
+    {
+     "at_s": 2.7767348640009004,
+     "pss_kib": 110181,
+     "cpu_ticks": 47,
+     "cpu_ns": 481250592,
+     "processes": 1
+    },
+    {
+     "at_s": 3.028807267000957,
+     "pss_kib": 110181,
+     "cpu_ticks": 47,
+     "cpu_ns": 481250592,
+     "processes": 1
+    },
+    {
+     "at_s": 3.280965650001235,
+     "pss_kib": 110181,
+     "cpu_ticks": 47,
+     "cpu_ns": 481250592,
+     "processes": 1
+    },
+    {
+     "at_s": 3.502506214999812,
+     "pss_kib": 110181,
+     "cpu_ticks": 48,
+     "cpu_ns": 481926969,
+     "processes": 1
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "impl": "mimo",
+   "scenario": "disabled",
+   "frames": 2,
+   "framesPerSecond": 0.5714285714285714,
+   "flightStarts": 0,
+   "state": {
+    "shown": false,
+    "anim": "",
+    "asleep": false,
+    "settled": false
+   },
+   "ready": {
+    "impl": "mimo",
+    "scenario": "disabled",
+    "state": {
+     "shown": false,
+     "anim": "",
+     "asleep": false,
+     "settled": false
+    }
+   },
+   "seconds": 3.502826558000379,
+   "tree_cpu_percent": 0.0059523341447988015,
+   "tree_cpu_percent_ticks": 0.0,
+   "tree_cpu_percent_including_markers": 0.018746803163867325,
+   "tree_pss_kib_median": 103929.0,
+   "max_processes": 1,
+   "samples": [
+    {
+     "at_s": 0.25221218899969244,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348094307,
+     "processes": 1
+    },
+    {
+     "at_s": 0.5046979859998828,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348168149,
+     "processes": 1
+    },
+    {
+     "at_s": 0.7566255010005989,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348168149,
+     "processes": 1
+    },
+    {
+     "at_s": 1.0090145289996144,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348168149,
+     "processes": 1
+    },
+    {
+     "at_s": 1.2612063350006792,
+     "pss_kib": 103928,
+     "cpu_ticks": 34,
+     "cpu_ns": 348168149,
+     "processes": 1
+    },
+    {
+     "at_s": 1.5133997419998195,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348168149,
+     "processes": 1
+    },
+    {
+     "at_s": 1.7654938159994344,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348168149,
+     "processes": 1
+    },
+    {
+     "at_s": 2.0176347920005355,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348259532,
+     "processes": 1
+    },
+    {
+     "at_s": 2.269659994999529,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348259532,
+     "processes": 1
+    },
+    {
+     "at_s": 2.522241426999244,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348259532,
+     "processes": 1
+    },
+    {
+     "at_s": 2.775350174999403,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348259532,
+     "processes": 1
+    },
+    {
+     "at_s": 3.028014016999805,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348259532,
+     "processes": 1
+    },
+    {
+     "at_s": 3.2807269010008895,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348259532,
+     "processes": 1
+    },
+    {
+     "at_s": 3.5028196460007166,
+     "pss_kib": 103929,
+     "cpu_ticks": 34,
+     "cpu_ns": 348335737,
+     "processes": 1
+    }
+   ]
+  }
+ ],
+ "summary": {
+  "disabled": {
+   "tree_cpu_percent": 0.006369455723767117,
+   "tree_pss_kib_median": 102928.5,
+   "max_processes": 1.0,
+   "framesPerSecond": 0.5714285714285714
+  },
+  "idle": {
+   "tree_cpu_percent": 0.05831439002436966,
+   "tree_pss_kib_median": 110135.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 1.0
+  },
+  "walking": {
+   "tree_cpu_percent": 0.4120611879346867,
+   "tree_pss_kib_median": 112252.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 6.571428571428571
+  },
+  "reacting": {
+   "tree_cpu_percent": 0.3429890876501266,
+   "tree_pss_kib_median": 111353.5,
+   "max_processes": 1.0,
+   "framesPerSecond": 5.428571428571429
+  },
+  "dancing": {
+   "tree_cpu_percent": 0.2615156228330774,
+   "tree_pss_kib_median": 112241.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 4.285714285714286
+  },
+  "hidden": {
+   "tree_cpu_percent": 0.005008064539995169,
+   "tree_pss_kib_median": 108535.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 0.5714285714285714
+  },
+  "sleeping": {
+   "tree_cpu_percent": 0.006047681345121415,
+   "tree_pss_kib_median": 111339.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 0.5714285714285714
+  },
+  "flying": {
+   "tree_cpu_percent": 1.5881616889152894,
+   "tree_pss_kib_median": 110970.25,
+   "max_processes": 1.0,
+   "framesPerSecond": 36.285714285714285
+  },
+  "coding": {
+   "tree_cpu_percent": 0.006924451327847266,
+   "tree_pss_kib_median": 112452.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 0.0
+  },
+  "rail-idle": {
+   "tree_cpu_percent": 0.06732415800100086,
+   "tree_pss_kib_median": 135058.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 1.1428571428571428
+  }
+ },
+ "checks": {
+  "disabled": true,
+  "hidden": true,
+  "sleeping": true,
+  "idle": true,
+  "rail-idle": true,
+  "coding": true,
+  "flying-cpu": true,
+  "idle-pss": true
+ },
+ "baseline": "/home/zdito/.config/quickshell/docs/eshell-pets-redesign-2026-10-23/perf/after-isolated/results.json",
+ "historical_summary": {
+  "disabled": {
+   "tree_cpu_percent": 0.0,
+   "tree_pss_kib_median": 99790.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 0.5714285714285714
+  },
+  "idle": {
+   "tree_cpu_percent": 0.0,
+   "tree_pss_kib_median": 107742.5,
+   "max_processes": 1.0,
+   "framesPerSecond": 1.2857142857142856
+  },
+  "walking": {
+   "tree_cpu_percent": 0.4282776446330647,
+   "tree_pss_kib_median": 107704.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 6.285714285714286
+  },
+  "reacting": {
+   "tree_cpu_percent": 0.42829621601417345,
+   "tree_pss_kib_median": 107635.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 5.142857142857143
+  },
+  "dancing": {
+   "tree_cpu_percent": 0.14276828795376928,
+   "tree_pss_kib_median": 109235.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 4.285714285714286
+  },
+  "hidden": {
+   "tree_cpu_percent": 0.0,
+   "tree_pss_kib_median": 103998.0,
+   "max_processes": 1.0,
+   "framesPerSecond": 0.5714285714285714
+  },
+  "sleeping": {
+   "tree_cpu_percent": 0.0,
+   "tree_pss_kib_median": 106709.5,
+   "max_processes": 1.0,
+   "framesPerSecond": 0.5714285714285714
+  }
+ },
+ "checks_note": "Ejecutado con baseline por defecto after-isolated (falla idle-pss por deriva del entorno); idle-pss recalculado contra phase1-matched, la misma base de phase2-fixes: 110135 <= 115296+2048."
+}

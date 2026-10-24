@@ -1,0 +1,72 @@
+[
+  {
+    "fixture": "layout-routing-regression.qml",
+    "platform": "wayland",
+    "result": "PASS"
+  },
+  {
+    "fixture": "media-dock-surfaces-regression.qml",
+    "platform": "wayland",
+    "result": "PASS"
+  },
+  {
+    "fixture": "pill-composition-regression.qml",
+    "platform": "wayland",
+    "result": "PASS"
+  },
+  {
+    "fixture": "bar-layout-transition-regression.qml",
+    "platform": "wayland",
+    "result": "PASS"
+  },
+  {
+    "fixture": "pill-interface-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  },
+  {
+    "fixture": "status-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  },
+  {
+    "fixture": "clock-reel-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  },
+  {
+    "fixture": "island-status-adapter-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  },
+  {
+    "fixture": "workspace-styles-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  },
+  {
+    "fixture": "pacman-motion-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  },
+  {
+    "fixture": "neon-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  },
+  {
+    "fixture": "optional-modules-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  },
+  {
+    "fixture": "module-composer-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  },
+  {
+    "fixture": "compact-island-regression.qml",
+    "platform": "offscreen",
+    "result": "PASS"
+  }
+]

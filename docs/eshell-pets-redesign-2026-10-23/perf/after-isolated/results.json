@@ -1,0 +1,1469 @@
+{
+  "environment": {
+    "utc": "2026-10-23T15:44:01Z",
+    "platform": "Linux-7.3.0-3-cachyos-x86_64-with-glibc2.44",
+    "quickshell": {
+      "exit": 0,
+      "stdout": "Quickshell 0.3.2 (revision , distributed by Arch Linux)\n",
+      "stderr": ""
+    },
+    "hyprland": {
+      "exit": 0,
+      "stdout": "Hyprland 0.56.2 built from branch v0.56.2 at commit efb50993780079460b0cbed1363e2166a2de1d9f clean ([gha] Nix: update inputs).\nDate: Wed Aug 5 14:13:21 2026\nTag: v0.56.2, commits: 7661\n\nLibraries:\nHyprgraphics: built against 0.5.1, system has 0.5.1\nHyprutils: built against 0.14.2, system has 0.14.3\nHyprcursor: built against 0.1.13, system has 0.1.13\nHyprlang: built against 0.6.8, system has 0.6.8\nAquamarine: built against 0.15.1, system has 0.15.1\n\nVersion ABI string: efb50993780079460b0cbed1363e2166a2de1d9f_aq_0.15_hu_0.14_hg_0.5_hc_0.1_hlg_0.6\nno flags were set\n\n",
+      "stderr": ""
+    },
+    "monitors": {
+      "exit": 0,
+      "stdout": "[{\n    \"id\": 0,\n    \"name\": \"DP-1\",\n    \"description\": \"Microstep MSI MAG251RX 0x000003CE\",\n    \"make\": \"Microstep\",\n    \"model\": \"MSI MAG251RX\",\n    \"serial\": \"0x000003CE\",\n    \"width\": 1920,\n    \"height\": 1080,\n    \"physicalWidth\": 540,\n    \"physicalHeight\": 300,\n    \"refreshRate\": 239.96400,\n    \"x\": 0,\n    \"y\": 0,\n    \"activeWorkspace\": {\n        \"id\": 1,\n        \"name\": \"1\"\n    },\n    \"specialWorkspace\": {\n        \"id\": 0,\n        \"name\": \"\"\n    },\n    \"reserved\": [0, 46, 0, 0],\n    \"scale\": 1,\n    \"transform\": 0,\n    \"focused\": true,\n    \"dpmsStatus\": true,\n    \"vrr\": false,\n    \"solitary\": \"0\",\n    \"solitaryBlockedBy\": [\"WINDOWED\",\"CANDIDATE\"],\n    \"activelyTearing\": false,\n    \"tearingBlockedBy\": [\"NOT_TORN\",\"USER\",\"CANDIDATE\"],\n    \"directScanoutTo\": \"0\",\n    \"directScanoutBlockedBy\": [\"USER\",\"SW\",\"CANDIDATE\"],\n    \"disabled\": false,\n    \"currentFormat\": \"XRGB8888\",\n    \"mirrorOf\": \"none\",\n    \"availableModes\": [\"1920x1080@60.00Hz\",\"1920x1080@239.96Hz\",\"1920x1080@144.00Hz\",\"1920x1080@119.88Hz\",\"1920x1080@119.98Hz\",\"1920x1080@99.93Hz\",\"1920x1080@59.94Hz\",\"1920x1080@50.00Hz\",\"1680x1050@59.88Hz\",\"1280x1024@75.03Hz\",\"1280x1024@60.02Hz\",\"1280x720@59.94Hz\",\"1280x720@50.00Hz\",\"1024x768@119.99Hz\",\"1024x768@99.97Hz\",\"1024x768@75.03Hz\",\"1024x768@70.07Hz\",\"1024x768@60.00Hz\",\"800x600@119.97Hz\",\"800x600@99.66Hz\",\"800x600@75.00Hz\",\"800x600@72.19Hz\",\"800x600@60.32Hz\",\"800x600@56.25Hz\",\"720x576@50.00Hz\",\"720x480@59.94Hz\",\"640x480@119.52Hz\",\"640x480@99.77Hz\",\"640x480@75.00Hz\",\"640x480@72.81Hz\",\"640x480@59.94Hz\",\"640x480@59.93Hz\"],\n    \"colorManagementPreset\": \"srgb\",\n    \"sdrBrightness\": 1,\n    \"sdrSaturation\": 1,\n    \"sdrMinLuminance\": 0.2,\n    \"sdrMaxLuminance\": 80,\n    \"hardwareCursorsInUse\": false\n}]\n",
+      "stderr": ""
+    },
+    "source_sha256": {
+      "bar/pets/PetActor.qml": "57df4d34e5fdacfdf3477adc556fe163ed9e65e2585a766c416e436b56327511",
+      "bar/pets/PetLayer.qml": "3ffafb8d333d9c7ad6b3bd35f4ade870811ff42e02a49f1179d354165384990e",
+      "bar/pets/PetPack.qml": "f835aee39f2cbe6279dcfa224f76f66a1d2f11571e3bbd4f9f19e1b28a561782",
+      "bar/pets/PetPerch.qml": "c78a31238a531c36824be31c47cee3f9bf35cb9040cf8bafbacd8a1d6e74b6d0",
+      "bar/pets/PetSprite.qml": "4100ef81f5ce9748f0afddfceae58e4d5b1ca6c66c9e665bfb7b300543653f46",
+      "bar/pets/packs/mimo/atlas.json": "2e4dc70337d3043caae6b96d3c539addc7486a4dc48bf500a6840296d76976fa",
+      "bar/pets/packs/mimo/atlas.png": "6090f5871dd035c5d510d38e84e98cfd21cab4d6d0fd6651edf21f99774a1536",
+      "bar/pets-performance.qml": "c7609581ea3cb66a03166e8418dbb281b0549172ab373ab557992b2b3dfb025e",
+      "bar/tests/pets-performance.py": "ad56817f0c9f175bd2af187e3361184a59bf4696265d500c1bd2e8f5be2ff45d",
+      "bar/tests/sample-process.py": "f1224a42e68c32605322f8339de99e73c4ef79c6075b28d45faf2b314188d60a"
+    },
+    "seconds_per_scenario": 3.5,
+    "rounds": 2,
+    "impl": "mimo",
+    "method": "same 200x100 Wayland surface; legacy PetHost 36x36 or Mimo on a 160x60 line perch at x2; frames counted with Window.frameSwapped (no render driver); 1s warmup excluded, Mimo sleeping settles before measuring; CPU one core"
+  },
+  "runs": [
+    {
+      "round": 1,
+      "impl": "mimo",
+      "scenario": "disabled",
+      "frames": 2,
+      "framesPerSecond": 0.5714285714285714,
+      "state": {
+        "shown": false,
+        "anim": "",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "disabled",
+        "state": {
+          "shown": false,
+          "anim": "",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.501727126998958,
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 98634.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25131212299857,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5028972929994779,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7543635239999276,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0060677980000037,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 1.257591252999191,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5089762049992714,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7605763679985102,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 2.012097584000003,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 2.263583823998488,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5151621639997757,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7671175239993318,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0191096119997383,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2709902949991374,
+          "pss_kib": 98634,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5017207889995916,
+          "pss_kib": 98638,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "impl": "mimo",
+      "scenario": "idle",
+      "frames": 3,
+      "framesPerSecond": 0.8571428571428571,
+      "state": {
+        "shown": true,
+        "anim": "blink",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "idle",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.5021547230007855,
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 106657.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.2521816400003445,
+          "pss_kib": 106649,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5048660989996279,
+          "pss_kib": 106649,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7570121810003911,
+          "pss_kib": 106649,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0092427199997474,
+          "pss_kib": 106653,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2613386049997644,
+          "pss_kib": 106653,
+          "processes": 1
+        },
+        {
+          "at_s": 1.513566436000474,
+          "pss_kib": 106657,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7656668670006184,
+          "pss_kib": 106657,
+          "processes": 1
+        },
+        {
+          "at_s": 2.0179524260001926,
+          "pss_kib": 106657,
+          "processes": 1
+        },
+        {
+          "at_s": 2.270049058999575,
+          "pss_kib": 106657,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5222344900012104,
+          "pss_kib": 106665,
+          "processes": 1
+        },
+        {
+          "at_s": 2.774280304000058,
+          "pss_kib": 106665,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0265193810009805,
+          "pss_kib": 106665,
+          "processes": 1
+        },
+        {
+          "at_s": 3.278581792001205,
+          "pss_kib": 106665,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5021472570006154,
+          "pss_kib": 106669,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "impl": "mimo",
+      "scenario": "walking",
+      "frames": 22,
+      "framesPerSecond": 6.285714285714286,
+      "state": {
+        "shown": true,
+        "anim": "walk",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "walking",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.5025558340003045,
+      "tree_cpu_percent": 0.5710115968988794,
+      "tree_pss_kib_median": 106698.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.2523084940003173,
+          "pss_kib": 106682,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5045351829994615,
+          "pss_kib": 106686,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7567703189997701,
+          "pss_kib": 106694,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0089476510001987,
+          "pss_kib": 106694,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2615628780004045,
+          "pss_kib": 106694,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5138653049998538,
+          "pss_kib": 106698,
+          "processes": 1
+        },
+        {
+          "at_s": 1.766386915998737,
+          "pss_kib": 106698,
+          "processes": 1
+        },
+        {
+          "at_s": 2.019298543998957,
+          "pss_kib": 106698,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2716345810003986,
+          "pss_kib": 106698,
+          "processes": 1
+        },
+        {
+          "at_s": 2.524176748998798,
+          "pss_kib": 106698,
+          "processes": 1
+        },
+        {
+          "at_s": 2.776596330999382,
+          "pss_kib": 106698,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0287888860002568,
+          "pss_kib": 106698,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2811511410000094,
+          "pss_kib": 106698,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5025498479990347,
+          "pss_kib": 106698,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "impl": "mimo",
+      "scenario": "reacting",
+      "frames": 18,
+      "framesPerSecond": 5.142857142857143,
+      "state": {
+        "shown": true,
+        "anim": "react",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "reacting",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.5019859180010826,
+      "tree_cpu_percent": 0.28555226189224525,
+      "tree_pss_kib_median": 106489.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25225649300045916,
+          "pss_kib": 106469,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5040125980012817,
+          "pss_kib": 106469,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7556717140014371,
+          "pss_kib": 106477,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0074363490002725,
+          "pss_kib": 106477,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2592199240007176,
+          "pss_kib": 106477,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5113125770003535,
+          "pss_kib": 106485,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7631968690002395,
+          "pss_kib": 106489,
+          "processes": 1
+        },
+        {
+          "at_s": 2.014982073000283,
+          "pss_kib": 106489,
+          "processes": 1
+        },
+        {
+          "at_s": 2.267069507000997,
+          "pss_kib": 106489,
+          "processes": 1
+        },
+        {
+          "at_s": 2.518687420000788,
+          "pss_kib": 106489,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7708125230001315,
+          "pss_kib": 106489,
+          "processes": 1
+        },
+        {
+          "at_s": 3.022554830000445,
+          "pss_kib": 106489,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2741883430007874,
+          "pss_kib": 106489,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5019813740000245,
+          "pss_kib": 106489,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "impl": "mimo",
+      "scenario": "dancing",
+      "frames": 15,
+      "framesPerSecond": 4.285714285714286,
+      "state": {
+        "shown": true,
+        "anim": "dance",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "dancing",
+        "state": {
+          "shown": true,
+          "anim": "dance",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.5022779680002714,
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 109306.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.2523132860005717,
+          "pss_kib": 109302,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5045036629999231,
+          "pss_kib": 109302,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7567209030003141,
+          "pss_kib": 109302,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0089284280002175,
+          "pss_kib": 109302,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2612109839992627,
+          "pss_kib": 109302,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5133447469997918,
+          "pss_kib": 109302,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7658543729994562,
+          "pss_kib": 109306,
+          "processes": 1
+        },
+        {
+          "at_s": 2.018010513000263,
+          "pss_kib": 109306,
+          "processes": 1
+        },
+        {
+          "at_s": 2.270271113999115,
+          "pss_kib": 109306,
+          "processes": 1
+        },
+        {
+          "at_s": 2.522577898998861,
+          "pss_kib": 109306,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7752613159991597,
+          "pss_kib": 109306,
+          "processes": 1
+        },
+        {
+          "at_s": 3.027427008999439,
+          "pss_kib": 109306,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2799215119994187,
+          "pss_kib": 109306,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5022720569995727,
+          "pss_kib": 109306,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "impl": "mimo",
+      "scenario": "hidden",
+      "frames": 2,
+      "framesPerSecond": 0.5714285714285714,
+      "state": {
+        "shown": false,
+        "anim": "",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "hidden",
+        "state": {
+          "shown": false,
+          "anim": "",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.5023220920011227,
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 104034.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25232818400036194,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5045977390000189,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7569132530006755,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 1.009078519000468,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2614183320001757,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5135866890013858,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7659027030003926,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 2.0181141140001273,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2704954410000937,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 2.522716354000295,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7747763870011113,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0268635660013388,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2792167630013864,
+          "pss_kib": 104034,
+          "processes": 1
+        },
+        {
+          "at_s": 3.502316079000593,
+          "pss_kib": 104034,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "impl": "mimo",
+      "scenario": "sleeping",
+      "frames": 2,
+      "framesPerSecond": 0.5714285714285714,
+      "state": {
+        "shown": true,
+        "anim": "sleep",
+        "asleep": true,
+        "settled": true
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "sleeping",
+        "state": {
+          "shown": true,
+          "anim": "sleep",
+          "asleep": true,
+          "settled": true
+        }
+      },
+      "seconds": 3.50204193099853,
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 106652.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.2517609939986869,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5040636119992996,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7563427469995077,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0086389269999927,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2608997309998813,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5130936469995504,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7652302779988531,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 2.0174294680000457,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2696235709991015,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5216547589989204,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 2.773757807999573,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0259645709993492,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 3.278221816999576,
+          "pss_kib": 106652,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5020362779996503,
+          "pss_kib": 106656,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "impl": "mimo",
+      "scenario": "sleeping",
+      "frames": 2,
+      "framesPerSecond": 0.5714285714285714,
+      "state": {
+        "shown": true,
+        "anim": "sleep",
+        "asleep": true,
+        "settled": true
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "sleeping",
+        "state": {
+          "shown": true,
+          "anim": "sleep",
+          "asleep": true,
+          "settled": true
+        }
+      },
+      "seconds": 3.5024365979988943,
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 106767.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25230348500008404,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5046218379993661,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7568808809992333,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 1.009285625999837,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2615459179996833,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5138769209988823,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7664634479988308,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 2.018864310999561,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 2.271165230000406,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 2.523669816999245,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 2.775847340999462,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 3.028327457999694,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2805007429997204,
+          "pss_kib": 106767,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5024307249987032,
+          "pss_kib": 106771,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "impl": "mimo",
+      "scenario": "hidden",
+      "frames": 2,
+      "framesPerSecond": 0.5714285714285714,
+      "state": {
+        "shown": false,
+        "anim": "",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "hidden",
+        "state": {
+          "shown": false,
+          "anim": "",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.502219824000349,
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 103962.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25227448899931915,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5044647220001934,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7567998340000486,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0088880059993244,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2612554709994583,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5135289749996446,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7655821079988527,
+          "pss_kib": 103960,
+          "processes": 1
+        },
+        {
+          "at_s": 2.0177577800004656,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 2.269981760999144,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5222254500004055,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7743592129991157,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 3.026565999000013,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2787156670001423,
+          "pss_kib": 103962,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5022137939995446,
+          "pss_kib": 103962,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "impl": "mimo",
+      "scenario": "dancing",
+      "frames": 15,
+      "framesPerSecond": 4.285714285714286,
+      "state": {
+        "shown": true,
+        "anim": "dance",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "dancing",
+        "state": {
+          "shown": true,
+          "anim": "dance",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.5021783000011055,
+      "tree_cpu_percent": 0.28553657590753856,
+      "tree_pss_kib_median": 109164.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25223370999992767,
+          "pss_kib": 109160,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5043694890009647,
+          "pss_kib": 109160,
+          "processes": 1
+        },
+        {
+          "at_s": 0.756393695000952,
+          "pss_kib": 109157,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0087131500004034,
+          "pss_kib": 109160,
+          "processes": 1
+        },
+        {
+          "at_s": 1.260914099000729,
+          "pss_kib": 109160,
+          "processes": 1
+        },
+        {
+          "at_s": 1.513133383999957,
+          "pss_kib": 109160,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7653813920005632,
+          "pss_kib": 109164,
+          "processes": 1
+        },
+        {
+          "at_s": 2.0176267300012114,
+          "pss_kib": 109164,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2701733620015148,
+          "pss_kib": 109164,
+          "processes": 1
+        },
+        {
+          "at_s": 2.522510428001624,
+          "pss_kib": 109164,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7746195810013887,
+          "pss_kib": 109164,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0268094680013746,
+          "pss_kib": 109164,
+          "processes": 1
+        },
+        {
+          "at_s": 3.279115212000761,
+          "pss_kib": 109164,
+          "processes": 1
+        },
+        {
+          "at_s": 3.502172350001274,
+          "pss_kib": 109164,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "impl": "mimo",
+      "scenario": "reacting",
+      "frames": 18,
+      "framesPerSecond": 5.142857142857143,
+      "state": {
+        "shown": true,
+        "anim": "react",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "reacting",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.5023805759992683,
+      "tree_cpu_percent": 0.5710401701361016,
+      "tree_pss_kib_median": 108781.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.2523730009997962,
+          "pss_kib": 108761,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5046633659985673,
+          "pss_kib": 108761,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7570877269990888,
+          "pss_kib": 108769,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0094047499987937,
+          "pss_kib": 108769,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2617239829996834,
+          "pss_kib": 108769,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5140230389988574,
+          "pss_kib": 108777,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7663277349984128,
+          "pss_kib": 108781,
+          "processes": 1
+        },
+        {
+          "at_s": 2.018723648998275,
+          "pss_kib": 108781,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2710688869992737,
+          "pss_kib": 108781,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5231936459986173,
+          "pss_kib": 108781,
+          "processes": 1
+        },
+        {
+          "at_s": 2.775606549999793,
+          "pss_kib": 108781,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0277208589996008,
+          "pss_kib": 108781,
+          "processes": 1
+        },
+        {
+          "at_s": 3.280247166998379,
+          "pss_kib": 108781,
+          "processes": 1
+        },
+        {
+          "at_s": 3.502374759998929,
+          "pss_kib": 108785,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "impl": "mimo",
+      "scenario": "walking",
+      "frames": 22,
+      "framesPerSecond": 6.285714285714286,
+      "state": {
+        "shown": true,
+        "anim": "walk",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "walking",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.5020910169987474,
+      "tree_cpu_percent": 0.28554369236725,
+      "tree_pss_kib_median": 108710.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25179138199928275,
+          "pss_kib": 108694,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5034419660005369,
+          "pss_kib": 108698,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7552198289995431,
+          "pss_kib": 108706,
+          "processes": 1
+        },
+        {
+          "at_s": 1.007143692999307,
+          "pss_kib": 108706,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2590324760003568,
+          "pss_kib": 108706,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5108316739988368,
+          "pss_kib": 108710,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7625288319995889,
+          "pss_kib": 108710,
+          "processes": 1
+        },
+        {
+          "at_s": 2.0140999220002413,
+          "pss_kib": 108710,
+          "processes": 1
+        },
+        {
+          "at_s": 2.266026134999265,
+          "pss_kib": 108710,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5180208749989106,
+          "pss_kib": 108710,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7700953259991365,
+          "pss_kib": 108710,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0216841729998123,
+          "pss_kib": 108710,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2738169059994107,
+          "pss_kib": 108710,
+          "processes": 1
+        },
+        {
+          "at_s": 3.502085062998958,
+          "pss_kib": 108710,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "impl": "mimo",
+      "scenario": "idle",
+      "frames": 6,
+      "framesPerSecond": 1.7142857142857142,
+      "state": {
+        "shown": true,
+        "anim": "walk",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "idle",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.5023670720001974,
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 108828.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25219266900057846,
+          "pss_kib": 108820,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5044313240014162,
+          "pss_kib": 108820,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7566594470008567,
+          "pss_kib": 108820,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0089004590008699,
+          "pss_kib": 108824,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2609609179999097,
+          "pss_kib": 108822,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5133310180008266,
+          "pss_kib": 108828,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7655919050012017,
+          "pss_kib": 108828,
+          "processes": 1
+        },
+        {
+          "at_s": 2.0179362810013117,
+          "pss_kib": 108828,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2701355300014256,
+          "pss_kib": 108828,
+          "processes": 1
+        },
+        {
+          "at_s": 2.522300440001345,
+          "pss_kib": 108836,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7745447920005972,
+          "pss_kib": 108836,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0268433040000673,
+          "pss_kib": 108836,
+          "processes": 1
+        },
+        {
+          "at_s": 3.279114598000888,
+          "pss_kib": 108836,
+          "processes": 1
+        },
+        {
+          "at_s": 3.502361093000218,
+          "pss_kib": 108840,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "impl": "mimo",
+      "scenario": "disabled",
+      "frames": 2,
+      "framesPerSecond": 0.5714285714285714,
+      "state": {
+        "shown": false,
+        "anim": "",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "disabled",
+        "state": {
+          "shown": false,
+          "anim": "",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 3.50224938700012,
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 100946.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25230295100118383,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5043670539998857,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7566510910000943,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0086866940000618,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2609692930000165,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5130111390008096,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7652883310001926,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 2.017562987000929,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2698344870004803,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5218643870011874,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7741130820013495,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0263507880008547,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2784763270010444,
+          "pss_kib": 100946,
+          "processes": 1
+        },
+        {
+          "at_s": 3.502242839000246,
+          "pss_kib": 100950,
+          "processes": 1
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "disabled": {
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 99790.0,
+      "max_processes": 1.0,
+      "framesPerSecond": 0.5714285714285714
+    },
+    "idle": {
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 107742.5,
+      "max_processes": 1.0,
+      "framesPerSecond": 1.2857142857142856
+    },
+    "walking": {
+      "tree_cpu_percent": 0.4282776446330647,
+      "tree_pss_kib_median": 107704.0,
+      "max_processes": 1.0,
+      "framesPerSecond": 6.285714285714286
+    },
+    "reacting": {
+      "tree_cpu_percent": 0.42829621601417345,
+      "tree_pss_kib_median": 107635.0,
+      "max_processes": 1.0,
+      "framesPerSecond": 5.142857142857143
+    },
+    "dancing": {
+      "tree_cpu_percent": 0.14276828795376928,
+      "tree_pss_kib_median": 109235.0,
+      "max_processes": 1.0,
+      "framesPerSecond": 4.285714285714286
+    },
+    "hidden": {
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 103998.0,
+      "max_processes": 1.0,
+      "framesPerSecond": 0.5714285714285714
+    },
+    "sleeping": {
+      "tree_cpu_percent": 0.0,
+      "tree_pss_kib_median": 106709.5,
+      "max_processes": 1.0,
+      "framesPerSecond": 0.5714285714285714
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "disabled": {
+    "cpu_before": 0.0,
+    "cpu_after": 0.0,
+    "cpu_delta": 0.0,
+    "pss_kib_before": 111338.0,
+    "pss_kib_after": 108880.0,
+    "pss_kib_delta": -2458.0,
+    "incremental_pss_kib_before": 0.0,
+    "incremental_pss_kib_after": 0.0
+  },
+  "idle": {
+    "cpu_before": 0.0,
+    "cpu_after": 0.0,
+    "cpu_delta": 0.0,
+    "pss_kib_before": 119256.0,
+    "pss_kib_after": 124083.0,
+    "pss_kib_delta": 4827.0,
+    "incremental_pss_kib_before": 7918.0,
+    "incremental_pss_kib_after": 15203.0
+  },
+  "reacting": {
+    "cpu_before": 8.424916786428792,
+    "cpu_after": 9.994456489139885,
+    "cpu_delta": 1.5695397027110936,
+    "pss_kib_before": 121117.0,
+    "pss_kib_after": 125010.5,
+    "pss_kib_delta": 3893.5,
+    "incremental_pss_kib_before": 9779.0,
+    "incremental_pss_kib_after": 16130.5
+  },
+  "hidden": {
+    "cpu_before": 0.0,
+    "cpu_after": 0.0,
+    "cpu_delta": 0.0,
+    "pss_kib_before": 109009.0,
+    "pss_kib_after": 110962.0,
+    "pss_kib_delta": 1953.0,
+    "incremental_pss_kib_before": -2329.0,
+    "incremental_pss_kib_after": 2082.0
+  },
+  "sleeping": {
+    "cpu_before": 9.275455714225032,
+    "cpu_after": 8.42485769054727,
+    "cpu_delta": -0.8505980236777617,
+    "pss_kib_before": 124563.5,
+    "pss_kib_after": 125402.5,
+    "pss_kib_delta": 839.0,
+    "incremental_pss_kib_before": 13225.5,
+    "incremental_pss_kib_after": 16522.5
+  }
+}

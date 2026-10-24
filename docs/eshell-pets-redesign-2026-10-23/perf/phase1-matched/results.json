@@ -1,0 +1,714 @@
+{
+  "method": "same current harness, pre-A core and37-frame pack, original9-field Settings; unused coding binding removed; original Math.random calls exposed through one injected random property for the same idle RNG control; same5s windows and warmup",
+  "sources": {
+    "bar/Singletons/Settings.js": "dad2a04df2b791008d36d04e84cb437a282cc9b21cd3a0d6b7488fbcc0277afb",
+    "bar/pets/PetLayer.qml": "6040326afc1bca8a1a790bffc91222556fe46f0bd611343ad6ab2b756d744f58",
+    "bar/pets/PetPerch.qml": "94d73396ae1adfef0d24b74af4b9076c5da19abad5574ba3e1d60fceda23861f",
+    "bar/pets/PetActor.qml": "3726a4e5eebd0d5a4b59f529c193834c51207313b532d89c75eede48565ef56c",
+    "bar/pets/PetSprite.qml": "4100ef81f5ce9748f0afddfceae58e4d5b1ca6c66c9e665bfb7b300543653f46",
+    "bar/pets/PetPack.qml": "f835aee39f2cbe6279dcfa224f76f66a1d2f11571e3bbd4f9f19e1b28a561782",
+    "bar/pets/packs/mimo/atlas.json": "1fe94169f89947a79e759c98655f2754120ed583555753ef080c3b9e414a4c07",
+    "bar/pets/packs/mimo/atlas.png": "6090f5871dd035c5d510d38e84e98cfd21cab4d6d0fd6651edf21f99774a1536",
+    "bar/pets/packs/mimo/pet.json": "3295d7bc18944da9d5b21936cc6f6324c9d50dae0f82cc37a3836ff6afd80ad4"
+  },
+  "runs": [
+    {
+      "round": 1,
+      "impl": "mimo",
+      "scenario": "disabled",
+      "frames": 2,
+      "framesPerSecond": 0.4,
+      "state": {
+        "shown": false,
+        "anim": "",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "disabled",
+        "state": {
+          "shown": false,
+          "anim": "",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 5.002451814001688,
+      "tree_cpu_percent": 0.004547176033283878,
+      "tree_cpu_percent_ticks": 0.0,
+      "tree_cpu_percent_including_markers": 0.036953299476586945,
+      "tree_pss_kib_median": 106148.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.2526724990020739,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429536060,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5052366350028024,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429536060,
+          "processes": 1
+        },
+        {
+          "at_s": 0.757797220001521,
+          "pss_kib": 106147,
+          "cpu_ticks": 42,
+          "cpu_ns": 429536060,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0104139060022135,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429536060,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2631801160023315,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429536060,
+          "processes": 1
+        },
+        {
+          "at_s": 1.515793520000443,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429536060,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7684946520021185,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429629458,
+          "processes": 1
+        },
+        {
+          "at_s": 2.021099444002175,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429629458,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2738781350017234,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429629458,
+          "processes": 1
+        },
+        {
+          "at_s": 2.526520777002588,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429629458,
+          "processes": 1
+        },
+        {
+          "at_s": 2.779101898002409,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429629458,
+          "processes": 1
+        },
+        {
+          "at_s": 3.0317991449992405,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429629458,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2845054240024183,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429731382,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5374128540024685,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429731382,
+          "processes": 1
+        },
+        {
+          "at_s": 3.7901971909996064,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429731382,
+          "processes": 1
+        },
+        {
+          "at_s": 4.042811195002287,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429731382,
+          "processes": 1
+        },
+        {
+          "at_s": 4.295538135000243,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429731382,
+          "processes": 1
+        },
+        {
+          "at_s": 4.548129692000657,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429731382,
+          "processes": 1
+        },
+        {
+          "at_s": 4.800647243002459,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 429874793,
+          "processes": 1
+        },
+        {
+          "at_s": 5.0024442140020255,
+          "pss_kib": 106148,
+          "cpu_ticks": 42,
+          "cpu_ns": 430846682,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 1,
+      "impl": "mimo",
+      "scenario": "idle",
+      "frames": 4,
+      "framesPerSecond": 0.8,
+      "state": {
+        "shown": true,
+        "anim": "idle",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "idle",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 5.002665748001164,
+      "tree_cpu_percent": 0.09307738733631968,
+      "tree_cpu_percent_ticks": 0.23273501154035914,
+      "tree_cpu_percent_including_markers": 0.0845127420653533,
+      "tree_pss_kib_median": 116227.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25281171000096947,
+          "pss_kib": 116211,
+          "cpu_ticks": 45,
+          "cpu_ns": 467370720,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5055142970013549,
+          "pss_kib": 116211,
+          "cpu_ticks": 45,
+          "cpu_ns": 467370720,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7582780450029531,
+          "pss_kib": 116211,
+          "cpu_ticks": 45,
+          "cpu_ns": 467370720,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0110559050008305,
+          "pss_kib": 116215,
+          "cpu_ticks": 45,
+          "cpu_ns": 468240927,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2638460430025589,
+          "pss_kib": 116215,
+          "cpu_ticks": 45,
+          "cpu_ns": 468330312,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5163746350008296,
+          "pss_kib": 116219,
+          "cpu_ticks": 45,
+          "cpu_ns": 468491170,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7691651349996391,
+          "pss_kib": 116219,
+          "cpu_ticks": 45,
+          "cpu_ns": 468491170,
+          "processes": 1
+        },
+        {
+          "at_s": 2.021892538999964,
+          "pss_kib": 116219,
+          "cpu_ticks": 45,
+          "cpu_ns": 468491170,
+          "processes": 1
+        },
+        {
+          "at_s": 2.274802953001199,
+          "pss_kib": 116219,
+          "cpu_ticks": 45,
+          "cpu_ns": 468491170,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5274985570031276,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 469412107,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7802294680004707,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 469412107,
+          "processes": 1
+        },
+        {
+          "at_s": 3.033151681000163,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 469614652,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2859718600011547,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 469614652,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5386489830016217,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 470418937,
+          "processes": 1
+        },
+        {
+          "at_s": 3.791402826002013,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 470418937,
+          "processes": 1
+        },
+        {
+          "at_s": 4.044160991001263,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 470516484,
+          "processes": 1
+        },
+        {
+          "at_s": 4.2968694910014165,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 471370006,
+          "processes": 1
+        },
+        {
+          "at_s": 4.54954383200311,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 471370006,
+          "processes": 1
+        },
+        {
+          "at_s": 4.802216561001842,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 471370006,
+          "processes": 1
+        },
+        {
+          "at_s": 5.0026579500008665,
+          "pss_kib": 116227,
+          "cpu_ticks": 46,
+          "cpu_ns": 471598610,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "impl": "mimo",
+      "scenario": "idle",
+      "frames": 4,
+      "framesPerSecond": 0.8,
+      "state": {
+        "shown": true,
+        "anim": "idle",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "idle",
+        "state": {
+          "shown": true,
+          "anim": "idle",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 5.002931648999947,
+      "tree_cpu_percent": 0.08948528453642424,
+      "tree_cpu_percent_ticks": 0.0,
+      "tree_cpu_percent_including_markers": 0.0840495192621818,
+      "tree_pss_kib_median": 114365.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.2526824779997696,
+          "pss_kib": 114345,
+          "cpu_ticks": 45,
+          "cpu_ns": 451610897,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5055153370012704,
+          "pss_kib": 114345,
+          "cpu_ticks": 45,
+          "cpu_ns": 451703435,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7582373380028002,
+          "pss_kib": 114345,
+          "cpu_ticks": 45,
+          "cpu_ns": 451703435,
+          "processes": 1
+        },
+        {
+          "at_s": 1.010933516001387,
+          "pss_kib": 114349,
+          "cpu_ticks": 45,
+          "cpu_ns": 452597970,
+          "processes": 1
+        },
+        {
+          "at_s": 1.2637247720012965,
+          "pss_kib": 114349,
+          "cpu_ticks": 45,
+          "cpu_ns": 452597970,
+          "processes": 1
+        },
+        {
+          "at_s": 1.5168184770009248,
+          "pss_kib": 114357,
+          "cpu_ticks": 45,
+          "cpu_ns": 452805388,
+          "processes": 1
+        },
+        {
+          "at_s": 1.76942350200261,
+          "pss_kib": 114357,
+          "cpu_ticks": 45,
+          "cpu_ns": 452805388,
+          "processes": 1
+        },
+        {
+          "at_s": 2.0222128290006367,
+          "pss_kib": 114357,
+          "cpu_ticks": 45,
+          "cpu_ns": 452907558,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2749348710021877,
+          "pss_kib": 114357,
+          "cpu_ticks": 45,
+          "cpu_ns": 452907558,
+          "processes": 1
+        },
+        {
+          "at_s": 2.527674939003191,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 453670524,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7804060140006186,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 453670524,
+          "processes": 1
+        },
+        {
+          "at_s": 3.033228746000532,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 453864592,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2859521960017446,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 453864592,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5387242249998963,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 454702256,
+          "processes": 1
+        },
+        {
+          "at_s": 3.791519271002471,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 454702256,
+          "processes": 1
+        },
+        {
+          "at_s": 4.044290484001976,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 454702256,
+          "processes": 1
+        },
+        {
+          "at_s": 4.297022302002006,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 455423896,
+          "processes": 1
+        },
+        {
+          "at_s": 4.549695132001943,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 455456091,
+          "processes": 1
+        },
+        {
+          "at_s": 4.802487649001705,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 455456091,
+          "processes": 1
+        },
+        {
+          "at_s": 5.00292478800111,
+          "pss_kib": 114365,
+          "cpu_ticks": 45,
+          "cpu_ns": 455787697,
+          "processes": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "impl": "mimo",
+      "scenario": "disabled",
+      "frames": 2,
+      "framesPerSecond": 0.4,
+      "state": {
+        "shown": false,
+        "anim": "",
+        "asleep": false,
+        "settled": false
+      },
+      "ready": {
+        "impl": "mimo",
+        "scenario": "disabled",
+        "state": {
+          "shown": false,
+          "anim": "",
+          "asleep": false,
+          "settled": false
+        }
+      },
+      "seconds": 5.0025631789976615,
+      "tree_cpu_percent": 0.005621924431844803,
+      "tree_cpu_percent_ticks": 0.0,
+      "tree_cpu_percent_including_markers": 0.014616906850270124,
+      "tree_pss_kib_median": 108395.0,
+      "max_processes": 1,
+      "samples": [
+        {
+          "at_s": 0.25252029100010986,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450307788,
+          "processes": 1
+        },
+        {
+          "at_s": 0.5050215209994349,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450307788,
+          "processes": 1
+        },
+        {
+          "at_s": 0.7575797520003107,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450307788,
+          "processes": 1
+        },
+        {
+          "at_s": 1.0101980430008553,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450307788,
+          "processes": 1
+        },
+        {
+          "at_s": 1.262746149997838,
+          "pss_kib": 108393,
+          "cpu_ticks": 44,
+          "cpu_ns": 450307788,
+          "processes": 1
+        },
+        {
+          "at_s": 1.515239781998389,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450397630,
+          "processes": 1
+        },
+        {
+          "at_s": 1.7677411459990253,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450397630,
+          "processes": 1
+        },
+        {
+          "at_s": 2.0202145219991507,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450397630,
+          "processes": 1
+        },
+        {
+          "at_s": 2.2726247840000724,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450397630,
+          "processes": 1
+        },
+        {
+          "at_s": 2.5252479949995177,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450397630,
+          "processes": 1
+        },
+        {
+          "at_s": 2.7779468959997757,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450397630,
+          "processes": 1
+        },
+        {
+          "at_s": 3.030524533998687,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450473483,
+          "processes": 1
+        },
+        {
+          "at_s": 3.2830974819989933,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450473483,
+          "processes": 1
+        },
+        {
+          "at_s": 3.5357272709989047,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450473483,
+          "processes": 1
+        },
+        {
+          "at_s": 3.7881852610007627,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450473483,
+          "processes": 1
+        },
+        {
+          "at_s": 4.040789112998027,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450473483,
+          "processes": 1
+        },
+        {
+          "at_s": 4.293459648997668,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450473483,
+          "processes": 1
+        },
+        {
+          "at_s": 4.545996713997738,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450549164,
+          "processes": 1
+        },
+        {
+          "at_s": 4.798476518000825,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450549164,
+          "processes": 1
+        },
+        {
+          "at_s": 5.002555866998591,
+          "pss_kib": 108395,
+          "cpu_ticks": 44,
+          "cpu_ns": 450549164,
+          "processes": 1
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "disabled": {
+      "tree_cpu_percent": 0.005084550232564341,
+      "tree_pss_kib_median": 107271.5,
+      "max_processes": 1.0,
+      "framesPerSecond": 0.4
+    },
+    "idle": {
+      "tree_cpu_percent": 0.09128133593637196,
+      "tree_pss_kib_median": 115296.0,
+      "max_processes": 1.0,
+      "framesPerSecond": 0.8
+    }
+  }
+}

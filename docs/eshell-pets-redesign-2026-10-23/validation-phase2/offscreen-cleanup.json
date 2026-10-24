@@ -1,0 +1,44 @@
+[
+  {
+    "pid": 67213,
+    "cwd": "/home/zdito/.config/quickshell/bar",
+    "stdout": "/proc/67213/fd/pipe:[240992]",
+    "state": "S (sleeping)",
+    "cleanup": "TERM"
+  },
+  {
+    "pid": 88067,
+    "cwd": "/home/zdito/.config/quickshell/bar",
+    "stdout": "/tmp/claude-1000/-home-zdito--config-quickshell/30966d84-5303-4795-97e2-d108db705eaf/scratchpad/tmp.vmLMv0GGGa/log",
+    "state": "S (sleeping)",
+    "cleanup": "TERM"
+  },
+  {
+    "pid": 89171,
+    "cwd": "/home/zdito/.config/quickshell/bar",
+    "stdout": "/tmp/claude-1000/-home-zdito--config-quickshell/30966d84-5303-4795-97e2-d108db705eaf/scratchpad/tmp.jSLYo5ZBxT/log",
+    "state": "S (sleeping)",
+    "cleanup": "TERM"
+  },
+  {
+    "pid": 89247,
+    "cwd": "/home/zdito/.config/quickshell/bar",
+    "stdout": "/tmp/claude-1000/-home-zdito--config-quickshell/30966d84-5303-4795-97e2-d108db705eaf/scratchpad/tmp.1quKEh3xAF/log",
+    "state": "S (sleeping)",
+    "cleanup": "TERM"
+  },
+  {
+    "pid": 89989,
+    "cwd": "/tmp/claude-1000/-home-zdito--config-quickshell/30966d84-5303-4795-97e2-d108db705eaf/scratchpad/bis/bar",
+    "stdout": "/tmp/claude-1000/-home-zdito--config-quickshell/30966d84-5303-4795-97e2-d108db705eaf/scratchpad/tmp.j7TUnqJG2Z/log",
+    "state": "S (sleeping)",
+    "cleanup": "TERM"
+  },
+  {
+    "pid": 90231,
+    "cwd": "/tmp/claude-1000/-home-zdito--config-quickshell/30966d84-5303-4795-97e2-d108db705eaf/scratchpad/head/bar",
+    "stdout": "/tmp/claude-1000/-home-zdito--config-quickshell/30966d84-5303-4795-97e2-d108db705eaf/scratchpad/tmp.pfZ9c0DeXj/log",
+    "state": "S (sleeping)",
+    "cleanup": "TERM"
+  }
+]

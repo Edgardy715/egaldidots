@@ -1,0 +1,40 @@
+{
+  "self_test": {
+    "command": [
+      "python",
+      "bar/tests/pets-performance.py",
+      "--self-test"
+    ],
+    "exit": 0,
+    "stdout": "PASS: log parsing, percentiles, paired aggregation and live process tree\n",
+    "stderr": ""
+  },
+  "python_compile": {
+    "command": [
+      "python",
+      "-m",
+      "py_compile",
+      "bar/tests/pets-performance.py"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "qt_version": {
+    "command": [
+      "pkg-config",
+      "--modversion",
+      "Qt6Core"
+    ],
+    "exit": 0,
+    "stdout": "6.12.0\n",
+    "stderr": ""
+  },
+  "additional_source_sha256": {
+    "bar/Singletons/Theme.qml": "fa8436d3f85ed1e772dcc0736871c60a610f1199eb8f703bbf2c21f33f7623c2",
+    "bar/Singletons/Motion.qml": "adef56ac9f635066ce9d002ee9b664a8e188fe8d423980878dde1408b0a31571",
+    "bar/Singletons/Config.qml": "a575668f26c5b129d6f65d4e25a2121ed574857adf97ef8e013e42b2d1ad8d10",
+    "bar/Singletons/Flags.qml": "6f20ce00438979c68f397327a48217c9403bf64b0f9e741f3d4c04582022e985",
+    "bar/Singletons/Settings.js": "a3545b91834fcb23e95e1be600b332fa04ef67b5bdc184cac5951623353e2d85"
+  }
+}

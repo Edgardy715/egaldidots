@@ -1,0 +1,2633 @@
+[
+  {
+    "summary": {
+      "scenario": "hidden",
+      "tick_cpu": 0.0,
+      "elapsed_s": 4.541299607997644,
+      "threads": [
+        {
+          "name": "qs",
+          "cpu_ms": 0.158536
+        },
+        {
+          "name": "WaylandEventThr",
+          "cpu_ms": 0.099768
+        },
+        {
+          "name": "WaylandEventThr",
+          "cpu_ms": 0.081702
+        }
+      ]
+    },
+    "samples": [
+      {
+        "at": 16514.004818514,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 233942116,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 529571,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1043767,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16514.257834217,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234029924,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 575799,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1090126,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16514.510959903,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234029924,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 575799,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1090126,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16514.763867394,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234029924,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 575799,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1090126,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16515.016107351,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234029924,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 575799,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1090126,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16515.268295847,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234029924,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 575799,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1090126,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16515.520298352,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234029924,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 575799,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1090126,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16515.772861269,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234054712,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 595951,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1100832,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16516.025085592,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234054712,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 595951,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1100832,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16516.277277908,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234054712,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 595951,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1100832,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16516.529506723,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234054712,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 595951,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1100832,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16516.782270424,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234054712,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 595951,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1100832,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16517.034403196,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234054712,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 595951,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1100832,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16517.28638946,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234114794,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 635131,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1129936,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16517.538376196,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234114794,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 635131,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1129936,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16517.790648921,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234114794,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 635131,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1129936,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16518.042657435,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234114794,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 635131,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1129936,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16518.2948111,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234114794,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 635131,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1129936,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16518.546969577,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234114794,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 635131,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1129936,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16518.799133825,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234188460,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 675567,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1171828,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10563066,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38295256,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16519.007811222,
+        "ticks": 45,
+        "threads": {
+          "409660": {
+            "ns": 234569940,
+            "name": "qs"
+          },
+          "409665": {
+            "ns": 1239628,
+            "name": "QDBusConnection"
+          },
+          "409666": {
+            "ns": 724067,
+            "name": "WaylandEventThr"
+          },
+          "409667": {
+            "ns": 1255161,
+            "name": "WaylandEventThr"
+          },
+          "409668": {
+            "ns": 10621833,
+            "name": "QThread"
+          },
+          "409681": {
+            "ns": 143662767,
+            "name": "QQmlThread"
+          },
+          "409682": {
+            "ns": 412688,
+            "name": "Thread (pooled)"
+          },
+          "409684": {
+            "ns": 38707583,
+            "name": "QSGRenderThread"
+          },
+          "409686": {
+            "ns": 28535124,
+            "name": "CPMMListener"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "summary": {
+      "scenario": "hidden",
+      "tick_cpu": 0.0,
+      "elapsed_s": 4.553433022003446,
+      "threads": [
+        {
+          "name": "qs",
+          "cpu_ms": 0.112184
+        },
+        {
+          "name": "WaylandEventThr",
+          "cpu_ms": 0.103534
+        },
+        {
+          "name": "WaylandEventThr",
+          "cpu_ms": 0.064904
+        }
+      ]
+    },
+    "samples": [
+      {
+        "at": 16520.570983497,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227474521,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 646846,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1082925,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16520.82404021,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227542197,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 675996,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1113878,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16521.076936765,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227542197,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 675996,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1113878,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16521.330104718,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227542197,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 675996,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1113878,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16521.582946271,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227542197,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 675996,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1113878,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16521.835988716,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227581007,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 718058,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1134658,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16522.088818252,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227581007,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 718058,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1134658,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16522.341801953,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227581007,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 718058,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1134658,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16522.594654331,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227581007,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 718058,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1134658,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16522.847625505,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227581007,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 718058,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1134658,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16523.100555932,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227581007,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 718058,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1134658,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16523.353551903,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227618288,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 744940,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1156730,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16523.60645469,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227618288,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 744940,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1156730,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16523.859496656,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227618288,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 744940,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1156730,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16524.112428165,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227618288,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 744940,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1156730,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16524.365439267,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227618288,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 744940,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1156730,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16524.618329853,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227618288,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 744940,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1156730,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16524.871431233,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227654381,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 779530,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1178782,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16525.124380551,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227654381,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 779530,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1178782,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16525.377473232,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227654381,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 779530,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1178782,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16525.573960585,
+        "ticks": 44,
+        "threads": {
+          "409910": {
+            "ns": 227654381,
+            "name": "qs"
+          },
+          "409923": {
+            "ns": 1275418,
+            "name": "QDBusConnection"
+          },
+          "409924": {
+            "ns": 779530,
+            "name": "WaylandEventThr"
+          },
+          "409925": {
+            "ns": 1178782,
+            "name": "WaylandEventThr"
+          },
+          "409926": {
+            "ns": 11780554,
+            "name": "QThread"
+          },
+          "409929": {
+            "ns": 144292822,
+            "name": "QQmlThread"
+          },
+          "409931": {
+            "ns": 436585,
+            "name": "Thread (pooled)"
+          },
+          "409933": {
+            "ns": 40696578,
+            "name": "QSGRenderThread"
+          },
+          "409935": {
+            "ns": 28608537,
+            "name": "CPMMListener"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "summary": {
+      "scenario": "disabled",
+      "tick_cpu": 0.0,
+      "elapsed_s": 4.5516880080031115,
+      "threads": [
+        {
+          "name": "qs",
+          "cpu_ms": 0.155732
+        },
+        {
+          "name": "WaylandEventThr",
+          "cpu_ms": 0.10579
+        },
+        {
+          "name": "WaylandEventThr",
+          "cpu_ms": 0.063563
+        }
+      ]
+    },
+    "samples": [
+      {
+        "at": 16527.264356689,
+        "ticks": 44,
+        "threads": {
+          "410049": {
+            "ns": 219339984,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 565346,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 998298,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16527.517240437,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219404859,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 599290,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1027953,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16527.769939388,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219444187,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 638260,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1047935,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16528.022743209,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219444187,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 638260,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1047935,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16528.275627546,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219444187,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 638260,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1047935,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16528.528597815,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219444187,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 638260,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1047935,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16528.781546371,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219444187,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 638260,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1047935,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16529.034427963,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219444187,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 638260,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1047935,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16529.287327767,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219483836,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 665240,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1071243,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16529.540190377,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219483836,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 665240,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1071243,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16529.793052234,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219483836,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 665240,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1071243,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16530.045874918,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219483836,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 665240,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1071243,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16530.298893123,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219483836,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 665240,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1071243,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16530.551667492,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219483836,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 665240,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1071243,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16530.804871031,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219520679,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 705080,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1091516,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16531.057615649,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219520679,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 705080,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1091516,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16531.310716137,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219520679,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 705080,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1091516,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16531.563479543,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219520679,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 705080,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1091516,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16531.816168365,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219520679,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 705080,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1091516,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16532.068928445,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219560591,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 705080,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1091516,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11133891,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 36559349,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      },
+      {
+        "at": 16532.267052553,
+        "ticks": 45,
+        "threads": {
+          "410049": {
+            "ns": 219993782,
+            "name": "qs"
+          },
+          "410051": {
+            "ns": 1211371,
+            "name": "QDBusConnection"
+          },
+          "410052": {
+            "ns": 823591,
+            "name": "WaylandEventThr"
+          },
+          "410053": {
+            "ns": 1195754,
+            "name": "WaylandEventThr"
+          },
+          "410054": {
+            "ns": 11206101,
+            "name": "QThread"
+          },
+          "410055": {
+            "ns": 157966668,
+            "name": "QQmlThread"
+          },
+          "410111": {
+            "ns": 37010763,
+            "name": "QSGRenderThread"
+          },
+          "410113": {
+            "ns": 26895169,
+            "name": "CPMMListener"
+          }
+        }
+      }
+    ]
+  }
+]
