@@ -19,6 +19,8 @@ Item {
     property string surfaceName: "media"
     property string artUrl: ""
     property var artworkTransition: null
+    property var petContext: null
+    property bool barNicheOccupied: false
     property bool mediaPlaying: false
     property size surfaceSize: IslandGeometry.mediaSurface
     property Component compactContent
@@ -133,7 +135,10 @@ Item {
         const center = Math.max(0, Math.min(1,
             (xPos + wPos / 2 - bodyX - bodyW) / Math.max(1, dropRadius + 3 * s)))
         const separation = Math.max(0, Math.min(1, (stretch - 0.75) / 0.53))
-        return bodyBusy ? center : Math.min(center, separation)
+        const ordinary = bodyBusy ? center : Math.min(center, separation)
+        return barNicheOccupied && !expanded
+            ? Math.min(ordinary, Math.max(0, Math.min(1, (xPos - bodyX - bodyW) / gap)))
+            : ordinary
     }
     // A bud or gathering card stays a blob; corners settle to 24 before any
     // content is more than faint, so the editor is never clipped by blob corners.
@@ -187,7 +192,7 @@ Item {
     }
 
     function start(): void {
-        captureExtra = expanded || Flags.reduceMotion ? 0 : 6 * s
+        captureExtra = expanded || Flags.reduceMotion || barNicheOccupied ? 0 : 6 * s
         captureTarget = 0; captureV = 0
         xPos = centered ? bodyX + (bodyW - 34 * s) / 2 : bodyX + bodyW - 18 * s
         yPos = bodyY + (bodyH - 34 * s) / 2
@@ -219,7 +224,8 @@ Item {
     // Below this the gathering card is a blob well inside the pill width.
     readonly property real gatherSize: 66 * s
     function returnHome(): void {
-        retarget("retornando", centered ? bodyX + (bodyW - returnW) / 2 : bodyX + bodyW - 20 * s,
+        retarget("retornando", centered ? bodyX + (bodyW - returnW) / 2
+                 : bodyX + bodyW - (barNicheOccupied ? returnW : 20 * s),
                  bodyY + (bodyH - returnH) / 2, returnW, returnH)
     }
 
@@ -292,7 +298,8 @@ Item {
     onHeightChanged: if (centered && expanded) syncHoverSize()
     function followBody(): void {
         if (phase === "retornando") {
-            targetX = centered ? bodyX + (bodyW - returnW) / 2 : bodyX + bodyW - 20 * s
+            targetX = centered ? bodyX + (bodyW - returnW) / 2
+                : bodyX + bodyW - (barNicheOccupied ? returnW : 20 * s)
             targetY = bodyY + (bodyH - returnH) / 2
             targetW = returnW
             targetH = returnH
@@ -308,6 +315,7 @@ Item {
     onReturnWChanged: if (phase === "retornando") followBody()
     onReturnHChanged: if (phase === "retornando") followBody()
     onBodyBusyChanged: updateBond()
+    onBarNicheOccupiedChanged: { followBody(); if (barNicheOccupied) captureTarget = 0 }
     onHoveredChanged: syncHoverSize()
     onCompactWidthChanged: syncHoverSize()
     onHoverWidthChanged: if (hovered) syncHoverSize()
@@ -356,7 +364,8 @@ Item {
         next = root.spring(root.wPos, root.vw, root.targetW, dt); root.wPos = next[0]; root.vw = next[1]
         next = root.spring(root.hPos, root.vh, root.targetH, dt); root.hPos = next[0]; root.vh = next[1]
         root.updateBond()
-        if (!root.centered && root.phase === "retornando" && root.stretch < 1.10) root.captureTarget = 20 * root.s
+        if (!root.centered && !root.barNicheOccupied && root.phase === "retornando" && root.stretch < 1.10)
+            root.captureTarget = 20 * root.s
         next = root.spring(root.captureExtra, root.captureV, root.captureTarget, dt)
         root.captureExtra = next[0]; root.captureV = next[1]
         if (root.phase === "brotando" && ((!root.bond && root.stretch >= 1.30) || root.settled)) {
@@ -450,6 +459,7 @@ Item {
 
         PillSurfaceHost {
             id: surfaceHost
+            petContext: root.petContext
             artworkTransition: root.artworkTransition
             z: 2
             open: root.expanded && !root.expandedContent

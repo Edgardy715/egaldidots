@@ -6,6 +6,7 @@ import Qt5Compat.GraphicalEffects
 import "../"
 import "../components"
 import "../Singletons"
+import "../pets"
 
 PillSurface {
     id: root
@@ -243,11 +244,13 @@ PillSurface {
                 Layout.minimumWidth: 0
                 spacing: 8 * root.s
                 Item {
+                    id: infoArea
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.minimumHeight: 0
                     visible: !root.lyricsOpen
                     ColumnLayout {
+                        id: infoColumn
                         anchors.verticalCenter: parent.verticalCenter
                         width: parent.width
                         spacing: 7 * root.s
@@ -308,6 +311,7 @@ PillSurface {
                     onRetryRequested: root.lyricsRetryRequested()
                 }
                 SwiftMediaTimeline {
+                    id: timeline
                     musicAccent: root.musicAccent
                     objectName: "mediaTimeline"
                     Layout.fillWidth: true
@@ -326,6 +330,30 @@ PillSurface {
                     onDragMoved: fraction => root.dragMoved(fraction)
                     onDragCommitted: fraction => root.dragCommitted(fraction)
                     onDragCanceled: root.dragCanceled()
+                    // The pet stands on the track, in the gap under the title, and
+                    // keeps clear of the playhead; while the music plays it dances.
+                    // Below the seek area: where they overlap, a press seeks.
+                    PetPerch {
+                        objectName: "mediaPetPerch"
+                        anchors.fill: parent
+                        z: -1
+                        petLayer: root.petContext
+                        perchId: "media"
+                        priority: 2
+                        kind: "line"
+                        available: root.petEligible && Config.pets.mediaSurface && timeline.enabled && timeline.visible
+                            && !root.lyricsOpen && petLayer !== null && headroom >= petLayer.reachRows
+                        floorY: height / 2 - timeline.restThickness / 2
+                        headroom: floorY + 8 * root.s
+                            + Math.max(0, (infoArea.height - infoColumn.implicitHeight) / 2)
+                        readonly property real half: petLayer ? petLayer.bodyWidth / 2 : 0
+                        minX: timeline.trackInset + half
+                        maxX: width - timeline.trackInset - half
+                        restX: maxX
+                        avoidFrom: timeline.cursorX - timeline.handleWidth
+                        avoidTo: timeline.cursorX + timeline.handleWidth
+                        mood: root.playback.isPlaying ? "music" : ""
+                    }
                 }
                 RowLayout {
                     Layout.fillWidth: true

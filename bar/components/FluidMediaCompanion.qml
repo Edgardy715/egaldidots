@@ -4,6 +4,7 @@ import "../Singletons"
 // Media adapter: source selection/CAVA stay outside the shared motion engine.
 FluidCompanion {
     id: root
+    barNicheOccupied: !!petContext && petContext.perchId === "bar"
     artUrl: Players.artUrl
     artworkTransition: sharedArtwork
     mediaPlaying: Players.live
