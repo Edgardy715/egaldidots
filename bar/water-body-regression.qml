@@ -60,11 +60,11 @@ ShellRoot {
             property bool passed: false
             property bool finished: false
             function roundOne() {
-                // 2: only fill/rim/shadow yield; accent decorations keep their own effects.
-                for (const name of ["Halo", "InnerGlow", "AccentTop", "AccentTint"])
-                    verify(findChild(decorationProbe, "pillMaterial" + name).visible, name)
-                verify(findChild(decorationProbe, "pillMaterialHalo").layer.enabled)
-                verify(!findChild(decorationProbe, "pillMaterialShadow").layer.enabled)
+                // W4: no legacy decoration instances or FBO under water.
+                const decorations = findChild(decorationProbe, "pillMaterialDecorations")
+                verify(!decorations.active && decorations.item === null)
+                for (const name of ["Halo", "InnerGlow", "AccentTop", "AccentTint", "Shadow"])
+                    verify(!findChild(decorationProbe, "pillMaterial" + name), name)
                 // 3/8: six consecutive unchanged frames, no layer, no input array when off.
                 compare(shaderProbe.renderInputs, null)
                 shaderProbe.time += 1
@@ -191,7 +191,8 @@ ShellRoot {
                     const material = findChild(pill, "pillMaterial")
                     const shadow = findChild(pill, "pillMaterialShadow")
                     const cache = findChild(pill, "pillBodyCache")
-                    verify(body && material && shadow && cache)
+                    verify(body && material && cache)
+                    compare(!!shadow, !body.waterActive)
                     wait(700)
                     roundOne()
                     compare(body.shader.outsideOpacity, 0)
@@ -243,11 +244,11 @@ ShellRoot {
                         wait(700)
                         compare(body.exposure, 1)
                         shape(body, material)
-                        verify(!shadow.visible && !shadow.layer.enabled, route + " has no material shadow FBO")
+                        verify(!findChild(pill, "pillMaterialShadow"), route + " has no material shadow instance")
                         fuzzyCompare(body.shader.shadowExposure, material.readingExposure * pill.fluidEdgeExposure, .001)
                         verify(body.shader.shadowExposure > 0)
-                        verify(!findChild(pill, "pillMaterialDepthLight").visible)
-                        verify(!findChild(pill, "pillMaterialDepthShade").visible)
+                        verify(!findChild(pill, "pillMaterialDepthLight"))
+                        verify(!findChild(pill, "pillMaterialDepthShade"))
                         tryVerify(() => !body.engine.needsFrames && !body.shader.parametersChanging, 3000)
                         verify(cache.visible && cache.hideSource && !cache.live)
                         verify(!body.shader.layer.enabled, "stationary glass is a texture")

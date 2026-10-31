@@ -16,6 +16,39 @@ ShaderEffect {
     property real reading: 0
     property real edgeExposure: 1
     property real shadowExposure: 1
+    property color decorAccent: colC
+    property real decorAwake: 0
+    property real decorGlow: 0
+    property vector4d reception: Qt.vector4d(0, 0, 0, 0)
+    property real sweep: 0
+    property bool decorMoving: false
+    signal advanceDecor(real dt)
+    property vector4d artBox: Qt.vector4d(0, 0, 0, 0)
+    property string artFirstUrl: ""
+    property string artSecondUrl: ""
+    property real artAspectFirst: artFirst.implicitWidth / Math.max(1, artFirst.implicitHeight)
+    property real artAspectSecond: artSecond.implicitWidth / Math.max(1, artSecond.implicitHeight)
+    property real artBlend: 0
+    property real artSlot: 0
+    property real artReady: artFirst.status === Image.Ready || artSecond.status === Image.Ready ? 1 : 0
+    property var artworkFirst: artFirst
+    property var artworkSecond: artSecond
+    Image {
+        id: artFirst
+        visible: false
+        source: root.artFirstUrl
+        sourceSize: Qt.size(256, 256)
+        asynchronous: true
+        fillMode: Image.PreserveAspectCrop
+    }
+    Image {
+        id: artSecond
+        visible: false
+        source: root.artSecondUrl
+        sourceSize: Qt.size(256, 256)
+        asynchronous: true
+        fillMode: Image.PreserveAspectCrop
+    }
     property bool cacheWhenStill: false
     property point cacheOrigin: Qt.point(0, 0)
     readonly property int quietFrames: 6
@@ -29,12 +62,14 @@ ShaderEffect {
         drop0, drop1, drop2, drop3, lightDir, wallOrigin, wallXform, colA, colB, colC,
         colBg, colBase, colTop, fillAlpha, pillRadius, water, reading, edgeExposure,
         companionBox0, companionShape0, companionBox1, companionShape1, companionBox2, companionShape2, companionBox3, companionShape3, companionBox4, companionShape4,
+        decorAccent, decorAwake, decorGlow, reception, sweep, decorMoving, artBox, artFirstUrl, artSecondUrl, artBlend, artSlot, artReady, artAspectFirst, artAspectSecond, artFirst.status, artSecond.status,
         shadowExposure, wallpaperSource, fragmentShader, status, cacheOrigin] : null
     onRenderInputsChanged: { unchangedFrames = 0; inputsDirty = true }
     FrameAnimation {
         id: settleFrames
-        running: root.cacheWhenStill && root.parametersChanging
+        running: root.decorMoving || root.cacheWhenStill && root.parametersChanging
         onTriggered: {
+            root.advanceDecor(frameTime)
             if (root.inputsDirty) root.inputsDirty = false
             else root.unchangedFrames++
         }

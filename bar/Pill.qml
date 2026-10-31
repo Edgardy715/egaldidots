@@ -36,7 +36,7 @@ Item {
     property bool companionBlocked: false
     property bool hovered: false
     property bool interactionOpen: surfaceOpen
-    readonly property bool receiving: material.receiving
+    readonly property bool receiving: body.waterActive ? body.receiving : material.receiving
     property real pointerX: width / 2
     property real pointerY: height / 2
     property string responseMood: "rest"
@@ -49,7 +49,10 @@ Item {
         responseMood = kind
         bodyEvents.react(kind)
         expressionHold.restart()
-        if (kind !== "paused" && kind !== "cancel") material.receive(0.55)
+        if (kind !== "paused" && kind !== "cancel") {
+            if (body.waterActive) body.receive(0.55)
+            else material.receive(0.55)
+        }
     }
     function notice(text, kind) {
         if (!visible || surface === "auth" || layoutChanging) return
@@ -63,6 +66,7 @@ Item {
         expressionHold.stop(); noticeHold.stop()
         responseMood = "rest"; activityNotice = ""
         material.settleReception()
+        body.settleReception()
     }
     // El motor Fluid puede extender visualmente el casquete derecho sin cambiar
     // el layout ni el contenido de reposo de la pill.
@@ -276,6 +280,13 @@ Item {
         companion3: pill.fluidCompanion3
         companion4: pill.fluidCompanion4
         sceneOrigin: pill.parent ? pill.parent.mapToItem(null, pill.x, pill.y) : Qt.point(pill.x, pill.y)
+        surface: pill.surface === "media" || surfaceHost.displayedSurface === "media" ? "media" : pill.surface
+        artUrl: contentAdapter.artUrl
+        artworkTransition: sharedArtwork
+        materialAccent: pill.materialAccent
+        materialAwake: pill.materialAwake
+        materialEpoch: pill.materialEpoch
+        notifBreathGlow: pill.notifBreathGlow
         reading: material.readingExposure
         edgeExposure: pill.fluidEdgeExposure
         suppressEdge: pill.fluidJoined

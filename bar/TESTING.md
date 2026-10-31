@@ -742,3 +742,24 @@ quieta, invalidación por geometría y Loader tras error real del shader.
 Resultado local: 17 fixtures PASS; settings-async no carga PanelWindow en
 offscreen. RHI no crea contexto OpenGL. Caché real, píxeles, GPU/PSS y QA Wayland
 siguen pendientes; Claude realiza esa QA. Informe: docs/agua-w3-2026-10-31/REPORT.md.
+
+
+## Agua W4 · decoraciones (2026-10-31)
+
+Usar un ISLA_CONFIG inexistente y directorios runtime/cache temporales (runtime
+con modo 0700); no reiniciar la shell de producción por la caché de qsb.
+
+```sh
+(cd bar/body/shaders && /usr/lib/qt6/bin/qsb --qt6 -o body.frag.qsb body.frag)
+ISLA_CONFIG=/tmp/agua-w4-nonexistent.json XDG_RUNTIME_DIR=/tmp/agua-w4-runtime XDG_CACHE_HOME=/tmp/agua-w4-cache QT_QPA_PLATFORM=offscreen timeout 90 quickshell -p bar/water-decor-regression.qml
+```
+
+Repetir para water-body, water-drop y los fixtures que devuelve
+`rg -l "PillMaterial|FluidCompanion" bar/*regression*.qml`; ejecutar además
+`node bar/tests/body-brain.cjs` y qmllint sobre los QML tocados.
+Repetir water-body/water-drop con `QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl`.
+WaterDecor valida descarga real del árbol decorativo, fallback, recepción de la
+gota, conservación del arte al cerrar/invertir, continuidad de muelles y reposo.
+La rama RHI añade píxeles de arte y error real de shader. Offscreen software no
+prueba el shader ni costuras; RHI sin contexto tampoco equivale a PASS visual.
+Resultados y fallos reproducidos sobre W3: `docs/agua-w4-2026-10-31/REPORT.md`.

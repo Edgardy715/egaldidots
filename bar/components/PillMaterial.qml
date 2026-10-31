@@ -30,9 +30,11 @@ Item {
     property real captureExtra: 0
     property real captureLeftExtra: 0
 
-    function receive(position) { reception.trigger(position) }
-    function settleReception() { reception.settle() }
-    readonly property bool receiving: reception.running
+    readonly property var decorationItem: decorations.status === Loader.Ready ? decorations.item : null
+
+    function receive(position) { if (decorationItem) decorationItem.receive(position) }
+    function settleReception() { if (decorationItem) decorationItem.settleReception() }
+    readonly property bool receiving: decorationItem !== null && decorationItem.receiving
 
     readonly property real bodyRadius: root.morphRadius + root.notifBreathRadius
     // A light compact tint grows gently for reading, keeping the backdrop visible.
@@ -42,6 +44,16 @@ Item {
 
     anchors.fill: parent
 
+    Loader {
+        id: decorations
+        objectName: "pillMaterialDecorations"
+        anchors.fill: parent
+        active: !root.shaderActive
+        sourceComponent: Item {
+            anchors.fill: parent
+            function receive(position) { reception.trigger(position) }
+            function settleReception() { reception.settle() }
+            readonly property bool receiving: reception.running
     Rectangle {
         id: bodyShadow
         objectName: "pillMaterialShadow"
@@ -256,6 +268,8 @@ Item {
             color: root.materialAccent
             objectName: "pillMaterialAccentTint"
             opacity: 0.035
+        }
+    }
         }
     }
 }

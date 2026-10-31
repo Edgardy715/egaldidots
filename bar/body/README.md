@@ -5,9 +5,9 @@ Motor sin contenido ni servicios multimedia. `BodyEngine` recibe geometría,
 `BodyShader` recibe esos datos y colores de Theme desde la composición.
 `PillBody` lo conecta a la pill de producción. Con `appearance.waterBody=false`
 (default) conserva la entrega de reposo al material de Fase 3. Con `true`,
-`body.frag` recibe la geometría viva de todos los surfaces; `PillMaterial` conserva
-recorte, arte, notificación y recepción. Morph e input siguen siendo propiedad
-de la pill. W3 incorpora gotas y cuellos Fluid al campo compartido.
+`body.frag` recibe geometría y decoraciones de todos los surfaces; `PillMaterial`
+descarga sus decoraciones. Morph, contenido e input siguen siendo propiedad
+de la pill. W3 incorpora gotas y cuellos; W4 añade arte, recepción y acento.
 
 Geometría en píxeles lógicos, origen superior izquierdo. Reserva 90 ×
 `designScale` de margen por lado para aura/sombra; evita recortarlas.
@@ -72,8 +72,8 @@ Radio y fusión del cuello de archivo se retiran juntos para no dejar hinchazón
 `reading` reproduce bodyAlpha y las paradas 0/.46/1 de cardTop/cardBot del material.
 El interior `d < -11*s` devuelve ese tinte premultiplicado con dithering antes de normales,
 lente y wallpaper. El borde respeta edgeExposure/suppressEdge; las decoraciones
-de recepción, barrido, notificación y arte siguen en el envoltorio, junto con
-materialHalo, InnerGlow, franja superior y tinte de acento.
+de recepción, barrido, notificación y arte seguían en el envoltorio en W1;
+W4 las incorpora al campo (contrato actualizado abajo).
 Software, error o reduceTransparency recuperan el material completo, sin sombra
 FBO del material mientras el shader esté activo.
 
@@ -129,7 +129,7 @@ Con renderer disponible no se cargan `PillMaterial` ni `FluidNeck` de la gota.
 Software, error del shader, waterBody=false, reduceTransparency, reduceMotion o
 Messenger recuperan ambos Loader con sus bindings anteriores. El contenido y
 sus controles siguen en la gota; arte ambiental y recepción alojados antes en
-su PillMaterial quedan pendientes de W4. No se modifica el respaldo FluidNeck.
+su PillMaterial se incorporan al campo en W4. No se modifica el respaldo FluidNeck.
 
 `bar/water-drop-regression.qml` comprueba Loader, histéresis, continuidad al
 invertir, coordenadas izquierda/derecha/centrada, brote, quietud y fallback.
@@ -140,3 +140,38 @@ y coste GPU siguen **no verificados**. La inversión no añade salto instantáne
 el recorrido normal a 60 Hz puede superar 1 px/cuadro. No equivale a una prueba
 de saltos <=1 px entre imágenes renderizadas. Evidencia y comandos:
 `docs/agua-w3-2026-10-31/REPORT.md`. La QA Wayland corresponde a Claude.
+
+
+## Agua W4 · decoraciones en el campo
+
+`PillMaterial.shaderActive` descarga el Loader completo de decoraciones. No quedan
+instancias de MediaAmbient, ReceptionPulse, halo, franja, velo ni tinte debajo del
+shader. La composición envía arte, transición compartida, acento, estado despierto,
+respiración de notificación y epoch a `PillBody`; la recepción Fluid se dirige al
+body con la caja de la gota. Media ocupa el slot 0; su ambiente sigue el contenido
+saliente durante cierre e inversión. La portada y los controles siguen siendo contenido.
+
+`body.frag` mezcla dos imágenes de hasta 256 px, siguiendo slot/blend del reloj
+ArtworkImage existente. Cinco muestras fijas por imagen producen ambiente con velo
+y máscara suave; no hay FastBlur/FBO decorativo ni movimiento ambiental perpetuo.
+No se muestrean imágenes fuera del cuerpo o de la máscara. El acento, la recepción
+y el barrido modifican el tinte anterior a la luz; el único borde usa la normal y
+la distancia del SDF unido, sin contorno rectangular interior. El aspecto de cada
+imagen se envía como uniform compatible con ESSL 100. Las URLs, estados de carga,
+aspectos y mezcla invalidan la captura, incluso si la segunda imagen carga tarde.
+
+Recepción y barrido usan `Motion.strokeSpring.wave` y `.tide`, manualStep=true,
+conservando posición/velocidad al recibir otro impulso o destino. Los integra el
+FrameAnimation de asentamiento ya existente de BodyShader; no se añade reloj ni
+bucle de cuadro. El barrido termina en un entero (intensidad cero en el wrap).
+Tras asentarse se detiene ese reloj; layer permanece apagado y la captura W1
+live:false se actualiza una vez. El arte no mantiene frames en reposo.
+
+Software, error del shader, waterBody=false, reduceTransparency y reduceMotion
+recuperan los Loader del material anterior. Al desactivar agua los muelles se
+resuelven al destino. No se cambia geometría, muelles de layout ni sus tiempos.
+`bar/water-decor-regression.qml` comprueba instancias, cableado, cierre/inversión,
+muelles, reposo y fallback. Su rama RHI comprueba cambio de píxeles por portada y
+fallo real de shader; la continuidad de cuello se mantiene en water-drop.
+En este entorno RHI no crea contexto: píxeles y coste GPU **no verificados**.
+Informe: `docs/agua-w4-2026-10-31/REPORT.md`. QA Wayland pendiente de Claude.

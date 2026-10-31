@@ -29,8 +29,16 @@ layout(std140, binding = 0) uniform buf {
     float fillAlpha;
     float pillRadius;
     float water, reading, edgeExposure, shadowExposure;
+    vec4 decorAccent;
+    float decorAwake, decorGlow;
+    vec4 reception;
+    float sweep;
+    vec4 artBox;
+    float artBlend, artSlot, artReady, artAspectFirst, artAspectSecond;
 };
 layout(binding = 1) uniform sampler2D wallpaper;
+layout(binding = 2) uniform sampler2D artworkFirst;
+layout(binding = 3) uniform sampler2D artworkSecond;
 
 // pillRadius < 0 keeps the stadium; a smaller radius follows the surface corners.
 float sdStadium(vec2 p, vec2 b) {
@@ -79,6 +87,47 @@ vec3 wall(vec2 p) {
     c = mix(c, colC.rgb, 0.65 * exp(-3.2 * length(q - vec2(0.55 * asp, 0.78 + 0.05 * sin(t * 0.7)))));
     return c * (1.0 - 0.6 * night);
 }
+// Fixed five-tap ambient filter: no extra pass, layer, clock or per-frame loop.
+vec3 ambient(sampler2D image, vec2 uv, float aspect) {
+    aspect = max(0.001, aspect);
+    float boxAspect = artBox.z / max(1.0, artBox.w);
+    uv = (uv - 0.5) * vec2(min(1.0, boxAspect / aspect), min(1.0, aspect / boxAspect)) + 0.5;
+    vec2 blur = vec2(0.09);
+    return (texture(image, clamp(uv, 0.0, 1.0)).rgb * 2.0
+        + texture(image, clamp(uv + blur, 0.0, 1.0)).rgb
+        + texture(image, clamp(uv - blur, 0.0, 1.0)).rgb
+        + texture(image, clamp(uv + vec2(blur.x, -blur.y), 0.0, 1.0)).rgb
+        + texture(image, clamp(uv + vec2(-blur.x, blur.y), 0.0, 1.0)).rgb) / 6.0;
+}
+vec4 decorate(vec4 tint, vec2 p, float y) {
+    if (water < 0.5) return tint;
+    vec3 color = tint.rgb / max(0.001, tint.a);
+    if (artReady > 0.5 && artBox.z > 0.0 && artBox.w > 0.0) {
+        vec2 uv = (p - artBox.xy) / (2.0 * artBox.zw) + 0.5;
+        // Feather into the common glass, never introduce an inner card border.
+        float mask = (1.0 - smoothstep(0.40, 0.55, abs(uv.x - 0.5)))
+            * (1.0 - smoothstep(0.40, 0.55, abs(uv.y - 0.5)));
+        if (mask > 0.0001) {
+            float blend = artSlot < 0.5 ? artBlend : 1.0 - artBlend;
+            vec3 art = mix(ambient(artworkFirst, uv, artAspectFirst), ambient(artworkSecond, uv, artAspectSecond), blend);
+            float veil = mix(0.35, 0.10, 1.0 - abs(uv.y * 2.0 - 1.0));
+            color = mix(color, art * (1.0 - veil), 0.22 * mask);
+        }
+    }
+    // One accent field; specular direction and the sole exterior rim remain below.
+    float topWash = (1.0 - smoothstep(0.0, 0.30, y)) * mix(0.028, 0.075, decorAwake);
+    color = mix(color, decorAccent.rgb, 0.035 + topWash);
+    float wave = min(1.0, reception.w);
+    if (wave > 0.0001) {
+        vec2 q = (p - reception.xy) / vec2(max(30.0, reception.z * 1.2), max(16.0, reception.z * 0.45));
+        color = mix(color, decorAccent.rgb, exp(-dot(q, q) * 2.0) * wave * 0.12);
+    }
+    float travel = fract(sweep);
+    float bandX = pill.x + (travel * 3.0 - 1.5) * pill.z * 2.0;
+    float band = exp(-pow((p.x - bandX + (p.y - pill.y) * 0.30) / max(24.0 * designScale, pill.z * 0.20), 2.0));
+    color += vec3(0.12) * band * pow(sin(travel * 3.14159265), 2.0);
+    return vec4(color * tint.a, tint.a);
+}
 void main() {
     vec2 p = qt_TexCoord0 * itemSize;
     float d = scene(p);
@@ -90,6 +139,7 @@ void main() {
     vec4 mid = vec4(colBase.rgb * fillAlpha, fillAlpha);
     vec4 bot = vec4(colBase.rgb / (1.0 + 0.16 * reading) * botA, botA);
     vec4 tint = y < 0.46 ? mix(top, mid, y / 0.46) : mix(mid, bot, (y - 0.46) / 0.54);
+    if (d < aaPx) tint = decorate(tint, p, y);
     float grain = (hash(p + (water > 0.5 ? 0.0 : fract(time))) - 0.5) * (2.0 / 255.0);
     if (water > 0.5 && d < -11.0 * designScale) {
         fragColor = vec4(tint.rgb + grain, tint.a) * qt_Opacity;
@@ -122,6 +172,10 @@ void main() {
     glass += lc * pow(max(dot(n, lightDir), 0.0), 2.0) * pow(edge, 5.0) * spec * rim;
     glass += colB.rgb * max(dot(n, -lightDir), 0.0) * pow(edge, 6.0) * 0.22 * rim;
     glass += colC.rgb * glow * pow(edge, 2.5) * 0.55 * rim;
+    // The accent belongs to the exterior SDF rim, including all fused necks.
+    if (water > 0.5)
+        glass = mix(glass, decorAccent.rgb * glassA,
+            min(0.40, 0.08 * decorAwake + decorGlow) * pow(edge, 6.0) * rim);
     float a = clamp(0.5 - d / aaPx, 0.0, 1.0);
     glass += grain;
     vec3 rgb = glass * a + auraRgb * (1.0 - a) * outsideOpacity;

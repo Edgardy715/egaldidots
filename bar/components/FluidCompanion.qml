@@ -36,6 +36,8 @@ Item {
     property string surfaceName: "media"
     property string artUrl: ""
     property var artworkTransition: null
+    readonly property bool ambientMedia: surfaceName === "media" && (expanded || surfaceHost.displayedSurface === "media"
+        || surfaceItem !== null && cardContentProgress > 0.001)
     property bool mediaPlaying: false
     property size surfaceSize: IslandGeometry.mediaSurface
     property Component compactContent
@@ -53,8 +55,12 @@ Item {
     readonly property bool pressed: compactHit.enabled && compactHit.pressed && compactHit.containsMouse
     signal requestToggle()
     function receive() {
-        const material = materialLoader.item as PillMaterial
-        if (root.active && root.expanded && material) material.receive(0.55)
+        if (!root.active || !root.expanded) return
+        if (root.waterActive) root.waterBody.receive(0.55, root)
+        else if (materialLoader.status === Loader.Ready) {
+            const material = materialLoader.item as PillMaterial
+            if (material) material.receive(0.55)
+        }
     }
     Connections {
         target: root.surfaceItem
