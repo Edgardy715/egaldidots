@@ -6,49 +6,12 @@ import "../"
 import "../components"
 import "../Singletons"
 import "../surfaces"
-import "../pets"
-import "../pets/PetApps.js" as PetApps
+import "../body"
 
 PanelWindow {
     id: overlay
     required property SurfaceRouter router
     required property var modelData
-    // One pet per monitor, only while enabled; surfaces offer perches through petContext.
-    Loader {
-        id: petLoader
-        z: 100
-        active: Config.pets.enabled
-        sourceComponent: PetLayer {
-            monitorActive: overlay.router.focusedMonitorName === overlay.modelData.name
-                && !overlay.layoutChanging && !overlay.monFullscreen && overlay.visible
-            s: overlay.s
-            coding: PetApps.isCoding(ToplevelManager.activeToplevel ? ToplevelManager.activeToplevel.appId : "")
-        }
-    }
-    readonly property Item petLayer: petLoader.item
-    Connections {
-        target: ToplevelManager
-        function onActiveToplevelChanged() {
-            const window = ToplevelManager.activeToplevel
-            if (petLoader.item && Config.pets.codingReaction && window && PetApps.isCoding(window.appId))
-                petLoader.item.notify("codingFocus")
-        }
-    }
-    Connections {
-        target: Players
-        function onPlayingChanged() {
-            if (Players.playing && petLoader.item) petLoader.item.notify("musicStart")
-        }
-        function onActiveChanged() {
-            if (Players.active && Players.active.isPlaying && petLoader.item) petLoader.item.notify("musicStart")
-        }
-    }
-    Connections {
-        target: Players.active
-        function onPostTrackChanged() {
-            if (Players.playing && petLoader.item) petLoader.item.notify("musicStart")
-        }
-    }
     readonly property real s: modelData ? (modelData.height / 1080) * Flags.uiScale : 1
     readonly property real topGap: 8 * Flags.topGap * s
     readonly property bool compact: layoutTransition.compact
@@ -79,6 +42,8 @@ PanelWindow {
     readonly property bool settingsReturning: !settingsOpen && settingsCompanion.active && surface !== "auth"
     property int profileRequest: 0
     readonly property bool settingsPickerOpen: settingsOpen && settingsCompanion.surfaceItem && settingsCompanion.surfaceItem.pathPickerOpen
+    readonly property bool settingsClearsSearch: settingsOpen && settingsCompanion.surfaceItem
+        && settingsCompanion.surfaceItem.escapeClearsSearch
     readonly property bool mixerPopupOpen: surface === "mixer" && pill.surfaceItem && !!pill.surfaceItem.popupOpen
     readonly property bool sessionOpen: surface === "session"
     readonly property bool wallpaperOpen: surface === "wallpaper"
@@ -99,14 +64,6 @@ PanelWindow {
     readonly property bool mediaDocking: router.mediaDockPendingMon === modelData.name
     readonly property bool launcherClosing: launcherOpen && router.launcherClosePhase !== 0
     readonly property bool launcherReturning: launcherOpen && router.launcherClosePhase === 2
-    onLauncherClosingChanged: {
-        if (!petLoader.item) return
-        if (launcherClosing) petLoader.item.holdForHome()
-        else if (launcherOpen) petLoader.item.cancelHomeReturn(true)
-    }
-    onSurfaceChanged: {
-        if (petLoader.item && surface && surface !== "launcher") petLoader.item.cancelHomeReturn()
-    }
     OverlayInputPolicy {
         id: inputPolicy
         objectName: "islandInputPolicy"
@@ -169,9 +126,16 @@ PanelWindow {
     }
     readonly property real fullscreenLift: -fullscreenHide * (pill.height + topGap)
 
-    onMonFullscreenChanged: if (monFullscreen) {
-        if (router.openMon === modelData.name) router.close();
-        if (router.peekMon === modelData.name) router.peekMon = "";
+    function dismissInFullscreen() {
+        if (monFullscreen) router.dismissMonitor(modelData.name)
+    }
+    onMonFullscreenChanged: dismissInFullscreen()
+    Connections {
+        target: router
+        function onOpenSurfaceChanged() { Qt.callLater(overlay.dismissInFullscreen) }
+        function onOpenMonChanged() { Qt.callLater(overlay.dismissInFullscreen) }
+        function onMediaDockPendingMonChanged() { Qt.callLater(overlay.dismissInFullscreen) }
+        function onPeekMonChanged() { Qt.callLater(overlay.dismissInFullscreen) }
     }
 
     screen: modelData
@@ -182,12 +146,6 @@ PanelWindow {
         ? WlrKeyboardFocus.Exclusive
         : WlrKeyboardFocus.None
     WlrLayershell.layer: WlrLayer.Overlay
-    // Foco de teclado SOLO mientras el overview está abierto en este
-    // monitor (con foco). Antes era siempre None (la pill es mouse-only y
-    // Exclusive robaba teclado de la app foco al abrir una surface normal);
-    // ahora el overview SÍ necesita flechas/Tab y las demás surfaces no.
-    // Sin HyprlandFocusGrab (que causaba la race que cerraba en seco): el
-    // foco lo pide la propia capa y lo libera al cerrar → robusto.
     WlrLayershell.namespace: "quickshell.island"
 
     anchors { top: true; left: true; right: true; bottom: true }
@@ -206,6 +164,12 @@ PanelWindow {
         onYChanged: changed()
         onWidthChanged: changed()
         onHeightChanged: changed()
+        Region {
+            x: messenger.hitItem.x; y: messenger.hitItem.y
+            width: messenger.acceptsClick ? messenger.hitItem.width : 0
+            height: messenger.acceptsClick ? messenger.hitItem.height : 0
+            shape: RegionShape.Ellipse
+        }
         Region {
             x: sideModules.x + sideModules.workspaceModule.x; y: sideModules.y + sideModules.workspaceModule.y
             width: sideModules.workspaceModule.interactive ? sideModules.workspaceModule.width : 0
@@ -281,7 +245,7 @@ PanelWindow {
     // surface (por ejemplo el TextInput del launcher) tiene el foco.
     Shortcut {
         sequence: "Escape"
-        enabled: inputPolicy.escapeShortcutEnabled && !overlay.settingsPickerOpen && !overlay.mixerPopupOpen
+        enabled: inputPolicy.escapeShortcutEnabled && !overlay.settingsPickerOpen && !overlay.mixerPopupOpen && !overlay.settingsClearsSearch
         onActivated: overlay.dismissSurface()
     }
     Shortcut {
@@ -313,20 +277,15 @@ PanelWindow {
 
         HoverHandler {
             parent: pill
-            onHoveredChanged: {
-                pill.hovered = hovered
-                if (petLoader.item) petLoader.item.pillLook(point.position.x, point.position.y, pill, hovered)
-            }
+            onHoveredChanged: pill.hovered = hovered
             onPointChanged: {
                 pill.pointerX = point.position.x
                 pill.pointerY = point.position.y
-                if (hovered && petLoader.item) petLoader.item.pillLook(pill.pointerX, pill.pointerY, pill, true)
             }
         }
 
         TopBarModules {
             id: sideModules
-            petLayer: petLoader.item
             objectName: "islandModules"
             x: overlay.compact ? pill.x : 0
             y: overlay.compact ? pill.y : 0
@@ -336,13 +295,13 @@ PanelWindow {
             compact: overlay.compact
             topGap: overlay.compact ? (height - 48 * overlay.s) / 2 : overlay.topGap
             opacity: !overlay.compact ? 1 : pill.opacity * ((!pill.surfaceOpen || pill.launcherReturning)
-                && !pill.notifAnimating ? Math.pow(pill.morphCloseness, 1.2)
+                && !pill.notifMorphing ? pill.morphRestReturn
                     * Math.max(0, Math.min(1, (pill.width - pill.restW + 40 * overlay.s) / (40 * overlay.s))) : 0)
             s: overlay.s
             screenName: overlay.modelData.name
             availableWidth: overlay.lateralAvailable
             centerWidth: pill.restCenterWidth
-            presented: !overlay.layoutChanging && inputPolicy.sideModulesPresented && (!overlay.compact || !pill.notifAnimating)
+            presented: !overlay.layoutChanging && inputPolicy.sideModulesPresented && (!overlay.compact || !pill.notifMorphing)
             onRequestSurface: name => {
                 if (name === "profile") {
                     overlay.profileRequest++
@@ -408,6 +367,45 @@ PanelWindow {
         }
     }
 
+    BodyMessenger {
+        id: messenger
+        objectName: "bodyMessenger"
+        anchors.fill: parent
+        z: 1
+        hitParent: overlay.contentItem
+        engine: pill.bodyPresentation.engine
+        bodyShader: pill.bodyPresentation.shader
+        bodyOrigin: Qt.point(pill.x + pill.bodyPresentation.x - pill.bodyPresentation.margin,
+            pill.y + pill.bodyPresentation.y - pill.bodyPresentation.margin)
+        reduceMotion: Flags.reduceMotion
+        acceptFiles: Config.appearance.personality && Config.appearance.bodyMessenger === true
+        enabled: acceptFiles && pill.bodyPresentation.resting && pill.bodyPresentation.running
+            && pill.bodyPresentation.shaderSupported && !pill.bodyPresentation.shaderFailed
+            && !overlay.monFullscreen
+    }
+    Binding { target: pill.bodyPresentation; property: "messengerActive"; value: messenger.shaderActive }
+    Binding { target: pill.bodyPresentation; property: "docked"; value: messenger.docked }
+    Binding { target: pill.bodyPresentation; property: "dock"; value: messenger.dock }
+    Binding { target: pill.bodyPresentation; property: "dockHovered"; value: messenger.dockHovered }
+    Binding { target: pill.bodyPresentation; property: "dockPressed"; value: messenger.dockPressed }
+    Binding { target: messenger; property: "dockProgress"; value: pill.bodyPresentation.dockProgress }
+    Connections {
+        target: overlay.router
+        function onFileActivationRequested(monitor) {
+            if (monitor === overlay.modelData.name) messenger.activate()
+        }
+        function onFileOffered(monitor, path) {
+            if (monitor === overlay.modelData.name) messenger.offerFile(path)
+        }
+    }
+    Connections {
+        target: Recording
+        function onSaved(path) {
+            const monitor = overlay.router.focusedMonitorName || (Quickshell.screens.length ? Quickshell.screens[0].name : "")
+            if (monitor === overlay.modelData.name) messenger.offerFile(path)
+        }
+    }
+
     Pill {
             id: pill
             objectName: "islandPill"
@@ -438,8 +436,19 @@ PanelWindow {
             s: overlay.s
             screenName: overlay.modelData.name
             recordingDetached: recordingCompanion.open || recordingCompanion.active
-            petContext: petLoader.item
-            petVisible: petLoader.item !== null && petLoader.item.petVisible
+            companionBlocked: overlay.launcherOpen || overlay.surface === "auth"
+            companionWorkspaceLook: sideModules.workspaceItem && sideModules.workspaceItem.hoverId > 0
+                ? (sideModules.workspaceItem.hoverId - 0.5) / Math.max(1, sideModules.workspaceItem.count) * 2 - 1 : 0
+            companionCodeFocused: {
+                const top = Hyprland.activeToplevel
+                const app = top && top.lastIpcObject ? String(top.lastIpcObject.class || "").toLowerCase() : ""
+                return /(^|[. -])(kitty|alacritty|foot|wezterm|ghostty|konsole|code|codium|zed|neovide|emacs|terminal)([. -]|$)/.test(app)
+            }
+            attentionItem: overlay.mediaSurfaceItem
+            companionMusicVisible: overlay.mediaOpen && !!overlay.mediaSurfaceItem && overlay.mediaSurfaceItem.visible
+            companionSeek: companionMusicVisible && overlay.mediaSurfaceItem.playback ? overlay.mediaSurfaceItem.playback.progress : 0.5
+            companionBeat: companionMusicVisible && Cava.hasFrame && Cava.values.length
+                ? Cava.values[Math.floor(Cava.values.length / 2)] : 0
             layoutChanging: overlay.layoutChanging
             interactionOpen: overlay.surfaceOpen
             restHeight: overlay.compact ? IslandGeometry.compactRestHeight : IslandGeometry.restHeight
@@ -451,9 +460,11 @@ PanelWindow {
             forcePinned: router.peekMon === overlay.modelData.name
             fluidJoined: (!overlay.compact && (!overlay.surfaceOpen || overlay.sessionOpen) && fluidCompanion.joined)
                 || sessionCompanion.joined || settingsCompanion.joined || recordingCompanion.joined
+                || notificationCompanion.joined
             fluidEdgeExposure: Math.min(
                 !overlay.compact && (!overlay.surfaceOpen || overlay.sessionOpen) ? fluidCompanion.edgeExposure : 1,
-                sessionCompanion.edgeExposure, settingsCompanion.edgeExposure, recordingCompanion.edgeExposure)
+                sessionCompanion.edgeExposure, settingsCompanion.edgeExposure, recordingCompanion.edgeExposure,
+                notificationCompanion.edgeExposure)
             fluidCaptureExtra: settingsCompanion.active ? settingsCompanion.captureExtra
                 : overlay.compact || overlay.surfaceOpen && !overlay.sessionOpen ? 0 : fluidCompanion.captureExtra
             fluidCaptureLeftExtra: Math.max(sessionCompanion.captureExtra, recordingCompanion.captureExtra)
@@ -486,7 +497,7 @@ PanelWindow {
             open: Recording.engaged && !overlay.layoutChanging && !overlay.monFullscreen
                 && overlay.recordingHasRoom && !overlay.sessionOpen && sessionCompanion.phase === "idle"
                 && !overlay.settingsOpen && settingsCompanion.phase === "idle"
-            bodyBusy: pill.surfaceOpen || pill.notifAnimating
+            bodyBusy: pill.surfaceOpen || pill.notifMorphing
             opacity: 1 - overlay.fullscreenHide
             transform: Translate { y: overlay.fullscreenLift }
             onRequestRecording: router.toggleSurface(overlay.modelData.name, "recording")
@@ -502,7 +513,7 @@ PanelWindow {
             surfaceSize: IslandGeometry.sessionSurface
             open: overlay.sessionOpen && !overlay.settingsReturning && recordingCompanion.phase === "idle"
             expanded: overlay.sessionOpen && !overlay.settingsReturning
-            bodyBusy: pill.surfaceOpen || pill.notifAnimating
+            bodyBusy: pill.surfaceOpen || pill.notifMorphing
             s: overlay.s
             screenName: overlay.modelData.name
             opacity: 1 - overlay.fullscreenHide
@@ -532,7 +543,7 @@ PanelWindow {
             asynchronousExpandedContent: true
             open: overlay.settingsOpen
             expanded: overlay.settingsOpen
-            bodyBusy: pill.surfaceOpen || pill.notifAnimating
+            bodyBusy: pill.surfaceOpen || pill.notifMorphing
             s: overlay.s
             screenName: overlay.modelData.name
             opacity: 1 - overlay.fullscreenHide
@@ -540,9 +551,42 @@ PanelWindow {
             onRequestToggle: { if (overlay.settingsOpen) router.close() }
         }
 
+        // Informational notifications bud below the pill; it keeps its content.
+        // Not part of the input region: clicks pass through as before.
+        FluidCompanion {
+            id: notificationCompanion
+            objectName: "islandNotificationCompanion"
+            anchors.fill: parent
+            z: 5
+            body: pill
+            centered: true
+            below: true
+            springRate: 1.5
+            surfaceName: "notification"
+            surfaceSize: Qt.size(380, 72)
+            expandedContent: Component {
+                IslandNotification {
+                    notification: pill.activeNotif
+                    s: overlay.s
+                    pillWidth: notificationCompanion.cardW
+                    pillHeight: notificationCompanion.cardH
+                    closeness: 1
+                    iconResolved: pill._notifIconResolved
+                    iconSource: pill.notificationIcon
+                }
+            }
+            retainExpandedContent: true
+            open: pill.notifDropOpen
+            expanded: pill.notifDropOpen
+            bodyBusy: pill.surfaceOpen
+            s: overlay.s
+            screenName: overlay.modelData.name
+            opacity: 1 - overlay.fullscreenHide
+            transform: Translate { y: overlay.fullscreenLift }
+        }
+
         FluidMediaCompanion {
             id: fluidCompanion
-            petContext: petLoader.item
             objectName: "islandMediaCompanion"
             z: fluidCompanion.cardFraction > 0.05 ? 3 : 1
             opacity: overlay.compact ? 0 : 1 - overlay.fullscreenHide
@@ -552,17 +596,25 @@ PanelWindow {
             body: pill
             open: !overlay.layoutChanging && !overlay.compact && (Players.has || overlay.mediaOpen) && !overlay.launcherOpen && !overlay.mediaPanelOpen
                 && !overlay.mediaPanelReturning && !overlay.mediaDocking
-            onPhaseChanged: if (phase === "idle" && overlay.mediaDocking)
+            // Once the drop is concealed inside the body the dock is visually done;
+            // its hidden springs settling to idle used to hold the launcher ~0.5 s.
+            // The returning drop's content is gone once its centre is inside the
+            // body; a surface growing in place covers the rest, so waiting for the
+            // capture to stretch around it only held it ~0.2 s. The launcher carries
+            // the body away from the top row and must wait until the drop is hidden.
+            readonly property bool docked: phase === "idle" || phase === "absorbiendo" && concealed
+                || phase === "retornando" && contentExposure <= 0 && router.mediaDockPendingSurface !== "launcher"
+            onDockedChanged: if (docked && overlay.mediaDocking)
                 Qt.callLater(() => router.finishMediaDock(overlay.modelData.name))
             Connections {
                 target: overlay
                 function onMediaDockingChanged() {
-                    if (overlay.mediaDocking && fluidCompanion.phase === "idle")
+                    if (overlay.mediaDocking && fluidCompanion.docked)
                         Qt.callLater(() => router.finishMediaDock(overlay.modelData.name))
                 }
             }
             expanded: !overlay.layoutChanging && !overlay.compact && overlay.mediaOpen && !overlay.mediaDocking && !overlay.settingsReturning
-            bodyBusy: overlay.surfaceOpen && !overlay.mediaOpen && !overlay.sessionOpen || pill.notifAnimating
+            bodyBusy: overlay.surfaceOpen && !overlay.mediaOpen && !overlay.sessionOpen || pill.notifMorphing
             s: overlay.s
             screenName: overlay.modelData.name
             onRequestMedia: router.toggleSurface(overlay.modelData.name, "media")

@@ -131,10 +131,12 @@ Item {
             font.pixelSize: Theme.fontSizeHero * root.s
             font.weight: Font.DemiBold
         }
-        Text {
+        CrossfadeLabel {
             Layout.fillWidth: true
-            text: root.succeeded ? qsTr("Conectado") : root.busy ? qsTr("Estableciendo conexión…") : qsTr("Introduce la contraseña de la red")
+            Layout.preferredHeight: implicitHeight
+            value: root.succeeded ? qsTr("Conectado") : root.busy ? qsTr("Estableciendo conexión…") : qsTr("Introduce la contraseña de la red")
             horizontalAlignment: Text.AlignHCenter
+            elide: Text.ElideRight
             color: root.succeeded ? root.successColor : Theme.iconSecondary
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeBody * root.s
@@ -220,12 +222,15 @@ Item {
             }
         }
 
-        Text {
+        CrossfadeLabel {
             Layout.fillWidth: true
             Layout.preferredHeight: 34 * root.s
-            text: root.errorText || (root.busy ? qsTr("Verificando credenciales…")
+            value: root.errorText || (root.busy ? qsTr("Verificando credenciales…")
                 : password.text.length > 0 && password.text.length < 8 ? qsTr("Faltan %1 caracteres").arg(8 - password.text.length)
                 : password.text.length >= 8 ? qsTr("Pulsa Enter para conectar") : qsTr("Mínimo 8 caracteres"))
+            // The countdown changes on every keystroke: swap it in place instead of
+            // queueing one crossfade per character.
+            animated: root.errorText.length > 0 || root.busy || password.text.length === 0 || password.text.length >= 8
             color: root.errorText.length ? root.errorColor : Theme.iconSecondary
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeBody * root.s
@@ -248,10 +253,12 @@ Item {
             background: Rectangle {
                 radius: Theme.radiusLg * root.s
                 color: parent.enabled ? Theme.accent : Qt.alpha(Theme.foreground, Theme.alphaSoft)
+                Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
             }
             contentItem: Text {
                 text: connectButton.text
                 color: connectButton.enabled ? Theme.primaryContent : Theme.iconSecondary
+                Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
                 font.weight: Font.DemiBold

@@ -28,6 +28,6 @@ QtObject {
     }
     function activate(id: int): void {
         if (id < 1 || id > count) return
-        Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + id + " })"])
+        Qt.callLater(Quickshell.execDetached, ["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + id + " })"])
     }
 }

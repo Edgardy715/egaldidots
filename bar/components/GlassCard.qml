@@ -24,7 +24,8 @@ Item {
     property real radius_: 16 * s
     property real pad: 0
     property bool clickable: false
-    property color borderColor: Theme.border
+    // Superficies líquidas: la tarjeta se separa por tono y luz, no por contorno.
+    property color borderColor: Theme.liquid ? "transparent" : Theme.border
     property real borderWidth: 1
     property color washColor: Qt.alpha(Theme.foreground, Theme.alphaFaint)
     property real glow: 0

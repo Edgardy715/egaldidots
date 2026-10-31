@@ -11,7 +11,7 @@ Item {
     property string iconName: ""
     // Font fallback compatibility; Lucide strokes remain outline.
     property real fill: 0
-    Behavior on fill { enabled: root.ready && root.visible; NumberAnimation { id: fillAnimation; duration: Motion.iconSwap; easing.type: Easing.OutCubic } }
+    Behavior on fill { enabled: root.ready && root.visible; NumberAnimation { id: fillAnimation; duration: Motion.iconSwap; easing.type: Motion.easeStandard } }
 
     property bool transport: false
     // A control supplies the gesture; decorative icons remain still.
@@ -40,7 +40,7 @@ Item {
     readonly property real hoverGain: iconName === "power_settings_new" ? Motion.iconEmphasisStrong
         : ["play_arrow", "pause", "wifi", "wifi_off", "bluetooth", "bluetooth_disabled", "lock", "lock_open", "add", "remove"].indexOf(iconName) >= 0 ? Motion.iconEmphasis : Motion.iconEmphasisSubtle
     property real emphasis: hovered && !Flags.reduceMotion && !pressed ? 1 : 0
-    Behavior on emphasis { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.hover; easing.type: Easing.OutCubic } }
+    Behavior on emphasis { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.hover; easing.type: Motion.easeStandard } }
     onIconNameChanged: {
         if (!ready || displayedIcon === iconName) return
         outgoingIcon = swapProgress < 0.5 && outgoingIcon.length > 0 ? outgoingIcon : displayedIcon
@@ -49,6 +49,8 @@ Item {
     }
     property font font
     property color color: Theme.foreground
+    // Only state changes on a mounted icon: hundreds of icons must not tween at load.
+    Behavior on color { enabled: root.ready && root.visible; ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
     property real neonIntensity: interaction ? 0.65 * interaction.presence + 0.25 * interaction.pressure : 0
     layer.enabled: visible && enabled && neonIntensity > 0.01
     layer.effect: MultiEffect {
@@ -77,7 +79,7 @@ Item {
         target: root; property: "swapProgress"
         from: 0; to: 1
         duration: root.animateChanges && root.visible ? Motion.iconSwap : 0
-        easing.type: Easing.OutCubic
+        easing.type: Motion.easeStandard
         onFinished: root.outgoingIcon = ""
     }
     Text {

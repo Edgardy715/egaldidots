@@ -39,6 +39,12 @@ Singleton {
     readonly property color hair: Qt.alpha(IslaPalette.colors.outline, 0.3)
     readonly property color glassShadow: Qt.rgba(0, 0, 0, alphaCritical)
 
+    // Cristal adaptativo: un fondo saturado (acento derivado del wallpaper) deja pasar
+    // color tras cifras y texto; el tinte sube hasta 0,10 con el croma. Se recalcula
+    // sólo al cambiar la paleta, no por fotograma. P1-6 del QA visual 2026-10-30.
+    readonly property real glassChromaLift: Math.min(1, IslaPalette.accent.hsvSaturation) * 0.10
+
+    readonly property bool dark: IslaPalette.mode === "dark"
     readonly property color accent: IslaPalette.accent
     readonly property color accentStrong: IslaPalette.accentStrong
     readonly property color accentSoft: IslaPalette.accentSoft
@@ -66,6 +72,44 @@ Singleton {
     readonly property color iconSecondary: IslaPalette.colors.on_surface_variant
     readonly property color iconMuted: Qt.alpha(iconSecondary, alphaDisabled)
     readonly property color iconOnAccent: primaryContent
+
+    // ---- Tidemark: color de resolución y grosor del trazo ----
+    // Verde/rojo sólo al resolver; el resto del tiempo el trazo usa el acento.
+    readonly property color signalSuccess: "#32d975"
+    readonly property color signalError: "#ff4d61"
+    readonly property real strokeRing: 0.045      // anillo: fracción del diámetro (0.055 en el símbolo)
+    readonly property real strokeSymbol: 0.055
+
+    // ---- Lenguaje líquido (Apariencia → Superficies líquidas) ----
+    // Un estado activo es una gota de acento que nace del icono y llena su
+    // contenedor; la tinta considera las dos caras del relleno y de la tarjeta.
+    readonly property bool liquid: Flags.liquidSurfaces
+    readonly property color stateFill: Qt.alpha(accent, Flags.stateIntensity)
+    // Cara iluminada del líquido: el relleno de estado gana volumen hacia arriba.
+    readonly property color stateFillLight: Qt.lighter(stateFill, 1.14)
+    function luminance(color) {
+        const linear = channel => channel <= 0.04045 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4)
+        return 0.2126 * linear(color.r) + 0.7152 * linear(color.g) + 0.0722 * linear(color.b)
+    }
+    function contrast(a, b) {
+        const first = luminance(a), second = luminance(b)
+        return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05)
+    }
+    function stateInk(bottom, top, fill, light, primary, normal) {
+        // shortcut: evaluates opaque theme surfaces; arbitrary backdrops need reduced transparency.
+        const faces = [Qt.tint(bottom, fill), Qt.tint(top, fill),
+            Qt.tint(bottom, light), Qt.tint(top, light)]
+        const inks = [primary, normal, Qt.rgba(0, 0, 0, 1), Qt.rgba(1, 1, 1, 1)]
+        let best = primary, bestScore = 0
+        for (let i = 0; i < inks.length; ++i) {
+            const score = Math.min(...faces.map(face => contrast(inks[i], face)))
+            if (i < 2 && score >= 4.5) return inks[i]
+            if (score > bestScore) { best = inks[i]; bestScore = score }
+        }
+        return best
+    }
+    readonly property color stateContent: stateInk(cardBot, cardTop, stateFill, stateFillLight, primaryContent, foreground)
+    readonly property color stateContentSecondary: Qt.alpha(stateContent, alphaIconSec)
 
     readonly property real shadowOpacity: 0.55
     readonly property real rSmall: Motion.rSmall * Flags.radiusScale
@@ -170,6 +214,9 @@ Singleton {
     // de caelestia). Cae a Inter si no está instalada.
     readonly property string fontDisplay: Flags.fontDisplayFamily
     readonly property string fontMedia: Flags.fontMediaFamily
+    // Cifras tabulares en la fuente de interfaz: valores y contadores no
+    // bailan al cambiar y no necesitan la monoespaciada (que rompe el tono).
+    readonly property var fontNumeric: ({ "tnum": 1 })
 
     function mix(a, b, t) {
         return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, 1)

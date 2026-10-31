@@ -115,7 +115,8 @@ Singleton {
         id: detectProc
         command: ["sh", "-c",
             "for d in /sys/class/backlight/*/; do dev=$(basename $d); max=$(cat ${d}max_brightness 2>/dev/null); " +
-            "if [ -n \"$max\" ] && [ \"$max\" -gt 0 ]; then echo \"$dev $max\"; break; fi; done"]
+            "bl=$(cat ${d}bl_power 2>/dev/null || echo 0); " +
+            "if [ -n \"$max\" ] && [ \"$max\" -gt 0 ] && [ \"$bl\" = 0 ]; then echo \"$dev $max\"; break; fi; done"]
         stdout: StdioCollector {
             id: detectColl
             onStreamFinished: {

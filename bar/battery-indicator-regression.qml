@@ -47,6 +47,13 @@ ShellRoot {
                     return
                 }
             }
+            // El rayo se dibuja sólo con el cargador: trazo completo conectado, ausente si no.
+            const bolt = n => indicators.itemAt(n).children.filter(c => c.objectName === "batteryBolt")[0]
+            if (!bolt(1).visible || bolt(0).visible) {
+                console.error("FAIL: battery bolt visibility", bolt(1).visible, bolt(0).visible)
+                Qt.exit(1)
+                return
+            }
             console.log("PASS: normal, charging, paused, warning and low battery")
             Qt.exit(0)
         }

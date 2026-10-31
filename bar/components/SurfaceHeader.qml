@@ -5,9 +5,10 @@ import "../Singletons"
 import "../"
 
 /**
- * Isla · SurfaceHeader. Header unificado de surfaces (reemplaza los ~7 headers
- * duplicados): título DemiBold + spacer + trailing (chip de contador, texto o
- * icono). Con entrada animada sutil (opacity + translate) cuando `entered`.
+ * Isla · SurfaceHeader. Header unificado de surfaces: título grande DemiBold
+ * (misma jerarquía que Portapapeles, Sonido y Conectividad) + trailing (chip
+ * de contador, texto o acción). Sin icono decorativo: el título manda.
+ * Con entrada animada sutil (opacity + translate) cuando `entered`.
  *
  * Props:
  *   title    — texto principal
@@ -22,7 +23,6 @@ Item {
 
     property string title: ""
     property string subtitle: ""
-    property string iconName: ""
     property real s: 1
     property bool entered: true
     property int delay: 0
@@ -42,31 +42,20 @@ Item {
         anchors.fill: parent
         spacing: Theme.spacingMd * root.s
 
-        MaterialIcon {
-            Layout.preferredWidth: root.iconName.length > 0 ? 22 * root.s : 0
-            Layout.preferredHeight: 22 * root.s
-            Layout.alignment: Qt.AlignVCenter
-            iconName: root.iconName
-            color: Theme.accent
-            font.pixelSize: 20 * root.s
-            visible: root.iconName.length > 0
-            Accessible.ignored: true
-        }
-
         ColumnLayout {
             id: labels
             Layout.fillWidth: true
             Layout.minimumWidth: 0
-            spacing: Theme.spacingXs * root.s
+            spacing: Theme.spacingXxs * root.s
             Layout.alignment: Qt.AlignVCenter
             Text {
                 Layout.fillWidth: true
                 text: root.title
                 color: Theme.foreground
                 font.family: Theme.font
-                font.pixelSize: Theme.fontSizeTitleLg * root.s
+                font.pixelSize: Theme.fontSizeDisplayLg * root.s
                 font.weight: Font.DemiBold
-                font.letterSpacing: -0.1 * root.s
+                font.letterSpacing: -0.3 * root.s
                 elide: Text.ElideRight
             }
             Text {
@@ -74,8 +63,7 @@ Item {
                 text: root.subtitle
                 color: Theme.iconSecondary
                 font.family: Theme.font
-                font.pixelSize: Theme.hSmall * root.s
-                font.letterSpacing: 0.15 * root.s
+                font.pixelSize: Theme.fontSizeSmall * root.s
                 visible: root.subtitle.length > 0
                 elide: Text.ElideRight
             }

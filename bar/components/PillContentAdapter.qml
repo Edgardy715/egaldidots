@@ -18,8 +18,8 @@ Item {
     readonly property string artUrl: Players.artUrl
     readonly property string title: Players.title
     readonly property string artist: Players.artist
-    readonly property bool hasProgress: !!Players.active && Players.active.length > 0
-    readonly property real progress: hasProgress ? Math.max(0, Math.min(1, Players.active.position / Players.active.length)) : 0
+    readonly property bool hasProgress: Players.lengthOf(Players.active) > 0
+    readonly property real progress: Players.progressOf(Players.active)
     readonly property string notificationIcon: notification ? resolveIcon(notification.appIcon, notification.appName) : ""
     signal workspaceChanged(int number)
     onActiveWsNameChanged: {

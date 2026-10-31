@@ -19,6 +19,8 @@ MotionButton {
         x: root.width - width
         y: root.height + 8
         padding: 10
+        enter: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Motion.fast; easing.type: Motion.easeStandard } }
+        exit: Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: Motion.hover; easing.type: Motion.easeStandard } }
         contentItem: Text {
             text: qsTr("Cambiar foto de perfil")
             font.family: Theme.font

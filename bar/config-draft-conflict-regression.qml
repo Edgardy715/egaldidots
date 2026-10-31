@@ -36,6 +36,7 @@ ShellRoot {
 
             function test_external_change() {
                 tryCompare(Config, "loaded", true)
+                page.fieldSelection = { active: true, section: "profile", keys: ["profile.displayName"] }
                 const editor = findType(page, "EdotsTextField")
                 verify(editor !== null, "profile editor found")
                 editor.forceActiveFocus()

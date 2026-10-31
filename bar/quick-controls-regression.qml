@@ -48,15 +48,15 @@ ShellRoot {
 
             function test_mocked_controls() {
                 wait(400)
-                compare(findChild(view, "brightnessPercent").text, "47%")
+                compare(findChild(view, "brightnessPercent").text, "47")
                 verify(findChild(view, "brightnessWriteError").visible)
                 compare(findChild(view, "powerProfileSummary").text, "Equilibrio · recomendado")
 
-                const brightnessDown = findChild(view, "brightnessDecrease")
-                mouseClick(brightnessDown, brightnessDown.width / 2, brightnessDown.height / 2)
-                compare(action("step")[1], -10)
-
                 const slider = findChild(view, "brightnessSlider")
+                slider.forceActiveFocus()
+                keyClick(Qt.Key_Left)
+                compare(action("step")[1], -5)
+
                 mouseClick(slider, slider.width * 0.8, slider.height / 2)
                 verify(action("brightness")[1] > 50 && action("brightness")[1] < 100)
 
@@ -71,7 +71,15 @@ ShellRoot {
                 const appearance = findChild(view, "appearanceAction")
                 mouseClick(appearance, appearance.width / 2, appearance.height / 2)
                 compare(action("page")[1], "appearance")
-                console.log("PASS: mocked quick controls render service state and emit brightness, keep-awake, profile and navigation actions")
+
+                const focus = findChild(view, "openFocus")
+                verify(focus.mapToItem(view, 0, focus.height).y <= view.height)
+                mouseClick(focus, focus.width / 2, focus.height / 2)
+                compare(test.actions[test.actions.length - 1][1], "focus")
+                focus.forceActiveFocus()
+                keyClick(Qt.Key_Return)
+                compare(test.actions[test.actions.length - 1][1], "focus")
+                console.log("PASS: mocked quick controls render service state and emit brightness, keep-awake, profile and navigation actions; the activities tile is reachable")
                 finished = true
             }
         }

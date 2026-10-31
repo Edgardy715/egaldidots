@@ -16,11 +16,13 @@ Item {
     property string screenName: ""
     property bool leftSide: false
     property bool centered: false
+    // Centered card rests just under the body instead of mid-screen.
+    property bool below: false
+    // Scales every spring frequency; reduced motion keeps its own.
+    property real springRate: 1
     property string surfaceName: "media"
     property string artUrl: ""
     property var artworkTransition: null
-    property var petContext: null
-    property bool barNicheOccupied: false
     property bool mediaPlaying: false
     property size surfaceSize: IslandGeometry.mediaSurface
     property Component compactContent
@@ -63,9 +65,12 @@ Item {
         : surfaceSize.height * s
     readonly property real gap: 12 * s
     readonly property real cardX: centered ? (width - cardW) / 2 : bodyX + bodyW + gap
-    readonly property real cardY: centered ? (height - cardH) / 2 : bodyY
+    readonly property real cardY: !centered ? bodyY : below
+        ? Math.min(bodyY + bodyH + gap, height - cardH - 24 * s) : (height - cardH) / 2
     readonly property real capX: centered ? bodyX + bodyW / 2 : bodyX + bodyW + captureExtra - bodyRadius
-    readonly property real capY: bodyY + bodyRadius
+    // A tall body still buds from its lower edge, never from its middle.
+    readonly property real capRadius: below ? Math.min(bodyRadius, 32 * s) : bodyRadius
+    readonly property real capY: below ? bodyY + bodyH - capRadius : bodyY + bodyRadius
 
     property string phase: "idle"
     property real xPos: 0
@@ -91,7 +96,7 @@ Item {
     readonly property bool transitioning: phase !== "idle"
     readonly property real dropRadius: Math.min(wPos, hPos) / 2
     readonly property real stretch: Math.hypot(xPos + wPos / 2 - capX, yPos + hPos / 2 - capY)
-        / Math.max(1, bodyRadius + dropRadius)
+        / Math.max(1, capRadius + dropRadius)
     readonly property bool joined: active && bond && !bodyBusy
     readonly property real neckWaist: {
         const tension = Math.max(0, Math.min(1, (stretch - 1.02) / (1.30 - 1.02)))
@@ -136,9 +141,7 @@ Item {
             (xPos + wPos / 2 - bodyX - bodyW) / Math.max(1, dropRadius + 3 * s)))
         const separation = Math.max(0, Math.min(1, (stretch - 0.75) / 0.53))
         const ordinary = bodyBusy ? center : Math.min(center, separation)
-        return barNicheOccupied && !expanded
-            ? Math.min(ordinary, Math.max(0, Math.min(1, (xPos - bodyX - bodyW) / gap)))
-            : ordinary
+        return ordinary
     }
     // A bud or gathering card stays a blob; corners settle to 24 before any
     // content is more than faint, so the editor is never clipped by blob corners.
@@ -154,20 +157,20 @@ Item {
     readonly property real budSize: moduleH
     readonly property real budX: centered ? capX - budSize / 2
         : capX + 1.45 * (bodyRadius + budSize / 2) - budSize / 2
-    readonly property real budY: centered ? capY + 1.45 * (bodyRadius + budSize / 2) - budSize / 2
+    readonly property real budY: centered ? capY + 1.45 * (capRadius + budSize / 2) - budSize / 2
         : bodyY + (bodyH - budSize) / 2
     // Start the trailing contraction while the return still has velocity.
     readonly property bool coveredByBody: {
         if (wPos > returnW + 3 * s
                 || hPos > returnH + 3 * s || contentExposure >= 0.01) return false
-        const left = bodyX + bodyRadius
-        const right = bodyX + bodyW + captureExtra - bodyRadius
+        const left = bodyX + capRadius
+        const right = bodyX + bodyW + captureExtra - capRadius
         const cy = yPos + hPos / 2
         const first = xPos + dropRadius
         const last = xPos + wPos - dropRadius
         const d1 = Math.hypot(first - Math.max(left, Math.min(right, first)), cy - capY)
         const d2 = Math.hypot(last - Math.max(left, Math.min(right, last)), cy - capY)
-        return Math.max(d1, d2) + dropRadius <= bodyRadius + 0.08 * s
+        return Math.max(d1, d2) + dropRadius <= capRadius + 0.08 * s
     }
     readonly property bool settled: Math.abs(targetX - xPos) < 0.08
         && Math.abs(targetY - yPos) < 0.08 && Math.abs(targetW - wPos) < 0.08
@@ -192,10 +195,11 @@ Item {
     }
 
     function start(): void {
-        captureExtra = expanded || Flags.reduceMotion || barNicheOccupied ? 0 : 6 * s
+        captureExtra = expanded || Flags.reduceMotion ? 0 : 6 * s
         captureTarget = 0; captureV = 0
+        lastBodyEdge = bodyX + bodyW
         xPos = centered ? bodyX + (bodyW - 34 * s) / 2 : bodyX + bodyW - 18 * s
-        yPos = bodyY + (bodyH - 34 * s) / 2
+        yPos = below ? capY - 17 * s : bodyY + (bodyH - 34 * s) / 2
         wPos = 34 * s; hPos = 34 * s
         vx = 0; vy = 0; vw = 0; vh = 0
         if (expanded && !Flags.reduceMotion) {
@@ -208,6 +212,8 @@ Item {
             retarget("nacimiento", xPos, yPos, wPos, hPos)
             birthTimer.restart()
         }
+        // The first frame already draws the neck, never a loose droplet inside the pill.
+        updateBond()
     }
 
     function close(): void {
@@ -225,8 +231,8 @@ Item {
     readonly property real gatherSize: 66 * s
     function returnHome(): void {
         retarget("retornando", centered ? bodyX + (bodyW - returnW) / 2
-                 : bodyX + bodyW - (barNicheOccupied ? returnW : 20 * s),
-                 bodyY + (bodyH - returnH) / 2, returnW, returnH)
+                 : bodyX + bodyW - 20 * s,
+                 below ? capY - returnH / 2 : bodyY + (bodyH - returnH) / 2, returnW, returnH)
     }
 
     // A card blooms only clear of the pill; reopening while joined or inside
@@ -258,6 +264,7 @@ Item {
         else if (phase === "recogiendo") { omega = 19; damping = 0.98 }
         else if (phase === "retornando" || phase === "absorbiendo") { omega = 15.5; damping = 0.98 }
         if (Flags.reduceMotion) { omega = 28; damping = 1.15 }
+        else omega *= springRate
         // Exact damped motion keeps the same trajectory at every refresh rate.
         const offset = value - target
         const decay = Math.exp(-damping * omega * dt)
@@ -274,7 +281,9 @@ Item {
     function updateBond(): void {
         if (!active || bodyBusy) { bond = false; return }
         // Returning grows the neck from zero at the same threshold where it breaks.
-        bond = stretch < (bond || phase === "retornando" ? 1.30 : 1.02)
+        // A wide droplet can pass the stretch limit while its edge is still
+        // inside the pill; the neck holds until it is clear, so no loose drop overlaps.
+        bond = stretch < (bond || phase === "retornando" ? 1.30 : 1.02) || (bond && overlapsBody)
     }
 
     onOpenChanged: {
@@ -296,11 +305,29 @@ Item {
     }
     onWidthChanged: if (expanded) syncHoverSize()
     onHeightChanged: if (centered && expanded) syncHoverSize()
+    // A growing pill carries the droplet on its edge instead of sweeping into
+    // it: body motion never brings clearance below its current value or 7 px.
+    readonly property real contactClearance: 7 * s
+    property real lastBodyEdge: 0
+    function carryClearance(): void {
+        const edge = bodyX + bodyW
+        const advance = edge - lastBodyEdge
+        lastBodyEdge = edge
+        if (centered || advance <= 0
+                || (phase !== "separando" && phase !== "companion" && phase !== "media")) return
+        const before = xPos - edge + advance
+        const floor = Math.min(before, contactClearance)
+        if (before - advance < floor) xPos = edge + floor
+    }
     function followBody(): void {
-        if (phase === "retornando") {
+        carryClearance()
+        if (phase === "separando") {
+            targetX = bodyX + bodyW + gap
+            targetY = compactY
+        } else if (phase === "retornando") {
             targetX = centered ? bodyX + (bodyW - returnW) / 2
-                : bodyX + bodyW - (barNicheOccupied ? returnW : 20 * s)
-            targetY = bodyY + (bodyH - returnH) / 2
+                : bodyX + bodyW - 20 * s
+            targetY = below ? capY - returnH / 2 : bodyY + (bodyH - returnH) / 2
             targetW = returnW
             targetH = returnH
         } else if (phase === "brotando" || phase === "recogiendo") {
@@ -315,7 +342,6 @@ Item {
     onReturnWChanged: if (phase === "retornando") followBody()
     onReturnHChanged: if (phase === "retornando") followBody()
     onBodyBusyChanged: updateBond()
-    onBarNicheOccupiedChanged: { followBody(); if (barNicheOccupied) captureTarget = 0 }
     onHoveredChanged: syncHoverSize()
     onCompactWidthChanged: syncHoverSize()
     onHoverWidthChanged: if (hovered) syncHoverSize()
@@ -364,7 +390,7 @@ Item {
         next = root.spring(root.wPos, root.vw, root.targetW, dt); root.wPos = next[0]; root.vw = next[1]
         next = root.spring(root.hPos, root.vh, root.targetH, dt); root.hPos = next[0]; root.vh = next[1]
         root.updateBond()
-        if (!root.centered && !root.barNicheOccupied && root.phase === "retornando" && root.stretch < 1.10)
+        if (!root.centered && root.phase === "retornando" && root.stretch < 1.10)
             root.captureTarget = 20 * root.s
         next = root.spring(root.captureExtra, root.captureV, root.captureTarget, dt)
         root.captureExtra = next[0]; root.captureV = next[1]
@@ -459,7 +485,6 @@ Item {
 
         PillSurfaceHost {
             id: surfaceHost
-            petContext: root.petContext
             artworkTransition: root.artworkTransition
             z: 2
             open: root.expanded && !root.expandedContent

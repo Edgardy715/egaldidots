@@ -4,7 +4,6 @@ import "../Singletons"
 // Media adapter: source selection/CAVA stay outside the shared motion engine.
 FluidCompanion {
     id: root
-    barNicheOccupied: !!petContext && petContext.perchId === "bar"
     artUrl: Players.artUrl
     artworkTransition: sharedArtwork
     mediaPlaying: Players.live
@@ -22,8 +21,7 @@ FluidCompanion {
     compactWidth: Players.live ? playingW : collapsedW
     readonly property string cavaConsumerId: "fluid-media:" + (screenName || "default")
     readonly property var player: Players.active
-    readonly property real progress: player && player.length > 0
-        ? Math.max(0, Math.min(1, (player.position || 0) / player.length)) : 0
+    readonly property real progress: Players.progressOf(player)
     signal requestMedia()
     onRequestToggle: requestMedia()
     function syncCava(): void { Cava.setConsumer(cavaConsumerId, Players.live && active && !expanded && visible) }
@@ -58,7 +56,7 @@ Item {
                 ringWidth: 1.8 * root.s
                 ringGap: 2 * root.s
                 progress: root.progress
-                hasProgress: root.player && root.player.length > 0
+                hasProgress: Players.lengthOf(root.player) > 0
                 artUrl: Players.artUrl || ""
             }
 

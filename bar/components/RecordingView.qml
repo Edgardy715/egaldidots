@@ -107,12 +107,14 @@ FocusScope {
                 Layout.preferredHeight: 20 * root.s
                 radius: height / 2
                 color: control.selected ? Theme.accent : Qt.alpha(Theme.foreground, Theme.alphaWashStrong)
+                Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                 opacity: control.enabled ? 1 : 0.5
                 Rectangle {
                     x: (control.selected ? 16 : 3) * root.s
                     y: 3 * root.s
                     width: 14 * root.s; height: width; radius: width / 2
                     color: control.selected ? Theme.primaryContent : Theme.foreground
+                    Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                     Behavior on x { enabled: root.motionAllowed; SmoothedAnimation { duration: Motion.standardSmall; velocity: -1 } }
                 }
                 Accessible.ignored: true
@@ -139,10 +141,11 @@ FocusScope {
                 anchors.centerIn: parent
                 width: parent.width
                 spacing: 6 * root.s
-                Text {
+                AnimatedLabel {
                     objectName: "recordingTime"
                     Layout.fillWidth: true
-                    text: root.counting ? String(Math.max(1, root.countdown)) : root.needsConnection ? "—" : root.timeText
+                    animated: root.counting
+                    value: root.counting ? String(Math.max(1, root.countdown)) : root.needsConnection ? "—" : root.timeText
                     horizontalAlignment: Text.AlignHCenter
                     color: root.needsConnection ? Theme.iconSecondary : Theme.foreground
                     font.family: Theme.fontMedia
@@ -225,6 +228,7 @@ FocusScope {
                     opacity: primary.enabled ? 1 : 0.5
                     border.width: primary.activeFocus ? 2 : 0
                     border.color: Theme.foreground
+                    Behavior on color { ColorAnimation { duration: Motion.morph; easing.type: Motion.easeStandard } }
                     Behavior on radius { SmoothedAnimation { id: shapeRadiusMotion; duration: root.motionAllowed ? Motion.morph : 0; velocity: -1 } }
                 }
                 contentItem: RowLayout {
@@ -235,6 +239,7 @@ FocusScope {
                         height: width
                         radius: (root.active || root.phase === "stopping" || root.counting ? 3 : 8) * root.s
                         color: root.active ? Theme.error : root.busy ? Theme.foreground : Theme.primaryContent
+                        Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                         Accessible.ignored: true
                         Behavior on width { SmoothedAnimation { id: symbolSizeMotion; duration: root.motionAllowed ? Motion.standardSmall : 0; velocity: -1 } }
                         Behavior on radius { SmoothedAnimation { id: symbolRadiusMotion; duration: root.motionAllowed ? Motion.standardSmall : 0; velocity: -1 } }
@@ -245,6 +250,7 @@ FocusScope {
                         font.pixelSize: Theme.fontSizeBodyLg * root.s
                         font.weight: Font.DemiBold
                         color: root.active || root.busy ? Theme.foreground : Theme.primaryContent
+                        Behavior on color { ColorAnimation { duration: Motion.morph; easing.type: Motion.easeStandard } }
                     }
                     Item { Layout.fillWidth: true }
                 }
@@ -252,8 +258,13 @@ FocusScope {
             MotionButton {
                 id: pause
                 objectName: "recordingPause"
-                Layout.preferredWidth: 52 * root.s; Layout.preferredHeight: 52 * root.s
-                visible: root.active
+                Layout.preferredWidth: root.active ? 52 * root.s : 0; Layout.preferredHeight: 52 * root.s
+                Layout.leftMargin: root.active ? 0 : -10 * root.s
+                opacity: root.active ? 1 : 0
+                visible: opacity > 0.01
+                Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                Behavior on Layout.preferredWidth { enabled: root.motionAllowed; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                Behavior on Layout.leftMargin { enabled: root.motionAllowed; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                 enabled: root.open && !root.busy && root.pauseSupported
                 text: !root.pauseSupported ? qsTr("Pausa no disponible") : root.phase === "paused" ? qsTr("Continuar") : qsTr("Pausar")
                 Accessible.name: text

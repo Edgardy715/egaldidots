@@ -15,7 +15,7 @@ Item {
     readonly property bool showTimeline: !embedded && session.canSeek
     readonly property bool hasPlayer: session.hasPlayer
     implicitHeight: Math.max(cover.y + cover.height, controls.y + controls.height)
-    MediaSession { id: session; player: root.player; trackKey: root.trackKey; active: root.visible && !root.embedded }
+    MediaSession { id: session; player: root.player; positionOffset: Players.offsetFor(player); trackKey: root.trackKey; active: root.visible && !root.embedded }
     ClippingRectangle {
         id: cover
         objectName: "lockMediaCover"

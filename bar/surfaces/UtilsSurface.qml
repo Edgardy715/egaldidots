@@ -12,8 +12,10 @@ PillSurface {
     mRight: Theme.marginLg
     mBottom: Theme.marginMd
     clip: true
+    readonly property real contentHeightHint: controls.contentHeight + (mTop + mBottom) * s
 
     QuickControlsAdapter {
+        id: controls
         anchors.fill: parent
         s: root.s
         contentReady: root.contentReady

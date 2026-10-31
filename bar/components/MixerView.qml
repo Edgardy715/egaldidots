@@ -152,14 +152,26 @@ Item {
             }
         }
         RowLayout {
+            id: errorRow
+            readonly property bool shown: root.error.length > 0
+            property string shownError: ""
             Layout.fillWidth: true
-            visible: root.error.length > 0
+            Layout.preferredHeight: shown ? implicitHeight : 0
+            opacity: shown ? 1 : 0
+            visible: opacity > 0.01 || Layout.preferredHeight > 0.5
+            enabled: shown
+            clip: true
             spacing: 12 * root.s
-            MaterialIcon { Layout.preferredWidth: 20 * root.s; Layout.preferredHeight: 20 * root.s; iconName: "error"; font.pixelSize: 20 * root.s; color: Theme.error }
+            onShownChanged: if (shown) shownError = root.error
+            Connections { target: root; function onErrorChanged() { if (root.error.length > 0) errorRow.shownError = root.error } }
+            Component.onCompleted: shownError = root.error
+            Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+            Behavior on Layout.preferredHeight { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Motion.standardSmall; velocity: -1 } }
+            ConfirmationIndicator { Layout.preferredWidth: 20 * root.s; Layout.preferredHeight: 20 * root.s; s: root.s; status: "error" }
             Text {
                 objectName: "audioError"
                 Layout.fillWidth: true
-                text: root.error
+                text: errorRow.shownError
                 maximumLineCount: 3; wrapMode: Text.WordWrap; elide: Text.ElideRight
                 font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; color: Theme.error
                 Accessible.role: Accessible.AlertMessage
@@ -273,8 +285,15 @@ Item {
                         MaterialIcon {
                             Layout.alignment: Qt.AlignHCenter
                             Layout.preferredWidth: 32 * root.s; Layout.preferredHeight: 32 * root.s
-                            iconName: root.ready ? root.tabSymbols[pages.displayedPage] : "sync"
+                            visible: root.ready
+                            iconName: root.tabSymbols[pages.displayedPage]
                             font.pixelSize: 32 * root.s; color: Theme.iconSecondary
+                        }
+                        ConfirmationIndicator {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredWidth: 32 * root.s; Layout.preferredHeight: 32 * root.s
+                            s: root.s
+                            status: root.ready ? "" : "busy"
                         }
                         Text {
                             Layout.fillWidth: true

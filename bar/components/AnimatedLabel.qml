@@ -6,12 +6,13 @@ Text {
     id: root
     property string value: ""
     property bool ready: false
+    property bool animated: true
     property string displayed: ""
     property real reveal: 1
     text: displayed
     opacity: reveal
     onValueChanged: {
-        if (!ready || !visible || Flags.reduceMotion) {
+        if (!ready || !animated || !visible || Flags.reduceMotion) {
             swap.stop()
             displayed = value
             reveal = 1

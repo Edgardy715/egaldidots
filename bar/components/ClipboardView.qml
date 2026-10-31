@@ -170,7 +170,7 @@ FocusScope {
         if (i < 0) i = n - 1
         else if (i >= n) i = 0
         selectedIndex = i
-        listView.positionViewAtIndex(i, ListView.Contain)
+        listView.revealIndex(i)
     }
     onFilteredEntriesChanged: {
         const previous = selectionId
@@ -357,7 +357,7 @@ FocusScope {
                     id: scrollMotion
                     target: sectionsScroll; property: "contentX"
                     duration: Flags.reduceMotion ? 0 : Motion.standardSmall
-                    easing.type: Easing.OutCubic
+                    easing.type: Motion.easeStandard
                 }
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
@@ -663,13 +663,9 @@ FocusScope {
             id: hintRow
             width: parent.width
             height: 30 * root.s
-            visible: true
-            opacity: visible ? historyMotion.progress : 0
+            // historyMotion already eases this fade; a Behavior would lag behind it.
+            opacity: historyMotion.progress
             clip: true
-            Behavior on height {
-                NumberAnimation { duration: Motion.morph; easing.type: Motion.easeMorph; easing.bezierCurve: Motion.morphCurve }
-            }
-            Behavior on opacity { Anim { type: Anim.DefaultEffects } }
 
             Rectangle {
                 anchors.left: parent.left

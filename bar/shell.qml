@@ -2,7 +2,6 @@
 //@ pragma DefaultEnv QS_DROP_EXPENSIVE_FONTS=1
 //@ pragma DefaultEnv QSG_RENDER_LOOP=threaded
 //@ pragma DefaultEnv QT_QUICK_FLICKABLE_WHEEL_DECELERATION=10000
-//@ pragma IconTheme "hicolor"
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -42,6 +41,17 @@ ShellRoot {
 
     IpcHandler {
         target: "island"
+        function bodyOpen(): bool {
+            const monitor = navigation.focusedMonitorName || (Quickshell.screens.length ? Quickshell.screens[0].name : "")
+            navigation.fileActivationRequested(monitor)
+            return true
+        }
+        function bodyFile(path: string): bool {
+            if (!Config.appearance.personality || !Config.appearance.bodyMessenger || !path.startsWith("/")) return false
+            const monitor = navigation.focusedMonitorName || (Quickshell.screens.length ? Quickshell.screens[0].name : "")
+            navigation.fileOffered(monitor, path)
+            return true
+        }
         function settings(): bool { navigation.toggleSurface("", "settings"); return true; }
         function clock(mon: string): bool     { navigation.toggleSurface(mon, "calendar"); return true; }
         function calendar(mon: string): bool   { navigation.toggleSurface(mon, "calendar"); return true; }

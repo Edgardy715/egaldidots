@@ -9,6 +9,7 @@ import "../Singletons"
 Item {
     id: root
 
+    property bool shaderActive: false
     property real s: 1
     property real morphRadius: 19 * s
     property real notifBreathRadius: 0
@@ -36,7 +37,8 @@ Item {
     readonly property real bodyRadius: root.morphRadius + root.notifBreathRadius
     // A light compact tint grows gently for reading, keeping the backdrop visible.
     readonly property real readingExposure: Math.max(0, Math.min(1, (height / s - 38) / 58))
-    readonly property real bodyAlpha: Flags.glassAlpha + (1 - Flags.glassAlpha) * (0.15 + 0.25 * readingExposure)
+    readonly property real bodyAlpha: Math.min(1, Flags.glassAlpha + (1 - Flags.glassAlpha) * (0.15 + 0.25 * readingExposure)
+        + Theme.glassChromaLift * (0.4 + 0.6 * readingExposure))
 
     anchors.fill: parent
 
@@ -51,9 +53,10 @@ Item {
         radius: root.bodyRadius
         color: Theme.cardBot
         // Compact shadows otherwise make compositor blur sample the app outside the glass.
-        opacity: root.surface === "auth" ? 0 : 0.32 * root.readingExposure * root.edgeExposure
+        opacity: root.shaderActive || root.surface === "auth" ? 0 : 0.32 * root.readingExposure * root.edgeExposure
         // Compact pills, rails and idle droplets keep no shadow FBO or MultiEffect.
-        layer.enabled: opacity > 0.001
+        visible: !root.shaderActive
+        layer.enabled: !root.shaderActive && opacity > 0.001
         layer.effect: MultiEffect {
             shadowEnabled: true
             shadowColor: Qt.rgba(0, 0, 0, 0.72)
@@ -66,6 +69,7 @@ Item {
 
     Rectangle {
         id: materialHalo
+        objectName: "pillMaterialHalo"
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -116,7 +120,7 @@ Item {
         anchors.bottom: parent.bottom
         width: parent.width + root.captureExtra + root.captureLeftExtra
         radius: root.bodyRadius
-        border.width: root.surface === "auth" ? 1 : Theme.borderHairline
+        border.width: root.shaderActive ? 0 : root.surface === "auth" ? 1 : Theme.borderHairline
         border.color: Qt.alpha(Theme.foreground, root.edgeExposure
             * (root.surface === "auth" ? 0.18 : root.materialAwake ? Theme.alphaHairline : Theme.alphaHair))
         color: "transparent"
@@ -124,6 +128,7 @@ Item {
         z: 2
 
         Rectangle {
+            visible: !root.shaderActive
             anchors.fill: parent
             gradient: Gradient {
                 GradientStop { position: 0; color: Qt.alpha(Theme.cardTop, Math.min(1, root.bodyAlpha + 0.08 * root.readingExposure)) }
@@ -133,6 +138,7 @@ Item {
         }
 
         InnerGlow {
+            objectName: "pillMaterialInnerGlow"
             anchors.fill: parent
             glowColor: root.materialAccent
             focusX: root.mode === "status" ? 0.76 : root.mode === "rest" || root.mode === "hover" ? 0.5 : 0.26
@@ -148,6 +154,7 @@ Item {
         }
 
         Rectangle {
+            objectName: "pillMaterialAccentTop"
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
@@ -167,7 +174,10 @@ Item {
             y: -parent.height * 0.70
             rotation: -17
             opacity: root.materialPulse > 0.01 ? 0.22 * Math.sin(root.materialPulse * Math.PI) : 0
+            // Across the band, not along it: a vertical gradient left hard side edges
+            // that read as a glass slab corner instead of light passing over it.
             gradient: Gradient {
+                orientation: Gradient.Horizontal
                 GradientStop { position: 0; color: "transparent" }
                 GradientStop { position: 0.48; color: Qt.alpha(Theme.foreground, 0.55) }
                 GradientStop { position: 0.56; color: Qt.alpha(root.materialAccent, 0.22) }
@@ -202,12 +212,13 @@ Item {
             height: 1.5 * root.s
             radius: height / 2
             color: Theme.sheen
-            visible: root.edgeExposure > 0
+            visible: !root.shaderActive && root.edgeExposure > 0
             opacity: (1 - root.readingExposure) * root.edgeExposure
         }
 
         Rectangle {
             objectName: "pillMaterialDepthLight"
+            visible: !root.shaderActive
             anchors.top: parent.top
             anchors.topMargin: root.s
             x: parent.width * 0.06
@@ -226,6 +237,7 @@ Item {
 
         Rectangle {
             objectName: "pillMaterialDepthShade"
+            visible: !root.shaderActive
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             width: parent.width * 0.75
@@ -242,6 +254,7 @@ Item {
             anchors.fill: parent
             radius: body.radius
             color: root.materialAccent
+            objectName: "pillMaterialAccentTint"
             opacity: 0.035
         }
     }

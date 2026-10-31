@@ -42,9 +42,9 @@ Item {
         running: root.resting
         loops: Animation.Infinite
         PauseAnimation { duration: Math.max(80, Qt.styleHints.cursorFlashTime / 2 - Motion.hover) }
-        NumberAnimation { target: root; property: "ink"; to: 0.25; duration: Motion.hover; easing.type: Easing.InOutSine }
+        NumberAnimation { target: root; property: "ink"; to: 0.25; duration: Motion.hover; easing.type: Motion.easeBreathe }
         PauseAnimation { duration: Math.max(80, Qt.styleHints.cursorFlashTime / 2 - Motion.hover) }
-        NumberAnimation { target: root; property: "ink"; to: 1; duration: Motion.hover; easing.type: Easing.InOutSine }
+        NumberAnimation { target: root; property: "ink"; to: 1; duration: Motion.hover; easing.type: Motion.easeBreathe }
     }
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter

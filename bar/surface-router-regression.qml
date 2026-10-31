@@ -107,6 +107,21 @@ ShellRoot {
             router.close()
             router.focusedMonitorName = "DP-1"
             test.check(router.openSurface === "", "hide cancels startup request")
+            router.present("DP-1", "launcher")
+            router.close()
+            router.toggleSurface("DP-2", "wallpaper")
+            router.dismissMonitor("DP-1")
+            test.check(router.openSurface === "" && router.launcherClosePhase === 0
+                && router.mediaDockPendingMon === "DP-2", "fullscreen abort preserves other monitor dock")
+            router.dismissMonitor("DP-2")
+            router.finishMediaDock("DP-2")
+            test.check(router.openSurface === "" && router.mediaDockPendingSurface === "", "fullscreen invalidates dock completion")
+            router.present("DP-1", "auth")
+            router.dismissMonitor("DP-1")
+            test.check(authCancels === 2 && router.openSurface === "", "fullscreen cancels auth once")
+            router.present("DP-2", "calendar")
+            router.dismissMonitor("DP-1")
+            test.check(router.openSurface === "calendar", "fullscreen stays monitor-local")
             console.log("PASS: routing, dock cancellation, auth priority, two-phase close, interruption and reduced motion")
             Qt.quit()
         }

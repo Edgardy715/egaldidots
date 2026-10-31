@@ -9,6 +9,8 @@ MotionButton {
     property bool selected: false
     property bool prominent: false
     property string iconName: ""
+    // Más↔check trazado (Tidemark) en lugar del glifo de fuente.
+    property bool morphIcon: false
     property string helpText: ""
     padding: 8 * s
     leftPadding: text.length ? 12 * s : 9 * s
@@ -16,9 +18,8 @@ MotionButton {
     implicitWidth: Math.max(36 * s, contents.implicitWidth + leftPadding + rightPadding)
     implicitHeight: 36 * s
     highlighted: selected
-    property bool presented: false
-    Component.onCompleted: presented = true
-    opacity: presented ? (enabled ? 1 : 0.42) : 0
+    // Chips arrive with their surface; only the enabled state fades here.
+    opacity: enabled ? 1 : 0.42
     Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast } }
     ToolTip.text: helpText
     ToolTip.visible: helpText.length > 0 && (hovered || activeFocus)
@@ -47,8 +48,17 @@ MotionButton {
     contentItem: RowLayout {
         id: contents
         spacing: 6 * root.s
+        PlusCheckGlyph {
+            objectName: "plusCheckGlyph"
+            visible: root.morphIcon
+            size: 17 * root.s
+            checked: root.iconName === "check"
+            color: root.prominent ? Theme.primaryContent : root.selected ? Theme.accent : Theme.foreground
+            Behavior on color { ColorAnimation { duration: Flags.reduceMotion ? 0 : Motion.hover } }
+            Accessible.ignored: true
+        }
         MaterialIcon {
-            visible: root.iconName.length > 0
+            visible: root.iconName.length > 0 && !root.morphIcon
             iconName: root.iconName
             interaction: root.interaction
             font.pixelSize: 17 * root.s

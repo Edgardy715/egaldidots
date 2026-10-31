@@ -3,7 +3,6 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Shapes
 import "../Singletons"
-import "../pets"
 
 Item {
     id: root
@@ -16,13 +15,7 @@ Item {
     property string style: "numbers"
     property real availableWidth: 320
     property int hoverId: 0
-    property Item petLayer: null
     property bool presented: true
-    property int previousActiveId: 1
-    property int hopDelta: 0
-    // The cell the pet perch points at; follows activeId only after the pet detaches.
-    property int petCell: 1
-    Component.onCompleted: petCell = activeId
     readonly property bool lensAnimating: lensMotion.running
     onVisibleChanged: if (!visible) {
         hoverId = 0
@@ -38,22 +31,7 @@ Item {
     }
     signal requestWorkspaces()
     signal workspaceRequested(int id)
-    onActiveIdChanged: {
-        hoverId = 0
-        const delta = activeId - previousActiveId
-        previousActiveId = activeId
-        // Detach at the old cell before the perch moves, so no frame shows it there.
-        if (delta !== 0 && railPerch.occupied) {
-            hopDelta = delta
-            petLayer.prepareHop()
-            hopTimer.restart()
-        }
-        petCell = activeId
-    }
-    onHoverIdChanged: {
-        if (railPerch.occupied) petLayer.lookAt(hoverId === 0 ? 0 : hoverId - activeId)
-    }
-    onStyleChanged: if (style === "pet") { lens.lensX = lens.targetX; lens.velocityX = 0 }
+    onActiveIdChanged: hoverId = 0
     readonly property real navWidth: (integrated ? 40 : 68) * s
     readonly property real slot: Math.min((style === "numbers" ? (integrated ? 28 : 38) : (integrated ? 22 : 24)) * s, Math.max(19 * s, (availableWidth - navWidth - 8 * s) / count))
     readonly property real inset: 4 * s
@@ -68,32 +46,6 @@ Item {
     onAnimateChangesChanged: if (!animateChanges) root.finishResize()
     height: 48 * s
     visible: fits
-
-    // Coalesce workspace and cell-bound bindings before reading the landing point.
-    Timer {
-        id: hopTimer
-        interval: 0
-        onTriggered: if (!railPerch.occupied) { if (root.petLayer) root.petLayer.cancelHop() }
-            else root.petLayer.hop(200 + 40 * Math.min(Math.abs(root.hopDelta), 6),
-                (8 + 2 * Math.min(Math.abs(root.hopDelta), 6)) * root.s, root.hopDelta)
-    }
-
-    PetPerch {
-        id: railPerch
-        objectName: "railPetPerch"
-        z: 2
-        petLayer: root.petLayer
-        perchId: "rail"
-        priority: 1
-        kind: "niche"
-        interactive: false
-        width: root.width
-        height: root.height
-        headroom: height
-        minX: root.navWidth + root.inset + (Math.max(1, root.petCell) - 0.5) * root.slot
-        maxX: minX
-        available: root.style === "pet" && root.visible && root.fits && root.presented && root.opacity > 0.95
-    }
 
     Item {
         x: root.navWidth
@@ -150,7 +102,7 @@ Item {
         readonly property real stretch: Math.min(7 * root.s, Math.abs(velocityX) * 0.025)
         readonly property real travel: Math.min(1, Math.abs(velocityX) / 320)
         Component.onCompleted: lensX = targetX
-        onTargetXChanged: if (Flags.reduceMotion || !root.visible || root.style === "pet") {
+        onTargetXChanged: if (Flags.reduceMotion || !root.visible) {
             lensX = targetX
             velocityX = 0
         }
@@ -160,8 +112,11 @@ Item {
             ? (root.integrated ? Math.min(28, root.slot / root.s) : 46) : 20) * root.s
         height: width
         radius: height / 2
+        // Pinned at the trailing edge: the leading edge reaches ahead and the
+        // tail follows, so travel reads as liquid rather than a centred squash.
+        // Stretch is proportional to |velocity|, so the origin flip is invisible.
         transform: Scale {
-            origin.x: lens.width / 2; origin.y: lens.height / 2
+            origin.x: lens.velocityX >= 0 ? 0 : lens.width; origin.y: lens.height / 2
             xScale: 1 + lens.stretch / lens.width
             yScale: 1 - lens.stretch / (lens.height * 4)
         }
@@ -182,7 +137,7 @@ Item {
         border.color: Qt.alpha(Theme.accent, root.integrated ? 0.26 : 0.70)
         FrameAnimation {
             id: lensMotion
-            running: root.visible && root.style !== "pet" && !Flags.reduceMotion
+            running: root.visible && !Flags.reduceMotion
                 && (lens.distance > 0.5 || Math.abs(lens.velocityX) > 10)
             onTriggered: {
                 const dt = Math.min(0.05, frameTime)
@@ -228,7 +183,7 @@ Item {
         property real mouthAngle: chewing ? 4 + 40 * (0.5 + 0.5 * Math.cos(chewPhase * 2 * Math.PI)) : 18
         Behavior on mouthAngle {
             enabled: !pacman.chewing && pacman.visible && !Flags.reduceMotion
-            NumberAnimation { duration: 90 * Motion.mult; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: Motion.hover; easing.type: Motion.easeStandard }
         }
         transform: Scale { origin.x: pacman.width / 2; xScale: pacman.facingLeft ? -1 : 1 }
         visible: root.style === "pacman"
@@ -271,6 +226,20 @@ Item {
                 readonly property real highlight: Math.max(0, 1 - centerDistance / root.slot)
                 readonly property real coverage: Math.max(0, Math.min(1,
                     (lens.width / 2 + 6 * root.s - centerDistance) / (10 * root.s)))
+                // Discrete state eases in; lens proximity (highlight) stays continuous.
+                property real occupiedLevel: workspaceState.occupied ? 1 : 0
+                property real hoverLevel: hit.containsMouse ? 1 : 0
+                property real urgentLevel: workspaceState.urgent ? 1 : 0
+                property real accentLevel: (workspaceState.urgent && highlight < 0.5 && !hit.containsMouse)
+                    || (root.hoverId > 0 && wsId === root.activeId && root.hoverId !== root.activeId) ? 1 : 0
+                Behavior on occupiedLevel { SmoothedAnimation { velocity: -1; duration: Motion.standardSmall } }
+                Behavior on hoverLevel { SmoothedAnimation { velocity: -1; duration: Motion.hover } }
+                Behavior on urgentLevel { SmoothedAnimation { velocity: -1; duration: Motion.standardSmall } }
+                Behavior on accentLevel { SmoothedAnimation { velocity: -1; duration: Motion.hover } }
+                function mix(a, b, t) {
+                    return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t,
+                        a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t)
+                }
                 width: root.slot
                 height: root.height
 
@@ -279,16 +248,15 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     text: cell.wsId
-                    color: cell.workspaceState.urgent && cell.highlight < 0.5 && !hit.containsMouse
-                        ? Theme.accent : root.hoverId > 0 && cell.wsId === root.activeId && root.hoverId !== root.activeId
-                            ? Theme.accent : Qt.alpha(Theme.foreground, hit.containsMouse ? 1
-                                : Math.max(cell.workspaceState.occupied ? 0.7 : 0.36, cell.highlight))
+                    readonly property real restAlpha: 0.36 + 0.34 * cell.occupiedLevel
+                    color: cell.mix(Qt.alpha(Theme.foreground,
+                            Math.max(restAlpha + (1 - restAlpha) * cell.hoverLevel, cell.highlight)),
+                        Theme.accent, cell.accentLevel)
                     font.family: Theme.fontDisplay
                     font.pixelSize: Theme.fontSizeBodyLg * root.s
                     font.weight: Font.DemiBold
                     opacity: 1 - lens.travel * cell.coverage
-                    scale: hit.pressed ? 0.94 : 1
-                    Behavior on scale { NumberAnimation { duration: Motion.fast } }
+                    scale: hit.motion.visualScale
                 }
                 Rectangle {
                     id: workspaceMark
@@ -307,8 +275,9 @@ Item {
                     height: (root.style === "bars" ? 7 + 13 * cell.highlight : root.style === "capsules" ? 6 : root.style === "pacman" ? 4 : 6 + 4 * cell.highlight) * root.s
                     radius: Math.min(width, height) / 2
                     color: cell.workspaceState.urgent || cell.highlight > 0.5 ? Theme.accent : Theme.foreground
-                    opacity: root.style === "pacman" ? (1 - cell.highlight) * (cell.workspaceState.occupied ? 0.8 : 0.35)
-                        : hit.containsMouse || cell.workspaceState.urgent ? 1 : Math.max(cell.workspaceState.occupied ? 0.65 : 0.25, cell.highlight)
+                    readonly property real restAlpha: 0.25 + 0.4 * cell.occupiedLevel
+                    opacity: root.style === "pacman" ? (1 - cell.highlight) * (0.35 + 0.45 * cell.occupiedLevel)
+                        : Math.max(restAlpha + (1 - restAlpha) * Math.max(cell.hoverLevel, cell.urgentLevel), cell.highlight)
                 }
                 Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -318,7 +287,8 @@ Item {
                     height: width
                     radius: width / 2
                     color: Theme.accent
-                    opacity: cell.workspaceState.occupied ? 1 - cell.coverage : 0
+                    opacity: cell.occupiedLevel * (1 - cell.coverage)
+                    scale: Flags.reduceMotion ? 1 : 0.4 + 0.6 * cell.occupiedLevel
                 }
                 MotionArea {
                     id: hit

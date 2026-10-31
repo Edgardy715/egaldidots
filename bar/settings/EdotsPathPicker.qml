@@ -93,7 +93,7 @@ Popup {
     enter: Transition {
         ParallelAnimation {
             NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Flags.reduceMotion ? 0 : Motion.fast }
-            NumberAnimation { property: "scale"; from: Flags.reduceMotion ? 1 : 0.97; to: 1; duration: Flags.reduceMotion ? 0 : Motion.emphasized; easing.type: Easing.OutCubic }
+            NumberAnimation { property: "scale"; from: Flags.reduceMotion ? 1 : 0.97; to: 1; duration: Flags.reduceMotion ? 0 : Motion.emphasized; easing.type: Motion.easeStandard }
         }
     }
     exit: Transition { NumberAnimation { property: "opacity"; to: 0; duration: Flags.reduceMotion ? 0 : Motion.fast } }
@@ -180,7 +180,7 @@ Popup {
                             color: Qt.alpha(Theme.foreground, entry.hovered ? 0.075 : grid.currentIndex === entry.index ? 0.055 : 0)
                             border.width: 1
                             border.color: grid.currentIndex === entry.index || entry.activeFocus ? Theme.accent : "transparent"
-                            Behavior on color { ColorAnimation { duration: Motion.hover } }
+                            Behavior on color { ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
                         }
                         contentItem: ColumnLayout {
                             spacing: 8

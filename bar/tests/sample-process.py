@@ -16,9 +16,10 @@ def counters(stat):
 
 
 def memory(process):
+    # With zram/swap, PSS alone drops when cold pages are swapped out.
     values = {}
     for line in (process / "smaps_rollup").read_text().splitlines():
-        if line.startswith(("Rss:", "Pss:", "Private_Dirty:")):
+        if line.startswith(("Rss:", "Pss:", "Pss_Anon:", "Pss_File:", "Private_Dirty:", "Swap:", "SwapPss:")):
             name, value, _ = line.split()
             values[name[:-1] + "_kib"] = int(value)
     return values
@@ -76,7 +77,8 @@ def main():
         live = sample(os.getpid(), 0.02, 0.01)
         assert live["duration_s"] >= 0.02 and len(live["samples"]) >= 2
         assert live["memory_after"]["Pss_kib"] > 0
-        print("PASS: proc parsing, PID identity, bounded sampling and PSS")
+        assert {"Pss_Anon_kib", "Pss_File_kib", "Swap_kib", "SwapPss_kib"} <= live["memory_after"].keys()
+        print("PASS: proc parsing, PID identity, bounded sampling, PSS and swap")
         return
     if args.pid is None or args.pid <= 0:
         parser.error("--pid must identify a running process")

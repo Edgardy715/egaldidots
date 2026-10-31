@@ -40,6 +40,7 @@ class PipelineTest(unittest.TestCase):
 import json, os, pathlib, sys, time, tomllib
 args = sys.argv[1:]
 mode = args[args.index('-m') + 1]
+pathlib.Path(os.environ['MOCK_MODE_LOG']).write_text(mode)
 config = pathlib.Path(args[args.index('-c') + 1])
 if os.environ.get('MOCK_MATUGEN_FAIL') == '1': sys.exit(7)
 time.sleep(float(os.environ.get('MOCK_DELAY', '0')))
@@ -65,11 +66,14 @@ sys.exit(9 if os.environ.get('MOCK_AWWW_FAIL') == '1' else 0)
 ''')
         for binary in ("matugen", "awww"):
             (self.bin / binary).chmod(0o755)
-        for binary in ("fish", "hyprctl"):
+        for binary in ("fish", "hyprctl", "gsettings"):
             stub = self.bin / binary
             stub.write_text("#!/bin/sh\nexit 0\n")
             stub.chmod(0o755)
         (self.bin / "hyprctl").write_text("#!/bin/sh\nif [ \"$1\" = monitors ]; then printf '%s' \"${MOCK_MONITORS:-}\"; fi\n")
+        (self.bin / "gsettings").write_text(
+            "#!/bin/sh\n[ \"${MOCK_SETTINGS_FAIL:-0}\" = 0 ] || exit 1\n"
+            "printf \"'%s'\\n\" \"${MOCK_COLOR_SCHEME:-prefer-dark}\"\n")
         pgrep = self.bin / "pgrep"
         pgrep.write_text("#!/bin/sh\ncase \" ${MOCK_RUNNING_NAMES:-} \" in *\" $2 \"*) exit 0;; *) exit 1;; esac\n")
         pgrep.chmod(0o755)
@@ -90,6 +94,7 @@ sys.exit(9 if os.environ.get('MOCK_AWWW_FAIL') == '1' else 0)
         self.env.update(XDG_CONFIG_HOME=str(self.config), XDG_CACHE_HOME=str(self.root / "cache"),
                         PATH=f"{self.bin}:{os.environ['PATH']}",
                         MOCK_AWWW_LOG=str(self.root / "awww.log"),
+                        MOCK_MODE_LOG=str(self.root / "mode.log"),
                         MOCK_QS_LOG=str(self.root / "qs.log"),
                         MOCK_ROFI_LOG=str(self.root / "rofi.log"),
                         MOCK_CLIENT_LOG=str(self.root / "clients.log"))
@@ -125,13 +130,15 @@ sys.exit(9 if os.environ.get('MOCK_AWWW_FAIL') == '1' else 0)
         old_text = (self.cache / "wallpaper.txt").read_text()
         for flag in ("MOCK_MATUGEN_FAIL", "MOCK_RENDER_FAIL", "MOCK_AWWW_FAIL"):
             env = dict(self.env, **{flag: "1"})
-            result = self.run_generator(self.other_wall, env=env)
+            result = self.run_generator(self.other_wall, "--mode", "light", env=env)
             self.assertNotEqual(result.returncode, 0, flag)
             self.assertEqual(os.readlink(self.cache / "current"), old)
             self.assertEqual((self.cache / "palette.json").read_text(),
                              (self.cache / old / "palette.json").read_text())
             self.assertEqual((self.cache / "current-wallpaper").resolve(), old_marker)
             self.assertEqual((self.cache / "wallpaper.txt").read_text(), old_text)
+            self.assertIn("gtk-application-prefer-dark-theme=1",
+                          (self.config / "gtk-3.0/settings.ini").read_text())
 
     def test_refresh_and_light_mode_do_not_apply_wallpaper(self):
         self.assertEqual(self.run_generator("--seed", self.wall).returncode, 0)
@@ -140,6 +147,72 @@ sys.exit(9 if os.environ.get('MOCK_AWWW_FAIL') == '1' else 0)
         self.assertEqual(json.loads((self.cache / "palette.json").read_text())["colors"]["primary"],
                          "#abcdef")
         self.assertFalse((self.root / "awww.log").exists())
+
+    def test_desktop_preference_selects_both_native_and_canonical_mode(self):
+        for preference, expected in (("prefer-light", "light"),
+                                     ("prefer-dark", "dark")):
+            with self.subTest(preference=preference):
+                result = self.run_generator("--seed", self.wall,
+                                            env=dict(self.env, MOCK_COLOR_SCHEME=preference))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads((self.cache / "palette.json").read_text())["mode"], expected)
+                self.assertEqual((self.root / "mode.log").read_text(), expected)
+        for mode in ("dark", "light"):
+            result = self.run_generator("--seed", self.wall, "--mode", mode)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            result = self.run_generator("--refresh", env=dict(self.env, MOCK_COLOR_SCHEME="default"))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual((self.root / "mode.log").read_text(), mode)
+            self.assertEqual(json.loads((self.cache / "palette.json").read_text())["mode"], mode)
+        result = self.run_generator("--refresh", env=dict(self.env, MOCK_SETTINGS_FAIL="1"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads((self.cache / "palette.json").read_text())["mode"], "light")
+
+    def test_no_desktop_preference_first_seed_falls_back_to_dark(self):
+        for settings in ({"MOCK_COLOR_SCHEME": "default"}, {"MOCK_SETTINGS_FAIL": "1"}):
+            with self.subTest(settings=settings):
+                shutil.rmtree(self.cache, ignore_errors=True)
+                result = self.run_generator("--seed", self.wall, env=dict(self.env, **settings))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads((self.cache / "palette.json").read_text())["mode"], "dark")
+
+    def test_gtk_preference_preserves_other_settings_and_permissions(self):
+        settings = self.config / "gtk-3.0/settings.ini"
+        settings.parent.mkdir()
+        settings.write_text("# Personal settings\n[Settings]\ngtk-font-name=Custom 12\n"
+                            "gtk-application-prefer-dark-theme=1\n[Other]\nvalue=keep\n")
+        settings.chmod(0o640)
+        for mode in ("light", "dark"):
+            result = self.run_generator("--seed", self.wall, "--mode", mode)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn(f"gtk-application-prefer-dark-theme={int(mode == 'dark')}", settings.read_text())
+            self.assertIn("gtk-font-name=Custom 12", settings.read_text())
+            self.assertIn("[Other]\nvalue=keep", settings.read_text())
+            self.assertEqual(settings.stat().st_mode & 0o777, 0o640)
+            self.assertIn(f"gtk-application-prefer-dark-theme={int(mode == 'dark')}",
+                          (self.config / "gtk-4.0/settings.ini").read_text())
+
+    def test_gtk_foreign_symlink_is_preserved_before_publication(self):
+        foreign = self.root / "personal-settings.ini"
+        foreign.write_text("[Settings]\ngtk-font-name=Keep 11\n")
+        settings = self.config / "gtk-3.0/settings.ini"
+        settings.parent.mkdir()
+        settings.symlink_to(foreign)
+        result = self.run_generator("--seed", self.wall)
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertFalse((self.cache / "current").exists())
+        self.assertIn("Refusing to replace linked GTK settings", result.stderr)
+        self.assertTrue(settings.is_symlink())
+        self.assertEqual(foreign.read_text(), "[Settings]\ngtk-font-name=Keep 11\n")
+        settings.unlink()
+        settings.parent.rmdir()
+        shared = self.root / "shared-gtk"
+        shared.mkdir()
+        settings.parent.symlink_to(shared, target_is_directory=True)
+        result = self.run_generator("--seed", self.wall)
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertTrue(settings.parent.is_symlink())
+        self.assertEqual(list(shared.iterdir()), [])
 
     def test_publish_failure_after_awww_reports_partial_apply(self):
         self.assertEqual(self.run_generator("--seed", self.wall).returncode, 0)

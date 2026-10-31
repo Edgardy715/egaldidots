@@ -36,14 +36,32 @@ ColumnLayout {
     readonly property int lineIndex: synced ? LyricsData.indexAt(lines, position) : -1
     signal retryRequested()
     signal closeRequested()
+    // Attention for Iris: the current synced line, in this view's coordinates.
+    // Unsynced text has no "current" line, so Iris keeps its own gaze there.
+    readonly property bool focusActive: open && visible && following && status === "ready" && synced && lineIndex >= 0
+    readonly property point focusPoint: {
+        if (!focusActive) return Qt.point(0, 0)
+        void lyrics.contentY; void lyrics.count; void lyrics.x; void lyrics.y
+        const row = lyrics.itemAtIndex(lineIndex)
+        const y = row ? Math.max(0, Math.min(lyrics.height, row.y + row.height / 2 - lyrics.contentY)) : lyrics.height / 2
+        return Qt.point(lyrics.x + lyrics.width / 2, lyrics.y + y)
+    }
     spacing: 8 * s
     onLinesChanged: { following = true; Qt.callLater(lyrics.reset) }
     onStatusChanged: if (status === "ready") Qt.callLater(lyrics.follow, false)
     onLineIndexChanged: Qt.callLater(lyrics.follow, true)
     onFollowingChanged: if (following) { followResume.stop(); Qt.callLater(lyrics.follow, true) }
+    // A crossfading host keeps the view visible while it fades out, so reopening
+    // follows the logical open state instead of waiting for visibility to flip.
+    property bool open: visible
+    function present() {
+        following = true
+        if (visible) { lyrics.forceActiveFocus(); Qt.callLater(lyrics.follow, false) }
+    }
+    onOpenChanged: open ? present() : followResume.stop()
     onVisibleChanged: {
-        if (visible) { following = true; lyrics.forceActiveFocus(); Qt.callLater(lyrics.follow, false) }
-        else followResume.stop()
+        if (visible && open) present()
+        else if (!visible) followResume.stop()
     }
     Keys.onEscapePressed: root.closeRequested()
 
@@ -84,13 +102,18 @@ ColumnLayout {
         }
         MediaTransportButton { iconName: "close"; accessibleName: qsTr("Volver a la portada"); size: 32; s: root.s; onClicked: root.closeRequested() }
     }
+    // List and status share one slot so the crossfade does not split the height between them.
+    Item {
+    Layout.fillWidth: true
+    Layout.fillHeight: true
+    Layout.minimumHeight: 0
     ListView {
         id: lyrics
         objectName: "mediaLyricsList"
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        Layout.minimumHeight: 0
-        visible: root.status === "ready"
+        anchors.fill: parent
+        opacity: root.status === "ready" ? 1 : 0
+        visible: opacity > 0.01
+        Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
         clip: true
         spacing: 12 * root.s
         model: root.lines
@@ -218,18 +241,26 @@ ColumnLayout {
         }
     }
     ColumnLayout {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        visible: root.status !== "ready"
+        anchors.fill: parent
+        id: statusColumn
+        readonly property bool shown: root.status !== "ready"
+        property string shownText: ""
+        opacity: shown ? 1 : 0
+        visible: opacity > 0.01
+        enabled: shown
+        Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
         spacing: 10 * root.s
         Item { Layout.fillHeight: true }
         Text {
             Layout.fillWidth: true
-            text: root.status === "loading" ? qsTr("Buscando letras…")
+            text: statusColumn.shownText
+            readonly property string statusMessage: root.status === "loading" ? qsTr("Buscando letras…")
                 : root.status === "instrumental" ? qsTr("Esta pista es instrumental.")
                 : root.status === "error" ? qsTr("No se pudieron cargar las letras. Vuelve a intentarlo en un momento.")
                 : root.status === "metadata" ? qsTr("Falta el título o el artista de la canción.")
                 : qsTr("No hay letras disponibles para esta canción.")
+            onStatusMessageChanged: if (statusColumn.shown) statusColumn.shownText = statusMessage
+            Component.onCompleted: statusColumn.shownText = statusMessage
             font.family: Theme.fontMedia
             font.pixelSize: Theme.fontSizeBodyLg * root.s
             color: Theme.iconSecondary
@@ -238,5 +269,6 @@ ColumnLayout {
         }
         MediaTransportButton { Layout.alignment: Qt.AlignHCenter; visible: root.status === "error" || root.status === "empty"; iconName: "refresh"; accessibleName: qsTr("Reintentar letras"); s: root.s; onClicked: root.retryRequested() }
         Item { Layout.fillHeight: true }
+    }
     }
 }

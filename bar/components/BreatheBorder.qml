@@ -41,12 +41,12 @@ Rectangle {
         ColorAnimation {
             to: Qt.alpha(root.glowColor, root.alphaMax)
             duration: Math.round(root.period / 2)
-            easing.type: Easing.InOutSine
+            easing.type: Motion.easeBreathe
         }
         ColorAnimation {
             to: Qt.alpha(root.glowColor, root.alphaMin)
             duration: Math.round(root.period / 2)
-            easing.type: Easing.InOutSine
+            easing.type: Motion.easeBreathe
         }
         PauseAnimation { duration: root.pause }
     }

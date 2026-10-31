@@ -36,7 +36,7 @@ Item {
     }
     onActiveFocusChanged: if (!activeFocus) keyboardDown = false
     onEnabledChanged: if (!enabled) keyboardDown = false
-    Behavior on opacity { NumberAnimation { duration: Motion.hover } }
+    Behavior on opacity { NumberAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
 
     InteractionMotion {
         id: response

@@ -20,8 +20,11 @@ PillSurface {
     Item {
         id: header
 
-        property int markerId: Math.max(1, Math.min(root.count, root.activeId))
+        // Plain value, not a binding: the direction must be read against the
+        // previous marker before it moves.
+        property int markerId: 1
         property bool movingForward: true
+        Component.onCompleted: markerId = Math.max(1, Math.min(root.count, root.activeId))
 
         anchors.top: parent.top
         anchors.left: parent.left
@@ -38,10 +41,10 @@ PillSurface {
             font.weight: Font.DemiBold
         }
 
-        Text {
+        AnimatedLabel {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            text: qsTr("Espacio %1").arg(root.activeId)
+            value: qsTr("Espacio %1").arg(root.activeId)
             color: Theme.iconSecondary
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeCaption * root.s
@@ -70,11 +73,12 @@ PillSurface {
             color: Theme.accent
             Behavior on leftEdge {
                 enabled: !Flags.reduceMotion && root.open
-                SmoothedAnimation { duration: header.movingForward ? 400 : 300; velocity: -1 }
+                // Leading edge first, trailing edge catches up: the marker stretches.
+                SmoothedAnimation { duration: header.movingForward ? Motion.standardLarge : Math.round(300 * Motion.mult); velocity: -1 }
             }
             Behavior on rightEdge {
                 enabled: !Flags.reduceMotion && root.open
-                SmoothedAnimation { duration: header.movingForward ? 300 : 400; velocity: -1 }
+                SmoothedAnimation { duration: header.movingForward ? Math.round(300 * Motion.mult) : Motion.standardLarge; velocity: -1 }
             }
         }
     }
@@ -128,18 +132,21 @@ PillSurface {
                             color: workspace.active
                                 ? Qt.alpha(Theme.accent, 0.14)
                                 : Qt.alpha(Theme.foreground, workspace.occupied ? 0.095 : 0.035)
+                            Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                         }
                         GradientStop {
                             position: 1
                             color: workspace.active
                                 ? Qt.alpha(Theme.accent, 0.06)
                                 : Qt.alpha(Theme.background, 0.10)
+                            Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                         }
                     }
                     border.width: Theme.borderHairline
                     border.color: workspace.active
                         ? Qt.alpha(Theme.accent, 0.56)
                         : Qt.alpha(Theme.foreground, mouse.containsMouse ? Theme.alphaSoft : Theme.alphaHair)
+                    Behavior on border.color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
                     InnerGlow {
                         anchors.fill: parent
@@ -167,7 +174,8 @@ PillSurface {
                         color: workspace.active || workspace.occupied ? Theme.foreground : Theme.iconSecondary
                         font.family: Theme.fontDisplay
                         font.pixelSize: Theme.fontSizeBodyLg * root.s
-                        font.weight: workspace.active ? Font.DemiBold : Font.Medium
+                        font.weight: Font.DemiBold
+                        Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                     }
 
                     Item {
@@ -177,7 +185,9 @@ PillSurface {
                         anchors.bottomMargin: 8 * root.s
                         width: 28 * root.s
                         height: 10 * root.s
-                        visible: workspace.occupied
+                        opacity: workspace.occupied ? 1 : 0
+                        visible: opacity > 0.01
+                        Behavior on opacity { NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
                         Row {
                             anchors.bottom: parent.bottom
@@ -193,20 +203,22 @@ PillSurface {
                                     color: workspace.active
                                         ? Qt.alpha(Theme.foreground, 0.84)
                                         : Qt.alpha(Theme.accent, 0.72)
+                                    Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                                 }
                             }
                         }
                     }
 
-                    Text {
+                    AnimatedLabel {
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         anchors.rightMargin: 8 * root.s
                         anchors.bottomMargin: 7 * root.s
                         visible: workspace.windowCount > 0
-                        text: workspace.windowCount
+                        value: String(workspace.windowCount)
                         color: Theme.iconSecondary
-                        font.family: Theme.fontMono
+                        font.family: Theme.font
+                        font.features: Theme.fontNumeric
                         font.pixelSize: Theme.fontSizeCaption * root.s
                         font.weight: Font.DemiBold
                     }

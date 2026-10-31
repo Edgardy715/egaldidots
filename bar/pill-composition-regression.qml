@@ -65,7 +65,8 @@ ShellRoot {
                     wait(35)
                     motion.targetW = 320
                     motion.targetH = 180
-                    wait(500)
+                    // El muelle de surfaces se asienta (< 0.5 px) en ~650 ms, no en 420 ms.
+                    wait(900)
                     verify(Math.abs(motion.width - 320) < 0.01)
                     verify(Math.abs(motion.height - 180) < 0.01)
                     verify(motion.closeness > 0.99 && motion.contentProgress > 0.99)
@@ -83,11 +84,15 @@ ShellRoot {
                     motion.reduceMotion = false
                     motion.targetW = 340
                     motion.targetH = 380
-                    wait(500)
+                    wait(900)
                     verify(motion.contentProgress > 0.99, "narrow surface reveals from wide rest")
                     motion.restW = 100
                     motion.coreH = 38
                     motion.surfaceOpen = false
+                    motion.targetW = 100
+                    motion.targetH = 38
+                    wait(900)
+                    verify(Math.abs(motion.width - 100) < 0.01 && Math.abs(motion.height - 38) < 0.01)
                     motion.workspaceAnimating = true
                     motion.targetW = 144
                     compare(motion.width, 144)

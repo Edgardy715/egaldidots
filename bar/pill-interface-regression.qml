@@ -47,7 +47,7 @@ ShellRoot {
                     compare(calendarRequests.count, 1)
                     clockHit.forceActiveFocus()
                     verify(clockHit.activeFocus)
-                    fuzzyCompare(material.bodyAlpha, 0.439, 0.000001)
+                    fuzzyCompare(material.bodyAlpha, 0.439 + Theme.glassChromaLift * 0.4, 0.000001)
                     fuzzyCompare(findChild(material, "pillMaterialShadow").opacity, 0, 0.000001)
                     const depthLight = findChild(material, "pillMaterialDepthLight")
                     const depthShade = findChild(material, "pillMaterialDepthShade")
@@ -62,14 +62,14 @@ ShellRoot {
                     compare(depthShade.opacity, 0)
                     material.edgeExposure = 1
                     materialBounds.height = 96
-                    fuzzyCompare(material.bodyAlpha, 0.604, 0.000001)
+                    fuzzyCompare(material.bodyAlpha, 0.604 + Theme.glassChromaLift, 0.000001)
                     wait(400)
                     fuzzyCompare(findChild(material, "pillMaterialShadow").opacity, 0.32, 0.000001)
                     material.s = 2
                     materialBounds.height = 76
-                    fuzzyCompare(material.bodyAlpha, 0.439, 0.000001)
+                    fuzzyCompare(material.bodyAlpha, 0.439 + Theme.glassChromaLift * 0.4, 0.000001)
                     materialBounds.height = 192
-                    fuzzyCompare(material.bodyAlpha, 0.604, 0.000001)
+                    fuzzyCompare(material.bodyAlpha, 0.604 + Theme.glassChromaLift, 0.000001)
                     Config.update({appearance: {glassAlpha: 1}})
                     compare(material.bodyAlpha, 1)
                     header.entered = true

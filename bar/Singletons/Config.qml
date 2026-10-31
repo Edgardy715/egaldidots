@@ -20,10 +20,11 @@ Singleton {
     readonly property var catalog: Settings.catalog(context)
     readonly property var modules: _effective.modules
     readonly property var profile: _effective.profile
-    readonly property var pets: _effective.pets
     readonly property string userAvatar: _effective.paths.userAvatar
     readonly property url userAvatarUrl: "file://" + userAvatar.split("/").map(part => encodeURIComponent(part)).join("/")
     readonly property var appearance: _effective.appearance
+    readonly property var companion: _effective.companion
+    readonly property var updates: _effective.updates
     readonly property string paletteFile: _effective.paths.paletteFile
     readonly property string wallpaperDir: _effective.paths.wallpaperDir
     readonly property string wallpaperCacheDir: _effective.paths.wallpaperCacheDir

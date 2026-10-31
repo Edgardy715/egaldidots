@@ -28,13 +28,29 @@ Singleton {
 
     function showVolumeOSD() {
         var sink = root._pwSink
-        if (sink && sink.audio)
-            root.volumeOSD(sink.audio.muted ? 0 : sink.audio.volume, sink.audio.muted)
+        if (!sink || !sink.audio) return
+        root._sinkLevel = root._level(sink)
+        root.volumeOSD(sink.audio.muted ? 0 : sink.audio.volume, sink.audio.muted)
     }
     function showSourceVolumeOSD() {
         var source = root._pwSource
-        if (source && source.audio)
-            root.micOSD(source.audio.muted ? 0 : source.audio.volume, source.audio.muted)
+        if (!source || !source.audio) return
+        root._sourceLevel = root._level(source)
+        root.micOSD(source.audio.muted ? 0 : source.audio.volume, source.audio.muted)
+    }
+    // Node properties also change when a view starts or stops tracking the node
+    // (the mixer closing), which is no reason to show the level again.
+    // The node id is part of the level: a new default device at the same volume still shows it.
+    function _level(node) { return node.id + ":" + node.audio.muted + ":" + node.audio.volume }
+    property string _sinkLevel: ""
+    property string _sourceLevel: ""
+    function _sinkPropertiesChanged() {
+        var a = root._pwSink ? root._pwSink.audio : null
+        if (a && root._level(root._pwSink) !== root._sinkLevel) root.showVolumeOSD()
+    }
+    function _sourcePropertiesChanged() {
+        var a = root._pwSource ? root._pwSource.audio : null
+        if (a && root._level(root._pwSource) !== root._sourceLevel) root.showSourceVolumeOSD()
     }
     function showBrightnessOSD() {
         if (typeof Brightness !== "undefined" && Brightness.available)
@@ -67,14 +83,83 @@ Singleton {
         function onRawEvent(event) {
             var name = "" + (event ? (event.name || event.event || event.type || "") : "")
             if (root.monitorServices && (name === "activelayout" || name === "submap"))
-                getKbdState.running = true
+                root._refreshCapsLock()
         }
     }
+
+    // Hyprland no emite eventos de Caps Lock. Leer el LED del kernel evita lanzar
+    // hyprctl y parsear ~10 KB de JSON cada segundo; Hyprland sincroniza el LED de
+    // los teclados, así que basta con que uno esté encendido. hyprctl queda como
+    // respaldo sólo si el sistema no expone LEDs de capslock.
+    property string capsLedPattern: "/sys/class/leds/*::capslock/brightness"
+    property var _capsLedPaths: []
+    property var _capsLedValues: ({})
+    property bool _capsLedsResolved: false
+    readonly property string capsLockSource: _capsLedPaths.length > 0 ? "leds"
+        : _capsLedsResolved ? "hyprctl" : ""
+    onMonitorServicesChanged: if (monitorServices) rediscoverCapsLeds()
+    onCapsLedPatternChanged: rediscoverCapsLeds()
+
+    function rediscoverCapsLeds() {
+        if (capsLedDiscovery.running) {
+            capsLedDiscovery.pending = true
+            return
+        }
+        capsLedDiscovery.pattern = root.capsLedPattern
+        capsLedDiscovery.running = true
+    }
+    function _refreshCapsLock() {
+        if (root._capsLedPaths.length > 0) {
+            for (var i = 0; i < capsLeds.instances.length; i++) capsLeds.instances[i].reload()
+        } else if (root._capsLedsResolved && !getKbdState.running) {
+            getKbdState.running = true
+        }
+    }
+    function _setCapsLed(path, on) {
+        root._capsLedValues[path] = on
+        root._capsLockOn = root._capsLedPaths.some(p => root._capsLedValues[p] === true)
+    }
+
+    Process {
+        id: capsLedDiscovery
+        property string pattern: ""
+        property bool pending: false
+        command: ["sh", "-c", "for f in $1; do [ -r \"$f\" ] && printf '%s\\n' \"$f\"; done; exit 0",
+                  "sh", pattern]
+        onExited: if (pending) {
+            pending = false
+            root.rediscoverCapsLeds()
+        }
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (capsLedDiscovery.pending || capsLedDiscovery.pattern !== root.capsLedPattern) return
+                root._capsLedValues = ({})
+                root._capsLedPaths = (text || "").split("\n").filter(path => path.length > 0)
+                root._capsLedsResolved = true
+                root._refreshCapsLock()
+            }
+        }
+    }
+    Variants {
+        id: capsLeds
+        model: root.monitorServices ? root._capsLedPaths : []
+        FileView {
+            required property string modelData
+            path: modelData
+            watchChanges: false
+            printErrors: false
+            onLoaded: root._setCapsLed(modelData, text().trim() !== "0")
+            // Teclado desconectado o renumerado: se vuelve a buscar sin martillear.
+            onLoadFailed: if (!capsLedRetry.running) capsLedRetry.start()
+        }
+    }
+    Timer { id: capsLedRetry; interval: 2000; onTriggered: root.rediscoverCapsLeds() }
     Timer {
-        interval: 1000
+        // Lectura de sysfs en el pool de E/S, sin procesos; respaldo hyprctl a 1 Hz.
+        interval: root._capsLedPaths.length > 0 ? 250 : 1000
         repeat: true
-        running: root.monitorServices
-        onTriggered: if (!getKbdState.running) getKbdState.running = true
+        running: root.monitorServices && root._capsLedsResolved
+        onTriggered: root._refreshCapsLock()
     }
     Process {
         id: getKbdState
@@ -120,7 +205,7 @@ Singleton {
     property var _pwAudio: root._pwSink ? root._pwSink.audio : null
     property var _pwSource: Pipewire.defaultAudioSource || null
     property var _pwSourceAudio: root._pwSource ? root._pwSource.audio : null
-    Component.onCompleted: if (root.monitorServices) getKbdState.running = true
+    Component.onCompleted: if (root.monitorServices) rediscoverCapsLeds()
     PwObjectTracker {
         objects: root.monitorServices ? [root._pwSink, root._pwSource].filter(node => node) : []
     }
@@ -129,7 +214,7 @@ Singleton {
         target: root._pwSink || null
         enabled: root.monitorServices
         ignoreUnknownSignals: true
-        function onPropertiesChanged() { root.showVolumeOSD() }
+        function onPropertiesChanged() { root._sinkPropertiesChanged() }
     }
     Connections {
         id: audioAudioConn
@@ -144,7 +229,7 @@ Singleton {
         target: root._pwSource || null
         enabled: root.monitorServices
         ignoreUnknownSignals: true
-        function onPropertiesChanged() { root.showSourceVolumeOSD() }
+        function onPropertiesChanged() { root._sourcePropertiesChanged() }
     }
     Connections {
         id: audioSourceAudioConn

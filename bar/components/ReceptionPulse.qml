@@ -31,7 +31,7 @@ Item {
         id: wave
         target: root; property: "progress"; to: 1
         duration: root.duration
-        easing.type: Easing.InOutSine
+        easing.type: Motion.easeBreathe
     }
     RadialGradient {
         anchors.fill: parent

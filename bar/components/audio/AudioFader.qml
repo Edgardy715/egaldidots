@@ -11,6 +11,12 @@ Slider {
     property string label: ""
     property bool pending: false
     property real pendingValue: 0
+    // Smooths external volume changes only; dragging/pending stays 1:1 with the pointer.
+    property real shownPosition: visualPosition
+    Behavior on shownPosition {
+        enabled: !root.pressed && !root.pending && !Flags.reduceMotion
+        SmoothedAnimation { duration: Motion.fast; velocity: -1 }
+    }
     readonly property real displayVolume: pressed || pending ? value : volume
     onVolumeChanged: if (pending && Math.abs(volume - pendingValue) < 0.015) { pending = false; confirmation.stop() }
     onVisibleChanged: if (!visible) { pending = false; confirmation.stop() }
@@ -37,7 +43,7 @@ Slider {
         radius: height / 2
         color: Qt.alpha(Theme.foreground, Theme.alphaSubtle)
         Rectangle {
-            height: parent.height; width: parent.width * root.visualPosition; radius: parent.radius
+            height: parent.height; width: parent.width * root.shownPosition; radius: parent.radius
             color: root.muted ? Theme.iconSecondary : root.value > 1 ? Theme.error : Theme.accent
             Behavior on color { ColorAnimation { duration: Motion.fast } }
         }
@@ -49,10 +55,11 @@ Slider {
         }
     }
     handle: Rectangle {
-        x: root.leftPadding + root.visualPosition * root.availableWidth - width / 2
+        x: root.leftPadding + root.shownPosition * root.availableWidth - width / 2
         y: (root.height - height) / 2
         width: 14 * root.s; height: width; radius: width / 2
         color: root.muted ? Theme.iconSecondary : Theme.foreground
+        Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
         scale: Flags.reduceMotion ? 1 : root.pressed ? 1.24 : root.hovered || root.activeFocus ? 1.12 : 1
         Behavior on scale { SmoothedAnimation { duration: Motion.hover; velocity: -1 } }
         Rectangle {

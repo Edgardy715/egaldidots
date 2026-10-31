@@ -25,6 +25,7 @@ QtObject {
     property real notifBreathRadius: 0
 
     property bool contentLoaded: false
+    property real contentHeightHint: 0
     property bool contentClosing: false
     property bool resultsVisible: false
     property bool emptyResultsVisible: false
@@ -40,14 +41,19 @@ QtObject {
     readonly property real notifPillW: 380 * s
     readonly property real notifPillH: 72 * s
     readonly property bool surfaceOpen: surface.length > 0
-    readonly property bool launcherReturning: surface === "launcher"
-        && launcherClosing && launcherClosePhase === 2
+    // The router clears the surface before resetting the phase, but the host's
+    // derived launcherClosing may drop first: reading the phase too keeps that
+    // instant from targeting the open launcher (a 680 px blip that kicked the
+    // returning pill outward).
+    readonly property bool launcherLeaving: surface === "launcher"
+        && (launcherClosing || launcherClosePhase !== 0)
+    readonly property bool launcherReturning: launcherLeaving && launcherClosePhase === 2
     readonly property size sizeFor: surfaceOpen && surfaceSizes[surface]
         ? surfaceSizes[surface] : fallbackSurface
     readonly property real authInputW: 400 * s
     readonly property real launcherSearchH: (44 + marginMd * 2) * s
     readonly property real launcherHeaderH: 78 * s
-    readonly property bool launcherHeaderVisible: surface === "launcher" && !launcherClosing
+    readonly property bool launcherHeaderVisible: surface === "launcher" && !launcherLeaving
     readonly property real restW: restContentWidth + padH * 2 + restLeftWidth + restRightWidth
         + (restLeftWidth > 0 ? 18 * s : 0) + (restRightWidth > 0 ? 18 * s : 0)
 
@@ -110,12 +116,14 @@ QtObject {
     readonly property real targetH: {
         if (hasNotification && notifAnimating && !isNaN(_notifTargetH)) return _notifTargetH
         if (launcherReturning) return coreH
-        if (surface === "launcher" && launcherClosing) return launcherSearchH
+        if (launcherLeaving) return launcherSearchH
         if (!surfaceOpen) return coreH
         if (surface === "auth") return Math.max(82, Math.max(44, fontSizeBodyLg + fontScale + 20)
             + 3 + Math.max(18, fontSizeLabel + 6) + 16) * s
         if (surface === "launcher") return launcherH
         if (surface === "media") return mediaH
+        // A surface that measures itself only gives back room it does not use.
+        if (contentLoaded && contentHeightHint > 0) return Math.min(sizeFor.height * s, contentHeightHint)
         return sizeFor.height * s
     }
     readonly property real radiusRest: coreH / 2

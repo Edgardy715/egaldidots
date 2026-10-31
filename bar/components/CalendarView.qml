@@ -21,7 +21,12 @@ PillSurface {
     id: root
     mTop: Theme.marginLg; mLeft: Theme.marginLg; mRight: Theme.marginLg; mBottom: Theme.marginMd
 
-    readonly property var locale: Qt.locale()
+    // Fechas y controles comparten el idioma traducible de la interfaz.
+    readonly property var dayNames: [qsTr("domingo"), qsTr("lunes"), qsTr("martes"),
+        qsTr("miércoles"), qsTr("jueves"), qsTr("viernes"), qsTr("sábado")]
+    readonly property var monthNames: [qsTr("enero"), qsTr("febrero"), qsTr("marzo"),
+        qsTr("abril"), qsTr("mayo"), qsTr("junio"), qsTr("julio"), qsTr("agosto"),
+        qsTr("septiembre"), qsTr("octubre"), qsTr("noviembre"), qsTr("diciembre")]
     property int viewYear: today.getFullYear()
     property int viewMonth: today.getMonth()   // 0-based
     property date today: new Date()
@@ -44,6 +49,16 @@ PillSurface {
     property string weatherUpdated: ""
     signal refreshWeatherRequested()
     property var forecast: []
+    // Escala común de la semana para las barras de rango del pronóstico.
+    readonly property var forecastRange: {
+        let lo = Infinity, hi = -Infinity
+        for (const day of forecast) {
+            const l = parseInt(day.low), h = parseInt(day.high)
+            if (!isNaN(l)) lo = Math.min(lo, l)
+            if (!isNaN(h)) hi = Math.max(hi, h)
+        }
+        return isFinite(lo) && isFinite(hi) && hi > lo ? { lo: lo, span: hi - lo } : null
+    }
     property bool hasMedia: false
     property string mediaTitle: ""
     property string mediaArtist: ""
@@ -81,7 +96,12 @@ PillSurface {
         return rows * 7
     }
 
+    // Last navigation direction: the title rolls and the grid slides with it.
+    property int monthDir: 1
+    property bool selectionSnap: false
     function shiftMonth(d) {
+        root.monthDir = d < 0 ? -1 : 1
+        root.selectionSnap = true
         var m = root.viewMonth + d
         var y = root.viewYear
         if (m < 0) { m = 11; y-- }
@@ -89,7 +109,20 @@ PillSurface {
         root.viewYear = y
         root.viewMonth = m
         root.monthEpoch++
+        root.selectionSnap = false
+        if (!Flags.reduceMotion) monthSlide.restart()
     }
+    property real gridShift: 0
+    NumberAnimation {
+        id: monthSlide
+        target: root; property: "gridShift"
+        from: root.monthDir * 18 * root.s; to: 0
+        duration: Motion.standard; easing.type: Motion.easeStandard
+    }
+    readonly property int selectedIndex: root.selectedDay >= 1 && root.selectedDay <= root.length
+        ? root.offset + root.selectedDay - 1 : -1
+    // Con Superficies líquidas el estiramiento de la gota ya es la respuesta.
+    onSelectedDayChanged: if (!Flags.reduceMotion && !selectionSnap && !Theme.liquid) selectionPop.restart()
 
     // ── sizing robusto de la grilla ──
     // cellSize = min(lo que cabe por ancho, lo que cabe por alto) → la grilla
@@ -122,7 +155,8 @@ PillSurface {
                 Layout.alignment: Qt.AlignVCenter
 
                 Text {
-                    text: root.locale.dayName(root.today.getDay()).toUpperCase()
+                    objectName: "calendarTodayWeekday"
+                    text: root.dayNames[root.today.getDay()].toUpperCase()
                     color: Theme.accent
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeBody * root.s
@@ -170,15 +204,15 @@ PillSurface {
             // prev
             Rectangle {
                 id: prevBtn
-                Layout.preferredWidth: 28 * root.s; Layout.preferredHeight: 28 * root.s
+                Layout.preferredWidth: Math.max(32, 36 * root.s); Layout.preferredHeight: Math.max(32, 36 * root.s)
                 radius: height / 2
                 color: prevMa.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaGlow) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
                 border.color: prevMa.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Qt.alpha(Theme.foreground, Theme.alphaSoft)
-                border.width: Theme.borderHairline
+                border.width: Theme.liquid ? 0 : Theme.borderHairline
                 transformOrigin: Item.Center
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
-                MotionArea { id: prevMa; accessibleName: qsTr("Mes anterior"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(-1) }
+                MotionArea { id: prevMa; objectName: "calendarPreviousMonth"; accessibleName: qsTr("Mes anterior"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(-1) }
 
                 MaterialIcon {
                     compressWithControl: true
@@ -193,32 +227,32 @@ PillSurface {
 
             }
 
-            Item { Layout.fillWidth: true }
-
-            // mes + año (crossfade al cambiar)
-            Text {
-                text: root.locale.monthName(root.viewMonth).charAt(0).toUpperCase()
-                      + root.locale.monthName(root.viewMonth).slice(1) + " " + root.viewYear
+            // mes + año: rueda en la dirección de la navegación
+            CrossfadeLabel {
+                objectName: "calendarMonthTitle"
+                Layout.fillWidth: true
+                value: root.monthNames[root.viewMonth].charAt(0).toUpperCase()
+                      + root.monthNames[root.viewMonth].slice(1) + " " + root.viewYear
+                swapTravel: root.monthDir * 6 * root.s * Motion.labelTravel
+                horizontalAlignment: Text.AlignHCenter
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeTitle * root.s
                 font.weight: Font.DemiBold
             }
 
-            Item { Layout.fillWidth: true }
-
             // next
             Rectangle {
                 id: nextBtn
-                Layout.preferredWidth: 28 * root.s; Layout.preferredHeight: 28 * root.s
+                Layout.preferredWidth: Math.max(32, 36 * root.s); Layout.preferredHeight: Math.max(32, 36 * root.s)
                 radius: height / 2
                 color: nextMa.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaGlow) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
                 border.color: nextMa.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Qt.alpha(Theme.foreground, Theme.alphaSoft)
-                border.width: Theme.borderHairline
+                border.width: Theme.liquid ? 0 : Theme.borderHairline
                 transformOrigin: Item.Center
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
-                MotionArea { id: nextMa; accessibleName: qsTr("Mes siguiente"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(1) }
+                MotionArea { id: nextMa; objectName: "calendarNextMonth"; accessibleName: qsTr("Mes siguiente"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(1) }
 
                 MaterialIcon {
                     compressWithControl: true
@@ -249,7 +283,7 @@ PillSurface {
                 model: {
                     var out = []
                     for (var i = 0; i < 7; i++)
-                        out.push(root.locale.dayName(i).slice(0, 2).toUpperCase())
+                        out.push(root.dayNames[i].slice(0, 2).toUpperCase())
                     return out
                 }
                 delegate: Text {
@@ -273,15 +307,53 @@ PillSurface {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            Grid {
-                id: grid
+            Item {
+                id: gridLayer
                 anchors.centerIn: parent
-                columns: 7
-                spacing: root.cellGap
                 width: root.cellSize * 7 + 6 * root.cellGap
                 height: root.cellSize * root.gridRows + (root.gridRows - 1) * root.cellGap
+                transform: Translate { x: root.gridShift }
+
+            // One selection that travels between days instead of each cell
+            // lighting up on its own; it snaps when the month changes. Liquid
+            // surfaces let it stretch toward the new day and gather on arrival.
+            LiquidSelection {
+                id: selectionMark
+                objectName: "calendarSelectionMark"
+                // Keep the last valid slot when the day falls outside the month
+                // (31 → a 30-day month) so it fades in place instead of jumping.
+                property int slot: 0
+                readonly property int col: slot % 7
+                readonly property int row: Math.floor(slot / 7)
+                // Arrive with the selected day's own staggered reveal.
+                readonly property Item cell: root.selectedIndex >= 0 && dayCells.count > root.selectedIndex ? dayCells.itemAt(root.selectedIndex) : null
+                targetX: col * (root.cellSize + root.cellGap)
+                targetY: row * (root.cellSize + root.cellGap)
+                targetWidth: root.cellSize
+                targetHeight: root.cellSize
+                immediate: root.selectionSnap
+                radius: Math.min(width, height) * 0.32
+                color: Theme.liquid ? Qt.alpha(Theme.accent, Theme.alphaChip) : Qt.alpha(Theme.accent, Theme.alphaGlow)
+                border.color: Qt.alpha(Theme.accent, Theme.alphaDisabled)
+                border.width: Theme.liquid ? 0 : Theme.borderHairline
+                opacity: cell ? cell.progress : 0
+                visible: opacity > 0.01
+                Binding on slot { when: root.selectedIndex >= 0; value: root.selectedIndex; restoreMode: Binding.RestoreNone }
+                SequentialAnimation {
+                    id: selectionPop
+                    NumberAnimation { target: selectionMark; property: "scale"; to: 1.06; duration: Motion.press; easing.type: Motion.easeStandard }
+                    NumberAnimation { target: selectionMark; property: "scale"; to: 1; duration: Motion.standard; easing.type: Easing.OutBack }
+                }
+            }
+
+            Grid {
+                id: grid
+                anchors.fill: parent
+                columns: 7
+                spacing: root.cellGap
 
                 Repeater {
+                    id: dayCells
                     model: root.cellCount
 
                     delegate: StaggerItem {
@@ -305,38 +377,32 @@ PillSurface {
                         width: root.cellSize
                         height: root.cellSize
 
-                        // pulso al seleccionar: anillo que crece y se asienta
-                        property bool justSelected: false
-                        onSelectedChanged: if (selected && !justSelected) {
-                            justSelected = true
-                            selectPulse.restart()
-                        }
-                        Timer {
-                            id: selectPulse
-                            interval: Motion.pulse + 60
-                            repeat: false
-                            onTriggered: cell.justSelected = false
-                        }
-
                         // fondo de la celda
                         Rectangle {
                             anchors.fill: parent
                             radius: root.cellSize * 0.32
                             color: {
-                                if (cell.isToday) return Theme.accent
-                                if (cell.selected) return Qt.alpha(Theme.accent, Theme.alphaGlow)
+                                if (cell.isToday) return Theme.liquid ? Theme.stateFill : Theme.accent
+                                if (cell.selected) return "transparent"
                                 if (cellMa.containsMouse && cell.inMonth) return Qt.alpha(Theme.accent, Theme.alphaSoft)
-                                return cell.weekend && cell.inMonth ? Qt.alpha(Theme.foreground, Theme.alphaGhost) : "transparent"
+                                // El fin de semana se distingue sólo por tinta: un fondo
+                                // propio volvía la rejilla una pared de bloques.
+                                return "transparent"
                             }
                             border.color: {
-                                if (cell.isToday) return Qt.alpha(Theme.accent, Theme.alphaIconOnAcc)
-                                if (cell.selected) return Qt.alpha(Theme.accent, Theme.alphaDisabled)
+                                if (cell.isToday) return Theme.liquid ? "transparent" : Qt.alpha(Theme.accent, Theme.alphaIconOnAcc)
+                                if (cell.selected) return "transparent"
                                 if (cellMa.containsMouse && cell.inMonth) return Qt.alpha(Theme.accent, Theme.alphaSelected)
                                 return "transparent"
                             }
                             border.width: Theme.borderHairline
                             Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                             Behavior on border.color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+                            gradient: Theme.liquid && cell.isToday ? todayVolume : null
+                            property Gradient todayVolume: Gradient {
+                                GradientStop { position: 0; color: Theme.stateFillLight }
+                                GradientStop { position: 1; color: Theme.stateFill }
+                            }
 
                             // glow suave detrás del "hoy"
                             Rectangle {
@@ -356,33 +422,19 @@ PillSurface {
                                 }
                             }
 
-                            // anillo de selección que respira brevemente
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: parent.radius
-                                color: "transparent"
-                                border.width: Theme.borderEmphasis
-                                border.color: Qt.alpha(Theme.accent, cell.justSelected ? 0.6 : 0)
-                                scale: cell.justSelected ? 1.08 : 1.0
-                                opacity: cell.justSelected ? 1 : 0
-                                visible: cell.selected
-                                Behavior on scale { Anim { type: Anim.EmphasizedOut } }
-                                Behavior on opacity { Anim { type: Anim.EmphasizedOut } }
-                            }
-
                             // número del día
                             Text {
                                 scale: cellMa.motion.visualScale
                                 transform: Translate { y: -Motion.labelTravel * cellMa.motion.presence }
                                 anchors.centerIn: parent
                                 text: cell.inMonth ? cell.dayNum : ""
-                                color: cell.isToday ? Theme.primaryContent
+                                color: cell.isToday ? (Theme.liquid ? Theme.stateContent : Theme.primaryContent)
                                               : cell.selected ? Theme.accent
                                                          : (cellMa.containsMouse && cell.inMonth ? Theme.foreground
                                                                                              : (cell.weekend && cell.inMonth ? Qt.alpha(Theme.foreground, Theme.alphaIconSec) : Theme.foreground))
                                 font.family: Theme.fontDisplay
                                 font.pixelSize: Theme.fontSizeBodyLg * root.s
-                                font.weight: cell.isToday ? Font.DemiBold : (cell.selected ? Font.DemiBold : Font.Medium)
+                                font.weight: cell.isToday ? Font.DemiBold : Font.Medium
                                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                             }
 
@@ -410,6 +462,7 @@ PillSurface {
                         }
                     }
                 }
+            }
             }
         }
         }
@@ -453,31 +506,34 @@ PillSurface {
                     Rectangle {
                         visible: !!root.selectedForecast
                         Layout.preferredWidth: 48 * root.s; Layout.preferredHeight: 28 * root.s
-                        radius: Theme.radiusSm * root.s
+                        radius: height / 2
                         color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                        Text { anchors.centerIn: parent; text: qsTr("Ahora"); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
+                        Text { anchors.centerIn: parent; text: qsTr("Ahora"); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; font.weight: Font.Medium }
                         MotionArea { objectName: "weatherCurrent"; anchors.fill: parent; accessibleName: qsTr("Volver al clima actual"); onClicked: root.selectForecast(-1) }
                     }
                     Rectangle {
                         Layout.preferredWidth: 28 * root.s; Layout.preferredHeight: 28 * root.s
                         radius: height / 2
                         color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                        MaterialIcon { anchors.centerIn: parent; iconName: "refresh"; color: Theme.iconSecondary; font.pixelSize: 17 * root.s; opacity: root.weatherLoading ? 0.4 : 1 }
+                        MaterialIcon {
+                            anchors.centerIn: parent; iconName: "refresh"; color: Theme.iconSecondary; font.pixelSize: 17 * root.s
+                            opacity: root.weatherLoading ? 0 : 1
+                            Behavior on opacity { NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+                        }
+                        ConfirmationIndicator { anchors.centerIn: parent; width: 20 * root.s; height: width; s: root.s; status: root.weatherLoading ? "busy" : "" }
                         MotionArea { objectName: "weatherRefresh"; anchors.fill: parent; enabled: !root.weatherLoading; accessibleName: qsTr("Actualizar clima"); onClicked: root.refreshWeatherRequested() }
                     }
                 }
-                Text {
-                    Layout.fillWidth: true
-                    text: root.weatherLocation || qsTr("Ubicación aproximada")
-                    color: Theme.iconSecondary; font.family: Theme.font
-                    font.pixelSize: Theme.fontSizeCaption * root.s; elide: Text.ElideRight
-                }
+                // Lugar y frescura en una sola línea de metadatos.
                 Text {
                     objectName: "weatherStatus"
                     Layout.fillWidth: true
-                    text: root.weatherLoading ? qsTr("Actualizando…") : root.weatherError ? (root.weatherTemp ? qsTr("Sin actualizar · datos anteriores") : root.weatherError) : (root.weatherUpdated ? qsTr("wttr.in · Actualizado %1").arg(root.weatherUpdated) : "wttr.in")
+                    Layout.topMargin: -6 * root.s
+                    text: (root.weatherLocation || qsTr("Ubicación aproximada")) + " · "
+                        + (root.weatherLoading ? qsTr("Actualizando…") : root.weatherError ? (root.weatherTemp ? qsTr("Sin actualizar · datos anteriores") : root.weatherError) : (root.weatherUpdated ? qsTr("Actualizado %1").arg(root.weatherUpdated) : "wttr.in"))
                     color: root.weatherError ? Theme.accent : Theme.iconSecondary
-                    font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; wrapMode: Text.WordWrap
+                    font.family: Theme.font; font.features: Theme.fontNumeric
+                    font.pixelSize: Theme.fontSizeLabel * root.s; wrapMode: Text.WordWrap
                     Accessible.role: Accessible.StaticText
                     Accessible.name: text
                 }
@@ -485,11 +541,12 @@ PillSurface {
                     Layout.fillWidth: true
                     spacing: 4 * root.s
                     opacity: root.weatherHeroOpacity
-                    Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
+                    Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                     Text {
                         Layout.fillWidth: true
-                        text: root.selectedForecast ? root.locale.dayName(new Date(root.selectedForecast.date + "T12:00:00").getDay()) : qsTr("Ahora mismo")
-                        color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; elide: Text.ElideRight
+                        objectName: "calendarForecastWeekday"
+                        text: root.selectedForecast ? root.dayNames[new Date(root.selectedForecast.date + "T12:00:00").getDay()] : qsTr("Ahora mismo")
+                        color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; elide: Text.ElideRight
                     }
                     RowLayout {
                         Layout.fillWidth: true
@@ -514,7 +571,7 @@ PillSurface {
                         Layout.fillWidth: true
                         text: root.selectedForecast ? qsTr("Máx. %1 · Mín. %2").arg(root.selectedForecast.high).arg(root.selectedForecast.low) : (root.weatherFeels ? qsTr("Sensación %1").arg(root.weatherFeels) : "")
                         visible: text.length > 0
-                        color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; wrapMode: Text.WordWrap
+                        color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; wrapMode: Text.WordWrap
                     }
                 }
                 Rectangle { Layout.fillWidth: true; Layout.preferredHeight: Theme.borderHairline; color: Theme.border }
@@ -523,16 +580,16 @@ PillSurface {
                     spacing: 12 * root.s
                     ColumnLayout {
                         Layout.fillWidth: true
-                        Text { text: qsTr("Humedad"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
+                        Text { text: qsTr("Humedad"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s }
                         Text { objectName: "weatherHumidityValue"; text: (root.selectedForecast ? root.selectedForecast.humidity : root.weatherHumidity) || "—"; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s }
                     }
                     ColumnLayout {
                         Layout.fillWidth: true
-                        Text { text: qsTr("Viento"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
+                        Text { text: qsTr("Viento"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s }
                         Text { objectName: "weatherWindValue"; text: (root.selectedForecast ? root.selectedForecast.wind : root.weatherWind) || "—"; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s }
                     }
                 }
-                Text { text: qsTr("Pronóstico"); visible: root.forecast.length > 0; color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; font.weight: Font.DemiBold }
+                Text { text: qsTr("Pronóstico"); visible: root.forecast.length > 0; color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; font.weight: Font.DemiBold }
                 Repeater {
                     model: root.forecast
                     delegate: Rectangle {
@@ -547,10 +604,32 @@ PillSurface {
                         RowLayout {
                             anchors.fill: parent; anchors.margins: 6 * root.s
                             spacing: 8 * root.s
-                            Text { Layout.fillWidth: true; text: root.locale.dayName(new Date(forecastRow.modelData.date + "T12:00:00").getDay()).slice(0, 3); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; elide: Text.ElideRight }
+                            Text { Layout.preferredWidth: 30 * root.s; text: root.dayNames[new Date(forecastRow.modelData.date + "T12:00:00").getDay()].slice(0, 3); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; font.weight: Font.Medium; elide: Text.ElideRight }
                             MaterialIcon { iconName: forecastRow.modelData.icon; color: Theme.accent; font.pixelSize: 18 * root.s }
-                            Text { text: forecastRow.modelData.high; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s; font.weight: Font.DemiBold }
-                            Text { text: forecastRow.modelData.low; color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s }
+                            Text { Layout.preferredWidth: 26 * root.s; horizontalAlignment: Text.AlignRight; text: forecastRow.modelData.low; color: Theme.iconSecondary; font.family: Theme.font; font.features: Theme.fontNumeric; font.pixelSize: Theme.fontSizeSmall * root.s }
+                            // Barra de rango: el tramo mín–máx del día sobre la escala de toda la semana.
+                            Rectangle {
+                                id: rangeTrack
+                                readonly property real lo: parseInt(forecastRow.modelData.low)
+                                readonly property real hi: parseInt(forecastRow.modelData.high)
+                                readonly property bool known: !!root.forecastRange && !isNaN(lo) && !isNaN(hi)
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 4 * root.s
+                                radius: height / 2
+                                color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
+                                Rectangle {
+                                    visible: rangeTrack.known
+                                    height: parent.height; radius: parent.radius
+                                    x: rangeTrack.known ? (rangeTrack.lo - root.forecastRange.lo) / root.forecastRange.span * parent.width : 0
+                                    width: rangeTrack.known ? Math.max(height, (rangeTrack.hi - rangeTrack.lo) / root.forecastRange.span * parent.width) : 0
+                                    gradient: Gradient {
+                                        orientation: Gradient.Horizontal
+                                        GradientStop { position: 0; color: Qt.alpha(Theme.accent, Theme.alphaIconSec) }
+                                        GradientStop { position: 1; color: Theme.accent }
+                                    }
+                                }
+                            }
+                            Text { Layout.preferredWidth: 26 * root.s; text: forecastRow.modelData.high; color: Theme.foreground; font.family: Theme.font; font.features: Theme.fontNumeric; font.pixelSize: Theme.fontSizeSmall * root.s; font.weight: Font.DemiBold }
                         }
                         MotionArea {
                             anchors.fill: parent; feedbackRadius: forecastRow.radius; hoverWash: false

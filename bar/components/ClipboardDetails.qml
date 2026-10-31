@@ -186,12 +186,14 @@ FocusScope {
             id: previewScroll
             objectName: "clipboardPreviewScroll"
             anchors.fill: parent
+            implicitHeight: 0
             visible: !root.organizerPage
             enabled: !root.choosingCollection && !root.organizerPage
             opacity: root.choosingCollection ? 0 : 1
             Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
             clip: true
             contentWidth: availableWidth
+            contentHeight: previewContent.height
             Keys.onUpPressed: event => { contentItem.contentY = Math.max(0, contentItem.contentY - 40 * root.s); event.accepted = true }
             Keys.onDownPressed: event => { contentItem.contentY = Math.min(Math.max(0, contentItem.contentHeight - contentItem.height), contentItem.contentY + 40 * root.s); event.accepted = true }
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
@@ -202,8 +204,9 @@ FocusScope {
                 color: Qt.alpha(Theme.foreground, 0.35)
             }
             Item {
+                id: previewContent
                 width: previewScroll.availableWidth
-                implicitHeight: root.entry && root.entry.isImage ? Math.max(120 * root.s, previewScroll.availableHeight) : Math.max(previewScroll.availableHeight, textPreview.implicitHeight + 12 * root.s)
+                height: root.entry && root.entry.isImage ? Math.max(120 * root.s, previewScroll.availableHeight) : Math.max(previewScroll.availableHeight, textPreview.implicitHeight + 12 * root.s)
                 Image {
                     id: imagePreview
                     objectName: "clipboardSelectedPreview"
@@ -397,8 +400,8 @@ FocusScope {
             currentIndex: root.collectionIndex
             model: root.destinations
             spacing: 4 * root.s
-            Keys.onUpPressed: { root.collectionIndex = Math.max(0, root.collectionIndex - 1); positionViewAtIndex(root.collectionIndex, ListView.Contain) }
-            Keys.onDownPressed: { root.collectionIndex = Math.min(count - 1, root.collectionIndex + 1); positionViewAtIndex(root.collectionIndex, ListView.Contain) }
+            Keys.onUpPressed: { const y = contentY; root.collectionIndex = Math.max(0, root.collectionIndex - 1); revealIndex(root.collectionIndex, y) }
+            Keys.onDownPressed: { const y = contentY; root.collectionIndex = Math.min(count - 1, root.collectionIndex + 1); revealIndex(root.collectionIndex, y) }
             Keys.onReturnPressed: root.chooseCollection(root.collectionIndex)
             Keys.onEnterPressed: root.chooseCollection(root.collectionIndex)
             delegate: MotionButton {

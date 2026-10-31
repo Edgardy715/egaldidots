@@ -27,6 +27,7 @@ MediaView {
         id: session
         player: Players.active
         trackKey: Players.trackKey
+        positionOffset: Players.offsetFor(player)
         active: root.open
     }
 

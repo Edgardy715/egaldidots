@@ -1,7 +1,6 @@
 import QtQuick
 import "../"
 import "../Singletons"
-import "../pets"
 
 /** The compact status section shown before the optional media chip. */
 Row {
@@ -12,7 +11,7 @@ Row {
     property bool capsLockOn: false
     property date now: new Date()
     signal requestCalendar()
-    signal requestFocus()
+    property var companionContext: null
     property bool companionEnabled: true
     property string activityText: ""
     property string activityMood: "rest"
@@ -20,12 +19,13 @@ Row {
     property int recordingCountdown: 0
     property real lookX: 0
     property real lookY: 0
-    property Item petLayer: null
-    property bool petAvailable: false
+    property bool companionAsleep: false
+    property bool companionSleepy: false
+    property bool companionListening: false
 
+    // Centre of the face in this row's coordinates; follows the chips before it.
+    readonly property point faceCenter: Qt.point(activityChip.x + activityChip.faceCenter.x, activityChip.y + activityChip.faceCenter.y)
     readonly property bool workspaceAnimating: workspaceFlash.shown || workspaceFlash.width > 0.01
-    // The pet's niche animates its own width; the pill follows it like the flash chip.
-    readonly property bool petNicheAnimating: Math.abs(barPerch.width - (barPerch.occupied ? barPerch.target : 0)) > 0.01
 
     spacing: 0
 
@@ -102,21 +102,25 @@ Row {
         color: Theme.accent
         font.family: Theme.fontMono
         font.pixelSize: Theme.fontSizeSmall * root.s
-        visible: root.capsLockOn
         opacity: root.capsLockOn ? 1 : 0
+        visible: opacity > 0.01
         Behavior on opacity { Anim { type: Anim.FastEffects } }
     }
-    Item { width: root.capsLockOn ? 6 * root.s : 0; height: 1; visible: root.capsLockOn }
+    Item {
+        width: root.capsLockOn ? 6 * root.s : 0; height: 1
+        Behavior on width { enabled: !Flags.reduceMotion; SmoothedAnimation { velocity: -1; duration: Motion.standardSmall } }
+    }
 
     IslandActivityChip {
+        id: activityChip
         s: root.s; coreH: root.coreH
+        companionContext: root.companionContext
         companionEnabled: root.companionEnabled
         label: root.activityText; mood: root.activityMood
         recordingPhase: root.recordingPhase
         recordingCountdown: root.recordingCountdown
-        actionName: root.recordingPhase.length ? qsTr("Abrir grabación") : qsTr("Abrir enfoque")
         lookX: root.lookX; lookY: root.lookY
-        onActivated: root.requestFocus()
+        asleep: root.companionAsleep; sleepy: root.companionSleepy; listening: root.companionListening
     }
 
     Item {
@@ -130,9 +134,11 @@ Row {
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 1.5 * root.s
             height: root.coreH
-            property font clockFont: Qt.font({family: Theme.fontDisplay, pixelSize: Theme.fontSizeHeadline * root.s, weight: Font.DemiBold, underline: clockHit.activeFocus})
+            property font clockFont: Qt.font({family: Theme.fontDisplay, pixelSize: Theme.fontSizeHeadline * root.s, weight: Font.DemiBold, underline: clockHit.activeFocus, features: Theme.fontNumeric})
             ClockReel {
                 objectName: "clockHours"
+                // Una hora de un dígito no reserva el hueco de dos: «9:41», no «9 :41».
+                widthSample: text.length > 1 ? "00" : "0"
                 width: implicitWidth; height: root.coreH
                 font: clockText.clockFont
                 text: String(root.now.getHours() % 12 || 12)
@@ -173,31 +179,6 @@ Row {
             anchors.margins: -6 * root.s
             cursorShape: Qt.PointingHandCursor
             onClicked: root.requestCalendar()
-        }
-    }
-
-    // The pet's home at rest: a niche after the clock that opens only while it
-    // is here, past the clock's hit margin so it never takes the clock's clicks.
-    PetPerch {
-        id: barPerch
-        objectName: "barPetPerch"
-        readonly property real gap: 8 * root.s
-        // Room for the body's left half and the furthest right any pose reaches (sleep's Zs).
-        readonly property real target: petLayer ? gap + petLayer.bodyWidth / 2 + petLayer.reachRight + 2 * root.s : 0
-        petLayer: root.petLayer
-        perchId: "bar"
-        priority: 0
-        kind: "niche"
-        available: root.petAvailable && Config.pets.barSurface
-        width: occupied ? target : 0
-        height: root.coreH
-        headroom: root.coreH
-        minX: gap + (petLayer ? petLayer.bodyWidth / 2 : 0)
-        maxX: minX
-        reveal: target > 0 ? Math.pow(Math.min(1, width / target), 2) : 0
-        Behavior on width {
-            enabled: !Flags.reduceMotion
-            SmoothedAnimation { duration: Motion.morph; velocity: -1 }
         }
     }
 }

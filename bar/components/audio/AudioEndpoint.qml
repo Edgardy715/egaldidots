@@ -167,7 +167,7 @@ Item {
             Layout.preferredHeight: root.renaming ? renameRow.implicitHeight : 0
             clip: true; enabled: root.renaming
             opacity: root.renaming ? 1 : 0
-            Behavior on Layout.preferredHeight { enabled: root.visible && !Flags.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Easing.OutCubic } }
+            Behavior on Layout.preferredHeight { enabled: root.visible && !Flags.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
             Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast } }
             RowLayout {
                 id: renameRow
@@ -208,7 +208,7 @@ Item {
                 horizontalAlignment: Text.AlignRight
                 text: Math.round(root.displayVolume * 100) + "%"
                 color: root.displayVolume > 1 ? Theme.error : root.endpoint.mute ? Theme.iconSecondary : Theme.foreground
-                font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeBodyLg * root.s
+                font.family: Theme.font; font.features: Theme.fontNumeric; font.weight: Font.Medium; font.pixelSize: Theme.fontSizeBodyLg * root.s
             }
         }
         Rectangle {
@@ -220,6 +220,7 @@ Item {
                 width: parent.width * Math.min(1, root.levels[root.meterSource] || 0)
                 height: parent.height; radius: parent.radius
                 color: (root.levels[root.meterSource] || 0) > 0.98 ? Theme.error : Theme.accent
+                // Literal on purpose: ~one meter-sample interval of linear smoothing; it follows live levels and must not scale with Motion.mult.
                 Behavior on width { enabled: root.visible && !Flags.reduceMotion; NumberAnimation { duration: 32; easing.type: Easing.Linear } }
             }
             Accessible.name: qsTr("Nivel de señal de %1").arg(root.title)
@@ -255,7 +256,7 @@ Item {
             clip: true
             opacity: root.expanded ? 1 : 0
             enabled: root.expanded
-            Behavior on Layout.preferredHeight { enabled: !Flags.reduceMotion && root.visible; NumberAnimation { duration: Motion.standardSmall; easing.type: Easing.OutCubic } }
+            Behavior on Layout.preferredHeight { enabled: !Flags.reduceMotion && root.visible; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
             Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast } }
             ColumnLayout {
                 id: details
@@ -306,7 +307,7 @@ Item {
                             Layout.preferredWidth: 48 * root.s
                             text: Math.round(channelFader.displayVolume * 100) + "%"
                             horizontalAlignment: Text.AlignRight
-                            font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
+                            font.family: Theme.font; font.features: Theme.fontNumeric; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
                         }
                     }
                 }
@@ -347,7 +348,7 @@ Item {
                 }
                 Text {
                     text: root.displayVolume > 0 ? (60 * Math.log(root.displayVolume) / Math.LN10).toFixed(1) + " dB" : "−∞ dB"
-                    font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
+                    font.family: Theme.font; font.features: Theme.fontNumeric; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
                 }
             }
         }

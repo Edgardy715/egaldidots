@@ -6,6 +6,7 @@ import "../Singletons"
 PillSurface {
     id: root
 
+    readonly property bool escapeClearsSearch: editor.escapeClearsSearch
     readonly property bool pathPickerOpen: editor.pathPickerOpen
     property int profileRequest: 0
     onProfileRequestChanged: { if (profileRequest > 0) editor.showProfile() }

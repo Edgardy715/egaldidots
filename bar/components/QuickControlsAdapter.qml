@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "../Singletons"
+import "ProfileProbe.js" as ProfileProbe
 
 Item {
     id: root
@@ -9,6 +10,10 @@ Item {
     property bool contentReady: false
     property bool open: parent && "open" in parent ? parent.open : visible
     property bool showBrightness: Brightness.available
+    // Sin daemon de perfiles (power-profiles-daemon enmascarado) la sección no aporta nada.
+    property bool showProfile: activeProfile.length > 0 || !profileReadFailed && profileExpected
+    readonly property bool profileExpected: ProfileProbe.available
+    readonly property real contentHeight: view.contentHeight
     property real brightnessPercent: Brightness.percent
     property bool brightnessLastWriteOk: Brightness.lastWriteOk
     property bool keepAwakeEnabled: KeepAwake.enabled
@@ -36,13 +41,16 @@ Item {
         if (!root.profileBusy) profileReader.running = true
     }
 
-    onOpenChanged: if (open) refreshProfile()
+    // El panel interno puede apagarse (portátil con monitor externo): se re-detecta al abrir.
+    onOpenChanged: if (open) { refreshProfile(); Brightness.detect() }
 
     QuickControlsView {
+        id: view
         anchors.fill: parent
         s: root.s
         contentReady: root.contentReady
         showBrightness: root.showBrightness
+        showProfile: root.showProfile
         brightnessPercent: root.brightnessPercent
         brightnessLastWriteOk: root.brightnessLastWriteOk
         keepAwakeEnabled: root.keepAwakeEnabled
@@ -80,6 +88,7 @@ Item {
             const profile = (profileOutput.text || "").trim().toLowerCase()
             const valid = code === 0 && root.profiles.indexOf(profile) >= 0
             if (valid) root.activeProfile = profile
+            if (valid || !root.pendingProfile.length) ProfileProbe.available = valid
             if (root.pendingProfile.length) {
                 root.profileError = root.profileSetFailed ? qsTr("No se pudo aplicar el perfil.")
                     : !valid || profile !== root.pendingProfile ? qsTr("No se pudo confirmar el perfil.") : ""

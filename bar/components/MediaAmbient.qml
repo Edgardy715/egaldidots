@@ -19,15 +19,12 @@ Item {
     property real pace: flowing ? 1 : 0
     Behavior on pace {
         enabled: root.shown && Flags.mediaTransitions && !Flags.reduceMotion
-        NumberAnimation { duration: 420; easing.type: Easing.OutCubic }
+        NumberAnimation { duration: Motion.morph; easing.type: Motion.easeStandard }
     }
-    Timer {
-        id: driftClock
+    AmbientSubscription {
         objectName: "mediaAmbientClock"
-        interval: 33
-        repeat: true
         running: root.shown && (root.flowing || root.pace > 0.001)
-        onTriggered: root.phase += interval / 1000 * root.pace
+        onTriggered: dt => root.phase += dt * root.pace
     }
 
     Item {

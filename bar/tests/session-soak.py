@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import time
 
 spec = importlib.util.spec_from_file_location('process_sample', Path(__file__).with_name('sample-process.py'))
@@ -35,12 +36,59 @@ def identity(process):
     return proc.counters((process / 'stat').read_text())
 
 
+def descendants(root):
+    """Procesos vivos bajo root como (pid, stat); child_cpu_ticks sólo ve hijos ya recogidos."""
+    children = {}
+    for entry in Path('/proc').iterdir():
+        if not entry.name.isdigit():
+            continue
+        try:
+            stat = (entry / 'stat').read_text()
+        except OSError:
+            continue
+        children.setdefault(int(stat[stat.rindex(')') + 2:].split()[1]), []).append((int(entry.name), stat))
+    found, pending = [], [root]
+    while pending:
+        for pid, stat in children.get(pending.pop(), []):
+            found.append((pid, stat))
+            pending.append(pid)
+    return found
+
+
+def live_children(pid):
+    """CPU acumulada (propia + hijos recogidos) y memoria de los descendientes vivos."""
+    result = dict(live_children={}, live_children_cpu_ticks=0, live_children_pss_kib=0,
+                  live_children_swap_pss_kib=0)
+    for child, stat in descendants(pid):
+        counters = proc.counters(stat)
+        result['live_children_cpu_ticks'] += counters['cpu_ticks'] + counters['child_cpu_ticks']
+        name = stat[stat.index('(') + 1:stat.rindex(')')]
+        result['live_children'][name] = result['live_children'].get(name, 0) + 1
+        try:
+            memory = proc.memory(Path('/proc') / str(child))
+        except OSError:
+            continue
+        result['live_children_pss_kib'] += memory.get('Pss_kib', 0)
+        result['live_children_swap_pss_kib'] += memory.get('SwapPss_kib', 0)
+    return result
+
+
 def record(pid, expected_start):
     process = Path('/proc') / str(pid)
     counters = identity(process)
     if counters['start_ticks'] != expected_start:
         raise RuntimeError('PID reutilizado')
-    return dict(monotonic_s=time.monotonic(), **counters, **proc.memory(process))
+    current = dict(monotonic_s=time.monotonic(), **counters, **proc.memory(process), **live_children(pid))
+    # Huella sin el sesgo del swap y CPU del árbol (qs + hijos recogidos + hijos vivos).
+    current['pss_with_swap_kib'] = current['Pss_kib'] + current['SwapPss_kib']
+    current['tree_cpu_ticks'] = current['cpu_ticks'] + current['child_cpu_ticks'] + current['live_children_cpu_ticks']
+    return current
+
+
+def percent(current, previous, key):
+    if previous is None:
+        return None
+    return 100 * (current[key] - previous[key]) / os.sysconf('SC_CLK_TCK') / (current['monotonic_s'] - previous['monotonic_s'])
 
 
 def run(args):
@@ -72,7 +120,8 @@ def run(args):
                     break
                 current['elapsed_s'] = current['monotonic_s'] - start
                 current['utc'] = datetime.now(timezone.utc).isoformat()
-                current['cpu_percent'] = None if previous is None else 100 * (current['cpu_ticks'] - previous['cpu_ticks']) / os.sysconf('SC_CLK_TCK') / (current['monotonic_s'] - previous['monotonic_s'])
+                current['cpu_percent'] = percent(current, previous, 'cpu_ticks')
+                current['tree_cpu_percent'] = percent(current, previous, 'tree_cpu_ticks')
                 current['gpu'] = gpu_row(command(['nvidia-smi', 'pmon', '-c', '1', '-s', 'um']), args.pid)
                 current['playback'] = command(['playerctl', 'status'])
                 session = os.environ.get('XDG_SESSION_ID')
@@ -113,13 +162,24 @@ if __name__ == '__main__':
         assert gpu_row('# header', 123) is None
         assert gpu_row('0 123 G - - - - - - 59 0 qs', 456) is None
         first = identity(Path('/proc') / str(os.getpid()))
-        assert record(os.getpid(), first['start_ticks'])['Pss_kib'] > 0
+        busy = subprocess.Popen([sys.executable, '-c', 'import time\nt = time.time()\nwhile time.time() - t < 0.4: pass\ntime.sleep(5)'])
+        try:
+            time.sleep(0.5)
+            sampled = record(os.getpid(), first['start_ticks'])
+            assert sampled['Pss_kib'] > 0 and sampled['pss_with_swap_kib'] == sampled['Pss_kib'] + sampled['SwapPss_kib']
+            assert any(pid == busy.pid for pid, _ in descendants(os.getpid()))
+            assert sampled['live_children_cpu_ticks'] >= 20 and sampled['live_children_pss_kib'] > 0
+            assert sampled['tree_cpu_ticks'] >= sampled['cpu_ticks'] + sampled['live_children_cpu_ticks']
+        finally:
+            busy.kill()
+            busy.wait()
+        assert all(pid != busy.pid for pid, _ in descendants(os.getpid()))
         try:
             record(os.getpid(), first['start_ticks'] + 1)
             raise AssertionError('Aceptó otro starttime')
         except RuntimeError:
             pass
-        print('PASS: GPU soportada/no disponible, filtro PID, PSS y rechazo PID reutilizado')
+        print('PASS: GPU soportada/no disponible, filtro PID, PSS+swap, hijos vivos y rechazo PID reutilizado')
     else:
         if args.pid is None or args.pid <= 0 or args.output is None:
             parser.error('se requieren --pid positivo y --output nuevo')

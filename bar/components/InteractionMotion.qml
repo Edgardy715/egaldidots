@@ -26,9 +26,9 @@ Item {
         else { recovery.to = targetScale; recovery.start() }
     }
     onVisibleChanged: if (!visible) { compression.stop(); recovery.stop(); hoverAnimation.complete(); pressureAnimation.complete(); visualScale = targetScale }
-    Behavior on presence { enabled: root.visible; NumberAnimation { id: hoverAnimation; duration: Motion.hover; easing.type: Easing.OutCubic } }
+    Behavior on presence { enabled: root.visible; NumberAnimation { id: hoverAnimation; duration: Motion.hover; easing.type: Motion.easeStandard } }
     Behavior on pressure { enabled: root.visible; NumberAnimation { id: pressureAnimation; duration: Motion.press; easing.type: Easing.OutQuad } }
-    NumberAnimation { id: compression; target: root; property: "visualScale"; duration: Motion.press; easing.type: Easing.OutCubic }
+    NumberAnimation { id: compression; target: root; property: "visualScale"; duration: Motion.press; easing.type: Motion.easeStandard }
     SpringAnimation {
         id: recovery
         target: root; property: "visualScale"

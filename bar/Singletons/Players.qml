@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Mpris
 import "MediaSource.js" as MediaSource
 
@@ -37,7 +38,10 @@ Singleton {
         return l.length > 0 ? l[0] : null
     }
     // playing aún puede conservar el valor del player anterior durante esta señal.
-    onActiveChanged: if (root.active && root.active.isPlaying) root.recent = root.active
+    onActiveChanged: {
+        if (root.active && root.active.isPlaying) root.recent = root.active
+        root._track()
+    }
 
     /** ciclo manual entre players (dir ±1) — para el switcher del media surface. */
     function cycleManual(dir) {
@@ -60,6 +64,108 @@ Singleton {
         repeat: true
         running: root.live && root.active.positionSupported
         onTriggered: if (root.active) root.active.positionChanged()
+    }
+
+    // Zen/Firefox con YouTube: tras cambiar de vídeo alterna entre dos fuentes
+    // con el mismo título, la real (posición + mpris:length) y otra sin duración
+    // y con posición ≈0 (la vista previa de YouTube), hasta la siguiente pausa.
+    // Sin lengthSupported, MprisPlayer.length devuelve la posición (anillo
+    // lleno). Guardamos el último dato válido del vídeo (de Quickshell o leído
+    // por D-Bus) y extrapolamos desde él mientras la fuente siga inválida.
+    property var _anchorPlayer: null
+    property string _anchorKey: ""
+    property real _anchorLen: 0
+    property real _anchorPos: 0
+    property real _anchorAt: 0
+
+    function _keyOf(p) { return p ? (p.trackTitle || "") + "::" + (p.trackArtist || "") : "" }
+    function _valid(p) { return !!p && p.lengthSupported && isFinite(p.length) && p.length > 0 }
+    function _anchored(p) { return !!p && p === root._anchorPlayer && root._anchorKey === root._keyOf(p) }
+    function _anchor(p, pos, len) {
+        root._anchorPlayer = p
+        root._anchorKey = root._keyOf(p)
+        root._anchorLen = len
+        root._anchorPos = Math.max(0, Math.min(len, pos))
+        root._anchorAt = Date.now()
+    }
+    function _anchorNow(p) {
+        var rate = p.isPlaying ? (isFinite(p.rate) && p.rate > 0 ? p.rate : 1) : 0
+        return Math.min(root._anchorLen, root._anchorPos + (Date.now() - root._anchorAt) / 1000 * rate)
+    }
+
+    function lengthOf(p) {
+        if (root._valid(p)) return p.length
+        return root._anchored(p) ? root._anchorLen : 0
+    }
+    function positionOf(p) {
+        if (!p) return 0
+        void p.position
+        if (root._valid(p) || !root._anchored(p)) return Math.max(0, p.position || 0)
+        return root._anchorNow(p)
+    }
+    function offsetFor(p) { return p ? root.positionOf(p) - Math.max(0, p.position || 0) : 0 }
+    function progressOf(p) {
+        var l = root.lengthOf(p)
+        return l > 0 ? Math.max(0, Math.min(1, root.positionOf(p) / l)) : 0
+    }
+
+    // Mantiene el ancla: copia el estado válido de Quickshell, acepta seeks
+    // reales mientras la fuente es inválida (la fantasma da ≈0) y pide lecturas.
+    function _track() {
+        var p = root.active
+        if (!p) return
+        if (root._valid(p)) { root._anchor(p, p.position || 0, p.length); return }
+        if (!root._anchored(p)) return
+        var raw = p.position || 0
+        if (raw > 1 && Math.abs(raw - root._anchorNow(p)) > 1.5) root._anchor(p, raw, root._anchorLen)
+    }
+
+    Connections {
+        target: root.active || null
+        ignoreUnknownSignals: true
+        function onPositionChanged() { root._track() }
+        function onLengthChanged() { root._track() }
+        function onLengthSupportedChanged() { root._track() }
+        function onPostTrackChanged() { root._track(); probeDelay.interval = 500; probeDelay.restart() }
+    }
+
+    // Lecturas D-Bus sólo mientras la fuente es inválida: rápidas hasta anclar,
+    // luego espaciadas para corregir deriva. playerctl da µs.
+    Timer {
+        id: probeDelay
+        interval: 1500
+        repeat: true
+        running: root.playing && !!root.active && root.active.positionSupported && !root._valid(root.active)
+        onRunningChanged: if (running) interval = 500
+        onTriggered: {
+            var p = root.active
+            var name = p && p.dbusName ? p.dbusName.replace(/^org\.mpris\.MediaPlayer2\./, "") : ""
+            interval = root._anchored(p) ? 10000 : 1500
+            if (!name || positionProbe.running) return
+            positionProbe.target = p
+            positionProbe.key = root._keyOf(p)
+            positionProbe.command = ["playerctl", "-p", name, "metadata", "--format", "{{position}} {{mpris:length}}"]
+            positionProbe.running = true
+        }
+    }
+
+    Process {
+        id: positionProbe
+        property var target: null
+        property string key: ""
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var p = positionProbe.target
+                var parts = (text || "").trim().split(/\s+/)
+                var pos = parseFloat(parts[0]) / 1e6
+                var len = parseFloat(parts[1]) / 1e6
+                if (p && p === root.active && positionProbe.key === root._keyOf(p)
+                        && isFinite(len) && len > 0 && isFinite(pos) && pos >= 0) {
+                    root._anchor(p, pos, len)
+                    p.positionChanged()
+                }
+            }
+        }
     }
 
     readonly property string title: root.has && root.active.trackTitle ? root.active.trackTitle : "Nothing playing"

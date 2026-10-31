@@ -8,8 +8,11 @@ PillSurface {
     mTop: Theme.marginMd + 78
     mLeft: Theme.marginMd; mRight: Theme.marginMd; mBottom: 20
     property alias query: view.query
+    focusActive: view.focusActive
+    focusPoint: view.focusPoint
     readonly property var searchResults: controller.searchResults
     readonly property int resultsCount: view.resultsCount
+    readonly property bool searching: controller.searching
     readonly property bool resultsVisible: view.resultsVisible
     readonly property bool emptyResultsVisible: view.emptyResultsVisible
     readonly property int maxVisibleResults: view.maxVisibleResults
@@ -26,8 +29,6 @@ PillSurface {
         id: view
         anchors.fill: parent
         s: root.s
-        petLayer: root.petContext
-        petAvailable: root.petEligible
         open: root.open
         closing: root.closing
         searchResults: controller.searchResults
@@ -35,7 +36,7 @@ PillSurface {
         showCalculator: controller.showCalculator
         searching: controller.searching
         onRequestClose: root.requestClose()
-        onLaunchRequested: app => controller.launch(app)
+        onLaunchRequested: app => { controller.launch(app); root.approved() }
         onCopyResultRequested: value => controller.copyResult(value)
     }
 }

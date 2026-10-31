@@ -9,6 +9,8 @@ PillSurface {
     mLeft: Theme.marginXl
     mRight: Theme.marginXl
     mBottom: Theme.marginXs
+    focusActive: view.focusActive
+    focusPoint: view.focusPoint
     readonly property color previewAccent: view.previewAccent
     readonly property var sel: view.sel
     readonly property string selName: view.selName
@@ -26,7 +28,7 @@ PillSurface {
         selectedIndex: view.currentIndex
         accentFallback: Theme.accent
         onSelectionRequested: index => view.selectIndex(index)
-        onApplied: view.applied()
+        onApplied: { view.applied(); root.approved() }
     }
     WallpaperView {
         id: view
@@ -43,8 +45,8 @@ PillSurface {
         previewAccent: controller.previewAccent
         mediaHas: Players.has
         mediaArtUrl: Players.artUrl
-        mediaHasProgress: !!(Players.active && Players.active.length > 0)
-        mediaProgress: mediaHasProgress ? Math.max(0, Math.min(1, Players.active.position / Players.active.length)) : 0
+        mediaHasProgress: Players.lengthOf(Players.active) > 0
+        mediaProgress: Players.progressOf(Players.active)
         mediaTitle: Players.title
         mediaArtist: Players.artist
         onRequestClose: root.requestClose()

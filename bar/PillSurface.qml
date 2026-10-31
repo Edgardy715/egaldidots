@@ -24,10 +24,6 @@ Item {
     property bool closing: false
     property real morphCloseness: 1
     property string screenName: ""
-    property var petContext: null
-    property bool petPresented: false
-    readonly property bool petEligible: petContext !== null && petContext.enabled
-        && petContext.monitorActive && petPresented && active && visible && morphCloseness > 0.99
     property real morphRadius: 0
     property real mTop: Theme.marginNone
     property real mLeft: Theme.marginNone
@@ -42,8 +38,15 @@ Item {
     property color bgColor: "transparent"
     property alias bgRect: _surfaceBg
 
+    // Attention: while the surface has one point that matters (a caret, a hovered
+    // card, the current lyric) it publishes it here, in its own coordinates, and
+    // Iris looks at it. `approved` is a discrete success (launch, apply).
+    property bool focusActive: false
+    property point focusPoint: Qt.point(0, 0)
+
     signal requestClose()
     signal feedbackRequested(string kind)
+    signal approved()
 
     // Los márgenes pertenecen al contrato visual de cada surface. Aplicarlos
     // aquí mantiene el contenido dentro del vidrio y evita que los encabezados

@@ -16,6 +16,14 @@ Item {
     property string applyError: ""
     property string feedback: ""
     property color previewAccent: "white"
+    // Attention for Iris: the thumbnail under the pointer, centre in view coordinates.
+    property Item hoveredThumb: null
+    readonly property bool focusActive: active && hoveredThumb !== null
+    readonly property point focusPoint: {
+        if (!focusActive) return Qt.point(0, 0)
+        void pathView.contentX; void pathView.x; void pathView.y
+        return hoveredThumb.mapToItem(root, hoveredThumb.width / 2, hoveredThumb.height / 2)
+    }
     property bool mediaHas: false
     property string mediaArtUrl: ""
     property bool mediaHasProgress: false
@@ -227,6 +235,7 @@ Item {
             }
 
             MaterialIcon {
+                id: refreshIcon
                 compressWithControl: true
                 interaction: refreshMouse.motion
                 hovered: refreshMouse.containsMouse
@@ -234,15 +243,24 @@ Item {
                 iconName: "refresh"
                 color: Theme.foreground
                 font.pixelSize: 18 * s
+                opacity: root.scanning ? 0 : 1
 
-                RotationAnimation on rotation {
-                    from: 0
-                    to: 360
-                    duration: 900
-                    loops: Animation.Infinite
-                    running: root.scanning && root.active && !Flags.reduceMotion
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Motion.fast
+                        easing.type: Motion.easeStandard
+                    }
+
                 }
 
+            }
+
+            ConfirmationIndicator {
+                anchors.centerIn: parent
+                width: 22 * root.s
+                height: width
+                s: root.s
+                status: root.scanning && root.active ? "busy" : ""
             }
 
         }
@@ -278,9 +296,11 @@ Item {
             anchors.rightMargin: 16 * s
             anchors.verticalCenter: refreshButton.verticalCenter
             text: root.count > 0 ? (pathView.currentIndex + 1) + " / " + root.count : "—"
-            color: root.previewAccent
-            font.family: Theme.fontMono
+            color: Theme.iconSecondary
+            font.family: Theme.font
+            font.features: Theme.fontNumeric
             font.pixelSize: 12 * s
+            font.weight: Font.Medium
         }
 
         Behavior on opacity {
@@ -476,7 +496,10 @@ Item {
                     border.color: root.previewAccent
                 }
             }
-            onCurrentIndexChanged: { Qt.callLater(root.refreshSelection); root.selectionChanged(currentIndex) }
+            onCurrentIndexChanged: {
+                Qt.callLater(root.refreshSelection)
+                root.selectionChanged(currentIndex)
+            }
 
             delegate: Item {
                 id: thumbnail
@@ -517,6 +540,8 @@ Item {
                         sourceSize: Qt.size(192, 108)
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true
+                        opacity: status === Image.Ready ? 1 : 0
+                        Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                     }
                     Rectangle {
                         anchors.right: parent.right; anchors.bottom: parent.bottom
@@ -551,6 +576,10 @@ Item {
                     hoverEnabled: true
                     enabled: root.active && !root.applying
                     cursorShape: Qt.PointingHandCursor
+                    onContainsMouseChanged: {
+                        if (containsMouse) root.hoveredThumb = thumbnail
+                        else if (root.hoveredThumb === thumbnail) root.hoveredThumb = null
+                    }
                     onClicked: root.selectIndex(thumbnail.index)
                     onDoubleClicked: if (!thumbnail.applied || root.feedback === "error") root.applyPath(thumbnail.path)
                 }
@@ -596,9 +625,9 @@ Item {
             width: Math.max(1, root.compact ? footer.width - 52 * s : applyActions.x - x - 24 * s)
             spacing: 5 * s
 
-            Text {
+            AnimatedLabel {
                 width: parent.width
-                text: root.selName
+                value: root.selName
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeHeadline * s
@@ -608,7 +637,7 @@ Item {
 
             Text {
                 width: parent.width
-                text: root.feedback === "applying" ? "Cambiando fondo y colores…" : root.feedback === "done" ? "Fondo y colores actualizados" : root.feedback === "error" ? root.applyError : root.selApplied ? "Fondo actual  ·  ← → para explorar" : "← → navegar  ·  Intro o doble clic para aplicar"
+                text: root.feedback === "applying" ? "Cambiando fondo y colores…" : root.feedback === "done" ? "Fondo y colores actualizados" : root.feedback === "error" ? root.applyError : root.selApplied ? "Ya es tu fondo  ·  ← → para explorar otros" : "← → navegar  ·  Intro o doble clic para aplicar"
                 color: root.feedback === "error" ? Theme.error : root.feedback === "done" ? root.previewAccent : Qt.alpha(Theme.foreground, Theme.alphaIconSec)
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeSmall * s
@@ -628,11 +657,14 @@ Item {
             spacing: 8 * s
 
             Rectangle {
+                id: applyButton
                 width: Math.max(164 * root.s, applyLabel.implicitWidth + 58 * root.s)
                 height: 40 * root.s
                 radius: Theme.radiusLg * root.s
-                color: applyMouse.pressed ? Qt.darker(root.previewAccent, 1.1) : applyMouse.containsMouse ? Qt.lighter(root.previewAccent, 1.1) : root.previewAccent
-                opacity: applyMouse.enabled ? 1 : 0.65
+                // Ya aplicado: estado tranquilo (tinte, no relleno) en vez de un botón apagado.
+                readonly property bool settled: root.selApplied && !root.applying && root.feedback === ""
+                color: settled ? Qt.alpha(root.previewAccent, Theme.alphaChip) : applyMouse.pressed ? Qt.darker(root.previewAccent, 1.1) : applyMouse.containsMouse ? Qt.lighter(root.previewAccent, 1.1) : root.previewAccent
+                opacity: applyMouse.enabled || settled ? 1 : 0.65
 
                 MotionArea {
                     id: applyMouse
@@ -653,40 +685,54 @@ Item {
                 }
 
                 Row {
+                    id: applyContent
                     anchors.centerIn: parent
                     spacing: 7 * root.s
 
                     MaterialIcon {
+                        id: applyIcon
                         compressWithControl: true
                         interaction: applyMouse.motion
                         anchors.verticalCenter: parent.verticalCenter
                         hovered: applyMouse.containsMouse
-                        iconName: root.feedback === "done" ? Icons.iCheck : root.applying ? "progress_activity" : "wallpaper"
-                        color: root.onPreviewAccent
+                        iconName: root.feedback === "done" || applyButton.settled ? Icons.iCheck : "wallpaper"
+                        color: applyButton.settled ? root.previewAccent : root.onPreviewAccent
                         font.pixelSize: 18 * root.s
+                        opacity: root.applying ? 0 : 1
 
-                        RotationAnimation on rotation {
-                            from: 0
-                            to: 360
-                            duration: 850
-                            loops: Animation.Infinite
-                            running: root.applying && root.active && !Flags.reduceMotion
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Motion.fast
+                                easing.type: Motion.easeStandard
+                            }
+
                         }
 
                     }
 
-                    Text {
+                    AnimatedLabel {
                         scale: applyMouse.motion.visualScale
                         transform: Translate { y: -Motion.labelTravel * applyMouse.motion.presence }
                         anchors.verticalCenter: parent.verticalCenter
                         id: applyLabel
-                        text: root.feedback === "done" ? "Listo" : root.applying ? "Aplicando…" : root.feedback === "error" ? "Reintentar" : root.selApplied ? "Fondo actual" : "Aplicar fondo"
-                        color: root.onPreviewAccent
+                        value: root.feedback === "done" ? "Listo" : root.applying ? "Aplicando…" : root.feedback === "error" ? "Reintentar" : root.selApplied ? "Aplicado" : "Aplicar fondo"
+                        color: applyButton.settled ? root.previewAccent : root.onPreviewAccent
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSizeBodyLg * root.s
                         font.weight: Font.DemiBold
                     }
 
+                }
+
+                // The working arc takes the glyph's place, tinted for the filled button.
+                ConfirmationIndicator {
+                    x: applyContent.x + applyIcon.x + (applyIcon.width - width) / 2
+                    y: applyContent.y + applyIcon.y + (applyIcon.height - height) / 2
+                    width: 20 * root.s
+                    height: width
+                    s: root.s
+                    busyColor: root.onPreviewAccent
+                    status: root.applying && root.active ? "busy" : ""
                 }
 
             }
@@ -709,6 +755,7 @@ Item {
         visible: root.count === 0
 
         Rectangle {
+            id: scanBadge
             anchors.horizontalCenter: parent.horizontalCenter
             width: 56 * s
             height: 56 * s
@@ -724,24 +771,11 @@ Item {
                 font.pixelSize: Theme.fontSizeHero * s
             }
 
-            SequentialAnimation on opacity {
-                running: root.scanning && root.active && !Flags.reduceMotion
-                loops: Animation.Infinite
-
-                NumberAnimation {
-                    from: 0.35
-                    to: 1
-                    duration: 1200
-                    easing.type: Easing.InOutSine
-                }
-
-                NumberAnimation {
-                    from: 1
-                    to: 0.35
-                    duration: 1200
-                    easing.type: Easing.InOutSine
-                }
-
+            // Scanning uses the shared working arc instead of a breathing badge.
+            ConfirmationIndicator {
+                anchors.fill: parent
+                s: root.s
+                status: root.scanning && root.active ? "busy" : ""
             }
 
         }
@@ -769,7 +803,7 @@ Item {
     Behavior on previewAccent {
         ColorAnimation {
             duration: Flags.reduceMotion ? 0 : Motion.standard
-            easing.type: Easing.OutCubic
+            easing.type: Motion.easeStandard
         }
 
     }

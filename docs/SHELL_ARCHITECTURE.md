@@ -35,6 +35,12 @@ Optional modules are composed by `TopBarModules.qml` and `OptionalModule.qml`.
 The main pill is required; disabled modules release input and unload after their
 exit transition. Both split and compact layouts use the same settings and data.
 
+El único pet es IslandCompanion (`bar/components/IslandCompanion.qml`), la cara de la
+isla: un item dentro del hueco del compañero del reloj, activado por
+`appearance.personality`. No hay capa ni overlay propios, ni percha, ni viaje entre
+surfaces. El sistema de mascotas pixel art (Eshell Pets: Mimo y Pip) se eliminó el
+2026-10-24; las ideas aprovechables están en `docs/companion-legacy-ideas-2026-10-24.md`.
+
 ## Configuration
 
 The file is `$ISLA_CONFIG`, or `$XDG_CONFIG_HOME/isla/shell.json` with a fallback
@@ -179,3 +185,26 @@ cases exec the Python reader after releasing the lock; missing binary also uses
 Python. `scripts/build-clipboard-list.sh` builds locked and installs atomically
 under XDG_DATA_HOME/isla/bin. Removing the binary restores Python on the next
 list request. Measurements: `docs/rust-clipboard-list-2026-10-21/REPORT.md`.
+
+## Actualizaciones del equipo
+
+Edots → Actualizaciones recibe `SystemUpdates` desde composición; la página sólo
+presenta resultados y delega acciones. `Settings.js` define `updates.enabled` y
+`updates.notifications`; se guardan/descartan con el mismo contrato de Config.
+`ShellRuntime` inicializa el servicio y abre Edots por la acción del aviso.
+El servicio consulta 45 segundos después del inicio y cada seis horas, sin
+instalar. `Notifs.postLocal` respeta No molestar y el centro abierto. La huella
+del último aviso se conserva en `$XDG_STATE_HOME/isla/updates-notice.json`
+(default ~/.local/state); el mismo resultado no repite aviso durante 24 horas.
+Errores parciales no impiden mostrar/avisar de fuentes válidas.
+
+`bar/scripts/system-updates.py` (stdlib) consulta checkupdates, paru, Flatpak si
+está instalado y el upstream Git de este checkout. Cada comando de consulta
+tiene timeout de 45 segundos; fuentes secuenciales. Flock impide operaciones
+simultáneas del puente. `launch system|aur|flatpak|shell` abre Kitty --hold;
+exit 0 sólo confirma el lanzamiento. La instalación conserva prompts nativos:
+pacman -Syu, paru -Syu (incluye oficiales), flatpak update o pull --ff-only.
+Git rechaza árbol sucio, commits locales o falta de upstream. No hace stash,
+reset ni instala automáticamente. Tras acabar se vuelve a comprobar manualmente;
+Isla puede necesitar reinicio. Apps externas a pacman/AUR/Flatpak y actualizadores
+propios no están cubiertos. IPC: `updates.check`, `updates.open`, `updates.state`.

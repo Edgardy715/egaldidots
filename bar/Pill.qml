@@ -1,6 +1,8 @@
 import QtQuick
+import Quickshell.Wayland
 import "Singletons"
 import "components"
+import "body"
 
 /** Pill principal: expone estado al shell y coordina geometría, surfaces y morphs de notificación.
  * Inspirada en Ricelin Pill.qml.
@@ -9,13 +11,13 @@ Item {
     id: pill
 
     // ---- API pública (host svg) ----
+    // Cuerpo replaces the face; retain legacy wiring for the later cleanup.
+    readonly property bool legacyCompanionEnabled: false
+    readonly property alias bodyPresentation: body
     property real s: 1
     property bool layoutChanging: false
     property bool recordingDetached: false
-    property bool petVisible: false
-    property var petContext: null
     readonly property real restHeaderOpacity: header.restOpacity
-    readonly property bool petNicheAnimating: header.petNicheAnimating
     property real restLeftWidth: 0
     property real restRightWidth: 0
     property real restHeight: IslandGeometry.restHeight
@@ -26,6 +28,12 @@ Item {
     property bool launcherClosing: false
     property int launcherClosePhase: 0
     property bool forcePinned: false
+    property real companionWorkspaceLook: 0
+    property bool companionCodeFocused: false
+    property bool companionMusicVisible: false
+    property real companionSeek: 0.5
+    property real companionBeat: 0
+    property bool companionBlocked: false
     property bool hovered: false
     property bool interactionOpen: surfaceOpen
     readonly property bool receiving: material.receiving
@@ -39,6 +47,7 @@ Item {
     function respond(kind) {
         if (!visible || surface === "auth" || layoutChanging) return
         responseMood = kind
+        bodyEvents.react(kind)
         expressionHold.restart()
         if (kind !== "paused" && kind !== "cancel") material.receive(0.55)
     }
@@ -83,11 +92,12 @@ Item {
         fontSizeBodyLg: Theme.fontSizeBodyLg
         fontSizeLabel: Theme.fontSizeLabel
         fontScale: Flags.fontScale
-        hasNotification: !!pill.activeNotif
-        notifAnimating: pill.notifAnimating
+        hasNotification: !!pill.activeNotif && !pill.notifDrop
+        notifAnimating: pill.notifMorphing
         notifState: pill.notifState
         notifBreathRadius: pill.notifBreathRadius
         contentLoaded: !!pill.surfaceItem
+        contentHeightHint: pill.surfaceItem && pill.surface === "utils" ? pill.surfaceItem.contentHeightHint || 0 : 0
         contentClosing: !!(pill.surfaceItem && pill.surfaceItem.closing)
         resultsVisible: !!(pill.surfaceItem && pill.surfaceItem.resultsVisible)
         emptyResultsVisible: !!(pill.surfaceItem && pill.surfaceItem.emptyResultsVisible)
@@ -110,6 +120,13 @@ Item {
     readonly property bool _notifIconResolved: activeNotif
         && contentAdapter.notificationIcon.length > 0
     readonly property bool notifAnimating: notificationMotion.notifAnimating
+    // Informational notifications bud below as a droplet; the pill keeps its
+    // content. Critical ones keep the interrupting morph.
+    readonly property bool notifDrop: Flags.notificationDrop && !!activeNotif && !activeNotif.isCritical
+    readonly property bool notifMorphing: notifAnimating && !notifDrop
+    readonly property bool notifDropOpen: notifDrop && notifAnimating
+        && (notifState === "collapse-in" || notifState === "expand" || notifState === "hold")
+    readonly property string notificationIcon: contentAdapter.notificationIcon
     // La surface abierta conserva su estado durante una notificación, pero su
     // árbol visual se retira antes del morph para que no se deforme junto al
     // contenido de la notificación. Se revela de nuevo cuando la pill ya volvió
@@ -126,7 +143,7 @@ Item {
     readonly property bool launcherReturning: geometry.launcherReturning
     readonly property string mode: surfaceOpen && !launcherReturning ? surface : (hovered ? "hover" : "rest")
     readonly property bool materialAwake: hovered || (surfaceOpen && !launcherReturning)
-        || notifAnimating || fluidCaptureExtra > 0.5 * s || fluidCaptureLeftExtra > 0.5 * s
+        || notifMorphing || fluidCaptureExtra > 0.5 * s || fluidCaptureLeftExtra > 0.5 * s
     readonly property color materialAccent: surface === "wallpaper" && surfaceItem && surfaceItem.previewAccent
         ? surfaceItem.previewAccent : Theme.accent
     MaterialChoreography {
@@ -172,9 +189,9 @@ Item {
         coreH: pill.coreH
         surfaceOpen: pill.surfaceOpen
         surfaceName: pill.surface
-        workspaceAnimating: header.workspaceAnimating || pill.petNicheAnimating
-        notifAnimating: pill.notifAnimating
-        notifHolding: pill.notifAnimating && pill.notifState === "hold"
+        workspaceAnimating: header.workspaceAnimating
+        notifAnimating: pill.notifMorphing
+        notifHolding: pill.notifMorphing && pill.notifState === "hold"
         reduceMotion: Flags.reduceMotion
         morphDuration: Motion.morph
         notifCollapseDuration: Motion.notifCollapse
@@ -185,6 +202,7 @@ Item {
     transformOrigin: Item.Top
     readonly property int _morphDuration: morph.duration
     readonly property real morphCloseness: morph.closeness
+    readonly property real morphRestReturn: morph.restReturn
     property alias lastSurfaceW: morph.lastSurfaceW
     property alias lastSurfaceH: morph.lastSurfaceH
     readonly property real restW: geometry.restW
@@ -196,6 +214,7 @@ Item {
         objectName: "pillNotificationMotion"
         blocked: pill.surface === "auth"
         deferInformational: true
+        suspendSurface: !pill.notifDrop
         popup: pill.notificationsEnabled ? Notifs.activePopup : null
         surfaceOpen: pill.interactionOpen
         collapseDuration: Motion.notifCollapse + 50
@@ -237,8 +256,65 @@ Item {
         motionVisible: pill.visible && (pill.surface === "media" || surfaceHost.displayedSurface === "media")
         preloadAmbient: true
     }
+    PillBody {
+        id: body
+        objectName: "pillBody"
+        width: pill.width
+        height: pill.coreH
+        liveHeight: pill.height
+        cornerRadius: pill.morphRadius + (body.waterBody ? pill.notifBreathRadius : 0)
+        s: pill.s
+        waterBody: Config.appearance.waterBody === true
+        sceneOrigin: pill.parent ? pill.parent.mapToItem(null, pill.x, pill.y) : Qt.point(pill.x, pill.y)
+        reading: material.readingExposure
+        edgeExposure: pill.fluidEdgeExposure
+        suppressEdge: pill.fluidJoined
+        shadowEnabled: pill.surface !== "auth"
+        captureExtra: pill.fluidCaptureExtra
+        captureLeftExtra: pill.fluidCaptureLeftExtra
+        restWidth: pill.restW
+        running: pill.visible && pill.opacity > 0.005
+        reduceMotion: Flags.reduceMotion
+        breathe: Config.appearance.bodyBreath === true
+        hour: pill.now.getHours() + pill.now.getMinutes() / 60
+        mood: bodyEvents.mood
+        music: Config.companion.reactToMusic && Players.playing && Cava.hasFrame && !Flags.reduceMotion
+        beatEnvelope: Cava.hasFrame && Cava.values.length ? Math.max.apply(null, Cava.values.slice(0, 8)) : 0
+        pointerInside: pill.hovered && Config.companion.followPointer
+        pointer: Qt.point(pill.pointerX, pill.pointerY)
+        resting: Config.appearance.personality && Flags.liquidSurfaces && !Flags.reduceTransparency
+            && !pill.surfaceOpen && !pill.interactionOpen && !pill.layoutChanging
+            && !pill.notifAnimating && !pill.fluidJoined && pill.fluidEdgeExposure > 0.999
+            && pill.fluidCaptureExtra < 0.5 * pill.s && pill.fluidCaptureLeftExtra < 0.5 * pill.s
+            && Math.abs(pill.height - pill.coreH) < 0.5 * pill.s
+    }
+    BodyEvents {
+        id: bodyEvents
+        active: Config.appearance.personality && body.running && !pill.companionBlocked
+        systemEnabled: Config.companion.reactToSystem
+        focusEnabled: Config.companion.reactToCode
+        nightEnabled: Config.companion.reactAtNight
+        focused: FocusSession.running || pill.companionCodeFocused
+        idle: presence.isIdle && !Players.playing && !FocusSession.running
+        hour: body.hour
+    }
+    readonly property bool bodyAudioWanted: body.exposure > 0.001 && body.running
+        && Config.companion.reactToMusic && Players.playing && !Flags.reduceMotion
+    property string bodyAudioConsumer: ""
+    function updateBodyAudio() {
+        if (bodyAudioConsumer) Cava.setConsumer(bodyAudioConsumer, false)
+        bodyAudioConsumer = "body:" + pill.screenName
+        Cava.setConsumer(bodyAudioConsumer, bodyAudioWanted)
+    }
+    onBodyAudioWantedChanged: updateBodyAudio()
+    onScreenNameChanged: updateBodyAudio()
+    Component.onDestruction: if (bodyAudioConsumer) Cava.setConsumer(bodyAudioConsumer, false)
     PillMaterial {
         id: material
+        objectName: "pillMaterial"
+        shaderActive: body.waterActive
+        opacity: body.waterBody ? 1 : 1 - body.exposure
+        visible: opacity > 0.001
         s: pill.s
         morphRadius: pill.morphRadius
         notifBreathRadius: pill.notifBreathRadius
@@ -282,12 +358,17 @@ Item {
             launcherHeaderH: pill.launcherHeaderH
             surfaceReveal: pill.surfaceReveal
             morphCloseness: pill.morphCloseness
-            hasNotification: !!pill.activeNotif
-            notifAnimating: pill.notifAnimating
+            restReturn: pill.morphRestReturn
+            contentReveal: pill.surfaceContentProgress
+            hasNotification: !!pill.activeNotif && !pill.notifDrop
+            notifAnimating: pill.notifMorphing
             capsLockOn: statusAdapter.capsLockOn
             now: pill.now
-            companionEnabled: Config.appearance.personality && !pill.petVisible
-            petLayer: pill.petContext
+            companionContext: companionBehavior
+            companionEnabled: pill.legacyCompanionEnabled
+            companionAsleep: presence.isIdle
+            companionSleepy: Config.companion.reactAtNight && companionBehavior.night
+            companionListening: Config.companion.reactToMusic && Players.playing
             recordingPhase: !pill.recordingDetached && Recording.engaged ? (Recording.uncertain ? "unknown" : Recording.phase) : ""
             recordingCountdown: Recording.countdown
             activityText: !pill.recordingDetached && Recording.engaged ? Recording.uncertain ? qsTr("Grabador sin conexión")
@@ -298,10 +379,9 @@ Item {
                 : pill.activityNotice || (FocusSession.active
                 ? (FocusSession.paused ? qsTr("Pausa · %1").arg(pill.focusTime) : pill.focusTime)
                 : FocusSession.durationSeconds > 0 && FocusSession.remainingSeconds === 0 ? qsTr("Sesión completada") : "")
-            activityMood: pill.responseMood !== "rest" ? pill.responseMood
-                : FocusSession.paused ? "paused" : FocusSession.running ? "working" : "rest"
-            lookX: pill.hovered ? (pill.pointerX / Math.max(1, pill.width) - 0.5) * 2 : 0
-            lookY: pill.hovered ? (pill.pointerY / Math.max(1, pill.height) - 0.5) * 2 : 0
+            activityMood: pill.faceMood
+            lookX: pill.faceLookX
+            lookY: pill.faceLookY
             hasMedia: contentAdapter.hasMedia
             artUrl: contentAdapter.artUrl
             hasProgress: contentAdapter.hasProgress
@@ -309,7 +389,6 @@ Item {
             title: contentAdapter.title
             artist: contentAdapter.artist
             onRequestCalendar: pill.requestSurface("calendar")
-            onRequestFocus: pill.requestSurface(!pill.recordingDetached && Recording.engaged ? "recording" : "focus")
         }
 
         IslandNotification {
@@ -318,10 +397,10 @@ Item {
             s: pill.s
             pillWidth: pill.notifPillW
             pillHeight: pill.notifPillH
-            closeness: pill.activeNotif && pill.notifAnimating
+            closeness: pill.activeNotif && pill.notifMorphing
                 && (pill.notifState === "expand" || pill.notifState === "hold") ? pill.morphCloseness : 0
             breath: pill.notifBreath
-            holding: pill.notifAnimating && pill.notifState === "hold"
+            holding: pill.notifMorphing && pill.notifState === "hold"
             iconResolved: pill._notifIconResolved
             iconSource: contentAdapter.notificationIcon
         }
@@ -352,7 +431,6 @@ Item {
     // El contenido es hermano del fondo: necesita su propio recorte redondeado.
     PillSurfaceHost {
         id: surfaceHost
-        petContext: pill.petContext
         artworkTransition: sharedArtwork
         open: pill.surfaceOpen
         surface: pill.surface
@@ -366,11 +444,34 @@ Item {
         authContextWidth: header.restContentWidth + 56 * pill.s
         closing: pill.launcherClosing
         suspended: pill.surfaceNotifSuspended
-        reveal: pill.launcherReturning ? 0 : pill.surfaceReveal
+        reveal: pill.surfaceReveal
+        returning: pill.launcherReturning
+        largeSurface: pill.lastSurfaceW * pill.lastSurfaceH > Motion.materializeLargeArea * pill.s * pill.s
         onRequestClose: pill.requestClose()
         onRequestPage: (name) => pill.requestSurface(name)
         onFeedbackRequested: kind => pill.respond(kind)
     }
+
+        // Iris travels to the corner of an open surface and back. It is the same
+        // face (same behaviour context) as the one in the header; the header face
+        // fades as this one takes over, so there is never a second personality.
+        IslandCompanion {
+            id: perch
+            objectName: "irisPerch"
+            z: 6
+            s: pill.s
+            context: companionBehavior
+            mood: pill.faceMood
+            asleep: presence.isIdle
+            sleepy: Config.companion.reactAtNight && companionBehavior.night
+            listening: Config.companion.reactToMusic && Players.playing
+            lookX: pill.faceLookX
+            lookY: pill.faceLookY
+            opacity: pill.perchTravel
+            visible: pill.perchShown
+            x: pill.perchOrigin.x + (pill.perchTarget.x - pill.perchOrigin.x) * pill.perchTravel - width / 2
+            y: pill.perchOrigin.y + (pill.perchTarget.y - pill.perchOrigin.y) * pill.perchTravel - height / 2
+        }
     }
 
     /** item de la surface activa (para que el host enrute teclado hacia él). */
@@ -379,7 +480,7 @@ Item {
     IslandStatusAdapter {
         id: statusAdapter
         s: pill.s
-        fallbackVisible: pill.surfaceOpen || (pill.activeNotif && pill.notifAnimating)
+        fallbackVisible: pill.surfaceOpen || (pill.activeNotif && pill.notifMorphing)
         onShowVolume: (progress, muted) => header.showVolume(progress, muted)
         onShowMic: (progress, muted) => header.showMic(progress, muted)
         onShowBrightness: (progress) => header.showBrightness(progress)
@@ -388,6 +489,7 @@ Item {
             if (status === "charging" && pill.lastBatteryStatus.length && pill.lastBatteryStatus !== status)
                 pill.notice(qsTr("Cargando · %1%").arg(percent), "connected")
             pill.lastBatteryStatus = status
+            companionBehavior.noteBattery(percent, status)
         }
         onFallbackVolumeRequested: (scaleFactor) => osd.showVolume(scaleFactor)
         onFallbackBrightnessRequested: (scaleFactor) => osd.showBrightness(scaleFactor)
@@ -396,6 +498,98 @@ Item {
     // Public API used by external hosts.
     function showVolumeOSD() { statusAdapter.showVolumeOSD() }
 
+    // ---- Iris: shared face state, perch and attention ----
+    readonly property string faceMood: responseMood !== "rest" ? responseMood
+        : FocusSession.paused ? "paused" : FocusSession.running ? "working" : "rest"
+    readonly property real faceLookX: companionBehavior.lookX
+    readonly property real faceLookY: responseMood === "attention" ? 0.8 : companionBehavior.lookY
+
+    // The perch: the face leaves the header for the corner of surfaces that hide
+    // the header. The launcher and the auth prompt keep it in their own header.
+    // With reduced motion it does not travel (the header face simply fades).
+    readonly property bool perchWanted: pill.legacyCompanionEnabled && surfaceOpen && !launcherReturning
+        && surface !== "launcher" && surface !== "auth" && !layoutChanging && !Flags.reduceMotion
+        && !surfaceNotifSuspended && !(activeNotif && notifMorphing)
+    property real perchTravel: perchWanted ? 1 : 0
+    // SmoothedAnimation keeps the velocity when the target flips mid-way, as the pill's own geometry does.
+    Behavior on perchTravel {
+        enabled: !Flags.reduceMotion
+        SmoothedAnimation { duration: Motion.standardLarge; velocity: -1 }
+    }
+    readonly property bool perchShown: perchTravel > 0.01
+    readonly property bool faceVisible: header.restOpacity > 0.01 || perchShown
+    // Origin: where the header face is now (it follows the header, so the way back
+    // ends exactly on it, whatever the scale). Target: top right, on the inset the
+    // launcher divider uses, at the middle of the scaled rest strip (coreH).
+    readonly property point perchOrigin: header.faceSlot
+    readonly property point perchTarget: Qt.point(width - 22 * s - 15 * s, coreH / 2)
+    // Where the face looks from: the perch while it is out, the header otherwise.
+    readonly property point faceCenter: perchShown ? Qt.point(perch.x + perch.width / 2, perch.y + perch.height / 2) : header.faceSlot
+
+    // Attention: a surface with one point that matters publishes it and Iris
+    // looks there. Nothing is evaluated unless the surface declares it active.
+    // The surface open in the pill, or else the one the host injects (the media card
+    // of the split layout lives outside the pill).
+    property var attentionItem: null
+    readonly property var attentionSource: surfaceItem ? surfaceItem : attentionItem
+    readonly property bool attentionActive: !!attentionSource && attentionSource.focusActive === true && faceVisible
+    readonly property point attentionVector: {
+        if (!attentionActive) return Qt.point(0, 0)
+        const p = attentionSource.mapToItem(pill, attentionSource.focusPoint.x, attentionSource.focusPoint.y)
+        const range = 120 * s
+        return Qt.point(Math.max(-1, Math.min(1, (p.x - faceCenter.x) / range)),
+                        Math.max(-1, Math.min(1, (p.y - faceCenter.y) / range)))
+    }
+
+    CompanionBehavior {
+        id: companionBehavior
+        objectName: "companionBehavior"
+        active: pill.legacyCompanionEnabled && pill.visible && pill.faceVisible && !pill.layoutChanging
+        reduced: Flags.reduceMotion
+        asleep: presence.isIdle
+        options: Config.companion
+        blocked: pill.companionBlocked || pill.surface === "launcher" || pill.surface === "auth" || Recording.engaged || !!pill.activeNotif
+        night: pill.now.getHours() >= 23 || pill.now.getHours() < 6
+        codeFocused: pill.companionCodeFocused
+        workspaceLook: pill.companionWorkspaceLook
+        musicVisible: pill.companionMusicVisible
+        playing: Players.playing
+        seek: pill.companionSeek
+        beat: pill.companionBeat
+        memoryPlayfulness: IrisMemory.playfulness
+        recording: Recording.engaged
+        greetingPending: IrisMemory.greetingKind !== ""
+        onInteracted: IrisMemory.noteInteraction()
+        onVisited: kind => IrisMemory.noteSighting(kind)
+        onGreetingRequested: greet(IrisMemory.consumeGreeting())
+        focusActive: pill.attentionActive
+        focusX: pill.attentionVector.x
+        focusY: pill.attentionVector.y
+        pointerInside: pill.hovered
+        pointerX: (pill.pointerX / Math.max(1, pill.width) - 0.5) * 2
+        pointerY: (pill.pointerY / Math.max(1, pill.height) - 0.5) * 2
+    }
+    onActiveNotifChanged: {
+        if (activeNotif && activeNotif.urgency >= 2) {
+            companionBehavior.gestureRequested("curious")
+            companionBehavior.react("surprised", "defer")
+            respond("attention")
+        }
+    }
+
+    // The companion's sense of presence: it falls asleep when the user leaves
+    // and greets them on return. The compositor reports idleness; nothing polls.
+    IdleMonitor {
+        id: presence
+        enabled: Config.appearance.personality && pill.visible
+        timeout: Config.companion.sleepAfterSeconds
+        respectInhibitors: true
+    }
+    // The first activity of the day is noted once the user is present, at startup
+    // or on waking; IrisMemory ignores every later call that day.
+    readonly property bool irisPresent: Config.loaded && pill.legacyCompanionEnabled && !presence.isIdle
+    onIrisPresentChanged: if (irisPresent) IrisMemory.noteActivity()
+
     Connections {
         target: FocusSession
         function onFinished() { pill.notice(qsTr("Sesión completada"), "finished") }
@@ -403,7 +597,22 @@ Item {
     Connections {
         target: Recording
         function onFeedbackRequested(kind) { pill.respond(kind) }
+        function onActiveChanged() { if (!Recording.active && !Recording.uncertain) Qt.callLater(() => companionBehavior.react("relief")) }
         function onSaved(path) { pill.notice(qsTr("Grabación guardada"), "finished") }
+    }
+    // The prompt's own verdict on the password; the face sits beside it on this surface.
+    Connections {
+        target: pill.surfaceItem
+        ignoreUnknownSignals: true
+        function onHasErrorChanged() { if (pill.surface === "auth" && pill.surfaceItem.hasError) companionBehavior.react("no", "surface") }
+        function onSuccessStateChanged() { if (pill.surface === "auth" && pill.surfaceItem.successState) companionBehavior.react("wink", "surface") }
+    }
+    // A discrete success on the open surface (an app launched, a wallpaper applied).
+    // Wink is the existing approval gesture; it bypasses `blocked` like auth's.
+    Connections {
+        target: pill.surfaceItem
+        ignoreUnknownSignals: true
+        function onApproved() { if (pill.surface !== "auth") companionBehavior.react("wink", "surface") }
     }
     Connections {
         target: Config
@@ -412,6 +621,7 @@ Item {
 
     Component.onCompleted: {
         lastBatteryStatus = statusAdapter.batteryStatus
+        if (irisPresent) IrisMemory.noteActivity()
         // The initial load is complete; the next workspace change is real.
         wsReady = true
     }

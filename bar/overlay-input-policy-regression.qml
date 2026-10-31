@@ -67,6 +67,7 @@ ShellRoot {
             policy.launcherClosing = true
             test.check(policy.maskMode === "pill" && !policy.kbFocusWanted && !policy.exclusiveFocus,
                 "launcher close releases modal focus")
+            test.check(!policy.escapeShortcutEnabled, "closing launcher does not steal Escape from app")
             policy.launcherClosing = false
             policy.surface = "auth"
             test.check(policy.authFocusGrab && policy.exclusiveFocus && !policy.escapeShortcutEnabled,
@@ -74,6 +75,8 @@ ShellRoot {
             policy.monitors = [{name: "DP-1", activeWorkspace: {lastIpcObject: {hasfullscreen: true}}}]
             test.check(policy.monFullscreen && policy.maskMode === "hidden" && !policy.kbFocusWanted && !policy.exclusiveFocus,
                 "fullscreen is click-through")
+            test.check(!policy.authFocusGrab && !policy.modal && !policy.escapeShortcutEnabled,
+                "fullscreen auth releases every keyboard path")
             test.check(!policy.sideModulesPresented, "fullscreen still hides lateral modules")
             policy.focusedMonitorName = "DP-2"
             test.check(!policy.monitorIsFocused, "focus follows monitor")

@@ -19,7 +19,7 @@ PillSurface {
     readonly property real detailHeight: Math.max(18, Theme.fontSizeLabel + 6) * s
     property bool editing: false
     property bool sendRejected: false
-    property real errorOffset: 0
+    readonly property real errorOffset: rejection.offset
     readonly property var flow: authState.flow
     readonly property bool sudoMode: authState.sudoActive && !authState.active && !authState.polkitSuccess
     readonly property bool successState: sudoMode ? authState.sudoSuccess : authState.polkitSuccess
@@ -63,7 +63,6 @@ PillSurface {
         editing = false
         sendRejected = false
         rejection.stop()
-        errorOffset = 0
         accounts.popup.close()
     }
     function responseRequirementChanged() {
@@ -82,7 +81,7 @@ PillSurface {
         responseRequested(secret, sudoMode, accepted => {
             if (!accepted) {
                 sendRejected = true
-                if (root.active && root.visible && !Flags.reduceMotion) rejection.restart()
+                if (root.active && root.visible) rejection.trigger()
                 if (canRespond) password.text = secret
                 Qt.callLater(root.focusInput)
                 return
@@ -99,7 +98,7 @@ PillSurface {
     }
     function reject() {
         password.clear()
-        if (root.active && root.visible && !Flags.reduceMotion) rejection.restart()
+        if (root.active && root.visible) rejection.trigger()
         Qt.callLater(root.focusInput)
     }
     function selectIdentity(index) {
@@ -114,7 +113,7 @@ PillSurface {
     }
     onVisibleChanged: {
         if (visible) Qt.callLater(root.focusInput)
-        else { password.clear(); rejection.stop(); errorOffset = 0; fieldColor.complete(); fieldBorder.complete() }
+        else { password.clear(); rejection.stop(); fieldColor.complete(); fieldBorder.complete() }
     }
     onFlowChanged: { resetInput(); Qt.callLater(root.focusInput) }
     onSudoModeChanged: { resetInput(); Qt.callLater(root.focusInput) }
@@ -124,16 +123,7 @@ PillSurface {
     Component.onCompleted: Qt.callLater(root.focusInput)
     Component.onDestruction: password.clear()
     Keys.onEscapePressed: event => { event.accepted = true; root.cancel() }
-    Connections {
-        target: Flags
-        function onReduceMotionChanged() { if (Flags.reduceMotion) { rejection.stop(); root.errorOffset = 0 } }
-    }
-    SequentialAnimation {
-        id: rejection
-        NumberAnimation { target: root; property: "errorOffset"; to: -4 * root.s; duration: Motion.press; easing.type: Easing.OutQuad }
-        NumberAnimation { target: root; property: "errorOffset"; to: 3 * root.s; duration: Motion.press; easing.type: Easing.InOutQuad }
-        NumberAnimation { target: root; property: "errorOffset"; to: 0; duration: Motion.fast; easing.type: Easing.OutCubic }
-    }
+    ErrorShake { id: rejection; amplitude: -5 * root.s }
     Item {
         id: slot
         anchors.right: parent.right
@@ -289,9 +279,13 @@ PillSurface {
                     status: root.successState ? "success" : root.errorState ? "error" : root.verifying ? "busy" : ""
                 }
             }
-            Text {
+            CrossfadeLabel {
+                objectName: "authDetail"
                 Layout.fillWidth: true
-                text: root.detail; elide: Text.ElideRight
+                Layout.fillHeight: true
+                value: root.detail; elide: Text.ElideRight
+                verticalAlignment: Text.AlignVCenter
+                swapTravel: 2
                 color: root.errorState || root.successState || root.capsLockOn && !root.responseVisible ? root.stateColor : Theme.iconSecondary
                 font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s
                 textFormat: Text.PlainText

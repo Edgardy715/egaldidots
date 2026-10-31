@@ -50,7 +50,7 @@ ShellRoot {
                     compare(list.currentIndex, -1)
                     media.lyricsStatus = "empty"
                     wait(50)
-                    verify(!list.visible)
+                    tryVerify(() => !list.visible, 1000)
                     media.lyricsSupported = false
                     verify(!media.lyricsOpen && !button.visible)
                     console.log("PASS: lyrics toggle, timed highlight, manual browsing, plain/empty, Escape and unsupported player")

@@ -21,6 +21,7 @@ Item {
     signal toggleDndRequested()
     signal clearAllRequested()
     signal dismissRequested(var notification)
+    signal closeRequested(var notification)
     signal linkRequested(var notification, string link)
     signal actionRequested(var notification, var action)
     signal notificationLockRequested(var notification, var owner)
@@ -40,8 +41,7 @@ Item {
         // ---- header ----
         SurfaceHeader {
             Layout.fillWidth: true
-            title: "Notificaciones"
-            iconName: Icons.iBell
+            title: qsTr("Notificaciones")
             s: root.s
             trailing: Component {
                 Rectangle {
@@ -54,12 +54,15 @@ Item {
                     color: Qt.alpha(Theme.accent, Theme.alphaSubtle)
                     border.color: Qt.alpha(Theme.accent, Theme.alphaStrong)
                     border.width: Theme.borderHairline
-                    Text {
+                    Behavior on width { SmoothedAnimation { velocity: -1; duration: Motion.fast } }
+                    AnimatedLabel {
                         id: countTxt
                         anchors.centerIn: parent
-                    text: root.count
+                        value: String(root.count)
                         color: Theme.accent
-                        font.family: Theme.fontMono
+                        font.family: Theme.font
+                        font.features: Theme.fontNumeric
+                        font.weight: Font.DemiBold
                         font.pixelSize: Theme.fontSizeLabel * root.s
                     }
                 }
@@ -89,6 +92,7 @@ Item {
                 Layout.preferredHeight: 28 * root.s
                 radius: Theme.radiusSm * root.s
                 opacity: root.count > 0 ? 1 : 0.42
+                Behavior on opacity { NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                 color: clr.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaChip) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
                 border.color: clr.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Qt.alpha(Theme.foreground, Theme.alphaSoft)
                 border.width: Theme.borderHairline
@@ -142,18 +146,21 @@ Item {
                 transform: Translate { y: historyMotion.offset * root.s }
                 anchors.fill: parent
                 clip: true
-                visible: root.count > 0
+                // Kept alive while the last card plays its remove transition.
+                visible: root.count > 0 || lastRemoval.running
                 spacing: Theme.spacingLg * root.s
                 cacheBuffer: 0
                 boundsBehavior: Flickable.StopAtBounds
                 model: ScriptModel { values: root.notifications }
                 delegate: NotifCardView {
+                    objectName: "historyCard"
                     width: lv.width
                     height: implicitHeight
                     s: root.s
                     compact: false
                     resolvedIconPath: root.iconPaths.get(modelData) || ""
                     onDismissRequested: root.dismissRequested(modelData)
+                    onCloseRequested: root.closeRequested(modelData)
                     onLinkRequested: link => root.linkRequested(modelData, link)
                     onActionRequested: action => root.actionRequested(modelData, action)
                     onLockRequested: (notification, owner) => root.notificationLockRequested(notification, owner)
@@ -161,22 +168,37 @@ Item {
                 }
             }
 
+            Timer {
+                id: lastRemoval
+                interval: Motion.fast + 40
+                property int previous: root.count
+                Component.onCompleted: previous = root.count
+            }
+            Connections {
+                target: root
+                function onCountChanged() {
+                    // Clear-all already concealed the list; only a lone close plays out.
+                    if (root.count === 0 && lastRemoval.previous > 0 && historyMotion.progress > 0.5
+                            && !Flags.reduceMotion) lastRemoval.restart()
+                    lastRemoval.previous = root.count
+                }
+            }
+
             ColumnLayout {
                 anchors.centerIn: parent
-                spacing: Theme.spacingLg * s
+                spacing: Theme.spacingLg * root.s
                 visible: opacity > 0
                 opacity: root.count === 0 ? 1 : 0
                 Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                 Rectangle {
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: 40 * s; Layout.preferredHeight: 40 * s; radius: width / 2
+                    Layout.preferredWidth: 40 * root.s; Layout.preferredHeight: 40 * root.s; radius: width / 2
                     color: Qt.alpha(Theme.accent, Theme.alphaSoft)
-                    border.color: Qt.alpha(Theme.accent, Theme.alphaEmphasis); border.width: Theme.borderHairlineSoft *  s
+                    border.color: Qt.alpha(Theme.accent, Theme.alphaEmphasis); border.width: Theme.borderHairlineSoft * root.s
                     MaterialIcon {
                         anchors.centerIn: parent
-                        iconName: Icons.iBell
-                        color: Theme.accent
-                        font.pixelSize: Theme.fontSizeHead * s
+                                    color: Theme.accent
+                        font.pixelSize: Theme.fontSizeHead * root.s
                         Accessible.ignored: true
                     }
                 }
@@ -185,7 +207,7 @@ Item {
                     text: qsTr("Todo al día")
                     color: Theme.iconSecondary
                     font.family: Theme.font
-                    font.pixelSize: Theme.fontSizeBodyLg * s
+                    font.pixelSize: Theme.fontSizeBodyLg * root.s
                     font.weight: Font.Medium
                 }
             }

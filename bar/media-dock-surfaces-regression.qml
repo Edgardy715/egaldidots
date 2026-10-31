@@ -9,7 +9,17 @@ ShellRoot {
     settings.watchFiles:false
     SurfaceRouter { id:router; focusedMonitorName:Quickshell.screens[0].name; reduceMotion:Flags.reduceMotion }
     IslandOverlay { id:overlay; modelData:Quickshell.screens[0]; router:router }
+    // The drop as the dock releases: later the opening surface moves the body.
+    property var atRelease: null
+    Connections {
+        target:router
+        function onOpenSurfaceChanged() {
+            const drop=overlay.contentItem ? suite.findChild(overlay.contentItem,"islandMediaCompanion") : null
+            if(router.openSurface && drop) atRelease={phase:drop.phase,exposure:drop.contentExposure,concealed:drop.concealed}
+        }
+    }
     TestCase {
+        id:suite
         name:"MediaDockSurfaces"
         when:Config.loaded
         function check(ok,message) { if(!ok) { console.error("FAIL:",message); Qt.exit(1) }; verify(ok,message) }
@@ -23,9 +33,14 @@ ShellRoot {
                 tryVerify(()=>!overlay.compact && !overlay.layoutChanging,5000)
                 for(const name of ["wallpaper","overview","launcher"]) {
                     tryVerify(()=>drop.phase !== "idle",5000)
+                    atRelease=null
                     router.toggleSurface("",name)
                     tryVerify(()=>overlay.surface===name && !overlay.mediaDocking,6000)
-                    check(drop.phase==="idle","companion absorbed before "+name)
+                    // Its content inside the body is enough for a surface that grows over the rest in place.
+                    const r=atRelease
+                    check(r!==null && (r.phase==="idle" || r.phase==="absorbiendo" && r.concealed
+                        || r.phase==="retornando" && r.exposure<=0 && name!=="launcher"),"companion absorbed before "+name+" "+JSON.stringify(r))
+                    tryVerify(()=>drop.phase==="idle",2000)
                     check(!drop.open,"companion stays absorbed in "+name)
                     router.close()
                     tryVerify(()=>!overlay.surfaceOpen,5000)

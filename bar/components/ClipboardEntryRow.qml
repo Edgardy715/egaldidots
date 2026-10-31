@@ -17,6 +17,12 @@ Item {
     signal previewRequested(var entry)
     signal organizeRequested(var entry)
     signal thumbnailRequested(string entryId)
+    // Las acciones aparecen al apuntar o seleccionar la fila: cinco pares de
+    // botones idénticos competían con el contenido. Su hueco queda reservado
+    // para que el texto no se reacomode al revelarlas.
+    HoverHandler { id: rowHover }
+    property real actionsShown: rowHover.hovered || selected || previewChip.activeFocus || saveChip.activeFocus ? 1 : 0
+    Behavior on actionsShown { SmoothedAnimation { duration: Flags.reduceMotion ? 0 : Motion.hover; velocity: -1 } }
     height: Math.max(72 * s, (Theme.fontSizeBodyLg * 2 + Theme.fontSizeSmall + 22) * s)
     objectName: "clipboardRow"
     onOnScreenChanged: if (onScreen && entry.isImage) thumbnailRequested(entry.id)
@@ -104,7 +110,10 @@ Item {
         anchors.rightMargin: 12 * root.s
         anchors.verticalCenter: parent.verticalCenter
         spacing: 8 * root.s
+        opacity: root.actionsShown
+        transform: Translate { x: 6 * root.s * (1 - root.actionsShown) }
         ClipboardChip {
+            id: previewChip
             objectName: "clipboardRowPreview"
             s: root.s
             iconName: "visibility"
@@ -113,10 +122,12 @@ Item {
             onClicked: root.previewRequested(root.entry)
         }
         ClipboardChip {
+            id: saveChip
             objectName: "clipboardRowSave"
             s: root.s
             text: root.entry.saved ? qsTr("Organizar") : qsTr("Guardar")
             iconName: root.entry.saved ? "check" : "add"
+            morphIcon: true
             selected: !!root.entry.saved
             enabled: !root.busy
             onClicked: root.organizeRequested(root.entry)

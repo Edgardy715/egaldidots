@@ -2,6 +2,7 @@
 """Exercise the real QML service with an isolated config, never user settings."""
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import tempfile
@@ -46,6 +47,27 @@ with tempfile.TemporaryDirectory(prefix='isla-settings-') as directory:
             assert schema['sections']['appearance']['fontScale']['minimum'] == 0.75
             assert schema['sections']['appearance']['fontScale']['label'] == 'Tamaño de texto'
             catalog = call('catalog')
+            assert schema['sections']['companion']['sleepAfterSeconds']['integer'] is True
+            assert any(section['id'] == 'companion' and section['label'] == 'Iris'
+                       for section in catalog['sectionOrder'])
+            assert call('get')['effective']['companion'] == {
+                'sleepAfterSeconds': 180, 'reactToCode': True, 'reactToMusic': True,
+                'reactAtNight': True, 'followPointer': True, 'mischief': 'rare', 'remember': True,
+                'reactToSystem': True, 'followFocus': True}
+            assert call('update', '{"companion":{"sleepAfterSeconds":180.5}}')['ok'] is False
+            assert call('get')['effective']['companion']['sleepAfterSeconds'] == 180
+            assert call('update', '{"companion":{"sleepAfterSeconds":600,"mischief":"normal","extension":7}}')['ok']
+            assert call('get')['effective']['companion']['sleepAfterSeconds'] == 600
+            assert call('discard')
+            assert call('get')['effective']['companion']['sleepAfterSeconds'] == 180
+            assert call('get')['effective']['updates'] == {'enabled': True, 'notifications': True}
+            assert call('update', '{"updates":{"enabled":false,"notifications":false}}')['ok']
+            assert call('save')
+            wait(lambda x: not x['saving'] and not x['dirty'] and not x['error'])
+            assert json.loads(config.read_text())['updates'] == {'enabled': False, 'notifications': False}
+            assert call('update', '{"updates":{"enabled":true}}')['ok']
+            assert call('discard')
+            assert call('get')['effective']['updates']['enabled'] is False
             assert catalog['availabilityIsLive'] is False
             assert catalog['sections']['appearance']['pillBlur']['availability'] == 'inactive'
             assert catalog['sections']['appearance']['clockSeconds']['availability'] == 'partial'
@@ -53,11 +75,26 @@ with tempfile.TemporaryDirectory(prefix='isla-settings-') as directory:
             assert len(catalog['surfaces']) == 17
             assert any(surface['id'] == 'settings' for surface in catalog['surfaces'])
             assert catalog['optionalModules'][1]['dependencyMode'] == 'any'
+            assert 'pets' not in call('get')['effective']
+            assert 'pets' not in schema['sections']
+            assert call('validate', '{"appearance":{"workspaceStyle":"pet"}}')['ok']
+            assert call('update', '{"appearance":{"workspaceStyle":"pet"}}')['ok']
+            assert call('get')['effective']['appearance']['workspaceStyle'] == 'numbers'
+            assert call('discard')
             assert call('validate', '{"appearance":{"fontScale":0}}')['ok'] is False
             assert call('validate', '{"appearance":{"barLayout":"wide"}}')['ok'] is False
             for key, maximum in (('uiScale', 3), ('topGap', 4), ('appGap', 4)):
                 assert call('validate', json.dumps({'appearance': {key: maximum}}))['ok']
                 assert call('validate', json.dumps({'appearance': {key: 1e308}}))['ok'] is False
+            assert call('get')['effective']['appearance']['reduceTransparency'] is False
+            assert call('update', '{"appearance":{"reduceTransparency":true,"glassAlpha":0.2}}')['ok']
+            assert call('save')
+            wait(lambda x: not x['saving'] and not x['dirty'] and not x['error'])
+            assert json.loads(config.read_text())['appearance']['reduceTransparency'] is True
+            assert call('update', '{"appearance":{"reduceTransparency":false}}')['ok']
+            assert call('discard')
+            assert call('get')['effective']['appearance']['reduceTransparency'] is True
+            assert call('get')['effective']['appearance']['glassAlpha'] == 0.2
             assert call('get')['effective']['appearance']['barLayout'] == 'split'
             assert call('update', '{"appearance":{"barLayout":"compact"}}')['ok']
             assert call('get')['effective']['appearance']['barLayout'] == 'compact'
@@ -101,6 +138,18 @@ with tempfile.TemporaryDirectory(prefix='isla-settings-') as directory:
             assert call('update', '{"appearance":{"materialDepth":0}}')['ok']
             assert call('discard')
             assert call('get')['effective']['appearance']['materialDepth'] == 0.6
+            companion = {'sleepAfterSeconds': 900, 'reactToCode': False, 'reactToMusic': False,
+                         'reactAtNight': False, 'followPointer': False, 'mischief': 'never', 'extension': 42}
+            assert call('update', json.dumps({'companion': companion}))['ok']
+            assert call('save')
+            wait(lambda x: not x['saving'] and not x['dirty'] and not x['error'])
+            assert json.loads(config.read_text())['companion'] == companion
+            assert call('update', '{"companion":{"sleepAfterSeconds":60}}')['ok']
+            assert call('discard')
+            assert call('get')['effective']['companion']['sleepAfterSeconds'] == 900
+            assert call('reload')
+            wait(lambda x: x['effective']['companion']['sleepAfterSeconds'] == 900)
+            assert json.loads(config.read_text())['custom']['keep'] == 10
             config.unlink()
             wait(lambda x: x['effective']['appearance']['fontScale'] == 1)
             assert call('update', '{"appearance":{"time12h":false}}')['ok']
@@ -160,3 +209,73 @@ with tempfile.TemporaryDirectory(prefix='isla-draft-conflict-') as directory:
             if process.poll() is None:
                 process.terminate()
                 process.wait(timeout=3)
+
+with tempfile.TemporaryDirectory(prefix='isla-companion-editor-') as directory:
+    folder = Path(directory)
+    shutil.copytree(bar, folder / 'bar', ignore=shutil.ignore_patterns('__pycache__'))
+    fixture = folder / 'editor.qml'
+    fixture.write_text("""import QtQuick
+import Quickshell
+import "%s/Singletons"
+import "%s/settings"
+ShellRoot {
+    settings.watchFiles: false
+    Item { width: 1000; height: 700; EdotsWindow { id: editor; anchors.fill: parent } }
+    function find(item, predicate) {
+        if (predicate(item)) return item
+        for (const child of item.children || []) {
+            const found = find(child, predicate)
+            if (found) return found
+        }
+        return null
+    }
+    function check(ok, message) { if (!ok) throw new Error(message) }
+    Timer {
+        interval: 100; running: true; repeat: true
+        property int stage: 0
+        property var page: null
+        property var slider: null
+        onTriggered: {
+            if (!Config.loaded) return
+            try {
+                if (stage === 0) {
+                    check(Config.update({appearance: {reduceMotion: true}}).ok, "reduce motion")
+                    const index = editor.sections.indexOf("companion")
+                    check(index >= 0 && editor.titles[index] === "Iris", "navigation section")
+                    check(editor.subtitles[index].includes("Prototipo"), "prototype help")
+                    editor.page = index
+                } else if (stage === 1) {
+                    page = find(editor, item => item.entries !== undefined && item.drafts !== undefined)
+                    check(page !== null && page.entries.length === 9, "companion field visibility")
+                    const row = find(page, item => item.fieldKey === "sleepAfterSeconds")
+                    check(row !== null, "sleep row")
+                    check(find(row, item => item.text === "180") !== null, "integer value presentation")
+                    slider = find(row, item => item.objectName === "settingSlider")
+                    check(slider !== null && slider.stepSize === 1, "integer slider step")
+                    slider.value = 333.5
+                    slider.moved()
+                    check(Config.companion.sleepAfterSeconds === 334, "integer slider update")
+                    slider.value = Qt.binding(() => row.value)
+                    check(Config.update({companion: {sleepAfterSeconds: 700, reactToMusic: false}}).ok, "external update")
+                } else if (stage === 2) {
+                    check(slider.value === 700 && !page.effective.companion.reactToMusic, "reactive companion update")
+                    Config.discard()
+                } else {
+                    check(slider.value === 180 && page.effective.companion.reactToMusic, "reactive companion discard")
+                    console.log("PASS: companion editor navigation, integer slider and reactive discard")
+                    Qt.quit()
+                }
+                stage++
+            } catch (error) { console.error("FAIL: " + error); Qt.exit(1) }
+        }
+    }
+    Timer { interval: 8000; running: true; onTriggered: { console.error("FAIL: companion editor timeout, loaded=" + Config.loaded); Qt.exit(1) } }
+}
+""" % ('bar', 'bar'))
+    result = subprocess.run(['quickshell', '-p', str(fixture)],
+                            env=dict(os.environ, ISLA_CONFIG=str(folder / 'shell.json'),
+                                     QT_QPA_PLATFORM=os.environ.get('QT_QPA_PLATFORM', 'offscreen')),
+                            capture_output=True, text=True, timeout=15)
+    output = result.stdout + result.stderr
+    assert result.returncode == 0 and 'PASS: companion editor navigation, integer slider and reactive discard' in output, output
+    print('PASS: companion editor navigation, integer slider and reactive discard')

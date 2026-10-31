@@ -45,7 +45,7 @@ Item {
     }
     onActiveFocusChanged: if (!activeFocus) keyboardDown = false
     onEnabledChanged: if (!enabled) keyboardDown = false
-    Behavior on opacity { NumberAnimation { duration: Motion.hover } }
+    Behavior on opacity { NumberAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
     InteractionMotion {
         id: response
         hovered: ma.containsMouse; pressed: root.keyboardDown || (ma.pressed && ma.containsMouse)
@@ -57,7 +57,8 @@ Item {
         anchors.fill: parent
         radius: height / 2
         color: root.checked
-            ? (ma.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaIconOnAcc) : Qt.alpha(Theme.accent, Theme.alphaIconSec))
+            ? (Theme.liquid ? (ma.containsMouse ? Qt.lighter(Theme.stateFill, 1.08) : Theme.stateFill)
+                : ma.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaIconOnAcc) : Qt.alpha(Theme.accent, Theme.alphaIconSec))
             : (ma.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWashStrong) : Qt.alpha(Theme.foreground, Theme.alphaGlow))
         border.width: root.activeFocus ? 2 * Theme.borderHairline : Theme.borderHairline
         border.color: root.checked
@@ -65,6 +66,11 @@ Item {
             : Qt.alpha(Theme.foreground, Theme.alphaHair)
         Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
         Behavior on border.color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+        gradient: Theme.liquid && root.checked ? trackVolume : null
+        property Gradient trackVolume: Gradient {
+            GradientStop { position: 0; color: Qt.lighter(track.color, 1.14) }
+            GradientStop { position: 1; color: track.color }
+        }
 
         Rectangle {
             id: knob
@@ -75,13 +81,20 @@ Item {
                 shadowBlur: 0.7
                 blurMax: 12
             }
-            width: parent.height - 4 * s
-            height: parent.height - 4 * s
-            radius: width / 2
-            color: root.checked ? Theme.primaryContent : Theme.iconSecondary
+            readonly property real diameter: parent.height - 4 * s
+            // Posición del centro de masa; con Superficies líquidas el botón se
+            // alarga hacia su destino mientras viaja y se recoge al llegar.
+            property real travel: root.checked ? parent.width - diameter - 2 * s : 2 * s
+            Behavior on travel { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Theme.liquid ? Motion.standardSmall : Motion.hover; velocity: -1 } }
+            readonly property real target: root.checked ? parent.width - diameter - 2 * s : 2 * s
+            readonly property real stretch: Theme.liquid ? Math.min(8 * s, Math.abs(target - travel) * 0.7) : 0
+            width: diameter + stretch
+            height: diameter
+            radius: height / 2
+            color: root.checked ? (Theme.liquid ? Theme.stateContent : Theme.primaryContent) : Theme.iconSecondary
             anchors.verticalCenter: parent.verticalCenter
-            x: root.checked ? parent.width - width - 2 * s : 2 * s
-            Behavior on x { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Motion.hover; velocity: -1 } }
+            x: target > travel ? travel : travel - stretch
+            Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
         }
     }
 

@@ -47,6 +47,8 @@ ShellRoot {
                     const search = findChild(editor, "settingsSearch")
                     const save = findChild(editor, "settingsSave")
                     assert(page && search && save, "controls available")
+                    assert(editor.pageFields[0].includes("appearance.reduceTransparency"), "reduce transparency belongs to Appearance")
+                    assert(page.entries.some(entry => entry.section === "appearance" && entry.key === "reduceTransparency"), "reduce transparency appears without search")
                     Config.discard()
                     editor.feedback = "Cambios guardados"
                     Config.update({appearance:{time12h: !Config.appearance.time12h}})

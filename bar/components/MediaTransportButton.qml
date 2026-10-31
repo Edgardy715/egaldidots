@@ -18,6 +18,8 @@ AbstractButton {
         const channels = [effectivePrimaryColor.r, effectivePrimaryColor.g, effectivePrimaryColor.b].map(v => v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4))
         return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
     }
+    property color displayedPrimary: effectivePrimaryColor
+    Behavior on displayedPrimary { ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
     readonly property color primaryInk: primaryLuminance > 0.179 ? "#000000" : "#ffffff"
     property bool active: false
     property bool playing: false
@@ -29,7 +31,7 @@ AbstractButton {
     property real symbolScale: 1
     property bool ready: false
     Component.onCompleted: ready = true
-    onIconNameChanged: if (ready && moving) symbolPop.restart()
+    onIconNameChanged: if (ready && moving && !tidemarkGlyph) symbolPop.restart()
     NumberAnimation {
         id: symbolPop
         target: root; property: "symbolScale"; from: 0.8; to: 1
@@ -93,19 +95,36 @@ AbstractButton {
                 return points
             }
             ShapePath {
-                fillColor: root.effectivePrimaryColor
+                fillColor: root.displayedPrimary
                 strokeColor: root.activeFocus ? Theme.foreground : "transparent"
                 strokeWidth: root.activeFocus ? 1.5 * root.s : 0
                 PathPolyline { path: cookie.outline }
             }
         }
     }
-    contentItem: MediaSymbol {
-        iconName: root.iconName
-        color: root.primary ? root.primaryInk : root.active ? Theme.secondaryContainerContent : Theme.foreground
-        font.pixelSize: root.iconSize * root.s
+    // Play/pausa del botón primario: la gota de Tidemark en lugar del glifo de fuente.
+    readonly property bool tidemarkGlyph: primary && (iconName === "play_arrow" || iconName === "pause")
+    contentItem: Item {
         opacity: root.enabled ? 1 : 0.32
         scale: response.visualScale * root.symbolScale
+        MediaSymbol {
+            anchors.fill: parent
+            visible: !root.tidemarkGlyph
+            iconName: root.iconName
+            color: root.primary ? root.primaryInk : root.active ? Theme.secondaryContainerContent : Theme.foreground
+            Behavior on color { ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
+            font.pixelSize: root.iconSize * root.s
+        }
+        PlayPauseGlyph {
+            objectName: "mediaPlayPauseGlyph"
+            anchors.centerIn: parent
+            visible: root.tidemarkGlyph
+            playing: root.playing
+            animate: root.moving
+            size: root.iconSize * root.s
+            color: root.primaryInk
+            Behavior on color { ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
+        }
     }
     HoverHandler { cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor }
 }

@@ -15,6 +15,7 @@ Item {
         anchors.centerIn: parent
         iconName: Icons.getVolumeIcon(root.volume, root.muted)
         color: Theme.iconSecondary
+        Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
         font.pixelSize: Theme.fontSizeBodyLg * root.s
         interaction: volumeHit.motion
     }

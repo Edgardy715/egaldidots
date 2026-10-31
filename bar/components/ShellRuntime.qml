@@ -13,8 +13,8 @@ Item {
         value: Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : ""
     }
     Binding { target: root.router; property: "reduceMotion"; value: Flags.reduceMotion }
-    Binding { target: root.router; property: "resultsDuration"; value: Motion.standard }
-    Binding { target: root.router; property: "morphDuration"; value: Motion.morph }
+    Binding { target: root.router; property: "resultsDuration"; value: Motion.launcherCloseResults }
+    Binding { target: root.router; property: "morphDuration"; value: Motion.launcherCloseReturn }
     Binding { target: Recording; property: "observe"; value: root.router.openSurface === "focus" || root.router.openSurface === "recording" || Recording.engaged || Recording.busy }
     Binding { target: Notifs; property: "centerOpen"; value: root.router.openSurface === "notifs" }
 
@@ -39,6 +39,15 @@ Item {
         Session.lockCmd
         Auth.active
         KeepAwake.enabled
+        SystemUpdates.initialize()
+    }
+
+    Connections {
+        target: SystemUpdates
+        function onOpenRequested() {
+            const monitor = Hyprland.focusedMonitor || Quickshell.screens[0]
+            root.router.present(monitor ? monitor.name : "", "settings")
+        }
     }
 
     Binding {

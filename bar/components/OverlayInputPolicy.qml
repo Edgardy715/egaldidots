@@ -49,10 +49,10 @@ QtObject {
     }
     readonly property bool kbFocusWanted: surfaceOpen && !monFullscreen && !launcherClosing
     readonly property bool sideModulesPresented: (!surfaceOpen || surface === "settings") && !monFullscreen
-    readonly property bool modal: surfaceOpen && !launcherClosing
+    readonly property bool modal: kbFocusWanted
     readonly property bool exclusiveFocus: kbFocusWanted
-    readonly property bool authFocusGrab: surface === "auth" && surfaceOpen
-    readonly property bool escapeShortcutEnabled: surfaceOpen && surface !== "session" && surface !== "auth"
+    readonly property bool authFocusGrab: surface === "auth" && kbFocusWanted
+    readonly property bool escapeShortcutEnabled: kbFocusWanted && surface !== "session" && surface !== "auth"
     readonly property string maskMode: monFullscreen ? "hidden" : modal ? "full" : "pill"
 
     readonly property real baseW: Math.max(pillWidth, pillTargetW)

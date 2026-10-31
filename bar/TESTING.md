@@ -5,6 +5,17 @@ use temporary directories; do not point test fixtures at your personal settings.
 
 ## Configuration and data
 
+`python bar/tests/launcher-media-clearance.py` (Wayland) closes the launcher
+with an isolated MPRIS fixture playing, on the production IslandOverlay, for long
+and short visits and under reduced motion. Per frame it asserts that the
+unjoined media droplet never overlaps the returning pill and that the pill never
+widens after the droplet buds (not even from a launcher-width blip at the
+handoff). QtTest failures are not printed under `qs -p`: the runner requires the
+final PASS marker.
+
+Settings integration verifies defaults, the removed `pet` workspace style falling back
+to the default, temporary persistence/discard and the real editor.
+
 ```sh
 sh bar/tests/verify-config.sh
 node bar/tests/media-source.cjs
@@ -31,6 +42,7 @@ Run controls/UX Wayland fixtures serially to avoid focus interference.
 
 ```sh
 python bar/tests/sample-process.py --self-test
+python bar/tests/session-soak.py --self-test
 python bar/tests/cava-stream.py
 python bar/tests/cava-envelope.py
 python bar/tests/cava-backend.py
@@ -46,12 +58,16 @@ The Cava envelope and discovery tests use synthetic data and fake producers;
 they never capture personal audio. `nmcli-lifetime.py` checks graceful quit,
 SIGTERM, hot reload and monitor restart using fake NetworkManager commands.
 `desktop-status-audio-rebind-regression.qml` tests observer replacement with
-mock devices. The native scanner test checks stale scans, coalescing, reentry
+mock devices. `desktop-status-capslock-regression.qml` drives Caps Lock
+from fake sysfs LEDs (discovery, OR across keyboards, removal, hyprctl fallback). The native scanner test checks stale scans, coalescing, reentry
 and destruction while work is active.
 
 `wallpaper-scan-benchmark.py --build /tmp/isla-wpscan-test` measures call latency,
 completion and a QML heartbeat with temporary caches. `sample-process.py --pid
-PID --seconds 30 --output /tmp/process.json` reads Linux CPU/RSS/PSS. For a real
+PID --seconds 30 --output /tmp/process.json` reads Linux CPU/RSS/PSS plus
+Pss_Anon/Pss_File/Swap/SwapPss (zram swaps cold pages out, so PSS alone falls).
+`session-soak.py` also logs `pss_with_swap_kib` and live descendants
+(`live_children*`, `tree_cpu_percent`): `child_cpu_ticks` only sees reaped children. For a real
 audio-server discovery comparison, `cava-discovery-performance.py --before
 /path/to/baseline/cava_stream.py --output /tmp/cava.json` uses an unresolved test
 identity and performs read-only queries. Animation-driver/heartbeat intervals
@@ -171,10 +187,18 @@ python bar/tests/settings-media-routing.py
 python bar/tests/settings-ux.py
 python bar/tests/hyprland-settings-ui.py
 python bar/tests/overlay-native-input.py
+python bar/tests/desktop-integration.py
 ```
 
 These tests need a running Wayland session. Offscreen checks do not establish
 visual quality or compositor input behavior.
+
+`desktop-integration.py` uses a disposable application and temporary configuration,
+data/state and askpass socket. It checks actual typing after Escape on 14 panels,
+nested settings search, workspace confirmation, actual compositor fullscreen and
+DesktopEntry launch/focus with both normal and reduced motion. Run it alone:
+other native fixtures can capture its keyboard. It restores the previous active
+window and never authenticates or changes the user's workspaces or wallpaper.
 
 ## Service and interaction regressions
 
@@ -212,8 +236,72 @@ checks reflected recording bounds without grabbing desktop-wide idle input.
 Real capture additionally needs the ScreenCast picker and a working GPU encoder.
 
 `personality-regression.qml` covers finite material reception, surface result routing,
-charging presentation, companion opt-out, reduced motion and hiding. Run on Wayland
+charging presentation, pet clicks/keyboard without surface navigation, separate recording
+indicator, companion opt-out, reduced motion and hiding. It also checks all new
+prototype moments finish, blink interruption, cursor stroking distinct from click,
+260 ms pointer sampling, context options, bounded night/mischief cadence, blockers,
+and no delayed joy transition from new events under reduced motion. Run on Wayland
 with a temporary `ISLA_CONFIG`; `ISLA_TEST_OUTPUT` stores mock-only captures.
+`companion-delight-regression.qml` checks touch deformation at scales 1/1.5/3,
+fixed layout and unclipped plate bounds, the four-click held-sneeze story,
+its visible anticipation after the previous smile, the fifth-click firefly story,
+light/eye tracking at scales 1/1.5/3, finite departure and unchanged mischief cadence,
+interruptions in three phases,
+pointer approach, reduced/hidden/suspended/blocked/sleep cancellation and tracking
+opt-out. Run with a temporary `ISLA_CONFIG`. `ISLA_TEST_OUTPUT=1` emits capture
+markers; `docs/companion-delight-2026-10-25/capture.py` captures Wayland on the
+documented desktop layout. `docs/companion-firefly-2026-10-25/capture.py` also captures
+the firefly crossing. These captures do not certify physical mouse input.
+`iris-memory-regression.qml` checks Iris' memory and greetings: lazy read of an absent
+`ISLA_IRIS` file, hour-histogram classification (habitual, adjacent, unusual, return,
+neutral under five days), a single consumed greeting, hostile files (`null`, broken JSON never
+overwritten by loading, `warmth: null`), the greeting waiting for dust and yawn to finish, warmth ageing and caps, the
+`companion.remember` opt-out (no read, no write), the `interacted`/greeting signals of
+`CompanionBehavior`, mood-scaled mischief, and that `welcome`/`surprised` end in stillness
+and are cancelled by reduced/hidden/suspended/blocked/asleep. Run with temporary
+`ISLA_CONFIG` and `ISLA_IRIS`: `ISLA_CONFIG=$T/shell.json ISLA_IRIS=$T/sub/iris.json
+QT_QPA_PLATFORM=offscreen quickshell -p bar/iris-memory-regression.qml` (about 17 s).
+`iris-system-regression.qml` checks Iris' system reactions through the composition hooks
+(`CompanionBehavior.react/noteBattery`, `recording`; no real battery, recorder, notification
+or authorization service is touched): deferred surprise for a critical notification, tired
+lids at 15 % or less, `content` on charging, `stretch` on full, red glint and `relief` around a
+capture, `no`/`wink` on the auth surface, stillness after each, cancellation by
+reduced/hidden/suspended/blocked/asleep and the `companion.reactToSystem` opt-out. Run with
+temporary `ISLA_CONFIG` and `ISLA_IRIS`: `ISLA_CONFIG=$T/shell.json ISLA_IRIS=$T/sub/iris.json
+QT_QPA_PLATFORM=offscreen timeout 90s quickshell -p bar/iris-system-regression.qml` (about 40 s).
+`surface-materialize-regression.qml` covers the surface spring and materialization: open
+overshoot 2.5-4 % and settling, resize <= 0.5 %, close <= 1.2 %, retarget with position and
+velocity equality, notification and workspace paths unchanged, reduced motion direct, and the
+host's scale/blur layer (retired at p=1, A to B at 0.97, blur limit on large surfaces).
+`PillMorphMotion.manualStep` drives `step(dt)` deterministically. Run with a temporary
+`ISLA_CONFIG`: `QT_QPA_PLATFORM=offscreen quickshell -p bar/surface-materialize-regression.qml`.
+Visual capture: `docs/surface-materialize-2026-10-25/capture.py <before|after> <dir>` (Wayland,
+grim) and `sheets.py`.
+`iris-continuity-regression.qml` checks Iris' continuity across surfaces: the attention
+mechanism of `CompanionBehavior` (`focusActive/focusX/focusY`: focus beats the pointer, the pointer
+leads without focus, saturation to -1..1, off with `reduced`, `asleep`, hidden and
+`companion.followFocus=false`, never blocked by `blocked`), the perch in `Pill`
+(`perchTravel` 0 at rest, monotonic 0 -> 1 on opening, retarget from the current value when
+closing mid-way, comes back and hides on close, absent in launcher/auth, with reduced motion and
+with personality off; corner inside the pill and no origin jump at scales 1, 1.33 and 2, mixer to
+launcher ending on the real header face) and the producers with fixtures (launcher caret, synced lyric line,
+wallpaper thumbnail under the pointer). The overview producer and the approval wink need a
+compositor and are not covered. Run with temporary `ISLA_CONFIG` and `ISLA_IRIS`:
+`ISLA_CONFIG=$T/shell.json ISLA_IRIS=$T/sub/iris.json QT_QPA_PLATFORM=offscreen timeout 120s
+quickshell -p bar/iris-continuity-regression.qml` (about 20 s). `ISLA_CONTINUITY_SHOTS=<dir>`
+saves a grab; offscreen is not visual QA.
+`iris-delight-regression.qml` checks Iris' small visitors (`bar/Singletons/Visitors.js`: firefly,
+moth, raindrop, bubble, snowflake): every path fits the 30x26 slot at scales 1, 1.5 and 3, the eyes
+follow raindrop (down) and bubble (up), each scene ends in stillness and counts one sighting only
+when seen to the end, reduced/hidden/suspended/blocked/asleep/touch cancel without residue, the
+choice by clock with explicit dates (moth 23:00-05:59, snowflake in December), unchanged mischief
+budget over a roll sweep, the fifth click still being the firefly, sightings in `IrisMemory`
+(cap 99, validated on load, inert with `remember=false`), the dust shake after 30 minutes asleep
+(smaller than the refusal, then yawn, then stillness) and the eye tint and pupil in dark and light
+palettes (contrast >= 4.5). Run with temporary `ISLA_CONFIG` and `ISLA_IRIS`:
+`ISLA_CONFIG=$T/shell.json ISLA_IRIS=$T/sub/iris.json QT_QPA_PLATFORM=offscreen timeout 120s
+quickshell -p bar/iris-delight-regression.qml` (about 65 s). `ISLA_TEST_OUTPUT=1` logs
+`DELIGHT_CAPTURE` markers for `docs/iris-delight-2026-10-25/capture.py`; offscreen is not visual QA.
 `focus-session-regression.qml` checks deadlines, suspend, pause/resume milliseconds,
 single completion, choosing the next duration, custom minutes and keyboard input.
 `notification-attention-regression.qml` and `notification-priority-regression.qml`
@@ -308,6 +396,12 @@ Run with a temporary `ISLA_CONFIG`. The image has an opaque backdrop for alpha Q
 progressive success/error strokes, retry, interruption, hidden pause and reduced
 motion. Use temporary `ISLA_CONFIG`; runs in a regular window without auth/network
 actions. Wallpaper confirmation capture uses `ISLA_TEST_OUTPUT`.
+
+`bar/stroke-language-regression.qml` (Tidemark) checks stroke tokens, `SpringValue`
+(final state, interruption keeping velocity, reduced motion, hidden = still) and
+`LevelStroke` (spring-followed level, tide mark hold/fall, head only while growing).
+A failed `compare`/`verify` aborts silently in this harness, so it prints PASS only if
+every function reaches its end. Use a temporary `ISLA_CONFIG`; offscreen is not visual QA.
 
 CAVA: `ISLA_CONFIG=/tmp/isla-cava-test.json ISLA_TEST_OUTPUT=/tmp QT_QPA_PLATFORM=offscreen quickshell -p bar/cava-response-regression.qml`
 verifica parser, agrupación, independencia del refresco y caída sin señal. Para
@@ -451,3 +545,159 @@ ISLA_CONFIG and Wayland; neither changes wallpaper or personal playback.
 selection bounds, rapid reversal, split/integrated styles and reduced/hidden/
 disabled animation. Use temporary ISLA_CONFIG and Wayland for native captures
 (`ISLA_TEST_OUTPUT`). No real workspace switches.
+
+## Design fixes: elapsed time and early input
+
+`bar/frame-time-regression.qml` advances the production spring manually at
+144/60/30/20/10 Hz, motion scales 0.25/1/2, isolated late frames, retarget,
+suspension, invalid intervals and reduced motion. It checks elapsed-time
+consistency and bounded settling; it does not measure compositor FPS.
+
+`bar/launcher-focus-regression.qml` uses the production Pill in a Wayland Window:
+focus within 120 ms after field load, typing without clicking, closing without
+reclaiming focus, cancelled close, unload and reduced motion. Run serially with
+other native focus fixtures and temporary ISLA_CONFIG/ISLA_IRIS. Its Window does
+not certify layer-shell keyboard policy.
+
+`bar/calendar-design-regression.qml` checks translated Spanish source dates,
+forecast weekdays, month titles, targets at scales 0.8/1/1.25, mouse navigation
+across year boundaries and Return/Space. Run with en_US and es_DO process locales
+to catch accidental dependence on the ambient date locale. Require explicit PASS
+and no FAIL in every log, not just exit 0.
+
+## Material readability and active ink
+
+`bar/material-accessibility-regression.qml` checks reduced transparency, stored
+glass alpha preservation/restoration, discard, split/compact and a 175% editor.
+Use temporary ISLA_CONFIG/ISLA_IRIS; Wayland is required for native inspection.
+ISLA_PALETTE_FIXTURES accepts `docs/design-accessibility-2026-10-26/palettes.json`,
+ISLA_PALETTE_INDEX selects its palette and ISLA_CAPTURE_HOLD_MS keeps the native
+window available after PASS for grim. Offscreen is not visual QA.
+
+`bar/matugen-palette-regression.qml` checks 426 active intensities across those
+six palettes. It checks semantic pairs and the best available active ink on
+four gradient faces; it does not certify a 4.5 ratio at every intensity or on
+arbitrary transparent backgrounds. Measurements and native captures are in
+`docs/design-accessibility-2026-10-26/REPORT.md`. Settings integration also tests
+reduceTransparency save/discard; settings UX checks Appearance without search.
+
+## System updates portal
+
+- `python bar/tests/system-updates.py`: ten isolated backend tests with fake PATH
+  and temporary Git remotes; no real installations.
+- `python bar/tests/updates-service.py`: mocked bridge/notifier, partial errors,
+  persistent notification dedupe across two processes, action and launch feedback.
+  Also verifies install guards, malformed output/process failure, preserved results
+  and recovery. Offscreen logic test, not visual QA.
+- `ISLA_TEST_OUTPUT=/tmp/isla-updates-qa python bar/tests/updates-ui.py`: native
+  Wayland, injected controller, navigation/search/actions, dirty shell protection,
+  unavailable Flatpak, busy state, 1000×700/640×560 and font scales 1/1.75.
+  Normal motion covers intermediate package disclosure, rapid reversal/navigation,
+  reduced motion enabled mid-flight and hidden page/window settling; activity
+  must stop while hidden or reduced. Captures are samples, not FPS measurements.
+- `python bar/tests/settings-integration.py`: includes update preference save/discard.
+
+Read-only live check: `qs -p bar ipc call updates check`, then `... updates state`.
+`... updates open` opens the portal. Never run install/launch for automated tests;
+updates require the user's deliberate action and native terminal confirmation.
+
+`python bar/tests/updates-notice.py` exercises the real Notifs singleton on a
+private D-Bus session with temporary state: DND, open center, saved notice and
+working local action after process restart. It never sends notices to the user bus.
+
+## Cuerpo
+
+Demo aislada: `quickshell -p bar/body-demo.qml` (1–5 ánimo, M música, B respiración,
+R reducir movimiento, Esc salir). Reiniciar tras recompilar el shader:
+`(cd bar/body/shaders && /usr/lib/qt6/bin/qsb --qt6 -o body.frag.qsb body.frag)`.
+
+- `node bar/tests/body-brain.cjs`
+- `ISLA_CONFIG=/tmp/isla-body-test.json QT_QPA_PLATFORM=offscreen quickshell -p bar/body-regression.qml`
+- Para comprobar ShaderEffect con renderizador real offscreen:
+  `ISLA_CONFIG=/tmp/isla-body-test-gl.json QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl quickshell -p bar/body-regression.qml`
+- `/usr/lib/qt6/bin/qmllint bar/body/*.qml bar/body-demo.qml bar/body-regression.qml`
+
+Software offscreen omite shader; no equivale a QA visual. Capturas Wayland,
+recuento Timer y límites: `docs/cuerpo-fase1-2026-10-30/REPORT.md`.
+
+### Cuerpo · gota mensajera (Fase 2)
+
+- `node bar/tests/body-drop.cjs`: estados, interrupciones, cuello/residuo, captura, reduce y dt.
+- `ISLA_CONFIG=/tmp/isla-drop-test.json QT_QPA_PLATFORM=offscreen quickshell -p bar/body-drop-regression.qml`
+- Shader: añadir `QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl` al comando anterior.
+- Demo: G soltar/llamar, D entregar; arrastrar `captura.png` arma la recogida.
+- Evidencia Wayland y límites: `docs/cuerpo-fase2-2026-10-30/REPORT.md`.
+
+### Cuerpo · pill real (Fase 3)
+
+- `ISLA_CONFIG=/tmp/isla-body-pill.json QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl quickshell -p bar/body-pill-regression.qml`
+- Repetir sin variables gráficas para Wayland. Offscreen software verifica fallback.
+- Geometría, material al abrir/cerrar e interrumpir, Fluid, compact/escala,
+  inactividad bajo cambios de puntero/ancho, movimiento/transparencia reducidos.
+- Exigir `PASS: BodyPill` y ausencia de `FAIL:`; QtTest puede dejar exit=0 al fallar.
+- Shader recompilado requiere reiniciar la instancia (reload conserva caché qsb).
+- Evidencia y alcance: `docs/cuerpo-fase3-2026-10-30/REPORT.md`.
+
+### Cuerpo · eventos y archivos (Fase 4)
+
+- `node bar/tests/body-file.cjs`: rutas locales y argv literal.
+- `python bar/tests/body-messenger.py`: abridor falso, clic/teclado, suspensión, archivo pendiente y reduceMotion.
+- `ISLA_CONFIG=/tmp/isla-events.json QT_QPA_PLATFORM=offscreen quickshell -p bar/body-events-regression.qml`
+- BodyPill incluye reloj local, foco, música y opciones. Repetir en Wayland.
+- Capturas guardadas al cerrar Satty y Recording.saved ofrecen el archivo al monitor enfocado.
+- Activación para un atajo de teclado: `qs ipc -p ~/.config/quickshell/bar/shell.qml call island bodyOpen`.
+  Ejecuta únicamente si hay archivo guardado y disponible; no configura un atajo global.
+- Un archivo pendiente por monitor; no mueve ni borra. Las ofertas nuevas se descartan mientras está ocupado.
+- Evidencia y límites: `docs/cuerpo-fase4-2026-10-30/REPORT.md`.
+
+
+## Agua W1 · vidrio único opt-in (2026-10-31)
+
+Usar un ISLA_CONFIG temporal inexistente: el fixture comprueba el default false,
+rechazo de valores no booleanos y activa waterBody sin guardar configuración.
+
+```sh
+ISLA_CONFIG=/tmp/isla-water-test.json QT_QPA_PLATFORM=wayland qs -p bar/water-body-regression.qml
+ISLA_CONFIG=/tmp/isla-water-test-gl.json QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl qs -p bar/water-body-regression.qml
+node bar/tests/body-brain.cjs
+(cd bar/body/shaders && /usr/lib/qt6/bin/qsb --qt6 -o body.frag.qsb body.frag)
+/usr/lib/qt6/bin/qmllint bar/body/PillBody.qml bar/body/BodyShader.qml bar/body/BodyEngine.qml bar/components/PillMaterial.qml bar/Pill.qml bar/water-body-regression.qml
+```
+
+Exigir PASS explícito y ausencia de FAIL. En software comprueba sólo fallback,
+cableado de geometría/uniformes y reloj determinista: **no** prueba compilación,
+caché ni exposición real. En RHI comprueba exposición constante al abrir/cerrar
+launcher/media/calendar/utils, geometría de captura, sombra del material sin FBO,
+caché quieto, error real de shader, movimiento reducido e interrupción. El fixture
+no prueba píxeles ni coste de GPU. Reiniciar qs después de recompilar el qsb.
+
+Comparar además body-pill, frame-time, pill-geometry, pill-composition,
+pill-interface, content-hold, surface-swap-close y surface-materialize con
+waterBody=false. La ejecución aislada de esta fase está en
+`docs/agua-w1-2026-10-31/BASELINE.md` y `REPORT.md`.
+
+En la sesión Wayland real, registrar `pgrep -ax qs` (shell `qs -d`), GPU reposo,
+launcher quieto y morph; sample-process.py aporta CPU/PSS. gpu-recording.py prueba
+el grabador con backend falso, no mide utilización GPU. qml-performance.py mide
+su fixture de composición, no FPS físicos; frame-time-regression es determinista.
+Capturar antes/después reposo, launcher, media, calendario, notificación y ambos
+temas, más ≥6 fotogramas reposo→launcher, con el método Wayland descrito arriba.
+No confundir offscreen con QA. El entorno W1 no permite sockets Wayland ni GPU;
+la sombra exterior, invalidez del caché en píxeles y rendimiento quedan pendientes.
+
+
+### Agua W1 · corrección R1 (2026-10-31)
+
+Sustituye la descripción anterior del alcance del fixture: ahora comprueba en
+software decoraciones conservadas, seis cuadros de quietud, render directo sin
+layer, continuidad del muelle de reposo y renderInputs null sin caché. Su rama
+RHI añade grabImage del shader: sombra independiente de outsideOpacity, pico
+≤0.14 y proporcional a shadowExposure, ausencia de sombra en reposo y dithering
+espacial también en el interior barato. Comprueba alineación física del caché y
+que bodyBreath mantiene sourceItem=null sin alternar captura/capa.
+
+Repetir los comandos W1 anteriores con ISLA_CONFIG nuevo. Exigir ambos PASS R1
+y el PASS final correspondiente al backend, sin FAIL. Software no ejecuta las
+aserciones de píxeles, respiración en producción ni ShaderEffectSource real.
+La sombra exterior ya está implementada; su aspecto y ausencia de segunda placa
+siguen **no verificados** hasta capturar Wayland con el compositor real.

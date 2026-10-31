@@ -36,13 +36,13 @@ Item {
     property bool entered: false
     property real entrance: entered ? 1 : 0
     property real restingMedia: player?.isPlaying && !authActive && !authenticated ? 1 : 0
-    Behavior on entrance { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.morph; easing.type: Easing.OutCubic } }
+    Behavior on entrance { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.morph; easing.type: Motion.easeStandard } }
     Behavior on restingMedia { SmoothedAnimation { duration: Flags.reduceMotion ? 0 : Motion.standard; velocity: -1 } }
     property bool authActive: false
     property string pendingPower: ""
     property bool retiring: false
     readonly property bool departing: retiring && retirementOpacity <= 0.001
-    property real fieldOffset: 0
+    readonly property real fieldOffset: rejection.offset
     property real successProgress: authenticated ? 1 : 0
     // One continuous trajectory: travel leads expansion, with no timer between them.
     readonly property real travel: 1 - Math.pow(1 - presentation, 3)
@@ -92,7 +92,6 @@ Item {
         if (!authenticated) return
         password.clear()
         rejection.stop()
-        fieldOffset = 0
         powerMenu.close()
         successHold.start()
     }
@@ -101,27 +100,14 @@ Item {
         interval: Flags.reduceMotion ? 180 : Motion.standard + Motion.fast
         onTriggered: root.retiring = true
     }
-    Connections {
-        target: Flags
-        function onReduceMotionChanged() {
-            if (Flags.reduceMotion) { rejection.stop(); root.fieldOffset = 0 }
-        }
-    }
-    SequentialAnimation {
-        id: rejection
-        NumberAnimation { target: root; property: "fieldOffset"; to: -6 * root.unit; duration: 50 }
-        NumberAnimation { target: root; property: "fieldOffset"; to: 6 * root.unit; duration: 50 }
-        NumberAnimation { target: root; property: "fieldOffset"; to: -4 * root.unit; duration: 50 }
-        NumberAnimation { target: root; property: "fieldOffset"; to: 4 * root.unit; duration: 50 }
-        NumberAnimation { target: root; property: "fieldOffset"; to: 0; duration: 50 }
-    }
+    ErrorShake { id: rejection; amplitude: -8 * root.unit }
     onSecuredChanged: if (secured) { if (!entered) entranceTimer.start(); if (authActive) password.forceActiveFocus(); else forceActiveFocus() }
     onBusyChanged: if (!busy && authActive) password.forceActiveFocus()
     onErrorTextChanged: if (errorText && !authenticated) {
         password.clear()
         authActive = true
         password.forceActiveFocus()
-        if (!Flags.reduceMotion) rejection.restart()
+        rejection.trigger()
     }
     function attemptUnlock() {
         if (!secured || busy || authenticated || !password.text.length || password.inputMethodComposing) return
@@ -188,7 +174,7 @@ Item {
         y: lockBody.y + (lockBody.height - height) / 2
         spacing: 12 * root.unit
         opacity: root.entrance * (1 - root.smoothReveal(Math.min(1, root.presentation / 0.18), 0))
-        MaterialIcon { iconName: root.authenticated ? "lock_open" : "lock"; font.pixelSize: 20 * root.unit; color: root.ink }
+        LockGlyph { open: root.authenticated; size: 20 * root.unit; color: root.ink }
         Text { text: qsTr("Bloqueado"); font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale; color: root.ink }
     }
     Row {
@@ -196,7 +182,7 @@ Item {
         y: 34 * root.unit
         spacing: 12 * root.unit
         opacity: root.contextOpacity
-        MaterialIcon { iconName: "lock"; font.pixelSize: 18 * root.unit; color: root.secondary }
+        LockGlyph { open: root.authenticated; size: 18 * root.unit; color: root.secondary }
         Text { visible: !!root.weather.temp; text: root.weather.temp || ""; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale; color: root.secondary }
         Text { visible: UPower.displayDevice.isLaptopBattery; text: Math.round(UPower.displayDevice.percentage * 100) + "%"; font.family: Theme.fontMedia; font.pixelSize: 13 * root.textScale; color: root.secondary }
         Text { visible: root.preview; text: qsTr("Vista previa"); font.family: Theme.fontMedia; font.pixelSize: 12 * root.textScale; color: root.secondary }
@@ -390,9 +376,9 @@ Item {
                     height: 24 * root.unit; radius: 4 * root.unit
                     color: Theme.accent
                     opacity: last > first ? 0.28 : 0
-                    Behavior on x { NumberAnimation { duration: Flags.reduceMotion ? 0 : 80; easing.type: Easing.OutQuad } }
-                    Behavior on width { NumberAnimation { duration: Flags.reduceMotion ? 0 : 80; easing.type: Easing.OutQuad } }
-                    Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : 120; easing.type: Easing.OutCubic } }
+                    Behavior on x { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.hover; easing.type: Easing.OutQuad } }
+                    Behavior on width { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.hover; easing.type: Easing.OutQuad } }
+                    Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast; easing.type: Motion.easeStandard } }
                 }
                 ListModel { id: dotModel }
                 ListView {
@@ -408,12 +394,12 @@ Item {
                     spacing: 2 * root.unit
                     model: dotModel
                     onContentWidthChanged: Qt.callLater(field.updateDotOffset)
-                    Behavior on x { NumberAnimation { duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Easing.OutCubic } }
+                    Behavior on x { NumberAnimation { duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Motion.easeStandard } }
                     add: Transition {
                         ParallelAnimation {
-                            NumberAnimation { property: "scale"; from: 0.92; to: 1; duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Easing.OutCubic }
-                            NumberAnimation { property: "y"; from: 2 * root.unit; to: 0; duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Easing.OutCubic }
-                            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Easing.OutCubic }
+                            NumberAnimation { property: "scale"; from: 0.92; to: 1; duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Motion.easeStandard }
+                            NumberAnimation { property: "y"; from: 2 * root.unit; to: 0; duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Motion.easeStandard }
+                            NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Motion.easeStandard }
                         }
                     }
                     remove: Transition {
@@ -422,7 +408,7 @@ Item {
                             NumberAnimation { property: "opacity"; to: 0; duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Easing.InCubic }
                         }
                     }
-                    displaced: Transition { NumberAnimation { properties: "x,y"; duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Easing.OutCubic } }
+                    displaced: Transition { NumberAnimation { properties: "x,y"; duration: Flags.reduceMotion || !root.visible ? 0 : Motion.fast; easing.type: Motion.easeStandard } }
                     delegate: Item {
                         id: dotSlot
                         required property int index
@@ -446,7 +432,7 @@ Item {
                 width: 36 * root.unit; height: 36 * root.unit
                 flatStyle: true
                 opacity: Math.max(0, 1 - root.successProgress * 4)
-                iconName: root.busy ? "hourglass_top" : root.errorText ? "refresh" : "arrow_forward"
+                iconName: root.errorText && !root.busy ? "refresh" : "arrow_forward"
                 text: qsTr("Desbloquear")
                 enabled: root.secured && !root.busy && !root.authenticated && password.text.length > 0
                 onClicked: root.attemptUnlock()

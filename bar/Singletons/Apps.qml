@@ -143,7 +143,12 @@ Singleton {
     function launch(entry) {
         if (!entry) return
         root._bumpFreq(entry.id)
-        try { entry.execute() } catch (e) { /* ignore */ }
+        // Run after the launcher releases its layer keyboard focus, even if it unloads.
+        Qt.callLater(root.executeEntry, entry)
+    }
+
+    function executeEntry(entry) {
+        try { entry.execute() } catch (e) { console.warn("[Apps] launch failed:", e) }
     }
 
     function _bumpFreq(id) {

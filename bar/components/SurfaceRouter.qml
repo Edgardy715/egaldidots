@@ -16,6 +16,8 @@ QtObject {
     property int resultsDuration: 250
     property int morphDuration: 420
     signal authCloseRequested()
+    signal fileOffered(string monitor, string path)
+    signal fileActivationRequested(string monitor)
 
     property string openMon: ""
     property string openSurface: ""
@@ -81,6 +83,23 @@ QtObject {
         root.openMon = mon
         root.openSurface = root.mediaDockPendingSurface
         root.mediaDockPendingMon = ""
+    }
+
+    // Fullscreen invalidates work for this monitor, including a dock still in flight.
+    function dismissMonitor(mon) {
+        if (mediaDockPendingMon === mon) {
+            mediaDockPendingMon = ""
+            mediaDockPendingSurface = ""
+        }
+        if (peekMon === mon) peekMon = ""
+        if (openMon !== mon) return
+        const wasAuth = openSurface === "auth"
+        launcherCloseResultsTimer.stop()
+        launcherClosePillTimer.stop()
+        openSurface = ""
+        openMon = ""
+        launcherClosePhase = 0
+        if (wasAuth) authCloseRequested()
     }
 
     function close() {

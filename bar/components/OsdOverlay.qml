@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import "../Singletons"
 import "../"
 import Quickshell.Services.Pipewire
@@ -23,10 +22,11 @@ Rectangle {
     property real value: 0
     property string kind: ""      // "volume" | "brightness" | "mic"
     property string glyph: ""
+    property bool muted: false
     property bool shown: false
 
     // tamaño y posición
-    width: 220 * s
+    width: 168 * s
     height: 36 * s
     radius: height / 2
     color: Qt.rgba(Theme.cardTop.r, Theme.cardTop.g, Theme.cardTop.b, 0.85)
@@ -36,11 +36,12 @@ Rectangle {
     visible: opacity > 0.01
     opacity: shown ? 1 : 0
     scale: Flags.reduceMotion ? 1 : shown ? 1.0 : 0.92
+    transformOrigin: Item.Top
     Behavior on opacity {
-        Anim { type: Anim.FastEffects }
+        Anim { type: overlay.shown ? Anim.FastIn : Anim.FastOut }
     }
     Behavior on scale {
-        Anim { type: Anim.FastEffects }
+        Anim { type: overlay.shown ? Anim.FastIn : Anim.FastOut }
     }
 
     InnerGlow {
@@ -56,53 +57,28 @@ Rectangle {
         anchors.rightMargin: 12 * s
         spacing: Theme.spacingMd * s
 
-        MaterialIcon {
+        LevelDial {
+            id: dial
             anchors.verticalCenter: parent.verticalCenter
+            diameter: parent.height - 6 * s
+            kind: overlay.kind
+            level: overlay.value
+            muted: overlay.muted
             iconName: overlay.glyph
-            color: Theme.accent
-            neonIntensity: 0.5
-            font.pixelSize: Theme.fontSizeTitle * s
         }
         Text {
             anchors.verticalCenter: parent.verticalCenter
-            text: overlay.kind === "volume" ? "Volume" : (overlay.kind === "mic" ? "Mic" : "Brillo")
+            text: overlay.kind === "volume" ? qsTr("Volumen") : (overlay.kind === "mic" ? qsTr("Micrófono") : qsTr("Brillo"))
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeSmall * s
         }
-        Item {
-            anchors.verticalCenter: parent.verticalCenter
-            width: 90 * s
-            height: 6 * s
-            Rectangle {
-                anchors.fill: parent
-                radius: height / 2
-                color: Qt.rgba(1, 1, 1, 0.12)
-            }
-            Rectangle {
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: parent.width * Math.max(0, Math.min(1, overlay.value))
-                radius: height / 2
-                color: Theme.accent
-                layer.enabled: overlay.visible && overlay.value > 0
-                layer.effect: MultiEffect {
-                    shadowEnabled: true
-                    shadowColor: Qt.alpha(Theme.accent, 0.75)
-                    shadowBlur: 0.7
-                    blurMax: 12
-                }
-                Behavior on width {
-                    Anim { type: Anim.FastEffects }
-                }
-            }
-        }
         Text {
             anchors.verticalCenter: parent.verticalCenter
-            text: Math.round(overlay.value * 100) + "%"
+            text: Math.round(Math.max(0, Math.min(1, dial.level)) * 100) + "%"
             color: Theme.accent
-            font.family: Theme.fontMono
+            font.family: Theme.font
+            font.features: Theme.fontNumeric
             font.pixelSize: Theme.fontSizeSmall * s
             font.weight: Font.DemiBold
         }
@@ -114,8 +90,9 @@ Rectangle {
         onTriggered: overlay.shown = false
     }
 
-    function show(kind, v, s) {
+    function show(kind, v, s, muted) {
         overlay.kind = kind
+        overlay.muted = !!muted
         overlay.value = v
         switch (kind) {
         case "brightness":
@@ -128,13 +105,13 @@ Rectangle {
             overlay.glyph = Icons.getVolumeIcon(v, v < 0.01)
             break
         }
-        overlay.shown = true
         overlay.s = s || 1
+        overlay.shown = true
         hideTimer.restart()
     }
     function showVolume(s) {
         var sink = Pipewire.defaultAudioSink
-        if (sink && sink.audio) show("volume", sink.audio.muted ? 0 : sink.audio.volume, s)
+        if (sink && sink.audio) show("volume", sink.audio.muted ? 0 : sink.audio.volume, s, sink.audio.muted)
     }
     function showBrightness(s) {
         if (typeof Brightness !== "undefined" && Brightness.available)

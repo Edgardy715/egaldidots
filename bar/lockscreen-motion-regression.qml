@@ -82,24 +82,24 @@ ShellRoot {
                 surface.errorText = "Contraseña incorrecta. Inténtalo de nuevo."
                 break
             case 12: test.capture("04-rejected"); break
-            case 14:
+            case 16:
                 test.check(test.sawRejection && Math.abs(surface.fieldOffset) < 0.01, "rejection recoils and settles")
                 surface.errorText = ""
                 surface.authenticated = true
                 break
-            case 17:
+            case 19:
                 test.check(surface.successProgress > 0.5 && !surface.departing, "success shown before departure")
                 test.capture("05-success")
                 break
-            case 20:
+            case 22:
                 test.check(surface.retiring && (!surface.departing || surface.contentOpacity <= 0.001), "content withdraws before collapse")
                 test.capture("06-return")
                 break
-            case 25:
+            case 27:
                 test.check(surface.departing && surface.presentation < 0.01, "success returns to pill")
                 test.capture("07-pill-return")
                 break
-            case 27:
+            case 29:
                 test.check(Config.update({appearance: {reduceMotion: true}}).ok, "temporary config ready")
                 surface.authenticated = false
                 surface.retiring = false
@@ -107,7 +107,7 @@ ShellRoot {
                 surface.entered = true
                 surface.errorText = "Otro error"
                 break
-            case 29:
+            case 31:
                 test.check(surface.presentation === 1 && surface.fieldOffset === 0, "reduced motion resolves geometry without recoil")
                 console.log("PASS: lockscreen morph interruption, rejection, success ordering, return and reduced motion")
                 Qt.quit()

@@ -26,7 +26,8 @@ QtObject {
     readonly property bool canNext: !!player && !!player.canControl && !!player.canGoNext
     readonly property bool canToggle: !!player && !!player.canControl && !!player.canTogglePlaying
 
-    property real position: player ? Math.max(0, player.position || 0) : 0
+    property real positionOffset: 0
+    property real position: player ? Math.max(0, (player.position || 0) + positionOffset) : 0
     property real lastPositionAt: 0
     property bool dragging: false
     property real dragFraction: 0
@@ -48,7 +49,7 @@ QtObject {
 
     function syncPosition() {
         if (!dragging) {
-            position = player ? Math.max(0, player.position || 0) : 0
+            position = player ? Math.max(0, (player.position || 0) + positionOffset) : 0
             lastPositionAt = Date.now()
         }
     }
@@ -99,6 +100,7 @@ QtObject {
     onTrackKeyChanged: cancelDrag()
     onCanSeekChanged: if (!canSeek) cancelDrag()
     onIsPlayingChanged: syncPosition()
+    onPositionOffsetChanged: syncPosition()
 
     property Connections playerConnections: Connections {
         target: root.player

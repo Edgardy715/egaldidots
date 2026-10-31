@@ -42,7 +42,7 @@ ComboBox {
         hovered: root.hovered || root.activeFocus
         color: Theme.iconSecondary
         rotation: root.popup.visible && !Flags.reduceMotion ? 180 : 0
-        Behavior on rotation { NumberAnimation { duration: Motion.standardSmall; easing.type: Easing.OutCubic } }
+        Behavior on rotation { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
     }
     background: Rectangle {
         radius: 10 * root.s
@@ -111,7 +111,7 @@ ComboBox {
         background: Rectangle { color: Theme.surfaceContainer; radius: 12 * root.s; border.width: 1; border.color: Theme.hair }
         enter: Transition {
             NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Flags.reduceMotion ? 0 : Motion.fast }
-            NumberAnimation { property: "scale"; from: Flags.reduceMotion ? 1 : 0.98; to: 1; duration: Motion.standardSmall; easing.type: Easing.OutCubic }
+            NumberAnimation { property: "scale"; from: Flags.reduceMotion ? 1 : 0.98; to: 1; duration: Motion.standardSmall; easing.type: Motion.easeStandard }
         }
         exit: Transition { NumberAnimation { property: "opacity"; to: 0; duration: Flags.reduceMotion ? 0 : Motion.fast } }
     }

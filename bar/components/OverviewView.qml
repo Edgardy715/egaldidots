@@ -68,6 +68,13 @@ PillSurface {
     // usuario hace con el teclado (bug: mouse sobre el tile activo → Enter iba al ws 2).
     // keyNav=true tras usar teclado; un movimiento REAL del mouse lo desactiva.
     property bool selectionTouched: false
+    // Attention for Iris: the previewed workspace under the pointer or the keys.
+    focusActive: active && selectionTouched && selectionRing.slot >= 0 && selectionRing.visible
+    focusPoint: {
+        if (!focusActive) return Qt.point(0, 0)
+        void selectionRing.x; void selectionRing.y
+        return selectionRing.mapToItem(root, selectionRing.width / 2, selectionRing.height / 2)
+    }
     property bool _keyNav: false
     function _keyMove() { root._keyNav = true; root.selectionTouched = true }
     function _mouseMove() { root._keyNav = false; root.selectionTouched = true }
@@ -121,11 +128,25 @@ PillSurface {
         var groupIdx = Math.floor((cur - 1) / span)
         var next = Math.max(0, groupIdx + delta)
         var base = next * span + 1
-        var ids = []
-        for (var i = 0; i < span; i++) ids.push(base + i)
+        if (base !== root.groupBase) root._slideGroup(base > root.groupBase ? 1 : -1)
         root.groupBase = base
         root._selIndexWs = base
+        root.selectionSnap = false
     }
+    // A group change slides the strip in its direction; the selection ring
+    // jumps with it instead of travelling across the old tiles.
+    property bool selectionSnap: false
+    property real groupShift: 0
+    function _slideGroup(dir) {
+        root.selectionSnap = true
+        if (Flags.reduceMotion || !root.open) return
+        groupSlide.from = dir * 28 * root.s
+        groupSlide.restart()
+        groupFade.restart()
+    }
+    NumberAnimation { id: groupSlide; target: root; property: "groupShift"; to: 0; duration: Motion.standard; easing.type: Motion.easeStandard }
+    property real groupReveal: 1
+    NumberAnimation { id: groupFade; target: root; property: "groupReveal"; from: 0.35; to: 1; duration: Motion.standard; easing.type: Motion.easeStandard }
     function commitSelection() {
         // Leer el índice directamente al confirmar. `selWs` es una propiedad
         // derivada y durante el mismo evento de teclado puede conservar su valor
@@ -136,16 +157,22 @@ PillSurface {
         else root.requestClose()
     }
     onActiveIdChanged: if (root.open && !root.selectionTouched) {
-        root.groupBase = Math.floor((root.activeId - 1) / root.groupSize) * root.groupSize + 1
+        const base = Math.floor((root.activeId - 1) / root.groupSize) * root.groupSize + 1
+        root.selectionSnap = base !== root.groupBase
+        root.groupBase = base
         root._selIndexWs = root.activeId
+        root.selectionSnap = false
     }
 
     onOpenChanged: {
         if (root.open) {
+            // Opening places the ring; it only travels for later selections.
+            root.selectionSnap = true
             root.selectionTouched = false
             root.groupBase = Math.floor((root.activeId - 1) / root.groupSize) * root.groupSize + 1
             root._selIndexWs = root.activeId
             root._keyNav = true
+            root.selectionSnap = false
         } else {
             root._selIndexWs = -1
             root._keyNav = false
@@ -175,8 +202,8 @@ PillSurface {
                     font.weight: Font.DemiBold
                     color: Theme.foreground
                 }
-                Text {
-                    text: qsTr("Espacios %1–%2").arg(root.groupBase).arg(root.groupBase + root.groupSize - 1)
+                AnimatedLabel {
+                    value: qsTr("Espacios %1–%2").arg(root.groupBase).arg(root.groupBase + root.groupSize - 1)
                     font.family: Theme.font
                     font.pixelSize: 11 * root.s
                     color: Theme.iconSecondary
@@ -203,14 +230,22 @@ PillSurface {
                 }
             }
         }
+        Item {
+            width: parent.width
+            height: root.tileH + 36 * root.s
         Row {
+            id: strip
             spacing: root.gap
+            opacity: root.groupReveal
+            transform: Translate { x: root.groupShift }
+            // Fixed slots: changing group retargets the previews instead of
+            // rebuilding every tile and its screencopy.
             Repeater {
-                model: root.visibleIds
+                model: root.groupSize
                 delegate: Item {
                     id: tile
-                    required property int modelData
-                    readonly property int wsId: modelData
+                    required property int index
+                    readonly property int wsId: root.groupBase + index
                     readonly property bool selected: root.selWs === wsId
                     readonly property bool activeWorkspace: root.activeId === wsId
                     readonly property var windows: root.windowsByWorkspace[wsId] || []
@@ -234,10 +269,9 @@ PillSurface {
                         height: root.tileH
                         radius: 12 * root.s
                         color: Theme.cardBot
-                        border.width: tile.selected ? 2 * root.s : Theme.borderHairline
-                        border.color: tile.selected ? Theme.accent : Qt.alpha(Theme.foreground, 0.16)
+                        border.width: Theme.borderHairline
+                        border.color: Qt.alpha(Theme.foreground, 0.16)
                         contentInsideBorder: true
-                        Behavior on border.color { ColorAnimation { duration: Motion.fast } }
                         Image {
                             anchors.fill: parent
                             source: root.wallpaperSource
@@ -245,6 +279,7 @@ PillSurface {
                             fillMode: Image.PreserveAspectCrop
                             asynchronous: true
                             opacity: tile.windows.length ? 0.55 : 0.8
+                            Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                         }
                         Repeater {
                             model: tile.windows
@@ -289,12 +324,12 @@ PillSurface {
                             onClicked: root.goWorkspace(tile.wsId)
                         }
                     }
-                    Text {
+                    AnimatedLabel {
                         anchors.right: parent.right
                         anchors.rightMargin: 3 * root.s
                         anchors.top: desktop.bottom
                         anchors.topMargin: 11 * root.s
-                        text: tile.windows.length ? String(tile.windows.length) : qsTr("Vacío")
+                        value: tile.windows.length ? String(tile.windows.length) : qsTr("Vacío")
                         font.family: Theme.font
                         font.pixelSize: 11 * root.s
                         color: Theme.iconSecondary
@@ -309,16 +344,39 @@ PillSurface {
                             anchors.verticalCenter: parent.verticalCenter
                             width: 4 * root.s; height: width; radius: width / 2
                             color: Theme.accent
-                            visible: tile.activeWorkspace
+                            opacity: tile.activeWorkspace ? 1 : 0
+                            scale: 0.4 + 0.6 * opacity
+                            Behavior on opacity { NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                         }
                         Text {
                             text: qsTr("Escritorio %1").arg(tile.wsId)
                             font.family: Theme.font
                             font.pixelSize: 12 * root.s
-                            font.weight: tile.selected ? Font.DemiBold : Font.Normal
+                            font.weight: Font.Medium
                             color: tile.selected ? Theme.foreground : Theme.iconSecondary
+                            Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                         }
                     }
+                }
+            }
+        }
+            // One selection ring that slides between previews.
+            Rectangle {
+                id: selectionRing
+                objectName: "overviewSelectionRing"
+                readonly property int slot: root.visibleIds.indexOf(root.selWs)
+                x: strip.x + root.groupShift + Math.max(0, slot) * (root.tileW + root.gap)
+                width: root.tileW
+                height: root.tileH
+                radius: 12 * root.s
+                color: "transparent"
+                border.width: 2 * root.s
+                border.color: Theme.accent
+                opacity: slot >= 0 ? root.groupReveal : 0
+                visible: opacity > 0.01
+                Behavior on x {
+                    enabled: !Flags.reduceMotion && !root.selectionSnap && !groupSlide.running
+                    SmoothedAnimation { velocity: -1; duration: Motion.standard }
                 }
             }
         }
@@ -345,6 +403,7 @@ PillSurface {
                         width: 30 * root.s; height: width
                         radius: 9 * root.s
                         color: buttonMouse.containsMouse ? Qt.alpha(Theme.foreground, 0.13) : Qt.alpha(Theme.foreground, 0.06)
+                        Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
                         MotionArea {
                             id: buttonMouse

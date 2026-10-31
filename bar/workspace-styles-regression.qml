@@ -36,7 +36,7 @@ ShellRoot {
     Timer {
         interval: 160; running: true; repeat: true
         onTriggered: {
-            if (test.step < 5) {
+            if (test.step < test.styles.length) {
                 const style = test.styles[test.step]
                 const choice = test.find(settings, "choice-" + style)
                 test.check(choice !== null, "setting choice exists: " + style)
@@ -51,20 +51,20 @@ ShellRoot {
                         rail.activeId = test.step + 1
                     }
                 }
-            } else if (test.step === 5) {
+            } else if (test.step === test.styles.length) {
                 test.check(!Config.update({appearance: {workspaceStyle: "invalid"}}).ok, "unknown style rejected")
                 Config.discard()
                 test.check(Config.appearance.workspaceStyle === "numbers", "discard restores default")
                 test.check(Config.update({appearance: {workspaceStyle: "capsules"}}).ok && Config.save(), "save style to isolated file")
-            } else if (test.step === 8) {
+            } else if (test.step === test.styles.length + 3) {
                 test.check(!Config.saving && !Config.dirty && Config.error === "", "isolated save completes")
                 Config.reload()
-            } else if (test.step === 9) {
+            } else if (test.step === test.styles.length + 4) {
                 test.check(Config.appearance.workspaceStyle === "capsules", "saved style survives reload")
                 const directory = Quickshell.env("ISLA_WORKSPACE_CAPTURE_DIR")
                 if (directory) samples.grabToImage(result => result.saveToFile(directory + "/styles.png"))
-            } else if (test.step === 12) {
-                console.log("PASS: five workspace representations, both layouts, setting choices, validation and discard")
+            } else if (test.step === test.styles.length + 7) {
+                console.log("PASS: six workspace representations, both layouts, setting choices, validation and discard")
                 Qt.quit()
             }
             test.step++

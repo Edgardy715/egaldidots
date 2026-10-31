@@ -23,6 +23,9 @@ Item {
     property real s: 1
     property string resolvedIconPath: ""
     signal dismissRequested()
+    // History only: the card leaves the history (native close), unlike the
+    // toast dismiss, which only hides the popup.
+    signal closeRequested()
     signal linkRequested(string link)
     signal actionRequested(var action)
     signal lockRequested(var notification, var owner)
@@ -54,8 +57,61 @@ Item {
     implicitWidth: 320 * s
     Behavior on implicitHeight { Anim { type: Anim.DefaultSpatial } }
 
+    // ---- swipe to dismiss (history) ----
+    // Locked to the pointer while dragging; on release it either flies out in
+    // the drag direction and then closes, or springs back.
+    property real swipeX: 0
+    property bool leaving: false
+    readonly property real swipeProgress: width > 0 ? Math.min(1, Math.abs(swipeX) / width) : 0
+    readonly property bool hovered: cardHover.hovered || closeArea.activeFocus
+    opacity: 1 - 0.75 * swipeProgress
+    transform: Translate { x: card.swipeX }
+
+    function requestClose(direction) {
+        if (leaving || compact) return
+        leaving = true
+        if (Flags.reduceMotion) { swipeX = 0; closeRequested(); return }
+        settle.stop()
+        flyOut.to = (direction < 0 ? -1 : 1) * (width + 24 * s)
+        flyOut.restart()
+    }
+    NumberAnimation {
+        id: flyOut
+        target: card; property: "swipeX"
+        duration: Motion.fast; easing.type: Motion.easeStandard
+        onFinished: card.closeRequested()
+    }
+    NumberAnimation {
+        id: settle
+        target: card; property: "swipeX"; to: 0
+        duration: Motion.standard; easing.type: Easing.OutBack; easing.overshoot: 1.1
+    }
+    HoverHandler { id: cardHover; enabled: !card.compact }
+    DragHandler {
+        id: swipe
+        enabled: !card.compact && !card.leaving
+        target: null
+        xAxis.enabled: true
+        yAxis.enabled: false
+        cursorShape: active ? Qt.ClosedHandCursor : Qt.ArrowCursor
+        onActiveChanged: {
+            if (active) { settle.stop(); return }
+            const fling = Math.abs(centroid.velocity.x) > 900 * card.s
+                && Math.sign(centroid.velocity.x) === Math.sign(card.swipeX)
+            if (Math.abs(card.swipeX) > card.width * 0.35 || fling) card.requestClose(card.swipeX)
+            else if (Flags.reduceMotion) card.swipeX = 0
+            else settle.restart()
+        }
+        onTranslationChanged: if (active) card.swipeX = translation.x
+    }
+
     // ---- expand/collapse ----
     property bool expanded: false
+    // Clip only while the height eases: a permanent clip would also trim the
+    // close button's enlarged hit area at the glass edge.
+    property bool resizing: false
+    onExpandedChanged: { resizing = true; resizeHold.restart() }
+    Timer { id: resizeHold; interval: Motion.standardLarge + 40; onTriggered: card.resizing = false }
     readonly property int bodyMaxLines: card.expanded ? 20 : 3
     readonly property bool bodyTruncated: card.md && card.md.body
         && card.md.body.length > 120
@@ -114,33 +170,28 @@ Item {
             visible: critical
             SequentialAnimation {
                 running: critical && card.visible && !Flags.reduceMotion; loops: Animation.Infinite
-                ColorAnimation { target: glowMid.border; property: "color"; from: Qt.alpha(Theme.accent, Theme.alphaTransparent); to: Qt.alpha(Theme.accent, Theme.alphaSelected); duration: 1800; easing.type: Easing.InOutSine }
-                ColorAnimation { target: glowMid.border; property: "color"; from: Qt.alpha(Theme.accent, Theme.alphaSelected); to: Qt.alpha(Theme.accent, Theme.alphaTransparent); duration: 1800; easing.type: Easing.InOutSine }
+                ColorAnimation { target: glowMid.border; property: "color"; from: Qt.alpha(Theme.accent, Theme.alphaTransparent); to: Qt.alpha(Theme.accent, Theme.alphaSelected); duration: Math.round(Motion.breathe * 0.6); easing.type: Motion.easeBreathe }
+                ColorAnimation { target: glowMid.border; property: "color"; from: Qt.alpha(Theme.accent, Theme.alphaSelected); to: Qt.alpha(Theme.accent, Theme.alphaTransparent); duration: Math.round(Motion.breathe * 0.6); easing.type: Motion.easeBreathe }
                 PauseAnimation { duration: Math.round(400 * Motion.mult) }
             }
         }
 
-        // hover wash
+        // hover wash: the single hover layer for both toast and history
         Rectangle {
             anchors.fill: parent; radius: body.radius
-            color: Qt.alpha(Theme.foreground, ma.containsMouse ? 0.08 : 0.0)
-            Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+            color: Theme.foreground
+            opacity: (card.compact ? ma.containsMouse : card.hovered) ? 0.07 : 0
+            Behavior on opacity { Anim { type: Anim.FastEffects } }
         }
     }
 
-    // ---- hover + click feedback ----
-    Rectangle {
-        anchors.fill: parent; radius: Motion.rTile
-        color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
-        opacity: ma.containsMouse ? 1 : 0
-        Behavior on opacity { Anim { type: Anim.FastEffects } }
-        z: -1
-    }
-
+    // Toast: the whole card dismisses. History: hover only, presses go to the
+    // swipe and to the controls inside.
     MotionArea {
         id: ma
-        enabled: card.compact
-        accessibleName: qsTr("Cerrar notificación")
+        accessibleName: card.compact ? qsTr("Cerrar notificación") : ""
+        acceptedButtons: card.compact ? Qt.LeftButton : Qt.NoButton
+        hoverWash: false
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: card.compact ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -154,6 +205,9 @@ Item {
         anchors.margins: 12 * s
         spacing: Theme.spacingMd * s
         z: 1
+        // The card height eases on expand/collapse; the new lines must not
+        // spill past the glass while it catches up.
+        clip: !card.compact && card.resizing
 
         RowLayout {
             Layout.fillWidth: true
@@ -249,9 +303,40 @@ Item {
                             anchors.centerIn: parent
                             text: "URGENTE"
                             color: Theme.accentStrong
-                            font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeCaption * card.s
+                            font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * card.s
                             font.weight: Font.Bold
-                            font.letterSpacing: 0.5
+                            font.letterSpacing: 0.6
+                        }
+                    }
+
+                    // close (history): appears with hover or keyboard focus
+                    Rectangle {
+                        id: closeButton
+                        visible: !card.compact
+                        Layout.preferredWidth: 20 * card.s
+                        Layout.preferredHeight: 20 * card.s
+                        Layout.alignment: Qt.AlignVCenter
+                        radius: width / 2
+                        opacity: card.hovered || closeArea.containsMouse ? 1 : 0
+                        scale: (0.86 + 0.14 * opacity) * closeArea.motion.visualScale
+                        color: closeArea.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaChip) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
+                        Behavior on opacity { Anim { type: Anim.FastEffects } }
+                        Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+                        MaterialIcon {
+                            anchors.centerIn: parent
+                            iconName: Icons.iClose
+                            color: closeArea.containsMouse ? Theme.foreground : Theme.iconSecondary
+                            font.pixelSize: 13 * card.s
+                        }
+                        MotionArea {
+                            id: closeArea
+                            objectName: "notificationClose"
+                            anchors.fill: parent
+                            anchors.margins: -4 * card.s
+                            enabled: !card.compact && !card.leaving
+                            feedbackEnabled: false
+                            accessibleName: qsTr("Descartar notificación")
+                            onClicked: card.requestClose(1)
                         }
                     }
                 }
@@ -300,7 +385,7 @@ Item {
                     transform: Translate { y: -Motion.labelTravel * ma.motion.presence }
                     Layout.fillWidth: true
                     visible: !card.compact && card.bodyTruncated
-                    text: card.expanded ? "mostrar menos" : "···"
+                    text: card.expanded ? qsTr("mostrar menos") : "···"
                     color: Qt.alpha(Theme.accent, Theme.alphaIconSec)
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeLabel * card.s

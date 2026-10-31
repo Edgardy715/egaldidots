@@ -10,7 +10,6 @@ Item {
     property real topGap: compact ? (height - 48 * s) / 2 : 8 * s
     property real availableWidth: 360
     property bool presented: true
-    property Item petLayer: null
     property real centerWidth: 0
     readonly property real contentWidth: centerWidth + leftWidth + rightWidth + 36 * s
         + (leftWidth > 0 ? 18 * s : 0) + (rightWidth > 0 ? 18 * s : 0)
@@ -59,7 +58,7 @@ Item {
     onCavaActiveChanged: Cava.setConsumer(cavaConsumerId, cavaActive)
     Component.onCompleted: Cava.setConsumer(cavaConsumerId, cavaActive)
     Component.onDestruction: Cava.setConsumer(cavaConsumerId, false)
-    MediaSession { id: mediaSession; player: root.mediaPlayer; active: mediaLoader.interactive && root.visible }
+    MediaSession { id: mediaSession; player: root.mediaPlayer; positionOffset: Players.offsetFor(player); active: mediaLoader.interactive && root.visible }
     readonly property TopWorkspaceRail workspaceItem: workspaceLoader.status === Loader.Ready ? (workspaceLoader.item as TopWorkspaceRail) : null
     readonly property TopSystemStatus statusItem: statusLoader.status === Loader.Ready ? (statusLoader.item as TopSystemStatus) : null
     signal requestSurface(string name)
@@ -75,7 +74,6 @@ Item {
         presented: root.presented && root.contentFits && (!root.workspaceItem || root.workspaceItem.fits)
         animateChanges: Config.modules.animateChanges
         sourceComponent: TopWorkspaceRail {
-            petLayer: root.petLayer
             presented: workspaceLoader.interactive && workspaceLoader.exposure > 0.95 && root.opacity > 0.95
             s: root.s
             integrated: root.compact
@@ -157,23 +155,27 @@ Item {
         }
     }
 
+    // Fixed delegates: a JS-array model bound to animating geometry would rebuild
+    // every separator each frame of a module reveal.
     Repeater {
-        model: [
-            { position: 18 * root.s + root.workspaceWidth + 6 * root.s,
-                exposure: Math.min(workspaceLoader.exposure, mediaLoader.exposure),
-                shown: root.workspaceWidth > 0 && mediaLoader.active },
-            { position: root.clockX - 9 * root.s, exposure: Math.max(workspaceLoader.exposure, mediaLoader.exposure), shown: root.leftWidth > 0 },
-            { position: root.clockX + root.centerWidth + 9 * root.s, exposure: Math.max(statusLoader.exposure, userLoader.exposure), shown: root.rightWidth > 0 }
-        ]
+        model: 3
         Rectangle {
-            required property var modelData
-            x: modelData.position
+            required property int index
+            readonly property real position: index === 0 ? 18 * root.s + root.workspaceWidth + 6 * root.s
+                : index === 1 ? root.clockX - 9 * root.s
+                : root.clockX + root.centerWidth + 9 * root.s
+            readonly property real exposure: index === 0 ? Math.min(workspaceLoader.exposure, mediaLoader.exposure)
+                : index === 1 ? Math.max(workspaceLoader.exposure, mediaLoader.exposure)
+                : Math.max(statusLoader.exposure, userLoader.exposure)
+            readonly property bool shown: index === 0 ? root.workspaceWidth > 0 && mediaLoader.active
+                : index === 1 ? root.leftWidth > 0 : root.rightWidth > 0
+            x: position
             y: (root.height - height) / 2
             width: Theme.borderHairline
             height: 20 * root.s
             color: Theme.hair
-            opacity: 0.65 * modelData.exposure
-            visible: root.compact && root.contentFits && modelData.shown && opacity > 0
+            opacity: 0.65 * exposure
+            visible: root.compact && root.contentFits && shown && opacity > 0
         }
     }
 

@@ -28,6 +28,7 @@ PillSurface {
         { key: "fontScale", label: qsTr("Tamaño de texto"), min: 0.75, max: 1.75 },
         { key: "radiusScale", label: qsTr("Redondez"), min: 0.75, max: 1.5 },
         { key: "glassAlpha", label: qsTr("Opacidad del vidrio"), min: 0.15, max: 1 },
+        { key: "stateIntensity", label: qsTr("Intensidad del color de estado"), min: 0.3, max: 1 },
         { key: "motionScale", label: qsTr("Velocidad de movimiento"), min: 0.25, max: 2 }
     ]
 
@@ -38,7 +39,6 @@ PillSurface {
         anchors.right: parent.right
         title: qsTr("Apariencia")
         subtitle: qsTr("Personaliza Isla")
-        iconName: "palette"
         s: root.s
         trailing: Component {
             CtrlBtn {
@@ -104,7 +104,9 @@ PillSurface {
                             id: valueText
                             text: Math.round((root.draft[preference.modelData.key] || preference.modelData.min) * 100) + "%"
                             color: Theme.accent
-                            font.family: Theme.fontMono
+                            font.family: Theme.font
+                            font.features: Theme.fontNumeric
+                            font.weight: Font.DemiBold
                             font.pixelSize: Theme.fontSizeCaption * root.s
                         }
                     }
@@ -134,6 +136,24 @@ PillSurface {
                 placeholderText: qsTr("Nombre de la fuente")
                 Component.onCompleted: text = root.initialFontFamily
                 onEditingFinished: root.setValue("fontFamily", text.trim())
+            }
+
+            RowLayout {
+                width: parent.width
+                Text {
+                    Layout.fillWidth: true
+                    text: qsTr("Superficies líquidas")
+                    color: Theme.foreground
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSizeCaption * root.s
+                }
+                Toggle {
+                    objectName: "appearanceLiquid"
+                    checked: root.draft.liquidSurfaces !== false
+                    s: root.s
+                    accessibleName: qsTr("Superficies líquidas")
+                    onToggled: value => root.valueEdited("liquidSurfaces", value)
+                }
             }
 
             RowLayout {

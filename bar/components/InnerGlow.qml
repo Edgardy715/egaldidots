@@ -12,6 +12,9 @@ Item {
     readonly property real driftX: Flags.reduceMotion ? 0 : Math.sin(driftPhase) * 0.06
     readonly property real driftY: Flags.reduceMotion ? 0 : (Math.cos(driftPhase) - 1) * 0.02
 
+    // La deriva recorre ~5 px/s en un degradado difuso: 12 Hz basta y es
+    // invisible. Un FrameAnimation obligaba a redibujar la ventana a la tasa
+    // del monitor (240 Hz) mientras la pill reposaba: ~20% de CPU en render.
     AmbientSubscription {
         clock: GlowClock
         running: root.visible && root.opacity > 0.005 && root.width > 0 && root.height > 0 && !Flags.reduceMotion

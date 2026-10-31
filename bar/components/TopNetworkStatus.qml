@@ -5,6 +5,7 @@ Item {
     id: root
     property real s: 1
     property bool connected: false
+    property bool wired: false
     signal activated()
 
     width: 19 * s
@@ -12,8 +13,9 @@ Item {
 
     MaterialIcon {
         anchors.centerIn: parent
-        iconName: root.connected ? Icons.iWifi : Icons.iWifiOff
-        color: root.connected ? Theme.iconSecondary : Theme.iconMuted
+        iconName: root.connected ? Icons.iWifi : root.wired ? "lan" : Icons.iWifiOff
+        color: root.connected || root.wired ? Theme.iconSecondary : Theme.iconMuted
+        Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
         font.pixelSize: Theme.fontSizeBodyLg * root.s
         interaction: wifiHit.motion
     }

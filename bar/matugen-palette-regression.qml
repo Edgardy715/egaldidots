@@ -78,6 +78,23 @@ ShellRoot {
                     for (const pair of [[Theme.foreground, Theme.background], [Theme.iconSecondary, Theme.cardTop],
                         [Theme.primaryContent, Theme.accent], [Theme.accentContainerContent, Theme.accentContainer],
                         [Theme.errorContainerContent, Theme.errorContainer]]) check(contrast(pair[0],pair[1]) >= 4.5, "contrast " + sample.name)
+                    let worst = 100
+                    for (let step = 30; step <= 100; ++step) {
+                        const intensity = step / 100
+                        Config.update({appearance:{stateIntensity:intensity}})
+                        wait(0)
+                        const faces = [Qt.tint(Theme.cardBot, Theme.stateFill), Qt.tint(Theme.cardTop, Theme.stateFill),
+                            Qt.tint(Theme.cardBot, Theme.stateFillLight), Qt.tint(Theme.cardTop, Theme.stateFillLight)]
+                        const score = ink => Math.min(...faces.map(face => contrast(ink, face)))
+                        const actual = score(Theme.stateContent)
+                        const previous = score(intensity >= 0.6 ? Theme.primaryContent : Theme.foreground)
+                        const optimal = Math.max(...[Theme.primaryContent, Theme.foreground, Qt.rgba(0,0,0,1), Qt.rgba(1,1,1,1)].map(score))
+                        check(actual >= 4.5 || actual + 0.0001 >= optimal, "best available state ink " + sample.name + " " + intensity)
+                        check(previous < 4.5 ? actual + 0.0001 >= previous : actual >= 4.5, "state contrast regression " + sample.name + " " + intensity)
+                        worst = Math.min(worst, actual)
+                    }
+                    Config.update({appearance:{stateIntensity:1}})
+                    console.log("STATE_CONTRAST", sample.name, "minimum", worst.toFixed(2))
                     const colors = IslaPalette.colors
                     check(!IslaPalette._apply('{"generator":"matugen"}'), "reject incomplete palette")
                     check(IslaPalette.colors === colors, "invalid palette keeps last valid colors")
@@ -88,7 +105,7 @@ ShellRoot {
                         tryVerify(() => saved, 3000)
                     }
                 }
-                console.log("PASS: six real Matugen palettes, semantic contrast, last-valid retention and integrated media/controls")
+                console.log("PASS: six real Matugen palettes, 426 state intensities, semantic contrast, last-valid retention and integrated media/controls")
                 finished = true
             }
         }

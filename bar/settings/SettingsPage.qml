@@ -73,6 +73,7 @@ Item {
     readonly property var effective: {
         // Explicit dependencies keep snapshot() reactive after update/discard/reload.
         const appearance = config.appearance
+        const companion = config.companion
         const modules = config.modules
         const profile = config.profile
         const paths = [config.userAvatar, config.paletteFile, config.wallpaperDir,
@@ -260,7 +261,10 @@ Item {
                     width: parent.width
                     readonly property var modelData: rowEntry.modelData
                     popupBounds: root.popupBounds
-                    sectionLabel: root.query.trim() ? root.config.catalog.sectionOrder.find(item => item.id === modelData.section).label : ""
+                    // Una tarjeta por sección consecutiva; en búsqueda, con su encabezado.
+                    groupFirst: rowEntry.index === 0 || root.entries[rowEntry.index - 1].section !== modelData.section
+                    groupLast: rowEntry.index === root.entries.length - 1 || root.entries[rowEntry.index + 1].section !== modelData.section
+                    sectionLabel: root.query.trim() && groupFirst ? root.config.catalog.sectionOrder.find(item => item.id === modelData.section).label : ""
                     fieldKey: modelData.key
                     field: modelData.field
                     value: root.effective[modelData.section] ? root.effective[modelData.section][fieldKey] : undefined

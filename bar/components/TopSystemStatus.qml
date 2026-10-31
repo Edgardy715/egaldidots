@@ -1,5 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
+import Quickshell.Io
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.Pipewire
@@ -45,6 +46,14 @@ Item {
         ? (apps.length * 26 + (status.width > 0 ? 17 : 0)) * s + (nameShown ? nameWidth : 0) : 0
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var audio: sink ? sink.audio : null
+    // Equipo cableado: sin Wi-Fi no es "sin red"; se muestra el enlace Ethernet.
+    property bool wiredConnected: false
+    Process {
+        id: wiredProbe
+        command: ["sh", "-c", "nmcli -t -f TYPE,STATE device 2>/dev/null | grep -qx 'ethernet:connected'"]
+        onExited: code => root.wiredConnected = code === 0
+    }
+    Timer { interval: 15000; running: true; repeat: true; triggeredOnStart: true; onTriggered: if (!wiredProbe.running) wiredProbe.running = true }
     readonly property var battery: UPower.displayDevice
     readonly property bool hasBattery: battery && battery.ready && battery.isLaptopBattery && battery.isPresent
     readonly property real batteryLevel: hasBattery ? battery.percentage : 0
@@ -107,6 +116,7 @@ Item {
             sourceComponent: TopNetworkStatus {
                 s: root.s
                 connected: Nmcli.wifiEnabled && !!Nmcli.active
+                wired: root.wiredConnected
                 onActivated: root.requestSurface("connectivity")
             }
         }

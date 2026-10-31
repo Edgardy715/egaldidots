@@ -12,7 +12,9 @@ assert.equal(validate({}).effective.appearance.mediaTransitions, true);
 assert.equal(validate({}).effective.appearance.menuSelectionAnchor, true);
 for (const value of [0, 0.6, 1])
     assert.equal(validate({ appearance: { materialDepth: value } }).effective.appearance.materialDepth, value);
-for (const key of ['mediaTransitions', 'menuSelectionAnchor']) {
+assert.equal(validate({}).effective.appearance.reduceTransparency, false);
+assert.equal(validate({ appearance: { reduceTransparency: true } }).effective.appearance.reduceTransparency, true);
+for (const key of ['mediaTransitions', 'menuSelectionAnchor', 'reduceTransparency']) {
     assert.equal(validate({ appearance: { [key]: false } }).effective.appearance[key], false);
     assert.equal(validate({ appearance: { [key]: 'false' } }).ok, false);
 }
@@ -23,6 +25,11 @@ assert.equal(validate({}).effective.appearance.workspaceStyle, 'numbers');
 for (const workspaceStyle of ['numbers', 'dots', 'bars', 'capsules', 'pacman'])
     assert.equal(validate({ appearance: { workspaceStyle } }).effective.appearance.workspaceStyle, workspaceStyle);
 assert.equal(validate({ appearance: { workspaceStyle: 'other' } }).ok, false);
+// The removed pixel-pet style falls back to the default without an error.
+assert.equal(validate({ appearance: { workspaceStyle: 'pet' } }).ok, true);
+assert.equal(validate({ appearance: { workspaceStyle: 'pet' } }).effective.appearance.workspaceStyle, 'numbers');
+assert.equal(validate({}).effective.pets, undefined);
+assert.equal(settings.fields.pets, undefined);
 assert.equal(validate({ appearance: { barLayout: 'compact' } }).effective.appearance.barLayout, 'compact');
 for (const [key, maximum] of [['uiScale', 3], ['topGap', 4], ['appGap', 4]]) {
     assert.equal(validate({ appearance: { [key]: maximum } }).ok, true);
@@ -40,6 +47,29 @@ for (const doc of [null, [], 'text', { version: 2 }, { appearance: [] }, { appea
     { paths: { wallpaperDir: 'relative' } }, { paths: { wallpaperDir: '/bad\0path' } }]) {
     assert.equal(validate(doc).ok, false, JSON.stringify(doc));
 }
+const companionDefaults = {
+    sleepAfterSeconds: 180, reactToCode: true, reactToMusic: true,
+    reactAtNight: true, followPointer: true, mischief: 'rare', remember: true, reactToSystem: true, followFocus: true
+};
+assert.deepEqual(JSON.parse(JSON.stringify(validate({}).effective.companion)), companionDefaults);
+for (const sleepAfterSeconds of [60, 180, 1800])
+    assert.equal(validate({ companion: { sleepAfterSeconds } }).effective.companion.sleepAfterSeconds, sleepAfterSeconds);
+for (const sleepAfterSeconds of [59, 1801, 180.5, NaN, Infinity, '180', null])
+    assert.equal(validate({ companion: { sleepAfterSeconds } }).ok, false);
+for (const key of ['reactToCode', 'reactToMusic', 'reactAtNight', 'followPointer', 'remember', 'reactToSystem', 'followFocus']) {
+    assert.equal(validate({ companion: { [key]: false } }).effective.companion[key], false);
+    assert.equal(validate({ companion: { [key]: 'false' } }).ok, false);
+}
+for (const mischief of ['never', 'rare', 'normal'])
+    assert.equal(validate({ companion: { mischief } }).effective.companion.mischief, mischief);
+for (const companion of [null, [], { mischief: 'frequent' }, { mischief: false }])
+    assert.equal(validate({ companion }).ok, false);
+const companionPatch = settings.merge({ companion: { reactToMusic: false, extension: 42 }, custom: { keep: 7 } },
+    { companion: { sleepAfterSeconds: 600, mischief: 'normal' } });
+assert.equal(companionPatch.companion.reactToMusic, false);
+assert.equal(companionPatch.companion.extension, 42);
+assert.equal(companionPatch.custom.keep, 7);
+assert.equal(validate(companionPatch).ok, true);
 const original = { appearance: { time12h: false, extension: 42 }, extra: { keep: true } };
 const next = settings.merge(original, { appearance: { fontScale: 1.2 } });
 assert.equal(next.appearance.time12h, false);
@@ -54,12 +84,16 @@ const schema = settings.schema(context);
 assert.deepEqual(Array.from(schema.sections.appearance.barLayout.options), ['split', 'compact']);
 assert.deepEqual(Array.from(schema.sections.appearance.barLayout.optionLabels), ['Separada', 'Compacta']);
 assert.equal(schema.sections.appearance.barLayout.control, 'choice');
+assert.equal(schema.sections.companion.sleepAfterSeconds.integer, true);
+assert.deepEqual(Array.from(schema.sections.companion.mischief.options), ['never', 'rare', 'normal']);
 assert.equal(schema.sections.appearance.fontScale.minimum, 0.75);
 assert.equal(schema.sections.appearance.materialDepth.maximum, 1);
 assert.equal(schema.sections.appearance.mediaTransitions.control, 'toggle');
 assert.equal(schema.sections.appearance.menuSelectionAnchor.control, 'toggle');
 assert.equal(schema.sections.paths.wallpaperDir.default, '/home/test/Wallpapers');
 assert.equal(schema.sections.appearance.fontScale.label, 'Tamaño de texto');
+assert.equal(schema.sections.appearance.reduceTransparency.control, 'toggle');
+assert.deepEqual(Array.from(schema.sections.appearance.reduceTransparency.options), [false, true]);
 assert.equal(schema.sections.appearance.reduceMotion.control, 'toggle');
 assert.deepEqual(Array.from(schema.sections.appearance.reduceMotion.options), [false, true]);
 assert.equal(schema.sections.paths.wallpaperDir.control, 'path');
@@ -81,6 +115,8 @@ for (const [sectionName, sectionFields] of Object.entries(settings.fields)) {
 }
 const catalog = settings.catalog(context);
 assert.equal(catalog.version, settings.version);
+assert.ok(catalog.sectionOrder.some(section => section.id === 'companion' && section.label === 'Cuerpo'
+    && section.description.includes('vidrio líquido')));
 assert.equal(catalog.availabilityIsLive, false);
 assert.deepEqual(Array.from(catalog.sectionOrder, item => item.id), Object.keys(settings.fields));
 assert.equal(catalog.requiredModules.length, 1);
@@ -128,6 +164,9 @@ assert.ok(catalog.optionalModules.find(item => item.id === 'battery').dependsOn.
 assert.equal(validate({}).effective.paths.userAvatar, '/home/test/.face');
 assert.equal(validate({ profile: { displayName: 'Nombre' } }).effective.profile.displayName, 'Nombre');
 assert.equal(validate({ profile: { displayName: 123 } }).ok, false);
+// A leftover pets section from older files is unknown, preserved and harmless.
+assert.equal(validate({ pets: { enabled: true, name: 'Nube' } }).ok, true);
+assert.equal(settings.merge({ pets: { legacy: 42 } }, { modules: { audio: false } }).pets.legacy, 42);
 assert.equal(validate({ paths: { userAvatar: 'relative.png' } }).ok, false);
 for (const key of Object.keys(settings.fields.modules)) {
     assert.equal(validate({}).effective.modules[key], true);

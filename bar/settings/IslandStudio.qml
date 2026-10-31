@@ -16,9 +16,9 @@ Rectangle {
     onVisibleChanged: if (!visible) { sceneSwap.stop(); displayedScene = scene; sceneExposure = 1 }
     SequentialAnimation {
         id: sceneSwap
-        NumberAnimation { target: root; property: "sceneExposure"; to: 0; duration: 90; easing.type: Easing.OutCubic }
+        NumberAnimation { target: root; property: "sceneExposure"; to: 0; duration: Motion.press; easing.type: Motion.easeStandard }
         ScriptAction { script: root.displayedScene = root.scene }
-        NumberAnimation { target: root; property: "sceneExposure"; to: 1; duration: 150; easing.type: Easing.OutCubic }
+        NumberAnimation { target: root; property: "sceneExposure"; to: 1; duration: Motion.fast; easing.type: Motion.easeStandard }
     }
     color: Qt.alpha(Theme.foreground, 0.035)
     radius: 16
@@ -35,7 +35,7 @@ Rectangle {
             Rectangle {
                 x: 8; y: 20; width: 88; height: 30; radius: 15; color: Qt.alpha(Theme.foreground, 0.08)
                 opacity: Config.modules.workspaceRail && root.width > 560 ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: root.reduced ? 0 : 200 } }
+                Behavior on opacity { NumberAnimation { duration: root.reduced ? 0 : Motion.standardSmall; easing.type: Motion.easeStandard } }
                 Row { anchors.centerIn: parent; spacing: 12
                     Repeater { model: 3; Text { required property int index; text: index + 1; color: index === 0 ? Theme.accent : Qt.alpha(Theme.foreground, 0.65); font.pixelSize: 11 } }
                 }
@@ -43,7 +43,7 @@ Rectangle {
             Rectangle {
                 anchors.right: parent.right; anchors.rightMargin: 8; y: 20; width: 80; height: 30; radius: 15; color: Qt.alpha(Theme.foreground, 0.08)
                 opacity: Config.modules.systemStatus && root.width > 560 ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: root.reduced ? 0 : 200 } }
+                Behavior on opacity { NumberAnimation { duration: root.reduced ? 0 : Motion.standardSmall; easing.type: Motion.easeStandard } }
                 Row { anchors.centerIn: parent; spacing: 12
                     EdotsIcon { visible: Config.modules.audio; iconName: "volume_up"; color: Theme.accent; font.pixelSize: 15 }
                     EdotsIcon { visible: Config.modules.network; iconName: "wifi"; color: Theme.accent; font.pixelSize: 15 }
@@ -57,12 +57,12 @@ Rectangle {
                 targetRadius: root.scene === 0 ? 22 : 28
                 restW: 150; coreH: 44; surfaceOpen: root.scene !== 0
                 reduceMotion: root.reduced || !root.visible
-                morphDuration: 420 * Config.appearance.motionScale
+                morphDuration: Motion.morph
                 PillMaterial { morphRadius: morph.radius; materialAccent: Theme.accent; surface: root.scene ? "preview" : "" }
                 Text {
                     anchors.centerIn: parent; text: "10:09"; color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 17 * Config.appearance.fontScale
                     opacity: root.scene === 0 ? 1 : 0
-                    Behavior on opacity { NumberAnimation { duration: root.reduced ? 0 : 100 } }
+                    Behavior on opacity { NumberAnimation { duration: root.reduced ? 0 : Motion.hover; easing.type: Motion.easeStandard } }
                 }
                 Column {
                     anchors.centerIn: parent; spacing: 8

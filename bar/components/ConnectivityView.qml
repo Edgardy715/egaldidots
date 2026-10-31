@@ -148,6 +148,9 @@ Item {
         property string iconName: Icons.iWifi
         property bool highlighted: false
         property bool busy: false
+        // "wifi" / "bluetooth": el glifo trazado de Tidemark con su estado encendido/apagado.
+        property string radioKind: ""
+        property bool radioOn: true
         implicitWidth: 42 * root.s
         implicitHeight: 42 * root.s
         radius: Theme.radiusXxl * root.s
@@ -155,15 +158,25 @@ Item {
             badge.highlighted ? Theme.alphaGlow : Theme.alphaFaint)
         MaterialIcon {
             anchors.centerIn: parent
-            iconName: badge.busy ? Icons.iRefresh : badge.iconName
+            visible: badge.radioKind.length === 0
+            iconName: badge.iconName
             color: badge.highlighted || badge.busy ? Theme.accent : Theme.iconSecondary
             font.pixelSize: Theme.fontSizeDisplayLg * root.s
-            RotationAnimator on rotation {
-                from: 0; to: 360
-                duration: 1000
-                loops: Animation.Infinite
-                running: badge.busy && root.motionActive && badge.visible
-            }
+        }
+        RadioGlyph {
+            objectName: "radioGlyph"
+            anchors.centerIn: parent
+            visible: badge.radioKind.length > 0
+            kind: badge.radioKind
+            on: badge.radioOn
+            size: Theme.fontSizeDisplayLg * root.s
+            color: badge.highlighted || badge.busy ? Theme.accent : Theme.iconSecondary
+        }
+        // Same working arc as login and updates, orbiting the unchanged symbol.
+        ConfirmationIndicator {
+            anchors.fill: parent
+            s: root.s
+            status: badge.busy ? "busy" : ""
         }
     }
 
@@ -226,16 +239,21 @@ Item {
                         RowLayout {
                             anchors.centerIn: parent
                             spacing: Theme.spacingMd * root.s
-                            MaterialIcon {
-                                iconName: modeButton.wifi ? Icons.iWifi : Icons.iBluetooth
+                            RadioGlyph {
+                                objectName: "modeGlyph-" + modeButton.modelData
+                                kind: modeButton.modelData
+                                on: modeButton.radioOn
+                                size: Theme.fontSizeDisplayLg * root.s
                                 color: root.mode === modeButton.modelData ? Theme.accent : Theme.iconSecondary
-                                font.pixelSize: Theme.fontSizeDisplayLg * root.s
+                                Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                             }
                             Column {
                                 spacing: Theme.spacingXs * root.s
                                 Label {
                                     text: modeButton.wifi ? qsTr("Wi-Fi") : qsTr("Bluetooth")
-                                    font.weight: root.mode === modeButton.modelData ? Font.DemiBold : Font.Normal
+                                    font.weight: Font.Medium
+                                    color: root.mode === modeButton.modelData ? Theme.foreground : Theme.iconSecondary
+                                    Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                                 }
                                 Label {
                                     text: !modeButton.radioOn ? qsTr("Desactivado")
@@ -311,9 +329,14 @@ Item {
                 Rectangle {
                     id: connectedHero
                     objectName: "wifiConnectedState"
-                    visible: root.wifiPage && root.wifiEnabled && (root.connectedNetwork !== null || root.activeSsid.length > 0)
+                    readonly property bool shown: root.wifiPage && root.wifiEnabled && (root.connectedNetwork !== null || root.activeSsid.length > 0)
+                    opacity: shown ? 1 : 0
+                    visible: opacity > 0.01
+                    clip: true
                     Layout.fillWidth: true
-                    Layout.preferredHeight: Math.max(92 * root.s, connectedInfo.implicitHeight + Theme.spacingXxl * 2 * root.s)
+                    Layout.preferredHeight: shown ? Math.max(92 * root.s, connectedInfo.implicitHeight + Theme.spacingXxl * 2 * root.s) : 0
+                    Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                    Behavior on Layout.preferredHeight { enabled: root.motionActive && !Flags.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                     radius: Theme.radiusXxl * root.s
                     color: Qt.alpha(Theme.accent, Theme.alphaHair)
                     MotionArea {
@@ -377,6 +400,12 @@ Item {
                     Layout.fillWidth: true
                     visible: root.wifiPage && root.wifiEnabled
                     spacing: Theme.spacingSm * root.s
+                    // Sin `add:` — el modelo es un array nuevo en cada refresco y recrea todas
+                    // las filas; un fundido las haría parpadear a cada actualización.
+                    move: Transition {
+                        enabled: !Flags.reduceMotion
+                        NumberAnimation { properties: "y"; duration: Motion.standardSmall; easing.type: Motion.easeStandard }
+                    }
                     Repeater {
                         model: root.availableNetworks
                         delegate: Item {
@@ -435,6 +464,12 @@ Item {
                     Layout.fillWidth: true
                     visible: !root.wifiPage && root.btEnabled
                     spacing: Theme.spacingMd * root.s
+                    // Sin `add:` — el modelo es un array nuevo en cada refresco y recrea todas
+                    // las filas; un fundido las haría parpadear a cada actualización.
+                    move: Transition {
+                        enabled: !Flags.reduceMotion
+                        NumberAnimation { properties: "y"; duration: Motion.standardSmall; easing.type: Motion.easeStandard }
+                    }
                     Repeater {
                         model: root.visibleDevices
                         delegate: Rectangle {
@@ -529,6 +564,8 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                         iconName: root.radioEnabled ? (root.wifiPage ? Icons.iWifi : Icons.iBluetooth)
                             : (root.wifiPage ? Icons.iWifiOff : Icons.iBluetoothOff)
+                        radioKind: root.wifiPage ? "wifi" : "bluetooth"
+                        radioOn: root.radioEnabled
                         busy: root.radioEnabled && root.scanning
                     }
                     Label {

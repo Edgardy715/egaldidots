@@ -84,7 +84,7 @@ Item {
             Layout.preferredHeight: root.advanced ? latency.implicitHeight : 0
             opacity: root.advanced ? 1 : 0
             clip: true; enabled: root.advanced
-            Behavior on Layout.preferredHeight { enabled: root.visible && !Flags.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Easing.OutCubic } }
+            Behavior on Layout.preferredHeight { enabled: root.visible && !Flags.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
             Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast } }
             ColumnLayout {
                 id: latency

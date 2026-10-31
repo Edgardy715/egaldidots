@@ -53,7 +53,7 @@ case " ${ID:-} ${ID_LIKE:-} " in *' arch '*|*' cachyos '*) ;; *) die "Requires A
 PKGS=(hypr kitty fish starship fastfetch nvim micro bat matugen gtk thunar git wallpapers)
 for pkg in "${PKGS[@]}"; do [[ -d "$REPO/$pkg" ]] || die "Incomplete checkout: missing $pkg"; done
 COMMANDS=(Hyprland hyprctl hypridle hyprlock quickshell qs fish starship python3 kitty nvim micro fastfetch bat eza zoxide fzf fd rg lazygit jq playerctl wl-copy wl-paste cliphist wl-clip-persist brightnessctl powerprofilesctl hyprshot notify-send thunar magick awww matugen stow cmake curl nmcli wpctl pactl parec cava gsettings fc-cache fc-match flock gh shfmt node npm)
-PACKAGES=(hyprland hypridle hyprlock quickshell fish starship python kitty neovim micro fastfetch bat eza zoxide fzf fd ripgrep lazygit github-cli jq playerctl wl-clipboard cliphist wl-clip-persist brightnessctl hyprshot libnotify gnome-keyring thunar imagemagick awww ttf-jetbrains-mono-nerd ttf-google-sans-flex stow matugen networkmanager power-profiles-daemon upower dbus adwaita-icon-theme pipewire pipewire-alsa pipewire-pulse libpulse wireplumber cava polkit xdg-desktop-portal-hyprland xdg-desktop-portal-gtk qt6ct qt6-base qt6-declarative qt6-svg qt6-wayland cmake ninja base-devel git curl util-linux gtk-engine-murrine gdk-pixbuf2 ruff shfmt nodejs npm unzip tree-sitter-cli)
+PACKAGES=(hyprland hypridle hyprlock quickshell fish starship python kitty neovim micro fastfetch bat eza zoxide fzf fd ripgrep lazygit github-cli jq playerctl wl-clipboard cliphist wl-clip-persist brightnessctl hyprshot libnotify gnome-keyring thunar imagemagick awww ttf-jetbrains-mono-nerd ttf-google-sans-flex stow matugen networkmanager power-profiles-daemon upower dbus adwaita-icon-theme pipewire pipewire-alsa pipewire-pulse libpulse wireplumber cava polkit xdg-desktop-portal-hyprland xdg-desktop-portal-gtk gtk3 qt6-base qt6-declarative qt6-svg qt6-wayland cmake ninja base-devel git curl util-linux gtk-engine-murrine gdk-pixbuf2 ruff shfmt nodejs npm unzip tree-sitter-cli)
 
 install_deps() {
     command -v sudo >/dev/null || die "Install sudo and grant this user sudo access first"
@@ -188,6 +188,23 @@ post_neovim() {
 }
 install_gtk() {
     step "Use Adwaita with Matugen GTK roles"
+    local version path directory temporary
+    for version in 3 4; do
+        directory="$HOME/.config/gtk-$version.0"
+        if [[ -L "$directory" && "$(readlink -f -- "$directory")" == "$REPO/gtk/.config/gtk-$version.0" ]]; then
+            temporary="$(mktemp -d "$directory.XXXXXX")"
+            cp -aL -- "$directory/." "$temporary/"
+            rm -- "$directory"
+            mv -T -- "$temporary" "$directory"
+        fi
+        path="$directory/settings.ini"
+        # The generator owns only the mode key; keep mutable settings out of Stow sources.
+        if [[ -L "$path" && "$(readlink -f -- "$path")" == "$REPO/gtk/.config/gtk-$version.0/settings.ini" ]]; then
+            temporary="$(mktemp "$path.XXXXXX")"
+            cp -pL -- "$path" "$temporary"
+            mv -T -- "$temporary" "$path"
+        fi
+    done
     gsettings set org.gnome.desktop.interface gtk-theme Adwaita
 }
 

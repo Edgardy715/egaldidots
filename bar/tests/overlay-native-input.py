@@ -11,10 +11,15 @@ source = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix="isla-native-input-") as directory:
     root = Path(directory)
     shutil.copytree(source, root / "bar")
+    auth = root / "bar/Singletons/Auth.qml"
+    expression = 'Quickshell.env("XDG_RUNTIME_DIR")\n        + "/isla-sudo-askpass.sock"'
+    assert expression in auth.read_text(), "Auth socket isolation needs updating"
+    auth.write_text(auth.read_text().replace(expression, json.dumps(str(root / "askpass.sock"))))
     config = root / "shell.json"
     config.write_text(json.dumps({"appearance": {"reduceMotion": True}}))
     fixture = root / "bar/overlay-native-input-regression.qml"
-    env = dict(os.environ, ISLA_CONFIG=str(config), QT_QPA_PLATFORM="wayland")
+    env = dict(os.environ, ISLA_CONFIG=str(config), QT_QPA_PLATFORM="wayland",
+               XDG_STATE_HOME=str(root / "state"))
     with (root / "output.log").open("w+") as log:
         process = subprocess.Popen(["qs", "-p", str(fixture)], env=env, stdout=log, stderr=subprocess.STDOUT)
         def call(method, *args):

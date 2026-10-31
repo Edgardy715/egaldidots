@@ -34,6 +34,7 @@ Singleton {
         const completed = shown
         if (completed) {
             completed.popup = false
+            if (completed.ephemeral) Qt.callLater(function() { completed.close() })
         }
         if (root.activePopup && root.activePopup !== completed && root.activePopup.popup) return
         root.activePopup = root.popups.find(n => n.isCritical) || root.popups[0] || null
@@ -94,6 +95,16 @@ Singleton {
 
     function toggleDnd() { root.dnd = !root.dnd; root._persistSoon() }
 
+    function postLocal(summary, body, actions, localId) {
+        const item = notifComp.createObject(root, {
+            popup: root.shouldShowPopup(), summary: summary, body: body,
+            appName: "Isla", appIcon: "system-software-update", notificationId: localId || "",
+            actions: actions || []
+        })
+        root.list = [item].concat(root.list)
+        root._bump()
+    }
+
     /** Quita todo el historial visible en una sola operación. */
     function clearAll() {
         var ns = root.notClosed.slice()
@@ -151,10 +162,13 @@ Singleton {
                 image: notif.image,
                 urgency: notif.urgency,
                 resident: notif.resident,
+                ephemeral: notif.transient,
                 hasActionIcons: notif.hasActionIcons,
                 expireTimeout: notif.expireTimeout,
                 hints: notif.hints
             })
+            // Sin toast (DND / centro abierto) un aviso efímero no deja rastro.
+            if (d.ephemeral && !d.popup) { d.close(); return }
             root.list = [d].concat(root.list)
             root._bump()   // promote a activePopup si no hay una activa
         }
@@ -188,7 +202,7 @@ Singleton {
                         hasActionIcons: !!s.hasActionIcons,
                         expireTimeout: s.expireTimeout !== undefined ? s.expireTimeout : -1,
                         time: new Date(s.time || Date.now()),
-                        actions: _restoreActionsText(s.actions)
+                        actions: _restoreActionsText(s.actions, s.notificationId || s.id, s.appName)
                     }
                     rebuilt.push(notifComp.createObject(root, props))
                 }
@@ -205,9 +219,13 @@ Singleton {
                 root._persistSoon()
             }
         }
-        function _restoreActionsText(a) {
+        function _restoreActionsText(a, notificationId, appName) {
             if (!a) return []
-            return a.map(function(x) { return { identifier: x.identifier || "", text: x.text || "", invoke: function() {} } })
+            return a.map(function(x) {
+                const localUpdate = appName === "Isla" && notificationId === "isla:updates" && x.identifier === "updates"
+                return { identifier: x.identifier || "", text: x.text || "",
+                    invoke: function() { if (localUpdate) SystemUpdates.open() } }
+            })
         }
     }
 

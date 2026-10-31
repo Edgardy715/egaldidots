@@ -71,6 +71,7 @@ ShellRoot {
                     primary.forceActiveFocus(); keyClick(Qt.Key_Space)
                     assert(starts === 1 && view.phase === "idle", "keyboard start requests only, never fabricates recording")
                     view.phase = "countdown"; view.countdown = 2
+                    wait(450)
                     assert(findChild(view, "recordingTime").text === "2", "countdown comes from backend")
                     mouseClick(primary)
                     assert(stops === 1, "countdown cancel requests stop")

@@ -38,13 +38,24 @@ ShellRoot {
                 result.visible = false; wait(40)
                 compare(result.drawProgress, 1)
                 result.visible = true; wait(40)
+                result.progress = 0.4; result.status = "progress"; wait(400)
+                verify(result.determinate && !result.terminal && !result.animating)
+                verify(Math.abs(result.shownProgress - 0.4) < 0.01)
+                result.progress = 0.8; wait(60)
+                verify(result.shownProgress > 0.4 && result.shownProgress < 0.8) // eases between steps
+                wait(350)
+                result.status = "cancelled"; wait(60)
+                verify(result.terminal && result.ringProgress >= 0.79) // closes from the determinate arc
+                wait(450)
+                compare(result.drawProgress, 1)
+                compare(result.signalColor, Theme.iconSecondary)
                 Config.update({appearance:{reduceMotion:true}}); wait(20)
                 compare(result.drawProgress, 1)
                 result.status = "error"; wait(20)
                 compare(result.drawProgress, 1)
                 result.status = ""; wait(20)
                 verify(!result.terminal)
-                console.log("PASS: confirmation success/error, retry, interruption, hidden and reduced motion")
+                console.log("PASS: confirmation progress/cancelled, success/error, retry, interruption, hidden and reduced motion")
                 Qt.quit()
             }
         }

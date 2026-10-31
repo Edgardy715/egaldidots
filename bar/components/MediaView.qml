@@ -6,7 +6,6 @@ import Qt5Compat.GraphicalEffects
 import "../"
 import "../components"
 import "../Singletons"
-import "../pets"
 
 PillSurface {
     id: root
@@ -40,6 +39,14 @@ PillSurface {
     property bool lyricsSynced: false
     property var lyricLines: []
     signal lyricsRetryRequested()
+    // Attention for Iris: the current lyric line while the synced lyrics are open.
+    focusActive: lyricsView.focusActive
+    focusPoint: {
+        if (!focusActive) return Qt.point(0, 0)
+        void lyricsView.x; void lyricsView.y; void lyricsView.width; void lyricsView.height
+        const p = lyricsView.focusPoint
+        return lyricsView.mapToItem(root, p.x, p.y)
+    }
     onLyricsSupportedChanged: if (!lyricsSupported) lyricsOpen = false
     Keys.onEscapePressed: event => { if (lyricsOpen) { lyricsOpen = false; event.accepted = true } else event.accepted = false }
     readonly property bool albumDistinct: playback.albumDistinct
@@ -131,6 +138,7 @@ PillSurface {
                 font.family: root.mediaFont
                 font.pixelSize: Theme.fontSizeSmall * root.s
                 color: root.lyricsOpen ? Theme.foreground : Theme.iconSecondary
+                Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
             }
             MediaTransportButton {
                 objectName: "mediaLyricsToggle"
@@ -143,12 +151,14 @@ PillSurface {
             }
         }
         RowLayout {
+            id: mediaIdentity
             objectName: "mediaIdentity"
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: 0
             spacing: 28 * root.s
             ColumnLayout {
+                id: artworkColumn
                 Layout.preferredWidth: root.coverSize
                 Layout.maximumWidth: root.coverSize
                 Layout.alignment: Qt.AlignVCenter
@@ -248,7 +258,14 @@ PillSurface {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.minimumHeight: 0
-                    visible: !root.lyricsOpen
+                    opacity: root.lyricsOpen ? 0 : 1
+                    visible: opacity > 0.01
+                    enabled: !root.lyricsOpen
+                    Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                    transform: Translate {
+                        y: Flags.reduceMotion ? 0 : (root.lyricsOpen ? -6 : 0) * root.s
+                        Behavior on y { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                    }
                     ColumnLayout {
                         id: infoColumn
                         anchors.verticalCenter: parent.verticalCenter
@@ -291,12 +308,22 @@ PillSurface {
                     }
                 }
                 LyricsView {
+                    id: lyricsView
                     musicAccent: root.musicAccent
                     objectName: "mediaLyricsView"
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.minimumHeight: 0
-                    visible: root.lyricsOpen && root.lyricsSupported
+                    readonly property bool shown: root.lyricsOpen && root.lyricsSupported
+                    open: shown
+                    opacity: shown ? 1 : 0
+                    visible: opacity > 0.01
+                    enabled: shown
+                    Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                    transform: Translate {
+                        y: Flags.reduceMotion ? 0 : (parent.shown ? 0 : 6) * root.s
+                        Behavior on y { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                    }
                     canSeek: root.playback.canSeek && !root.playback.dragging
                     motionEnabled: root.mediaMotionAllowed
                     s: root.s
@@ -330,30 +357,6 @@ PillSurface {
                     onDragMoved: fraction => root.dragMoved(fraction)
                     onDragCommitted: fraction => root.dragCommitted(fraction)
                     onDragCanceled: root.dragCanceled()
-                    // The pet stands on the track, in the gap under the title, and
-                    // keeps clear of the playhead; while the music plays it dances.
-                    // Below the seek area: where they overlap, a press seeks.
-                    PetPerch {
-                        objectName: "mediaPetPerch"
-                        anchors.fill: parent
-                        z: -1
-                        petLayer: root.petContext
-                        perchId: "media"
-                        priority: 2
-                        kind: "line"
-                        available: root.petEligible && Config.pets.mediaSurface && timeline.enabled && timeline.visible
-                            && !root.lyricsOpen && petLayer !== null && headroom >= petLayer.reachRows
-                        floorY: height / 2 - timeline.restThickness / 2
-                        headroom: floorY + 8 * root.s
-                            + Math.max(0, (infoArea.height - infoColumn.implicitHeight) / 2)
-                        readonly property real half: petLayer ? petLayer.bodyWidth / 2 : 0
-                        minX: timeline.trackInset + half
-                        maxX: width - timeline.trackInset - half
-                        restX: maxX
-                        avoidFrom: timeline.cursorX - timeline.handleWidth
-                        avoidTo: timeline.cursorX + timeline.handleWidth
-                        mood: root.playback.isPlaying ? "music" : ""
-                    }
                 }
                 RowLayout {
                     Layout.fillWidth: true

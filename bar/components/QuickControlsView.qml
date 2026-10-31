@@ -5,11 +5,16 @@ import QtQuick.Layouts
 import "../"
 import "../Singletons"
 
+// Centro de control: dos mosaicos de acción (estado de un vistazo), un
+// deslizador de brillo táctil y el selector de perfil de energía.
 Item {
     id: root
     property real s: 1
     property bool contentReady: false
     property bool showBrightness: false
+    property bool showProfile: true
+    // What the controls need, so the glass does not reserve room for absent sections.
+    readonly property real contentHeight: col.implicitHeight
     property real brightnessPercent: 0
     property bool brightnessLastWriteOk: true
     property bool keepAwakeEnabled: false
@@ -28,6 +33,7 @@ Item {
     function profileIndex(): int {
         return root.profiles ? root.profiles.indexOf(root.activeProfile) : 0
     }
+    readonly property bool profileAvailable: root.profileIndex() >= 0
 
     clip: true
 
@@ -38,6 +44,101 @@ Item {
         onWheel: (wheel) => {}
     }
 
+    // Mosaico de acción: icono en círculo arriba, título y estado abajo.
+    // Activo = círculo de acento relleno y estado en acento; el fondo sólo se tiñe.
+    component QuickTile: Item {
+        id: tile
+        property string iconName: ""
+        property string title: ""
+        property string detail: ""
+        property bool active: false
+        property bool navigates: false
+        property alias hit: tileHit
+        signal activated()
+
+        implicitHeight: 92 * root.s
+
+        Rectangle {
+            id: tileFace
+            anchors.fill: parent
+            scale: tileHit.motion.visualScale
+            radius: Theme.radiusXxl * root.s
+            color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
+            border.width: Theme.liquid ? 0 : Theme.borderHairline
+            border.color: Qt.alpha(Theme.foreground, Theme.alphaHair)
+
+            // El estado activo nace de la gota del icono y llena el mosaico.
+            LiquidFill {
+                id: tileFill
+                objectName: "tileLiquid"
+                active: tile.active
+                originX: tileBadge.x; originY: tileBadge.y
+                originSize: tileBadge.width
+                cornerRadius: tileFace.radius
+            }
+
+            Rectangle {
+                id: tileBadge
+                x: 12 * root.s; y: 12 * root.s
+                width: 34 * root.s; height: width
+                radius: width / 2
+                color: tileFill.covered ? Qt.alpha(Theme.stateContent, Theme.alphaChip) : Qt.alpha(Theme.foreground, Theme.alphaSoft)
+                Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    iconName: tile.iconName
+                    interaction: tileHit.motion
+                    compressWithControl: true
+                    color: tileFill.covered ? Theme.stateContent : Theme.foreground
+                    font.pixelSize: 19 * root.s
+                    Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                }
+            }
+
+            MaterialIcon {
+                visible: tile.navigates
+                anchors.right: parent.right; anchors.rightMargin: 10 * root.s
+                anchors.verticalCenter: tileBadge.verticalCenter
+                iconName: Icons.iChevronRight
+                color: tileFill.covered ? Theme.stateContentSecondary : Theme.iconSecondary
+                font.pixelSize: 18 * root.s
+                transform: Translate { x: 2 * root.s * tileHit.motion.presence }
+            }
+
+            Column {
+                anchors.left: parent.left; anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.margins: 12 * root.s
+                spacing: Theme.spacingXs * root.s
+                Text {
+                    width: parent.width
+                    text: tile.title
+                    color: tileFill.covered ? Theme.stateContent : Theme.foreground
+                    Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                    font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; font.weight: Font.DemiBold
+                    elide: Text.ElideRight
+                }
+                AnimatedLabel {
+                    width: parent.width
+                    value: tile.detail
+                    color: tileFill.covered ? Theme.stateContentSecondary : Theme.iconSecondary
+                    font.family: Theme.font; font.features: Theme.fontNumeric
+                    font.pixelSize: Theme.fontSizeLabel * root.s
+                    elide: Text.ElideRight
+                    Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                }
+            }
+        }
+
+        MotionArea {
+            id: tileHit
+            anchors.fill: parent
+            feedbackRadius: tileFace.radius
+            hoverWash: true
+            onClicked: tile.activated()
+        }
+    }
+
     ColumnLayout {
         id: col
         anchors.fill: parent
@@ -46,32 +147,39 @@ Item {
         // ════════════════════ HEADER ════════════════════
         SurfaceHeader {
             Layout.fillWidth: true
-            title: "Ajustes rápidos"
-            subtitle: "Sistema"
-            iconName: Icons.iSettings2
+            title: qsTr("Ajustes rápidos")
             s: root.s
             trailing: Component {
-                Item {
-                    width: 88 * root.s
-                    height: 32 * root.s
+                Rectangle {
+                    implicitWidth: appearanceRow.implicitWidth + 22 * root.s
+                    implicitHeight: 30 * root.s
+                    radius: height / 2
+                    color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
+                    border.width: Theme.liquid ? 0 : Theme.borderHairline
+                    border.color: Qt.alpha(Theme.foreground, Theme.alphaHair)
+                    scale: appearanceHit.motion.visualScale
                     Row {
+                        id: appearanceRow
                         anchors.centerIn: parent
                         spacing: Theme.spacingSm * root.s
                         MaterialIcon {
                             anchors.verticalCenter: parent.verticalCenter
-                            iconName: Icons.iSettings2
+                            iconName: "palette"
+                            interaction: appearanceHit.motion
                             color: Theme.accent
                             font.pixelSize: Theme.fontSizeBodyLg * root.s
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: qsTr("Apariencia")
-                            color: Theme.iconSecondary
+                            color: Theme.foreground
                             font.family: Theme.font
-                            font.pixelSize: Theme.fontSizeLabel * root.s
+                            font.pixelSize: Theme.fontSizeSmall * root.s
+                            font.weight: Font.Medium
                         }
                     }
                     MotionArea {
+                        id: appearanceHit
                         objectName: "appearanceAction"
                         anchors.fill: parent
                         accessibleName: qsTr("Abrir ajustes de apariencia")
@@ -82,78 +190,44 @@ Item {
             }
         }
 
-        // ════════════════════ KEEP AWAKE ════════════════════
+        // ════════════════════ MOSAICOS ════════════════════
         StaggerItem {
             Layout.fillWidth: true
+            implicitHeight: tiles.implicitHeight
             staggerIndex: 0
             entered: root.contentReady
             s: root.s
 
-            GlassCard {
+            RowLayout {
+                id: tiles
                 anchors.fill: parent
-                s: root.s
-                implicitHeight: keepBody.implicitHeight + 20 * root.s
-                borderColor: root.keepAwakeEnabled ? Qt.alpha(Theme.accent, Theme.alphaSelected) : Theme.border
-                glow: root.keepAwakeEnabled ? 0.7 : 0
-                borderWidth: 1
-                Behavior on borderColor { ColorAnimation { duration: Motion.fast } }
+                spacing: Theme.spacingLg * root.s
 
-                ColumnLayout {
-                    id: keepBody
-                    anchors.fill: parent
-                    anchors.margins: 12 * root.s
-                    spacing: Theme.spacingLg * root.s
+                QuickTile {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    iconName: Icons.iCoffee
+                    title: qsTr("Mantener activa")
+                    detail: root.keepAwakeEnabled ? qsTr("Activa · %1").arg(root.keepAwakeElapsedTime) : qsTr("Desactivada")
+                    active: root.keepAwakeEnabled
+                    hit.objectName: "keepAwakeToggle"
+                    hit.accessibleName: qsTr("Mantener despierto")
+                    hit.Accessible.role: Accessible.CheckBox
+                    hit.Accessible.checkable: true
+                    hit.Accessible.checked: root.keepAwakeEnabled
+                    onActivated: root.keepAwakeToggleRequested()
+                }
 
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: Theme.spacingLg * root.s
-
-                        IconTile {
-                            active: root.keepAwakeEnabled
-                            iconName: Icons.iCoffee
-                            color: root.keepAwakeEnabled ? Theme.accent : Theme.foreground
-                            size: 30
-                            s: root.s
-                            scale: root.keepAwakeEnabled ? 1.1 : 1
-                            Behavior on scale { Anim { type: Anim.FastEffects } }
-                        }
-
-                        ColumnLayout {
-                            spacing: Theme.spacingXxs * root.s
-                            Layout.fillWidth: true
-                            Text {
-                                text: "Keep Awake"
-                                color: Theme.foreground
-                                font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * root.s; font.weight: Font.DemiBold
-                            }
-                            Text {
-                                text: root.keepAwakeEnabled ? "Pantalla activa · " + root.keepAwakeElapsedTime : "Evita que la pantalla se apague"
-                                color: root.keepAwakeEnabled ? Theme.accent : Theme.iconSecondary
-                                font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s
-                                Behavior on color { ColorAnimation { duration: Motion.fast } }
-                            }
-                        }
-
-                        Item { Layout.fillWidth: true }
-
-                        Toggle {
-                            objectName: "keepAwakeToggle"
-                            accessibleName: qsTr("Mantener despierto")
-                            checked: root.keepAwakeEnabled
-                            onToggled: root.keepAwakeToggleRequested()
-                        }
-                    }
-
-                    // descripción expandible
-                    Text {
-                        Layout.fillWidth: true
-                        visible: !root.keepAwakeEnabled
-                        text: "Mientras esté activo, la pantalla no se apagará ni el sistema entrará en reposo."
-                        color: Theme.iconSecondary
-                        font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s
-                        wrapMode: Text.WordWrap
-                        opacity: 0.9
-                    }
+                QuickTile {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    iconName: "timer"
+                    title: qsTr("Actividades")
+                    detail: qsTr("Enfoque y grabación")
+                    navigates: true
+                    hit.objectName: "openFocus"
+                    hit.accessibleName: qsTr("Abrir enfoque y grabación")
+                    onActivated: root.requestPage("focus")
                 }
             }
         }
@@ -169,7 +243,7 @@ Item {
             GlassCard {
                 anchors.fill: parent
                 s: root.s
-                implicitHeight: briBody.implicitHeight + 20 * root.s
+                implicitHeight: briBody.implicitHeight + 24 * root.s
 
                 ColumnLayout {
                     id: briBody
@@ -179,37 +253,45 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Theme.spacingLg * root.s
-
-                        IconTile {
-                            iconName: Icons.iBrightness
-                            size: 30
-                            s: root.s
-                        }
-
                         Text {
-                            text: "Brillo"
-                            color: Theme.foreground
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * root.s; font.weight: Font.DemiBold
                             Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignBaseline
+                            text: qsTr("Brillo")
+                            color: Theme.foreground
+                            font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; font.weight: Font.DemiBold
                         }
-
+                        // La cifra es el dato: grande y tabular, sigue al arrastre.
                         Text {
                             objectName: "brightnessPercent"
-                            text: Math.round(root.brightnessPercent) + "%"
-                            color: Theme.accent
-                            font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeBody * root.s; font.weight: Font.DemiBold
+                            Layout.alignment: Qt.AlignBaseline
+                            text: Math.round(brightnessSlider.dragging || brightnessSlider.holding ? brightnessSlider.dragValue * 100 : root.brightnessPercent)
+                            color: Theme.foreground
+                            font.family: Theme.fontDisplay; font.features: Theme.fontNumeric
+                            font.pixelSize: Theme.fontSizeDisplayLg * root.s; font.weight: Font.DemiBold
+                        }
+                        Text {
+                            Layout.alignment: Qt.AlignBaseline
+                            Layout.leftMargin: -parent.spacing + 1 * root.s
+                            text: "%"
+                            color: Theme.iconSecondary
+                            font.family: Theme.fontDisplay
+                            font.pixelSize: Theme.fontSizeBody * root.s; font.weight: Font.DemiBold
                         }
                     }
 
-                    // slider unificado
+                    // Deslizador grueso estilo centro de control: el sol vive dentro
+                    // de la pista y cambia de tinta cuando el relleno lo alcanza.
                     Slider {
+                        id: brightnessSlider
                         objectName: "brightnessSlider"
                         Layout.fillWidth: true
+                        Layout.preferredHeight: height
                         value: root.brightnessPercent / 100
-                        height_: 6
-                        knob: true
+                        height_: 36
+                        knob: false
                         s: root.s
+                        // En 0 % el relleno es una gota con el sol dentro; al subir se estira.
+                        minFill: Theme.liquid ? height : 0
                         enabled: root.showBrightness
                         activeFocusOnTab: enabled
                         Accessible.role: Accessible.Slider
@@ -220,6 +302,16 @@ Item {
                         Keys.onLeftPressed: if (enabled && visible) root.brightnessStepRequested(-5)
                         Keys.onRightPressed: if (enabled && visible) root.brightnessStepRequested(5)
                         onSliderLiveChanged: (v) => root.brightnessSetPercent(v * 100)
+
+                        MaterialIcon {
+                            readonly property bool covered: brightnessSlider.minFill > 0 || brightnessSlider.shownValue * brightnessSlider.width > x + width
+                            x: (brightnessSlider.height - width) / 2
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: root.brightnessPercent < 40 ? "brightness_low" : "brightness_high"
+                            color: covered ? (Theme.liquid ? Theme.stateContent : Theme.primaryContent) : Theme.iconSecondary
+                            font.pixelSize: 18 * root.s
+                            Behavior on color { ColorAnimation { duration: Motion.fast } }
+                        }
                         Rectangle {
                             anchors.fill: parent
                             radius: height / 2
@@ -228,78 +320,26 @@ Item {
                             border.width: parent.activeFocus ? Theme.borderHairline : 0
                             Accessible.ignored: true
                         }
+                        WheelHandler {
+                            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+                            onWheel: (event) => {
+                                if (event.angleDelta.y !== 0) root.brightnessStepRequested(event.angleDelta.y > 0 ? 5 : -5)
+                            }
+                        }
                     }
 
-                    RowLayout {
+                    Text {
+                        objectName: "brightnessWriteError"
                         Layout.fillWidth: true
-                        spacing: Theme.spacingMd * root.s
-
-                        // botones − / +
-                        Rectangle {
-                            Layout.preferredWidth: 30 * root.s; Layout.preferredHeight: 28 * root.s
-                            radius: Theme.radiusMd * root.s
-                            color: briMinusHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                            border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaCritical)
-                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-
-                            MotionArea {
-                                id: briMinusHover
-                                objectName: "brightnessDecrease"
-                                anchors.fill: parent
-                                accessibleName: qsTr("Bajar brillo")
-                                hoverWash: false
-                                onClicked: root.brightnessStepRequested(-10)
-                            }
-
-                            MaterialIcon {
-                                compressWithControl: true
-                                interaction: briMinusHover.motion
-                                anchors.centerIn: parent
-                                iconName: Icons.iMinus
-                                color: Theme.foreground
-                                font.pixelSize: Theme.fontSizeTitleLg * root.s
-                            }
-
-                        }
-
-                        Item { Layout.fillWidth: true }
-
-                        Text {
-                            objectName: "brightnessWriteError"
-                            visible: !root.brightnessLastWriteOk
-                            text: "✗ permiso denegado"
-                            color: Theme.accentStrong
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s
-                            opacity: 0
-                            NumberAnimation on opacity { from: 0; to: 0.8; duration: Motion.fast }
-                        }
-
-                        Rectangle {
-                            Layout.preferredWidth: 30 * root.s; Layout.preferredHeight: 28 * root.s
-                            radius: Theme.radiusMd * root.s
-                            color: briPlusHover.containsMouse ? Qt.alpha(Theme.foreground, Theme.alphaWash) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                            border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaCritical)
-                            Behavior on color { ColorAnimation { duration: Motion.fast } }
-
-                            MotionArea {
-                                id: briPlusHover
-                                objectName: "brightnessIncrease"
-                                anchors.fill: parent
-                                accessibleName: qsTr("Subir brillo")
-                                hoverWash: false
-                                onClicked: root.brightnessStepRequested(10)
-                            }
-
-                            MaterialIcon {
-                                compressWithControl: true
-                                interaction: briPlusHover.motion
-                                anchors.centerIn: parent
-                                iconName: Icons.iPlus
-                                color: Theme.foreground
-                                font.pixelSize: Theme.fontSizeTitleLg * root.s
-                            }
-
-                        }
+                        Layout.preferredHeight: implicitHeight * opacity
+                        Layout.topMargin: -Theme.spacingLg * root.s * (1 - opacity)
+                        visible: opacity > 0.01
+                        text: qsTr("Sin permiso para cambiar el brillo")
+                        color: Theme.accentStrong
+                        font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s
+                        clip: true
+                        opacity: root.brightnessLastWriteOk ? 0 : 1
+                        Behavior on opacity { NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                     }
                 }
             }
@@ -309,13 +349,14 @@ Item {
         StaggerItem {
             Layout.fillWidth: true
             staggerIndex: 2
-            entered: root.contentReady
+            entered: root.contentReady && root.showProfile
+            visible: root.showProfile
             s: root.s
 
             GlassCard {
                 anchors.fill: parent
                 s: root.s
-                implicitHeight: powBody.implicitHeight + 20 * root.s
+                implicitHeight: powBody.implicitHeight + 24 * root.s
 
                 ColumnLayout {
                     id: powBody
@@ -325,70 +366,67 @@ Item {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        spacing: Theme.spacingLg * root.s
-
-                        IconTile {
-                            iconName: Icons.iGauge
-                            size: 30
-                            s: root.s
+                        spacing: Theme.spacingMd * root.s
+                        Text {
+                            text: qsTr("Energía")
+                            color: Theme.foreground
+                            font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; font.weight: Font.DemiBold
                         }
-
-                        ColumnLayout {
-                            spacing: Theme.spacingXxs * root.s
+                        AnimatedLabel {
+                            objectName: "powerProfileSummary"
                             Layout.fillWidth: true
-                            Text {
-                                text: "Perfil de energía"
-                                color: Theme.foreground
-                                font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * root.s; font.weight: Font.DemiBold
+                            horizontalAlignment: Text.AlignRight
+                            elide: Text.ElideRight
+                            value: {
+                                if (root.activeProfile === "performance") return "Máximo rendimiento · más consumo"
+                                if (root.activeProfile === "balanced") return "Equilibrio · recomendado"
+                                if (root.activeProfile === "power-saver") return "Máximo ahorro · menos consumo"
+                                return root.profileError.length ? root.profileError : qsTr("Perfil no disponible")
                             }
-                            Text {
-                                objectName: "powerProfileSummary"
-                                text: {
-                                    if (root.activeProfile === "performance") return "Máximo rendimiento · más consumo"
-                                    if (root.activeProfile === "balanced") return "Equilibrio · recomendado"
-                                    if (root.activeProfile === "power-saver") return "Máximo ahorro · menos consumo"
-                                    return qsTr("Perfil no disponible")
-                                }
-                                color: Theme.iconSecondary
-                                font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s
-                            }
-                            Text {
-                                objectName: "powerProfileError"
-                                visible: root.profileError.length > 0
-                                text: root.profileError
-                                color: Theme.accentStrong
-                                font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * root.s
-                                Layout.fillWidth: true
-                                wrapMode: Text.WordWrap
-                            }
+                            color: root.profileAvailable ? Theme.iconSecondary : Theme.accentStrong
+                            font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s
                         }
+                    }
+
+                    // Un fallo al aplicar se explica aquí; si no hay perfil, ya lo dice el resumen.
+                    Text {
+                        objectName: "powerProfileError"
+                        visible: root.profileError.length > 0 && root.profileAvailable
+                        text: root.profileError
+                        color: Theme.accentStrong
+                        font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
                     }
 
                     // selector segmentado animado
                     Item {
                         id: segSelector
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 32 * root.s
+                        Layout.preferredHeight: 38 * root.s
+                        opacity: root.profileAvailable ? (root.profileBusy ? 0.7 : 1) : Theme.alphaDisabled
+                        Behavior on opacity { NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
                         Rectangle {
                             anchors.fill: parent
-                            radius: Theme.radiusLg * root.s
+                            radius: height / 2
                             color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                            border.width: Theme.borderHairline; border.color: Qt.alpha(Theme.border, Theme.alphaCritical)
+                            border.width: Theme.liquid ? 0 : Theme.borderHairline; border.color: Qt.alpha(Theme.foreground, Theme.alphaHair)
                         }
 
-                        // píldora que se desliza entre opciones
-                        Rectangle {
+                        // Gota de selección: se estira hacia la opción nueva y se recoge al llegar.
+                        LiquidSelection {
+                            objectName: "profileSelection"
                             readonly property real segW: segSelector.width / 3
-                            visible: root.profileIndex() >= 0
-                            width: segW - 4 * root.s
-                            height: segSelector.height - 4 * root.s
-                            y: 2 * root.s
-                            x: 2 * root.s + Math.max(0, root.profileIndex()) * segW
-                            radius: Theme.radiusSm * root.s
-                            color: Theme.foreground
-                            Behavior on x { enabled: !Flags.reduceMotion; Anim { type: Anim.FastSpatial } }
-                            Behavior on color { ColorAnimation { duration: Motion.fast } }
+                            visible: root.profileAvailable && root.profileIndex() >= 0
+                            targetX: 3 * root.s + Math.max(0, root.profileIndex()) * segW
+                            targetY: 3 * root.s
+                            targetWidth: segW - 6 * root.s
+                            targetHeight: segSelector.height - 6 * root.s
+                            immediate: !root.contentReady
+                            radius: height / 2
+                            color: Theme.liquid ? Theme.stateFill : Theme.accent
+                            volume: true
                         }
 
                         Row {
@@ -398,26 +436,43 @@ Item {
                                 delegate: Item {
                                     id: profileOption
                                     required property string modelData
+                                    readonly property bool current: root.activeProfile === modelData
                                     width: parent.width / 3
                                     height: parent.height
-                                    Text {
-                                        id: profileLabel
+                                    Row {
                                         anchors.centerIn: parent
-                                        text: profileOption.modelData === "performance" ? "Rendimiento"
-                                            : profileOption.modelData === "balanced" ? "Balanceado"
-                                            : profileOption.modelData === "power-saver" ? "Ahorro" : profileOption.modelData
-                                        color: root.activeProfile === profileOption.modelData ? Theme.primaryContent : Theme.foreground
-                                        font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; font.weight: Font.Medium
-                                        Behavior on color { ColorAnimation { duration: Motion.fast } }
+                                        spacing: Theme.spacingSm * root.s
+                                        MaterialIcon {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            iconName: profileOption.modelData === "performance" ? "bolt"
+                                                : profileOption.modelData === "balanced" ? "balance" : "eco"
+                                            interaction: profileHit.motion
+                                            color: profileOption.current ? Theme.stateContent : Theme.iconSecondary
+                                            font.pixelSize: 15 * root.s
+                                            Behavior on color { ColorAnimation { duration: Motion.fast } }
+                                        }
+                                        Text {
+                                            id: profileLabel
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: profileOption.modelData === "performance" ? "Rendimiento"
+                                                : profileOption.modelData === "balanced" ? "Balanceado"
+                                                : profileOption.modelData === "power-saver" ? "Ahorro" : profileOption.modelData
+                                            color: profileOption.current ? Theme.stateContent : Theme.foreground
+                                            font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s
+                                            font.weight: profileOption.current ? Font.DemiBold : Font.Medium
+                                            Behavior on color { ColorAnimation { duration: Motion.fast } }
+                                        }
                                     }
                                     MotionArea {
+                                        id: profileHit
                                         objectName: "profile-" + profileOption.modelData
                                         anchors.fill: parent; cursorShape: Qt.PointingHandCursor
                                         accessibleName: qsTr("Perfil de energía: %1").arg(profileLabel.text)
                                         Accessible.role: Accessible.RadioButton
-                                        Accessible.checked: root.activeProfile === profileOption.modelData
+                                        Accessible.checked: profileOption.current
                                         enabled: !root.profileBusy
-                                        hoverWash: false
+                                        feedbackRadius: height / 2
+                                        hoverWash: !profileOption.current
                                         onClicked: root.profileSelected(profileOption.modelData)
                                     }
                                 }
@@ -428,17 +483,6 @@ Item {
             }
         }
 
-        MotionButton {
-            objectName: "openFocus"
-            Layout.fillWidth: true
-            Layout.preferredHeight: 40 * root.s
-            text: qsTr("Enfoque y grabación")
-            font.family: Theme.font
-            font.pixelSize: Theme.fontSizeBodyLg * root.s
-            contentItem: Text { text: parent.text; font: parent.font; color: Theme.foreground; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
-            background: Rectangle { radius: Theme.radiusMd * root.s; color: Qt.alpha(Theme.accent, Theme.alphaWash); border.width: parent.activeFocus ? 2 : 0; border.color: Theme.accent }
-            onClicked: root.requestPage("focus")
-        }
         Item { Layout.fillHeight: true }
     }
 }

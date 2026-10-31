@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 
 // Clock and weather observation; no presentation or date-selection state.
@@ -44,8 +45,24 @@ Item {
         const n = Number(value)
         return Number.isFinite(n) && n >= minimum && n <= maximum ? String(n) + suffix : ""
     }
-    function parseWeather(output) {
-        root.weatherLoading = false
+    // Última lectura buena en disco: al reabrir el calendario el clima aparece al
+    // instante (aunque sea de antes) y se refresca por detrás.
+    readonly property string weatherCachePath: Quickshell.cachePath("weather-last.json")
+    FileView {
+        id: weatherCache
+        path: root.weatherCachePath
+        printErrors: false
+        watchChanges: false
+        onLoaded: {
+            if (root.weatherTemp) return
+            try {
+                const c = JSON.parse(weatherCache.text())
+                if (root.parseWeather(c.raw, true)) root.weatherUpdated = String(c.updated || "")
+            } catch (e) {}
+        }
+    }
+    function parseWeather(output, fromCache) {
+        if (!fromCache) root.weatherLoading = false
         try {
             const d = JSON.parse(output || "{}")
             const cc = d.current_condition && d.current_condition[0]
@@ -74,7 +91,12 @@ Item {
             root.forecast = days
             root.weatherUpdated = Qt.formatDateTime(new Date(), "HH:mm")
             root.weatherError = ""
-        } catch (e) { root.weatherError = qsTr("No se pudo actualizar el clima") }
+            if (!fromCache) weatherCache.setText(JSON.stringify({raw: output, updated: root.weatherUpdated}))
+            return true
+        } catch (e) {
+            if (!fromCache) root.weatherError = qsTr("No se pudo actualizar el clima")
+            return false
+        }
     }
     function refresh() {
         if (getWeather.running) return

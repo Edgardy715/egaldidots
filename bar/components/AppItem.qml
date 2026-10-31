@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import "../Singletons"
@@ -22,11 +21,9 @@ Item {
     implicitHeight: 72 * s
     implicitWidth: parent ? parent.width : 0
 
+    // Rows reveal once when created; a reused delegate keeps its place while
+    // the query narrows, so typing never re-fades the whole list.
     Component.onCompleted: revealTimer.start()
-    onModelDataChanged: {
-        revealed = false
-        revealTimer.restart()
-    }
 
     Timer {
         id: revealTimer
@@ -58,7 +55,7 @@ Item {
         anchors.fill: parent
         scale: root.revealed ? hoverArea.motion.visualScale : 0.97
         transform: Translate {
-            y: root.revealed ? 0 : 8 * root.s
+            y: root.revealed || Flags.reduceMotion ? 0 : 8 * root.s
             Behavior on y { Anim { type: Anim.EmphasizedIn } }
         }
 
@@ -67,30 +64,9 @@ Item {
         Rectangle {
             anchors.fill: parent
             radius: Theme.radiusLg * root.s
-            color: root.selected
-                ? Qt.alpha(Theme.accent, Theme.alphaGlow)
-                : (hoverArea.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaWash) : "transparent")
+            // Selection is painted by the list's sliding highlight; rows own hover only.
+            color: !root.selected && hoverArea.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaWash) : "transparent"
             Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-        }
-
-        Rectangle {
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            width: Theme.borderHairline * root.s
-            radius: width / 2
-            color: Theme.accent
-            layer.enabled: root.visible && root.revealed && root.selected
-            layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowColor: Qt.alpha(Theme.accent, 0.8)
-                shadowBlur: 0.75
-                blurMax: 12
-            }
-            opacity: root.selected ? 1 : 0
-            scale: root.selected ? 1 : 0.4
-            Behavior on opacity { Anim { type: Anim.FastEffects } }
-            Behavior on scale { Anim { type: Anim.FastEffects } }
         }
 
         Item {
@@ -186,13 +162,14 @@ Item {
                 border.color: root.selected
                     ? Qt.alpha(Theme.foreground, Theme.alphaSoft)
                     : Qt.alpha(Theme.foreground, Theme.alphaHair)
-                Behavior on color { ColorAnimation { duration: Motion.fast } }
-                Behavior on border.color { ColorAnimation { duration: Motion.fast } }
+                Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+                Behavior on border.color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
                 Text {
                     anchors.centerIn: parent
                     text: String(root.resultIndex)
                     color: root.selected ? Theme.background : Theme.iconSecondary
+                    Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeSmall * root.s
                     font.weight: Font.DemiBold

@@ -17,11 +17,11 @@ OverviewView {
     wallpaperSource: Wallpapers.current ? Wallpapers.fileSource(Wallpapers.current, 0) : ""
     hasMedia: Players.has
     mediaArtUrl: Players.artUrl
-    mediaHasProgress: !!Players.active && Players.active.length > 0
-    mediaProgress: mediaHasProgress ? Math.max(0, Math.min(1, Players.active.position / Players.active.length)) : 0
+    mediaHasProgress: Players.lengthOf(Players.active) > 0
+    mediaProgress: Players.progressOf(Players.active)
     mediaTitle: Players.title
     mediaArtist: Players.artist
     onWorkspaceRequested: id => {
-        if (id > 0) Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + id + " })"])
+        if (id > 0) Qt.callLater(Quickshell.execDetached, ["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + id + " })"])
     }
 }

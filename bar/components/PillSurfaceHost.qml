@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell.Widgets
 import "../Singletons"
 
@@ -19,11 +20,24 @@ ClippingRectangle {
     property bool closing: false
     property bool suspended: false
     property real reveal: 1
+    // Fase 2 del cierre del launcher: la surface se retira (fundido, escala, desenfoque).
+    property bool returning: false
+    property bool largeSurface: false
     property var artworkTransition: null
-    property var petContext: null
     property string displayedSurface: ""
     property real swapOpacity: 1
     property real loadReveal: 0
+    property real returnFade: returning ? 0 : 1
+    Behavior on returnFade {
+        enabled: !Flags.reduceMotion
+        NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard }
+    }
+    // p: cuánto está presente el contenido entrante; q: cuánto el saliente (swap A->B).
+    readonly property real matP: Math.max(0, Math.min(1, root.morphCloseness)) * root.loadReveal * root.returnFade
+    readonly property real matQ: root.swapOpacity
+    readonly property real contentScale: surfaceLoader.scale
+    readonly property bool contentLayerActive: surfaceLoader.layer.enabled
+    readonly property bool materializing: !Flags.reduceMotion && (matP < 0.999 || matQ < 0.999)
 
     signal requestClose()
     signal requestPage(string name)
@@ -36,7 +50,7 @@ ClippingRectangle {
     radius: root.surfaceRadius
     color: "transparent"
     enabled: root.open && !root.suspended
-    opacity: root.suspended ? 0 : root.reveal * root.swapOpacity * root.loadReveal
+    opacity: root.suspended ? 0 : root.reveal * root.returnFade * root.swapOpacity * root.loadReveal
 
     Behavior on loadReveal {
         enabled: surfaceLoader.status === Loader.Ready && !Flags.reduceMotion
@@ -46,7 +60,7 @@ ClippingRectangle {
     Behavior on swapOpacity {
         NumberAnimation {
             id: swapAnimation
-            duration: Flags.reduceMotion ? 0 : Motion.fast
+            duration: Flags.reduceMotion ? 0 : Motion.crossfadeOut
             easing.type: Easing.InOutQuad
 
         }
@@ -54,7 +68,7 @@ ClippingRectangle {
 
     Timer {
         id: swapTimer
-        interval: Flags.reduceMotion ? 0 : Motion.fast
+        interval: Flags.reduceMotion ? 0 : Motion.crossfadeOut
         onTriggered: {
             if (root.surface.length > 0) root.displayedSurface = root.surface
             root.swapOpacity = 1
@@ -106,8 +120,20 @@ ClippingRectangle {
         id: surfaceLoader
         anchors.fill: parent
         asynchronous: true
+        transformOrigin: Item.Top
+        scale: Flags.reduceMotion ? 1
+            : (Motion.materializeScale + (1 - Motion.materializeScale) * root.matP)
+              * (Motion.materializeRetireScale + (1 - Motion.materializeRetireScale) * root.matQ)
         transform: Translate {
-            y: Flags.reduceMotion ? 0 : 4 * root.scaleFactor * (1 - root.loadReveal)
+            y: Flags.reduceMotion ? 0 : Motion.materializeTravel * root.scaleFactor * (1 - root.matP)
+        }
+        // La capa (y su desenfoque) sólo existe mientras el contenido se materializa o se retira.
+        layer.enabled: root.materializing && surfaceLoader.status === Loader.Ready
+        layer.effect: MultiEffect {
+            autoPaddingEnabled: false
+            blurEnabled: true
+            blurMax: root.largeSurface ? Motion.materializeBlurMaxLarge : Motion.materializeBlurMax
+            blur: Math.min(1, (1 - root.matP) * Motion.materializeBlur + (1 - root.matQ) * Motion.materializeBlur)
         }
         active: root.displayedSurface.length > 0
         // La URL depende del nombre, no del orden de actualización de `open`.
@@ -121,10 +147,6 @@ ClippingRectangle {
             if ("artworkTransition" in item) item.artworkTransition = Qt.binding(() => root.artworkTransition)
             if ("contextWidth" in item) item.contextWidth = Qt.binding(() => root.authContextWidth)
             if ("capsLockOn" in item) item.capsLockOn = Qt.binding(() => root.capsLockOn)
-            if ("petContext" in item) item.petContext = Qt.binding(() => root.petContext)
-            if ("petPresented" in item) item.petPresented = Qt.binding(() => root.open && !root.closing
-                && !root.suspended && root.surface === root.displayedSurface && root.visible
-                && root.opacity > 0.99 && root.reveal > 0.99)
             item.s = Qt.binding(() => root.scaleFactor)
             item.open = Qt.binding(() => root.displayedSurface.length > 0)
             item.closing = Qt.binding(() => root.closing || !root.open)

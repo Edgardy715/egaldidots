@@ -31,8 +31,8 @@ TextField {
         border.width: 1
         border.color: root.invalid ? Theme.error : root.activeFocus ? Theme.accent : Qt.alpha(Theme.foreground, root.hovered ? 0.22 : 0.12)
         opacity: root.enabled ? 1 : 0.45
-        Behavior on color { enabled: root.motionActive; ColorAnimation { duration: Motion.hover } }
-        Behavior on border.color { enabled: root.motionActive; ColorAnimation { duration: Motion.hover } }
+        Behavior on color { enabled: root.motionActive; ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
+        Behavior on border.color { enabled: root.motionActive; ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
         Behavior on opacity { enabled: root.motionActive; NumberAnimation { duration: Motion.fast } }
         Rectangle {
             anchors.fill: parent; anchors.margins: -2

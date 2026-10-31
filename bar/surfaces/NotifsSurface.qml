@@ -57,6 +57,7 @@ PillSurface {
         onToggleDndRequested: Notifs.toggleDnd()
         onClearAllRequested: Notifs.clearAll()
         onDismissRequested: notification => { if (notification) notification.popup = false }
+        onCloseRequested: notification => { if (notification) notification.close() }
         onLinkRequested: (notification, link) => {
             Qt.openUrlExternally(link)
             if (notification) notification.popup = false

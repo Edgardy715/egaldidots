@@ -77,9 +77,10 @@ FocusScope {
                         contentItem: Text {
                             text: tab.text
                             color: root.selectedPage === tab.index ? Theme.foreground : Theme.iconSecondary
+                            Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSizeBodyLg * root.s
-                            font.weight: root.selectedPage === tab.index ? Font.DemiBold : Font.Medium
+                            font.weight: Font.DemiBold
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }

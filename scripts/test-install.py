@@ -106,8 +106,10 @@ class Recovery(unittest.TestCase):
         subprocess.run([str(self.home/'.local/bin/isla'), '--verbose'], env=self.env, check=True)
         self.assertIn(['qs', '-c', 'bar', '--no-duplicate', '--verbose'], self.commands())
         self.assertTrue((self.home/'.cache/matugen/current-wallpaper').is_symlink())
+        self.assertFalse((self.home/'.config/gtk-3.0/settings.ini').is_symlink())
+        self.assertEqual((self.repo/'gtk/.config/gtk-3.0/settings.ini').read_text(), '[Settings]\ngtk-theme-name=Adwaita\n')
         self.assertEqual(manifest.read_text(), manifest_text, 'Fisher changed source manifest')
-        self.assertIn('monitor=,preferred,auto,1', (self.home/'.config/hypr/modules/monitors.conf').read_text())
+        self.assertIn('monitor=,preferred,auto,auto', (self.home/'.config/hypr/modules/monitors.conf').read_text())
         hardware = self.home/'.config/hypr/local.hardware.conf'
         hardware.write_text('# personal override\n')
         self.run_install('--stow-only', '--keep-shell')

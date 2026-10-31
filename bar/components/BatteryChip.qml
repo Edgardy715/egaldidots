@@ -54,7 +54,9 @@ Item {
         anchors.rightMargin: root.airR
         radius: height / 2
         color: Qt.alpha(batteryGlyph.tint, Theme.alphaWash)
+        Behavior on color { ColorAnimation { duration: Motion.standard; easing.type: Motion.easeStandard } }
         border.color: Qt.alpha(batteryGlyph.tint, Theme.alphaSelected)
+        Behavior on border.color { ColorAnimation { duration: Motion.standard; easing.type: Motion.easeStandard } }
         border.width: Theme.borderHairline
 
         Row {
@@ -73,7 +75,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.percent + "%"
                 color: batteryGlyph.tint
-                font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeLabel * root.s
+                Behavior on color { ColorAnimation { duration: Motion.standard; easing.type: Motion.easeStandard } }
+                font.family: Theme.font; font.features: Theme.fontNumeric; font.pixelSize: Theme.fontSizeLabel * root.s
                 font.weight: Font.DemiBold
             }
         }

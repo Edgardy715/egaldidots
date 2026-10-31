@@ -79,7 +79,7 @@ Item {
         id: progressReset
         target: root
         property: "displayedProgress"
-        duration: 750
+        duration: Math.round(750 * Motion.mult)
         easing.type: Easing.BezierSpline
         easing.bezierCurve: [0.05, 0, 0.133333, 0.06, 0.166666, 0.4,
             0.208333, 0.82, 0.25, 1, 1, 1]
@@ -96,7 +96,7 @@ Item {
     function animateAmplitude() {
         amplitudeAnimation.from = waveAmount
         amplitudeAnimation.to = moving ? 1 : 0
-        amplitudeAnimation.duration = moving ? 800 : 550
+        amplitudeAnimation.duration = Math.round((moving ? 800 : 550) * Motion.mult)
         amplitudeAnimation.easing.bezierCurve = moving ? Motion.emphasizedDecelCurve : Motion.standardDecelCurve
         amplitudeAnimation.start()
     }

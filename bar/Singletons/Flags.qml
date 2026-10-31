@@ -4,10 +4,14 @@ import Quickshell
 // Compatibility facade: settings have one owner, Config. New editors use
 // Config.update/discard/save; consumers cannot break bindings by assigning here.
 Singleton {
-    readonly property real glassAlpha: Config.appearance.glassAlpha
+    readonly property bool reduceTransparency: Config.appearance.reduceTransparency
+    readonly property real glassAlpha: reduceTransparency ? 1 : Config.appearance.glassAlpha
     readonly property real materialDepth: Config.appearance.materialDepth
+    readonly property bool liquidSurfaces: Config.appearance.liquidSurfaces
+    readonly property real stateIntensity: Config.appearance.stateIntensity
     readonly property real ambientFps: Config.appearance.ambientFps
     readonly property bool mediaTransitions: Config.appearance.mediaTransitions
+    readonly property bool notificationDrop: Config.appearance.notificationDrop
     readonly property bool menuSelectionAnchor: Config.appearance.menuSelectionAnchor
     readonly property bool pillBlur: Config.appearance.pillBlur
     readonly property real topGap: Config.appearance.topGap

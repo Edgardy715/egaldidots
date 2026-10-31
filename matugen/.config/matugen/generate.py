@@ -271,6 +271,57 @@ def transition_fps():
     return 144
 
 
+def gtk_settings_paths(config_home):
+    paths = [config_home / f"gtk-{version}.0/settings.ini" for version in (3, 4)]
+    for path in paths:
+        if path.is_symlink() or path.parent.is_symlink():
+            raise RuntimeError(f"Refusing to replace linked GTK settings: {path}")
+    return paths
+
+
+def sync_gtk_mode(config_home, mode):
+    for path in gtk_settings_paths(config_home):
+        text = path.read_text() if path.exists() else "[Settings]\n"
+        value = f"gtk-application-prefer-dark-theme={int(mode == 'dark')}"
+        if re.search(r"(?m)^gtk-application-prefer-dark-theme\s*=", text):
+            text = re.sub(r"(?m)^gtk-application-prefer-dark-theme\s*=.*$", value, text)
+        elif re.search(r"(?m)^\[Settings\]\s*$", text):
+            text = re.sub(r"(?m)^(\[Settings\])\s*$", lambda match: match[1] + "\n" + value, text, count=1)
+        else:
+            text += "\n[Settings]\n" + value + "\n"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as temporary:
+            temporary.write(text)
+            temporary_path = Path(temporary.name)
+        try:
+            if path.exists():
+                shutil.copymode(path, temporary_path)
+            os.replace(temporary_path, path)
+        finally:
+            temporary_path.unlink(missing_ok=True)
+
+
+def desktop_mode(cache):
+    if shutil.which("gsettings"):
+        try:
+            result = subprocess.run(
+                ["gsettings", "get", "org.gnome.desktop.interface", "color-scheme"],
+                capture_output=True, text=True, timeout=3)
+            preference = result.stdout.strip().strip("'")
+            if result.returncode == 0 and preference in ("prefer-light", "prefer-dark"):
+                return "dark" if preference == "prefer-dark" else "light"
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    # No desktop preference (including default) preserves the published mode.
+    try:
+        mode = json.loads((cache / "palette.json").read_text())["mode"]
+        if mode in ("dark", "light"):
+            return mode
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    return "dark"
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("wallpaper", nargs="?", type=Path)
@@ -278,7 +329,7 @@ def main():
     parser.add_argument("--refresh", action="store_true", help="Regenerate the current wallpaper without a transition")
     parser.add_argument("--reduce-motion", action="store_true", help="Change wallpaper without spatial animation")
     parser.add_argument("--isla-feedback", action="store_true", help="Coordinate wallpaper apply with Isla feedback")
-    parser.add_argument("--mode", choices=("dark", "light"), default="dark")
+    parser.add_argument("--mode", choices=("dark", "light"), help="Override the desktop color scheme for this generation")
     args = parser.parse_args()
     config_home = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
     cache_home = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
@@ -286,6 +337,7 @@ def main():
     cache.mkdir(parents=True, exist_ok=True)
     with (cache / "apply.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
+        args.mode = args.mode or desktop_mode(cache)
         wallpaper = args.wallpaper
         if wallpaper is None and args.refresh:
             marker = cache / "current-wallpaper"
@@ -299,6 +351,7 @@ def main():
             raise ValueError(f"Wallpaper is not a file: {wall}")
         config_dir = Path(__file__).resolve().parent
         entries = load_manifest(config_dir)
+        gtk_settings_paths(config_home)
         binary = shutil.which("matugen")
         if not binary:
             raise RuntimeError("matugen executable is unavailable")
@@ -355,6 +408,10 @@ def main():
                 raise WallpaperAppliedError(str(error)) from error
             raise
         print(f"matugen: published {args.mode} palette for {wall}")
+        try:
+            sync_gtk_mode(config_home, args.mode)
+        except (OSError, RuntimeError) as error:
+            raise PaletteReloadError(f"GTK appearance synchronization failed: {error}") from error
         if not args.seed and not reload_clients(config_home):
             raise PaletteReloadError("running Isla kept its previous palette")
         if transition_end:

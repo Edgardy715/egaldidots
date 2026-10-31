@@ -4,7 +4,6 @@ import Quickshell
 import "../"
 import "../Singletons"
 import "../components"
-import "../pets"
 /**
  * Isla · LauncherSurface. Center "Spotlight" morfeano desde la pill (igual que
  * notifs/calendar): la pill se colapsa en círculo → morph a rect 620×460
@@ -32,8 +31,6 @@ Item {
     activeFocusOnTab: true
 
     property real s: 1
-    property Item petLayer: null
-    property bool petAvailable: false
     property bool open: false
     property bool closing: false
     readonly property bool active: open && !closing
@@ -50,6 +47,16 @@ Item {
     signal requestClose()
     signal launchRequested(var app)
     signal copyResultRequested(string value)
+
+    // Attention for Iris: the text caret, in this view's coordinates. Only
+    // bound while the field has focus, so a hidden launcher costs nothing.
+    readonly property bool focusActive: active && searchInput.activeFocus
+    readonly property point focusPoint: {
+        if (!focusActive) return Qt.point(0, 0)
+        const r = searchInput.cursorRectangle
+        void searchInput.x; void searchInput.y
+        return searchInput.mapToItem(root, r.x, r.y + r.height / 2)
+    }
 
     onOpenChanged: {
         if (open) {
@@ -73,27 +80,6 @@ Item {
             listView.currentIndex = 0
             focusTimer.restart()
         }
-    }
-
-    // The pet stands on the search field's rim, in the empty glass right of
-    // the header's clock; the perch sits above the column and adds no input.
-    PetPerch {
-        objectName: "launcherPetPerch"
-        x: Math.round(parent.width * 0.66)
-        y: searchBox.y - height
-        width: parent.width - x - 24 * root.s
-        height: 44 * root.s
-        petLayer: root.petLayer
-        perchId: "launcher"
-        priority: 3
-        kind: "edge"
-        available: root.petAvailable && root.active && Config.pets.launcherSurface
-        floorY: height
-        headroom: height
-        readonly property real half: petLayer ? petLayer.bodyWidth / 2 : 0
-        minX: half
-        maxX: width - half
-        restX: maxX
     }
 
     // ── logical layout ────────────────────────────────────────────────
@@ -162,7 +148,7 @@ Item {
                         }
                     }
                 }
-                onActiveFocusChanged: if (!activeFocus && root.open) focusTimer.restart()
+                onActiveFocusChanged: if (!activeFocus && root.active) focusTimer.restart()
             }
 
             // Stable clear target with an independently animated icon.
@@ -201,7 +187,16 @@ Item {
             objectName: "launcherEmptyResults"
             width: parent.width
             height: root.emptyResultsVisible ? 34 * root.s : 0
-            visible: root.emptyResultsVisible
+            visible: root.emptyResultsVisible || opacity > 0.01
+            opacity: root.emptyResultsVisible ? 1 : 0
+            Behavior on height {
+                enabled: !Flags.reduceMotion
+                NumberAnimation { duration: Motion.morph; easing.type: Motion.easeMorph; easing.bezierCurve: Motion.morphCurve }
+            }
+            Behavior on opacity {
+                enabled: !Flags.reduceMotion
+                Anim { type: Anim.DefaultEffects }
+            }
             text: qsTr("Sin resultados. Prueba con otro nombre.")
             color: Theme.iconSecondary
             font.family: Theme.font
@@ -306,15 +301,41 @@ Item {
                 onValuesChanged: listView.currentIndex = 0
             }
             // resaltado de selección (highlight que siguen al currentIndex)
+            // One selection surface owns the row highlight and glides between
+            // rows; SmoothedAnimation retargets on held arrow keys without
+            // restarting, so fast navigation never stutters or double-paints.
             highlight: Rectangle {
-                color: Qt.alpha(Theme.accent, Theme.alphaWash)
+                readonly property Item target: listView.currentItem
+                width: listView.width
+                y: target ? target.y : 0
+                height: target ? target.height : 0
+                opacity: target && target.revealed ? 1 : 0
+                color: Qt.alpha(Theme.accent, Theme.alphaGlow)
                 border.color: Qt.alpha(Theme.accent, Theme.alphaHair)
                 border.width: Theme.borderHairlineSoft
                 radius: Theme.radiusLg * root.s
-                Behavior on y { enabled: !Flags.reduceMotion; Anim { type: Anim.FastEffects } }
+                Behavior on y {
+                    enabled: !Flags.reduceMotion && root.active
+                    SmoothedAnimation { velocity: -1; duration: Motion.fast }
+                }
+                Behavior on opacity { Anim { type: Anim.FastEffects } }
+                // Accent edge travels with the selection instead of popping per row.
+                Rectangle {
+                    x: 4 * root.s
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 2 * root.s
+                    height: parent.height - 18 * root.s
+                    radius: width / 2
+                    color: Theme.accent
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: parent.width * 4; height: parent.height + 6 * root.s
+                        radius: width / 2
+                        color: Qt.alpha(Theme.accent, Theme.alphaWash)
+                    }
+                }
             }
-            highlightMoveDuration: Flags.reduceMotion ? 0 : Motion.fast
-            highlightResizeDuration: 0
+            highlightFollowsCurrentItem: false
             preferredHighlightBegin: 0
             preferredHighlightEnd: listView.height
             highlightRangeMode: ListView.ApplyRange
@@ -390,13 +411,13 @@ Item {
 
     Keys.onEscapePressed: root.requestClose()
 
-    // Espera el morph y vuelve a intentarlo mientras la capa adquiere el foco.
+    // Acepta escritura al cargar; el foco no espera al asentamiento del vidrio.
     Timer {
         id: focusTimer
-        interval: Motion.morph + 60
+        interval: 0
         repeat: false
         onTriggered: {
-            if (!root.open) return
+            if (!root.active) return
             searchInput.forceActiveFocus()
             if (!searchInput.activeFocus) retryFocusTimer.restart()
         }
@@ -405,7 +426,7 @@ Item {
         id: retryFocusTimer
         interval: 80
         repeat: false
-        onTriggered: if (root.open && !searchInput.activeFocus) {
+        onTriggered: if (root.active && !searchInput.activeFocus) {
             searchInput.forceActiveFocus()
             if (!searchInput.activeFocus) retryFocusTimer.restart()
         }
@@ -428,11 +449,10 @@ Item {
             return
         }
         if (root.searching) return
-        if (listView.count === 0) return
-        var item = listView.currentItem
-        if (item && item.modelData) {
-            root.launchRequested(item.modelData)
-        }
+        // Results can arrive before ListView creates the selected delegate.
+        const app = root.searchResults[Math.max(0, listView.currentIndex)]
+        if (!app) return
+        root.launchRequested(app)
         root.requestClose()
     }
 }

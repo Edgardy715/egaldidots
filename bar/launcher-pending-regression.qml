@@ -81,6 +81,13 @@ ShellRoot {
                     input.text = "new"
                     tryCompare(controller, "lastQuery", "new")
                     verify(apps.calls > calls, "reopening the same query refreshes results")
+                    controller.closing = false
+                    controller.open = true
+                    input.text = "instant"
+                    tryCompare(controller, "lastQuery", "instant")
+                    view.searchResults = [{id: "before-delegate", name: "Immediate", icon: ""}]
+                    view.launchCurrent()
+                    compare(view.launches[view.launches.length - 1], "before-delegate", "activation uses current model before delegate creation")
                     console.log("PASS: launcher rejects stale activation, hidden search and closing input")
                 } catch (error) {
                     console.error("FAIL: launcher pending: " + error)

@@ -3,7 +3,10 @@
   "appearance": {
     "barLayout": "split",
     "glassAlpha": 0.34,
+    "reduceTransparency": false,
     "materialDepth": 0.25,
+    "liquidSurfaces": true,
+    "stateIntensity": 1.0,
     "ambientFps": 60,
     "mediaTransitions": true,
     "personality": true,
@@ -25,6 +28,17 @@
     "showGlyphs": true,
     "fontMediaFamily": "Inter"
   },
+  "companion": {
+    "sleepAfterSeconds": 180,
+    "reactToCode": true,
+    "reactToMusic": true,
+    "reactAtNight": true,
+    "followPointer": true,
+    "mischief": "rare",
+    "remember": true,
+    "reactToSystem": true,
+    "followFocus": true
+  },
   "paths": {
     "wallpaperDir": "~/Wallpapers",
     "wallpaperCacheDir": "~/.cache/quickshell/wallpapers",
@@ -35,22 +49,6 @@
   "profile": {
     "displayName": ""
   },
-  "pets": {
-    "enabled": false,
-    "pack": "mimo",
-    "name": "Mimo",
-    "scale": "normal",
-    "barSurface": true,
-    "launcherSurface": true,
-    "mediaSurface": true,
-    "jumps": true,
-    "mischief": "normal",
-    "codingReaction": true,
-    "musicReaction": true,
-    "nightReaction": true,
-    "sleepEnabled": true,
-    "sleepAfter": 2
-  },
   "modules": {
     "workspaceRail": true,
     "systemStatus": true,
@@ -59,5 +57,9 @@
     "network": true,
     "battery": true,
     "animateChanges": true
+  },
+  "updates": {
+    "enabled": true,
+    "notifications": true
   }
 }

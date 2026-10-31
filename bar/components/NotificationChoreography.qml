@@ -6,6 +6,8 @@ QtObject {
     property bool surfaceOpen: false
     property bool blocked: false
     property bool deferInformational: false
+    // False when the notification buds as a droplet: the open surface stays.
+    property bool suspendSurface: true
     property int collapseDuration: 0
     property int expandDuration: 0
     property int holdDuration: 0
@@ -78,7 +80,7 @@ QtObject {
     }
 
     function _notifToCircleIn() {
-        if (surfaceOpen) {
+        if (surfaceOpen && suspendSurface) {
             surfaceReveal = 0
             surfaceNotifSuspended = true
         }
@@ -178,7 +180,7 @@ QtObject {
             surfaceNotifSuspended = false
             surfaceReveal = 1
             syncPopup()
-        } else if (notifAnimating) {
+        } else if (notifAnimating && suspendSurface) {
             surfaceReveal = 0
             surfaceNotifSuspended = true
         }

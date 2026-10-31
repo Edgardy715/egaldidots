@@ -65,10 +65,12 @@ código, material ni recursos propietarios de Apple.
 
 ## Pill y cambio de surfaces (2026-09-26)
 
-- Ancho, alto, radio y desplazamiento vertical usan `SmoothedAnimation` con
-  inversión suave y duración `Motion.morph`. Al retargetear conservan velocidad;
-  no reinician una curva Bézier desde reposo. Notificaciones usan su duración
-  semántica existente. Referencia: [Qt SmoothedAnimation](https://doc.qt.io/qt-6/qml-qtquick-smoothedanimation.html).
+- Radio y desplazamiento vertical usan `SmoothedAnimation` con inversión suave y
+  duración `Motion.morph`. Ancho y alto de las surfaces usan, desde 2026-10-25,
+  el muelle físico de «Materialización» (más abajo); `SmoothedAnimation` queda
+  para notificaciones (duración semántica existente), el aviso de workspace y el
+  reposo. Al retargetear ambos conservan velocidad; ninguno reinicia una curva
+  Bézier desde reposo. Referencia: [Qt SmoothedAnimation](https://doc.qt.io/qt-6/qml-qtquick-smoothedanimation.html).
 - El contenido necesita espacio en ambos ejes para revelarse. Entre surfaces,
   el contenido saliente se retira en `Motion.fast`, se sustituye y reaparece;
   la geometría continúa su recorrido. Una nueva petición sustituye el destino
@@ -375,6 +377,106 @@ acotada al borde inferior, sin aro expansivo ni invasión de todo el panel. Entr
 y salida sinusoidales. El hover de los ojos no muestra tooltip: luz local y
 expresión acompañan la presión del control, con foco visible y target fijo.
 
+### El compañero es la cara de la isla (prototipo, 2026-10-25)
+
+**PROTOTIPO — no es la implementación final.** Un solo personaje vectorial junto
+al reloj, del mismo material de la pill. Sin nicho, viajes ni cambios de ancho.
+Carácter tranquilo, atento y un poco curioso. Ojos ligeramente asimétricos,
+punto interior que sigue la mirada con retardo, párpados independientes y alegría
+teñida con el acento de Theme. Mirada con resorte y deriva interior más lenta.
+
+El roce horizontal o vertical cierra los ojos progresivamente y acompaña la mano;
+la presión se acumula sin depender del refresco y se libera al parar. Tres
+inversiones suaves en 1,4 s dejan alegría (mínimo 1,8 s entre caricias). Por encima
+de 550 unidades/s el roce provoca cosquillas. Clic/teclado: curiosidad, juego y
+«ya, ya»; la secuencia se reinicia tras 1,1 s sin clics. Después de una caricia
+recuerda afecto durante 30 s y saluda con más calidez, sin persistencia ni puntos.
+Hover prolongado (750 ms) despierta curiosidad; al salir conserva la mirada 850 ms.
+La superficie acompaña el roce con compresión horizontal/estiramiento vertical
+del 8 %, luz local y desplazamiento de hasta 1,1 unidades; comparte la presión
+continua de los ojos y su liberación, conservando layout y target de interacción.
+Un cuarto clic descubre una historia de 1,74 s: contiene un estornudo y guiña.
+Cancela la sonrisa del tercer clic para conservar la anticipación visible.
+Quinto clic: una luciérnaga cruza el hueco de la cara durante 2,6 s, seguida por
+los ojos. La mirada y la luz comparten progreso y envolvente de entrada/salida;
+el resorte habitual se desactiva durante el recorrido para evitar retraso por
+retarget continuo. Halo y núcleo usan el acento de Theme y no salen del slot.
+Ambas historias reutilizan la oportunidad existente de travesura; acercarse o
+tocarlo interrumpe la escena. Sin temporizador ni loop de actividad adicional.
+Seguimiento desactivado elimina también inclinación por roce y mirada de salida.
+La cara no abre surfaces. Enfoque y Grabación: Super+U → Ajustes rápidos →
+Actividades. REC y el texto informativo quedan fuera de su zona de interacción.
+
+Cada momento es finito y exclusivo: anticipación, expresión y asentamiento;
+confirmación → guiño; final de sesión/grabación → dos saltos; inicio de música →
+dos vaivenes; sueño → bostezo y cierre; regreso corto → reconocimiento,
+regreso tras al menos 60 s dormido → estiramiento y saludo. A veces de noche
+intenta mantenerse despierto antes de bostezar (2,5 % por oportunidad de 2 min).
+El parpadeo responde a interacción/estado y se interrumpe al comenzar otro gesto.
+Atención importante usa ojos grandes y mirada abajo hacia la notificación central,
+respetando la ocultación normal de la cabecera durante la expansión.
+Sin loop idle ni respiración continua: la respiración acompaña un gesto puntual.
+Reduced, ocultación o desactivación cortan los momentos y dejan el cuerpo quieto.
+
+`CompanionBehavior` recibe contexto desde composición: puntero cada 260 ms como
+máximo, celda del rail, clase de terminal/editor, progreso musical y Cava sólo
+con reproducción y panel visible. No abre consumidores nuevos de Cava. El reloj
+marca noche entre 23 y 6; bostezo nocturno al 10 % cada 2 min como máximo.
+Travesura rara: 8 % por oportunidad de 10 min (normal: 28 %), nunca durante
+launcher, auth, grabación o notificación; un bloqueo también cancela el momento.
+
+Config.companion y Edots → Iris controlan sueño (180 s, rango 60–1800),
+reacciones a código/música/noche, seguimiento y travesuras. appearance.personality
+sigue siendo el interruptor general. IdleMonitor conserva sus inhibidores.
+Iris (nombre de la cara) recuerda, en `isla/iris.json` y sin timers, sólo el histograma
+de horas de la primera actividad del día y un ánimo lento (`IrisMemory`, opción
+`companion.remember`). Saluda una vez por día en una sola pantalla: `welcome` (parpadeo
+lento 220/260 ms InOutSine/OutCubic, sonrisa 2,2 s, squash 1,05 OutBack), `welcomeBack`
+(igual, 3,6 s, tras más de 36 h) o `surprised` (ojos 1,25, tilt −7 OutBack 240 ms, un
+parpadeo 70/150 ms). El ánimo sólo reduce la tirada de travesura (÷ 0,6–1,6).
+Iris reacciona al sistema sólo ante sucesos reales y discretos (`companion.reactToSystem`,
+`CompanionBehavior.react/noteBattery`): notificación crítica → `surprised`, diferida hasta que
+la cara se vea (la notificación la cubre; las demás no hacen nada); batería ≤15 % descargando →
+párpados pesados persistentes (`tired`, droop 0,35), empezar a cargar → `content` (squint con
+sonrisa), llegar a completa → `stretch` (squash 1,18 OutBack, tilt atrás 240 ms, vuelta 380 ms);
+captura activa → brillo del ojo en `Theme.error` sin gestos al azar y, al terminar, `relief`
+(parpadeo lento 220 ms + exhalación 0,94→1); contraseña fallida → `no` (dos vaivenes
+decrecientes de 120 ms InOutSine con párpado `wary` 0,25), éxito → `wink`. Un solo gesto a la
+vez; `stopMoment()`/`settle()` los cancelan; en `reduced` no se mueve nada.
+
+Iris viaja con el usuario (`companion.followFocus`). Las surfaces que ocultan la cabecera
+reciben la cara en la esquina superior derecha (inset 22·s + 15·s, centro vertical del reposo):
+una sola propiedad `perchTravel` 0→1, 400 ms (`Motion.standardLarge`) con `SmoothedAnimation`
+(`velocity: -1`: una inversión a mitad de viaje conserva la velocidad), de la posición viva de la cara de reposo a la esquina, escala 1→1 y opacidad igual al viaje; al
+cerrar o cambiar de superficie se reorienta desde el valor actual. Con movimiento reducido no hay
+viaje (la cara de la cabecera simplemente se desvanece). Launcher y auth conservan la cara en su
+cabecera. La mirada va a lo que importa en la superficie (cursor del launcher, línea actual de la
+letra, fondo bajo el puntero, espacio bajo el puntero o las teclas en overview) por los mismos
+resortes de siempre; lo que importa manda sobre el puntero (`followFocus`; sin foco, el puntero
+sobre la pill guía) y reducido, dormida u opción apagada la devuelven a su comportamiento anterior.
+La letra sincronizada también guía en el layout dividido: `IslandOverlay` inyecta la superficie
+multimedia en `Pill.attentionItem`; límite: la mirada parte de la cabecera y no se reevalúa
+mientras la tarjeta se mueve, y en layout dividido la cara no viaja. El saludo del día espera a
+que la cara termine el gesto de despertar (polvo, bostezo; `CompanionBehavior.noteMoment/busyFaces`),
+sin temporizador fijo. Lanzar una app o aplicar un fondo hace `wink`.
+
+Vista previa ×3: `bar/companion-preview.qml`, con rótulo de prototipo visible.
+Abiertos a valoración: amplitud a tamaño real, punto interior, tiempos/probabilidades
+y reconocimiento de caricia física. Informes: docs/companion-polish-2026-10-25/REPORT.md
+y docs/companion-interaction-2026-10-25/REPORT.md.
+
+Visitas de Iris (`bar/Singletons/Visitors.js`): luciérnaga, polilla (23:00 a 05:59), gota,
+burbuja y copo (diciembre) comparten una escena: una forma cruza el hueco de 30x26 y los ojos la
+siguen con el mismo cruce de mirada de la luciérnaga; progreso 0→1 InOutSine, 1,8 a 3,6 s según
+la visita, opacidad por envolvente. La polilla tiembla ±28° (rotación) y la burbuja estalla en el
+último octavo (escala hasta 1,6 y un parpadeo de 70/150 ms). Ocupan la ranura rara de la
+luciérnaga (1,25 %), repartida por pesos: ninguna probabilidad total sube. Sólo cuentan como
+avistamiento si la escena termina; cualquier interrupción la cancela sin rastro. Tras media hora
+dormida Iris «sacude el polvo» (`dust`): mitad de amplitud y 100 ms por paso frente a `no`,
+parpadeo, 560 ms de pausa y bostezo. Los ojos llevan un 12 % de acento sobre el color de texto
+(`Motion.standard`); en tema claro la pupila baja de 1,9 a 1,6 veces la escala para mantener el
+contraste. Informe: docs/iris-delight-2026-10-25/REPORT.md.
+
 ### Grabación y actividades (2026-10-21)
 
 Enfoque y grabación comparten surface mediante cambio finito de pestaña. El botón
@@ -409,3 +511,105 @@ pill y sólo florece tras pellizcar el cuello; al cerrar se recoge a esa yema,
 ya sin contenido, y vuelve redonda: nunca una tarjeta ni una cápsula del ancho
 de la pill unida por el cuello (se lee como bloque o trapecio). Esquinas sobre
 24 sólo en mancha vacía; con contenido >0.25, 24. docs/drop-gather-2026-10-22/.
+
+## Microinteracciones coherentes (2026-10-23)
+
+- Selección: un único indicador compartido que se desliza (launcher, calendario,
+  overview) en vez de anillos por celda que aparecen y desaparecen. Retarget con
+  SmoothedAnimation; salta sin viajar cuando cambia el contexto (mes, grupo).
+- Paginación lateral (mes, grupo de escritorios): desplazamiento corto en la
+  dirección del cambio (18–28 px) más un leve fundido; nada bajo reduceMotion.
+  Repeaters con huecos fijos para no reconstruir delegados ni capturas.
+- Texto: AnimatedLabel/CrossfadeLabel sólo para cambios discretos (contadores,
+  títulos, estados); nunca para texto que cambia con cada tecla. Peso tipográfico
+  constante: el énfasis se anima con color, no con un salto de grosor.
+- Rechazo: ErrorShake (oscilación amortiguada, Motion.standardLarge) en bloqueo
+  y autenticación. Sin sacudidas bajo reduceMotion.
+- Gestos: las tarjetas del historial de notificaciones siguen al dedo sin
+  suavizado, se cierran con 35 % del ancho o un lanzamiento rápido y vuelven con
+  OutBack suave; el botón de cerrar aparece con hover/foco.
+- Listas con teclado: MotionList.revealIndex desliza contentY hasta la fila en
+  vez de saltar con positionViewAtIndex.
+- Hojas: no repetir con Behavior un valor que ya suaviza su fuente
+  (ContentMotion, shownValue) ni fundir en Component.onCompleted lo que ya llega
+  con su surface.
+
+## Superficies líquidas (2026-10-23)
+
+- Un estado activo no se enciende: se derrama. `LiquidFill` nace con la forma del
+  icono del control y se extiende (ancho antes que alto) hasta el contenedor; el
+  texto cambia de tinta sólo cuando el líquido ya lo cubre (`covered`).
+- Una selección no se desliza rígida: `LiquidSelection` adelanta el borde de
+  destino (~180 ms) y deja que el trasero lo alcance (~380 ms), así se estira al
+  viajar y se recoge al llegar. Interrumpir retargetea cada borde desde donde está.
+- Interruptores y deslizadores comparten la regla: el botón se alarga hacia su
+  destino; el relleno del deslizador es una gota en 0 % y forma menisco al arrastrar.
+- El líquido tiene volumen (más claro arriba, menisco fino); las tarjetas se separan
+  por tono, sin contorno.
+- Todo depende de `appearance.liquidSurfaces` (clásico intacto en false) y la
+  cantidad de acento de `appearance.stateIntensity`; reduceMotion lo coloca sin animar.
+- La tinta activa `Theme.stateContent` considera relleno normal/iluminado sobre
+  ambas caras de la tarjeta. Prefiere tinta semántica con contraste 4.5 y, si no
+  llega, maximiza el peor contraste entre candidatas semánticas, negro y blanco.
+  No garantiza 4.5 para toda intensidad ni fondo; mediciones y límites en
+  `docs/design-accessibility-2026-10-26/REPORT.md`.
+- `appearance.reduceTransparency` fuerza `Flags.glassAlpha=1` para los materiales
+  compartidos, sin sobrescribir la opacidad guardada ni modificar el movimiento.
+  Al desactivarse vuelve a `Config.appearance.glassAlpha`.
+
+## Materialización de surfaces (2026-10-25)
+
+La petición actual del usuario (abrir y cerrar no se sentía premium) prevalece sobre
+la retirada de septiembre de la «curva de rebase simulada»: aquello era una curva
+Bézier con rebote fijo; esto es un muelle físico retargeteable que conserva la
+velocidad. Los rebotes no se extienden a otros elementos.
+
+**Geometría** (`PillMorphMotion`, tokens en `Motion.surfaceSpring`). Ancho y alto
+integran `a = -w²e - 2·z·w·v` en subpasos de 1/240 s con `FrameAnimation` (sólo
+corre mientras no está asentado; `step(dt)` es determinista para pruebas).
+Los cuadros tardíos recuperan el tiempo transcurrido en esos subpasos, sin
+ralentizar la animación por descartar tiempo. Una suspensión se limita a 2 s
+normalizados por `motionScale` (máximo 480 subpasos); se publica una vez por cuadro.
+Más allá del destino el muelle se endurece (`omegaFar`, `zetaFar`, mezcla suave en
+`band` x recorrido): rebasa ~3 % y se asienta en ~600 ms, algo que un zeta constante
+no logra (necesita ~1 s). La velocidad es continua; sólo cambia la aceleración.
+- `open` (rest u otra surface -> surface): ancho w 9.0 / z 0.60; alto w 7.8 / z 0.60
+  (90 % ~40 ms después que el ancho). Rebase 2.7-3.0 %, 90 % a 258/300 ms,
+  asentado (< 0.5 px) a 604/638 ms.
+- `resize` (misma surface con `contentHeld`, p. ej. resultados del launcher):
+  w 15 / z 1, sin oscilación.
+- `close` (destino = reposo): ancho w 17 / z 1 (sin infrarrebase); alto w 17 / z 0.85
+  (retroceso < 0.5 %). `closeness` es unilateral: rebasar cuenta como llegado, para
+  que el contenido de reposo no se atenúe por el retroceso.
+- El tipo se decide en el primer paso tras el retarget, cuando destinos y estado de
+  la surface ya se evaluaron (el orden de los handlers no es fiable). Un A->B usa
+  `open`; un retarget a mitad de vuelo conserva posición y velocidad.
+- Notificaciones, aviso de workspace y movimiento reducido NO usan el muelle (misma
+  ruta y duraciones de antes). `springOn` depende de la altura, no del ancho, para
+  que el aviso de workspace (sólo ancho) no secuestre el muelle.
+- El radio no rebasa. El muelle ignora `Motion.morph`; escala con `Flags.motionScale`.
+
+**Contenido** (`PillSurfaceHost`). p = `morphCloseness` x `loadReveal` x `returnFade`.
+Entrada: escala 0.94 -> 1 (origen superior), desenfoque `MultiEffect` (0.6 x
+`blurMax` -> 0) y 6·s px hacia abajo -> 0. La capa sólo existe mientras p < 1 o
+hay intercambio; en reposo no hay capa (escala exactamente 1). A->B: la saliente se
+retira a escala 0.97 con desenfoque y fundido (`Motion.fast`); la entrante se
+materializa. Cierre: el contenido sale entre el 90 % y el 60 % del crecimiento
+(antes: 80 %-45 % al abrir), sin alargar el cierre; la fase 2 del launcher se retira
+con `returnFade` (`Motion.fast`) en lugar de cortarse. Contenido de reposo: vuelve
+con escala 0.96 -> 1 atada al mismo fundido. Superficies grandes (> 480000 px² a
+escala 1: wallpaper, ajustes) limitan `blurMax` a 14. Movimiento reducido: sin
+escala, capa ni desenfoque.
+
+El launcher pide foco al cargar el buscador, sin esperar al asentamiento ni a
+`Motion.morph`. Los reintentos sólo actúan mientras está abierto y no cerrando;
+cerrar o descargarlo libera el foco. La entrada útil y la cola visual se validan
+por separado (`launcher-focus-regression.qml`).
+# Integración de entrada y escritorio · 2026-10-26
+
+Fullscreen invalida inmediatamente la ruta, el docking pendiente y la captura de
+teclado de ese monitor; pill y gotas conservan su retirada visual compartida.
+El cierre animado del launcher libera teclado desde el primer tramo. Las acciones
+de aplicación/workspace se programan fuera del contexto descargable del panel;
+Escape respeta primero búsqueda y popups locales. No añadir una segunda espera
+de morph para ejecutar o enfocar la aplicación.

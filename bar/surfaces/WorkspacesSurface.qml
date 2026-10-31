@@ -11,5 +11,8 @@ WorkspacesView {
     }
     activeId: desktop.activeId
     workspaceData: desktop.occupied
-    onWorkspaceRequested: id => desktop.activate(id)
+    onWorkspaceRequested: id => {
+        desktop.activate(id)
+        root.requestClose()
+    }
 }

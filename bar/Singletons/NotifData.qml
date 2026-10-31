@@ -25,6 +25,7 @@ QtObject {
     property string image: ""
     property int urgency: NotificationUrgency.Normal
     property bool resident: false
+property bool ephemeral: false  // avisos efímeros (p. ej. cambio de teclado): toast sí, historial no
     property bool hasActionIcons: false
     property var actions: []        // [{identifier, text, invoke}]
     property var hints: ({})

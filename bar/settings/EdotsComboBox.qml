@@ -80,8 +80,8 @@ ComboBox {
         border.width: 1
         border.color: root.invalid ? Theme.error : root.popup.visible || root.activeFocus ? Theme.accent : Qt.alpha(Theme.foreground, 0.12)
         opacity: root.enabled ? 1 : 0.45
-        Behavior on color { enabled: root.motionActive; ColorAnimation { duration: Motion.hover } }
-        Behavior on border.color { enabled: root.motionActive; ColorAnimation { duration: Motion.hover } }
+        Behavior on color { enabled: root.motionActive; ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
+        Behavior on border.color { enabled: root.motionActive; ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
         Behavior on opacity { enabled: root.motionActive; NumberAnimation { duration: Motion.fast } }
         Rectangle {
             anchors.fill: parent; anchors.margins: -2
@@ -108,7 +108,7 @@ ComboBox {
         background: Rectangle {
             radius: 8
             color: Qt.alpha(Theme.foreground, option.highlighted ? 0.10 : option.hovered ? 0.055 : 0)
-            Behavior on color { enabled: root.popup.visible; ColorAnimation { duration: Motion.hover } }
+            Behavior on color { enabled: root.popup.visible; ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
         }
         EdotsIcon {
             anchors.right: parent.right; anchors.rightMargin: 13; anchors.verticalCenter: parent.verticalCenter
@@ -142,10 +142,12 @@ ComboBox {
                 height = fullHeight
                 x = anchor.x
                 y = selectedY
+                opensBelow = true
                 list.positionViewAtBeginning()
                 return
             }
             const down = below >= Math.min(240, above)
+            opensBelow = down
             height = Math.min(280, root.count * root.optionHeight + 16, down ? below : above)
             x = anchor.x
             y = down ? anchor.y + root.height + 6 : anchor.y - height - 6
@@ -153,6 +155,7 @@ ComboBox {
         }
         contentItem: ListView {
             id: list
+            transformOrigin: menu.opensBelow ? Item.Top : Item.Bottom
             objectName: "fontOptions"
             clip: true
             model: root.popup.visible ? root.delegateModel : null
@@ -162,20 +165,23 @@ ComboBox {
             ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
         }
         background: Rectangle {
+            transformOrigin: menu.opensBelow ? Item.Top : Item.Bottom
             radius: 15
             color: Theme.surfaceContainer
             border.width: 1; border.color: Qt.alpha(Theme.foreground, 0.18)
         }
+        // Scale grows from the edge nearest the combobox (top when opening below).
+        property bool opensBelow: true
         enter: Transition {
             ParallelAnimation {
-                NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Motion.fast }
-                NumberAnimation { property: "scale"; from: Flags.reduceMotion ? 1 : 0.98; to: 1; duration: Motion.standardSmall; easing.type: Easing.OutCubic }
+                NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Motion.fast; easing.type: Easing.BezierSpline; easing.bezierCurve: Motion.emphasizedDecelCurve }
+                NumberAnimation { targets: [menu.background, list]; property: "scale"; from: Flags.reduceMotion ? 1 : 0.96; to: 1; duration: Motion.fast; easing.type: Easing.BezierSpline; easing.bezierCurve: Motion.emphasizedDecelCurve }
             }
         }
         exit: Transition {
             ParallelAnimation {
-                NumberAnimation { property: "opacity"; to: 0; duration: Motion.hover }
-                NumberAnimation { property: "scale"; to: Flags.reduceMotion ? 1 : 0.985; duration: Motion.hover; easing.type: Easing.OutCubic }
+                NumberAnimation { property: "opacity"; to: 0; duration: Motion.hover; easing.type: Easing.BezierSpline; easing.bezierCurve: Motion.standardAccelCurve }
+                NumberAnimation { targets: [menu.background, list]; property: "scale"; to: Flags.reduceMotion ? 1 : 0.96; duration: Motion.hover; easing.type: Easing.BezierSpline; easing.bezierCurve: Motion.standardAccelCurve }
             }
         }
     }

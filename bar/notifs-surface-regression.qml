@@ -12,6 +12,7 @@ ShellRoot {
     property int nativeCalls: 0
     property int locks: 0
     property int unlocks: 0
+    property int closes: 0
     property var fakeAction: ({ text: "Open", invoke: function() { test.nativeCalls++ } })
     property var fakeNotification: ({
         summary: "Fixture notification", body: "Test body", appName: "Fixture",
@@ -32,6 +33,7 @@ ShellRoot {
             notifications: [test.fakeNotification]
             onToggleDndRequested: test.toggles++
             onActionRequested: (notification, action) => test.actions++
+            onCloseRequested: notification => test.closes++
             onNotificationLockRequested: (notification, owner) => test.locks++
             onNotificationUnlockRequested: (notification, owner) => test.unlocks++
             iconPaths: new Map()
@@ -56,6 +58,20 @@ ShellRoot {
                 compare(test.actions, 1)
                 compare(test.nativeCalls, 0)
                 console.log("PASS: notification view renders injected data and emits DND/action signals without invoking native actions")
+                const close = findChild(view, "notificationClose")
+                verify(close !== null)
+                const card = findChild(view, "historyCard")
+                verify(card !== null)
+                const start = card.mapToItem(view, card.width * 0.3, card.height / 2)
+                mousePress(view, start.x, start.y)
+                for (let i = 1; i <= 8; i++) mouseMove(view, start.x + i * 8, start.y, 40)
+                verify(card.swipeX > 20, "card follows the pointer horizontally")
+                mouseRelease(view, start.x + 64, start.y, Qt.LeftButton, Qt.NoModifier, 40)
+                tryCompare(card, "swipeX", 0, 1500)
+                compare(test.closes, 0)
+                mouseClick(close, close.width / 2, close.height / 2)
+                tryCompare(test, "closes", 1, 1500)
+                console.log("PASS: history card springs back from a short swipe and closes from its button")
                 finished = true
             }
         }
