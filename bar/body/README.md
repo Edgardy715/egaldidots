@@ -7,7 +7,7 @@ Motor sin contenido ni servicios multimedia. `BodyEngine` recibe geometría,
 (default) conserva la entrega de reposo al material de Fase 3. Con `true`,
 `body.frag` recibe la geometría viva de todos los surfaces; `PillMaterial` conserva
 recorte, arte, notificación y recepción. Morph e input siguen siendo propiedad
-de la pill. Gotas y cuellos Fluid quedan fuera de W1.
+de la pill. W3 incorpora gotas y cuellos Fluid al campo compartido.
 
 Geometría en píxeles lógicos, origen superior izquierdo. Reserva 90 ×
 `designScale` de margen por lado para aura/sombra; evita recortarlas.
@@ -105,3 +105,38 @@ conserva espacio para la sombra. El límite de alfa pretende evitar la segunda
 placa de blur; hay comprobación de píxeles en el fixture, pendiente de ejecutar
 con RHI y de capturas Wayland. Informe y línea base: docs/agua-w1-2026-10-31/.
 No activar por defecto antes de QA.
+
+## Agua W3 · gotas y cuellos
+
+La composición conecta cinco `FluidCompanion` (media, sesión, ajustes, grabación
+y notificación) a `PillBody`. Cada una publica `fieldBox` (centro y semiejes en
+coordenadas del body) y `fieldShape` (radio y fusión en píxeles lógicos).
+`body.frag` une sus cajas redondeadas al campo existente antes de calcular
+relleno, normales, luz, borde y sombra. Son cinco entradas fijas, sin bucle nuevo.
+El dominio incluye todas las cajas y el margen de 90*s; pill, brote y archivo
+guardado se trasladan al mismo origen. El borde exterior del campo permanece
+expuesto aunque la gota esté unida; no existe borde interior que ocultar.
+
+El cuello conserva los umbrales de histéresis de FluidCompanion. Su fusión sigue
+`Motion.strokeSpring.lift`, integrado desde el FrameAnimation existente de la
+gota; retarget conserva valor y velocidad. No cambia sus muelles de posición,
+captura, tamaño ni fases. `manualStep` permite comprobar interrupciones sin reloj.
+Al asentarse paran ambos integradores; las diez entradas también invalidan la
+caché W1, que espera seis cuadros quietos y captura una sola textura live:false.
+No se habilita el layer de recorte de la gota en este camino.
+
+Con renderer disponible no se cargan `PillMaterial` ni `FluidNeck` de la gota.
+Software, error del shader, waterBody=false, reduceTransparency, reduceMotion o
+Messenger recuperan ambos Loader con sus bindings anteriores. El contenido y
+sus controles siguen en la gota; arte ambiental y recepción alojados antes en
+su PillMaterial quedan pendientes de W4. No se modifica el respaldo FluidNeck.
+
+`bar/water-drop-regression.qml` comprueba Loader, histéresis, continuidad al
+invertir, coordenadas izquierda/derecha/centrada, brote, quietud y fallback.
+Su rama RHI captura una fila que cruza el cuello y exige variación adyacente de
+luminancia <=32/255 (incluye dithering), además de caché e invalidación.
+En este entorno esa rama no crea contexto OpenGL: píxeles, sombra/luz continuas
+y coste GPU siguen **no verificados**. La inversión no añade salto instantáneo;
+el recorrido normal a 60 Hz puede superar 1 px/cuadro. No equivale a una prueba
+de saltos <=1 px entre imágenes renderizadas. Evidencia y comandos:
+`docs/agua-w3-2026-10-31/REPORT.md`. La QA Wayland corresponde a Claude.

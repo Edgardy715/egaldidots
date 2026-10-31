@@ -15,6 +15,11 @@ layout(std140, binding = 0) uniform buf {
     vec4 pill;
     vec4 bulge;
     vec4 drop0; vec4 drop1; vec4 drop2; vec4 drop3;
+    vec4 companionBox0; vec2 companionShape0;
+    vec4 companionBox1; vec2 companionShape1;
+    vec4 companionBox2; vec2 companionShape2;
+    vec4 companionBox3; vec2 companionShape3;
+    vec4 companionBox4; vec2 companionShape4;
     vec2 lightDir;
     vec2 wallOrigin;
     vec4 wallXform;
@@ -37,6 +42,13 @@ float smin(float a, float b, float k) {
     float h = max(k - abs(a - b), 0.0) / k;
     return min(a, b) - h * h * k * 0.25;
 }
+float companionUnion(float d, vec2 p, vec4 box, vec2 shape) {
+    if (box.z <= 0.0 || box.w <= 0.0 || water < 0.5) return d;
+    float r = min(shape.x, min(box.z, box.w));
+    vec2 q = abs(p - box.xy) - box.zw + vec2(r);
+    float drop = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+    return shape.y > 0.001 ? smin(d, drop, shape.y) : min(d, drop);
+}
 float scene(vec2 p) {
     float d = sdStadium(p - pill.xy, pill.zw);
     if (bulge.z > 0.0 && bulge.w > 0.001) d = smin(d, length(p - bulge.xy) - bulge.z, fusionRadius * bulge.w);
@@ -45,6 +57,11 @@ float scene(vec2 p) {
     if (drop1.w > 0.5) d = smin(d, length(p - drop1.xy) - drop1.z, fusionRadius);
     if (drop2.w > 0.5) d = smin(d, length(p - drop2.xy) - drop2.z, fusionRadius);
     if (drop3.w > 0.5) d = smin(d, length(p - drop3.xy) - drop3.z, fusionRadius);
+    d = companionUnion(d, p, companionBox0, companionShape0);
+    d = companionUnion(d, p, companionBox1, companionShape1);
+    d = companionUnion(d, p, companionBox2, companionShape2);
+    d = companionUnion(d, p, companionBox3, companionShape3);
+    d = companionUnion(d, p, companionBox4, companionShape4);
     return d;
 }
 float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }

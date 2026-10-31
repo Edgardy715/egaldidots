@@ -5,6 +5,22 @@ import "../components"
 // Presentation only: PillMorphMotion remains the owner of layout and input.
 Item {
     id: root
+    property var companion0: null
+    readonly property vector4d box0: companion0 ? companion0.fieldBox : Qt.vector4d(0, 0, 0, 0)
+    property var companion1: null
+    readonly property vector4d box1: companion1 ? companion1.fieldBox : Qt.vector4d(0, 0, 0, 0)
+    property var companion2: null
+    readonly property vector4d box2: companion2 ? companion2.fieldBox : Qt.vector4d(0, 0, 0, 0)
+    property var companion3: null
+    readonly property vector4d box3: companion3 ? companion3.fieldBox : Qt.vector4d(0, 0, 0, 0)
+    property var companion4: null
+    readonly property vector4d box4: companion4 ? companion4.fieldBox : Qt.vector4d(0, 0, 0, 0)
+    // All bodies share one padded render domain, including detached/centered cards.
+    readonly property real fieldLeft: Math.min(-captureLeftExtra, box0.x - box0.z, box1.x - box1.z, box2.x - box2.z, box3.x - box3.z, box4.x - box4.z)
+    readonly property real fieldTop: Math.min(0, box0.y - box0.w, box1.y - box1.w, box2.y - box2.w, box3.y - box3.w, box4.y - box4.w)
+    readonly property real fieldRight: Math.max(width + captureExtra, box0.x + box0.z, box1.x + box1.z, box2.x + box2.z, box3.x + box3.z, box4.x + box4.z)
+    readonly property real fieldBottom: Math.max(height, liveHeight, box0.y + box0.w, box1.y + box1.w, box2.y + box2.w, box3.y + box3.w, box4.y + box4.w)
+    readonly property bool hasCompanion: box0.z > 0 || box1.z > 0 || box2.z > 0 || box3.z > 0 || box4.z > 0
     property bool waterBody: false
     property real reading: 0
     property real edgeExposure: 1
@@ -103,15 +119,16 @@ Item {
         visible: !root.messengerActive
         objectName: "pillBodyShader"
         opacity: root.waterBody ? 1 : root.exposure / Math.max(0.001, 1 - root.fillAlpha * (1 - root.exposure))
-        x: -root.margin - (root.waterBody ? root.captureLeftExtra : 0); y: -root.margin
-        width: root.width + (root.waterBody ? root.captureExtra + root.captureLeftExtra : 0) + 2 * root.margin
-        height: Math.max(root.height, root.liveHeight) + 2 * root.margin
+        x: -root.margin + (root.waterBody ? root.fieldLeft : 0)
+        y: -root.margin + (root.waterBody ? root.fieldTop : 0)
+        width: (root.waterBody ? root.fieldRight - root.fieldLeft : root.width) + 2 * root.margin
+        height: (root.waterBody ? root.fieldBottom - root.fieldTop : Math.max(root.height, root.liveHeight)) + 2 * root.margin
         designScale: root.s
         // Aura stays off; water shadow has its own alpha capped below ignore_alpha=0.15.
         outsideOpacity: 0
         water: root.waterBody ? 1 : 0
         reading: root.reading
-        edgeExposure: root.suppressEdge ? 0 : root.edgeExposure
+        edgeExposure: root.hasCompanion ? 1 : root.suppressEdge ? 0 : root.edgeExposure
         shadowExposure: root.shadowEnabled ? root.reading * edgeExposure : 0
         cacheWhenStill: root.waterActive && !engine.needsFrames
             && !(engine.breathe && !root.reduceMotion) && !restPresence.integrating
@@ -119,14 +136,15 @@ Item {
         cacheOrigin: root.sceneOrigin
         time: engine.time
         // Use only bounded expressive offsets, never a second layout spring.
-        pillCx: root.margin + (root.width + (root.waterBody ? root.captureExtra + root.captureLeftExtra : 0)) / 2 + root.expressiveGeometry * Math.max(-6 * root.s, Math.min(6 * root.s, engine.pill.x - engine.cx))
-        pillCy: root.margin + root.liveHeight / 2 + root.expressiveGeometry * Math.max(-4 * root.s, Math.min(4 * root.s, engine.pill.y - engine.cy))
+        pillCx: -glass.x + (root.width + (root.waterBody ? root.captureExtra - root.captureLeftExtra : 0)) / 2 + root.expressiveGeometry * Math.max(-6 * root.s, Math.min(6 * root.s, engine.pill.x - engine.cx))
+        pillCy: -glass.y + root.liveHeight / 2 + root.expressiveGeometry * Math.max(-4 * root.s, Math.min(4 * root.s, engine.pill.y - engine.cy))
         pillHalfW: root.waterBody ? (root.width + root.captureExtra + root.captureLeftExtra) / 2
             + root.restExposure * Math.max(-8 * root.s, Math.min(8 * root.s, engine.pill.z - engine.baseW / 2))
             : Math.max(pillHalfH, root.width / 2 + Math.max(-8 * root.s, Math.min(8 * root.s, engine.pill.z - engine.baseW / 2)))
         pillHalfH: root.liveHeight / 2 + root.expressiveGeometry * Math.max(-6 * root.s, Math.min(4 * root.s, engine.pill.w - engine.baseH / 2))
         pillRadius: root.waterBody ? root.cornerRadius : root.resting ? -1 : root.cornerRadius
-        bulge: Qt.vector4d(engine.bulge.x, engine.bulge.y, engine.bulge.z * root.restExposure, engine.bulge.w * root.restExposure)
+        bulge: Qt.vector4d(engine.bulge.x - glass.x - root.margin, engine.bulge.y - glass.y - root.margin,
+            engine.bulge.z * root.restExposure, engine.bulge.w * root.restExposure)
         // Buds from inside the lower edge; the shared fusion radius draws the neck.
         // A shared rest spring withdraws the bud and expressive shape without a hard switch.
         drop0: {
@@ -135,8 +153,19 @@ Item {
             const r = root.dock.z * Math.min(1, 0.4 + 0.6 * size) * (1 + 0.08 * dockTouch.value)
                 * (root.waterBody ? root.restExposure : 1)
             const top = glass.pillCy + glass.pillHalfH - r * 0.6
-            return Qt.vector4d(root.dock.x, top + (root.dock.y - top) * p, r * Math.min(1, size * 4), root.waterBody ? p : p > 0.01 ? 1 : 0)
+            return Qt.vector4d(root.dock.x - glass.x - root.margin, top + (root.dock.y - glass.y - root.margin - top) * p, r * Math.min(1, size * 4), root.waterBody ? p : p > 0.01 ? 1 : 0)
         }
+        wallOrigin: Qt.vector2d(x + (root.waterBody ? root.sceneOrigin.x : 0), y + (root.waterBody ? root.sceneOrigin.y : 0))
+        companionBox0: Qt.vector4d(root.box0.x - x, root.box0.y - y, root.box0.z, root.box0.w)
+        companionShape0: root.companion0 ? root.companion0.fieldShape : Qt.vector2d(0, 0)
+        companionBox1: Qt.vector4d(root.box1.x - x, root.box1.y - y, root.box1.z, root.box1.w)
+        companionShape1: root.companion1 ? root.companion1.fieldShape : Qt.vector2d(0, 0)
+        companionBox2: Qt.vector4d(root.box2.x - x, root.box2.y - y, root.box2.z, root.box2.w)
+        companionShape2: root.companion2 ? root.companion2.fieldShape : Qt.vector2d(0, 0)
+        companionBox3: Qt.vector4d(root.box3.x - x, root.box3.y - y, root.box3.z, root.box3.w)
+        companionShape3: root.companion3 ? root.companion3.fieldShape : Qt.vector2d(0, 0)
+        companionBox4: Qt.vector4d(root.box4.x - x, root.box4.y - y, root.box4.z, root.box4.w)
+        companionShape4: root.companion4 ? root.companion4.fieldShape : Qt.vector2d(0, 0)
         glow: engine.glow
         night: engine.night
         spec: engine.spec

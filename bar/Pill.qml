@@ -66,6 +66,11 @@ Item {
     }
     // El motor Fluid puede extender visualmente el casquete derecho sin cambiar
     // el layout ni el contenido de reposo de la pill.
+    property Item fluidCompanion0: null
+    property Item fluidCompanion1: null
+    property Item fluidCompanion2: null
+    property Item fluidCompanion3: null
+    property Item fluidCompanion4: null
     property bool fluidJoined: false
     property real fluidEdgeExposure: fluidJoined ? 0 : 1
     property real fluidCaptureExtra: 0
@@ -265,6 +270,11 @@ Item {
         cornerRadius: pill.morphRadius + (body.waterBody ? pill.notifBreathRadius : 0)
         s: pill.s
         waterBody: Config.appearance.waterBody === true
+        companion0: pill.fluidCompanion0
+        companion1: pill.fluidCompanion1
+        companion2: pill.fluidCompanion2
+        companion3: pill.fluidCompanion3
+        companion4: pill.fluidCompanion4
         sceneOrigin: pill.parent ? pill.parent.mapToItem(null, pill.x, pill.y) : Qt.point(pill.x, pill.y)
         reading: material.readingExposure
         edgeExposure: pill.fluidEdgeExposure

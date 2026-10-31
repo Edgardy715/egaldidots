@@ -458,6 +458,11 @@ PanelWindow {
             launcherClosing: overlay.launcherClosing
             launcherClosePhase: router.launcherClosePhase
             forcePinned: router.peekMon === overlay.modelData.name
+            fluidCompanion0: fluidCompanion
+            fluidCompanion1: sessionCompanion
+            fluidCompanion2: settingsCompanion
+            fluidCompanion3: recordingCompanion
+            fluidCompanion4: notificationCompanion
             fluidJoined: (!overlay.compact && (!overlay.surfaceOpen || overlay.sessionOpen) && fluidCompanion.joined)
                 || sessionCompanion.joined || settingsCompanion.joined || recordingCompanion.joined
                 || notificationCompanion.joined
@@ -487,6 +492,7 @@ PanelWindow {
             anchors.fill: parent
             z: 3
             body: pill
+            waterBody: pill.bodyPresentation
             leftSide: true
             s: overlay.s
             screenName: overlay.modelData.name
@@ -508,6 +514,7 @@ PanelWindow {
             anchors.fill: parent
             z: 3
             body: pill
+            waterBody: pill.bodyPresentation
             leftSide: true
             surfaceName: "session"
             surfaceSize: IslandGeometry.sessionSurface
@@ -526,6 +533,7 @@ PanelWindow {
             anchors.fill: parent
             z: overlay.settingsReturning ? 1 : 4
             body: pill
+            waterBody: pill.bodyPresentation
             centered: true
             surfaceName: "settings"
             surfaceSize: IslandGeometry.settingsSurface
@@ -559,6 +567,7 @@ PanelWindow {
             anchors.fill: parent
             z: 5
             body: pill
+            waterBody: pill.bodyPresentation
             centered: true
             below: true
             springRate: 1.5
@@ -594,6 +603,7 @@ PanelWindow {
             visible: opacity > 0.005
             anchors.fill: parent
             body: pill
+            waterBody: pill.bodyPresentation
             open: !overlay.layoutChanging && !overlay.compact && (Players.has || overlay.mediaOpen) && !overlay.launcherOpen && !overlay.mediaPanelOpen
                 && !overlay.mediaPanelReturning && !overlay.mediaDocking
             // Once the drop is concealed inside the body the dock is visually done;

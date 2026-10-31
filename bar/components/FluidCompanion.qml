@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell.Widgets
 import "../fluid" as Fluid
@@ -9,6 +11,17 @@ Item {
     id: root
 
     required property Item body
+    // The composition supplies the shared renderer; legacy callers need no wiring.
+    property var waterBody: null
+    readonly property bool waterActive: !!waterBody && waterBody.waterActive
+        && !waterBody.messengerActive && !Flags.reduceMotion
+    readonly property vector4d fieldBox: waterActive && active && visible && opacity > 0.005
+        ? Qt.vector4d(visualX - bodyX + wPos / 2, yPos - bodyY + hPos / 2, wPos / 2, hPos / 2)
+        : Qt.vector4d(0, 0, 0, 0)
+    readonly property vector2d fieldShape: Qt.vector2d(cardRadius, Math.max(0, neckSpring.value))
+    readonly property alias fieldSpring: neckSpring
+    readonly property alias motionRunning: motionFrames.running
+    property bool manualStep: false
     property bool open: false
     property bool expanded: false
     property bool bodyBusy: false
@@ -39,7 +52,10 @@ Item {
     readonly property real visualCapX: leftSide ? bodyX - captureExtra + bodyRadius : capX
     readonly property bool pressed: compactHit.enabled && compactHit.pressed && compactHit.containsMouse
     signal requestToggle()
-    function receive() { if (root.active && root.expanded) companionMaterial.receive(0.55) }
+    function receive() {
+        const material = materialLoader.item as PillMaterial
+        if (root.active && root.expanded && material) material.receive(0.55)
+    }
     Connections {
         target: root.surfaceItem
         ignoreUnknownSignals: true
@@ -376,9 +392,20 @@ Item {
         }
     }
 
+    // Stepped by the existing geometry clock: no second per-frame driver.
+    SpringValue {
+        id: neckSpring
+        objectName: "waterNeckSpring"
+        target: root.joined ? root.neckBlend : 0
+        spring: Motion.strokeSpring.lift
+        active: root.waterActive && root.phase !== "idle"
+        manualStep: true
+    }
+
     FrameAnimation {
-        running: !Flags.reduceMotion && root.phase !== "idle"
-            && (!root.settled || root.phase === "separando" || root.phase === "brotando"
+        id: motionFrames
+        running: !root.manualStep && !Flags.reduceMotion && root.phase !== "idle"
+            && (!root.settled || root.waterActive && neckSpring.integrating || root.phase === "separando" || root.phase === "brotando"
                 || root.phase === "recogiendo"
                 || root.phase === "retornando" || root.phase === "absorbiendo")
         onTriggered: root.advanceMotion(frameTime)
@@ -394,6 +421,7 @@ Item {
             root.captureTarget = 20 * root.s
         next = root.spring(root.captureExtra, root.captureV, root.captureTarget, dt)
         root.captureExtra = next[0]; root.captureV = next[1]
+        if (root.waterActive && neckSpring.integrating) neckSpring.step(dt)
         if (root.phase === "brotando" && ((!root.bond && root.stretch >= 1.30) || root.settled)) {
             root.retarget("media", root.cardX, root.cardY, root.cardW, root.cardH)
         } else if (root.phase === "recogiendo"
@@ -411,32 +439,37 @@ Item {
         }
     }
 
-    Fluid.FluidNeck {
-        z: 0
-        visible: root.joined && root.neckBlend > 0.5
-        bodyLeft: root.bodyX - (root.leftSide ? root.captureExtra : 0)
-        bodyTop: root.bodyY
-        bodyWidth: root.bodyW + (root.centered ? 0 : root.captureExtra)
-        bodyHeight: root.bodyH
-        bodyCorner: root.bodyRadius
-        dropLeft: root.visualX; dropTop: root.yPos
-        dropWidth: root.wPos; dropHeight: root.hPos
-        dropCorner: root.cardRadius
-        blend: root.neckBlend
-        readonly property real bodyAlpha: root.glassAlpha(root.bodyExposure)
-        readonly property real dropAlpha: root.glassAlpha(root.dropExposure)
-        bodyColor0: Qt.alpha(Theme.cardTop, Math.min(1, bodyAlpha + 0.08 * root.bodyExposure))
-        bodyColor1: Qt.alpha(Theme.cardBot, bodyAlpha)
-        bodyColor2: Qt.alpha(Qt.darker(Theme.cardBot, 1 + 0.16 * root.bodyExposure), Math.min(1, bodyAlpha + 0.04 * root.bodyExposure))
-        dropColor0: Qt.alpha(Theme.cardTop, Math.min(1, dropAlpha + 0.08 * root.dropExposure))
-        dropColor1: Qt.alpha(Theme.cardBot, dropAlpha)
-        dropColor2: Qt.alpha(Qt.darker(Theme.cardBot, 1 + 0.16 * root.dropExposure), Math.min(1, dropAlpha + 0.04 * root.dropExposure))
-        accent: Theme.accent
-        // Accent band of a resting pill and of the awake droplet material.
-        bodyBand: 0.028 * 0.62 * (1 - 0.65 * root.bodyExposure)
-        bodyBandHeight: Math.max(30 * root.s, 0.22 * root.bodyH)
-        dropBand: 0.075 * 0.88 * (1 - 0.65 * root.dropExposure)
-        dropBandHeight: Math.max(30 * root.s, 0.22 * root.hPos)
+    Loader {
+        objectName: "companionNeckLoader"
+        active: !root.waterActive
+        sourceComponent: Fluid.FluidNeck {
+            objectName: "companionLegacyNeck"
+            z: 0
+            visible: root.joined && root.neckBlend > 0.5
+            bodyLeft: root.bodyX - (root.leftSide ? root.captureExtra : 0)
+            bodyTop: root.bodyY
+            bodyWidth: root.bodyW + (root.centered ? 0 : root.captureExtra)
+            bodyHeight: root.bodyH
+            bodyCorner: root.bodyRadius
+            dropLeft: root.visualX; dropTop: root.yPos
+            dropWidth: root.wPos; dropHeight: root.hPos
+            dropCorner: root.cardRadius
+            blend: root.neckBlend
+            readonly property real bodyAlpha: root.glassAlpha(root.bodyExposure)
+            readonly property real dropAlpha: root.glassAlpha(root.dropExposure)
+            bodyColor0: Qt.alpha(Theme.cardTop, Math.min(1, bodyAlpha + 0.08 * root.bodyExposure))
+            bodyColor1: Qt.alpha(Theme.cardBot, bodyAlpha)
+            bodyColor2: Qt.alpha(Qt.darker(Theme.cardBot, 1 + 0.16 * root.bodyExposure), Math.min(1, bodyAlpha + 0.04 * root.bodyExposure))
+            dropColor0: Qt.alpha(Theme.cardTop, Math.min(1, dropAlpha + 0.08 * root.dropExposure))
+            dropColor1: Qt.alpha(Theme.cardBot, dropAlpha)
+            dropColor2: Qt.alpha(Qt.darker(Theme.cardBot, 1 + 0.16 * root.dropExposure), Math.min(1, dropAlpha + 0.04 * root.dropExposure))
+            accent: Theme.accent
+            // Accent band of a resting pill and of the awake droplet material.
+            bodyBand: 0.028 * 0.62 * (1 - 0.65 * root.bodyExposure)
+            bodyBandHeight: Math.max(30 * root.s, 0.22 * root.bodyH)
+            dropBand: 0.075 * 0.88 * (1 - 0.65 * root.dropExposure)
+            dropBandHeight: Math.max(30 * root.s, 0.22 * root.hPos)
+        }
     }
 
     Item {
@@ -446,7 +479,7 @@ Item {
         visible: root.active
         // Remove the received portion; translucent glass cannot occlude another layer.
         // Also while crossing unbonded: a wide droplet overlaps before it joins.
-        layer.enabled: root.overlapsBody && (root.joined || root.phase === "nacimiento" || root.phase === "brotando"
+        layer.enabled: !root.waterActive && root.overlapsBody && (root.joined || root.phase === "nacimiento" || root.phase === "brotando"
             || root.phase === "separando" || root.phase === "retornando" || root.phase === "absorbiendo")
         layer.smooth: true
         layer.effect: ShaderEffect {
@@ -460,22 +493,28 @@ Item {
             fragmentShader: Qt.resolvedUrl("../fluid/shaders/fluid_cut.frag.qsb")
         }
 
-        PillMaterial {
-            id: companionMaterial
+        Loader {
+            id: materialLoader
+            objectName: "companionMaterialLoader"
             anchors.fill: parent
-            s: root.s
-            morphRadius: root.cardRadius
-            materialAwake: true
-            materialAccent: Theme.accent
-            mode: root.surfaceName
-            surface: root.surfaceName === "media" && (root.expanded || surfaceHost.displayedSurface === "media") ? "media" : ""
-            artUrl: root.artUrl
-            artworkTransition: root.artworkTransition
-            mediaPlaying: root.mediaPlaying
-            mediaSettled: root.expanded && root.cardContentProgress > 0.95
-            suppressEdge: root.joined || (!root.centered && root.contentExposure < 0.3)
-            edgeExposure: root.edgeClearance * (root.joined ? root.edgeExposure
-                : !root.centered && root.contentExposure < 0.3 ? 0 : 1)
+            active: !root.waterActive
+            sourceComponent: PillMaterial {
+                objectName: "companionLegacyMaterial"
+                anchors.fill: parent
+                s: root.s
+                morphRadius: root.cardRadius
+                materialAwake: true
+                materialAccent: Theme.accent
+                mode: root.surfaceName
+                surface: root.surfaceName === "media" && (root.expanded || surfaceHost.displayedSurface === "media") ? "media" : ""
+                artUrl: root.artUrl
+                artworkTransition: root.artworkTransition
+                mediaPlaying: root.mediaPlaying
+                mediaSettled: root.expanded && root.cardContentProgress > 0.95
+                suppressEdge: root.joined || (!root.centered && root.contentExposure < 0.3)
+                edgeExposure: root.edgeClearance * (root.joined ? root.edgeExposure
+                    : !root.centered && root.contentExposure < 0.3 ? 0 : 1)
+            }
         }
 
         Loader {

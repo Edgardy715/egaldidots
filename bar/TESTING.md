@@ -701,3 +701,44 @@ y el PASS final correspondiente al backend, sin FAIL. Software no ejecuta las
 aserciones de píxeles, respiración en producción ni ShaderEffectSource real.
 La sombra exterior ya está implementada; su aspecto y ausencia de segunda placa
 siguen **no verificados** hasta capturar Wayland con el compositor real.
+
+### Agua W3 · campo compartido de gotas (2026-10-31)
+
+Desde la raíz, sin tocar la shell real. Cada lanzamiento es un proceso nuevo
+para invalidar el qsb cacheado. No guardar Config desde los fixtures.
+
+```sh
+(cd bar/body/shaders && /usr/lib/qt6/bin/qsb --qt6 -o body.frag.qsb body.frag)
+task_dir=$(mktemp -d /tmp/agua-w3-XXXXXX)
+mkdir -m 700 "$task_dir/runtime" "$task_dir/cache"
+export ISLA_CONFIG="$task_dir/missing.json"
+export XDG_RUNTIME_DIR="$task_dir/runtime" XDG_CACHE_HOME="$task_dir/cache"
+export QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME=
+for test in water-body water-drop body-pill body frame-time pill-geometry pill-composition content-hold surface-swap-close surface-materialize; do
+    timeout -k 5 90 quickshell -p "bar/$test-regression.qml"
+done
+rg -l 'FluidCompanion|FluidNeck|FluidMediaCompanion' bar/*regression*.qml
+# Ejecutar también los fixtures enumerados por rg que no estén en el bucle anterior.
+QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl timeout -k 5 90 quickshell -p bar/water-body-regression.qml
+QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl timeout -k 5 90 quickshell -p bar/water-drop-regression.qml
+node bar/tests/body-brain.cjs
+/usr/lib/qt6/bin/qmllint bar/body/PillBody.qml bar/body/BodyShader.qml bar/components/FluidCompanion.qml bar/Pill.qml bar/windows/IslandOverlay.qml bar/water-drop-regression.qml
+```
+
+Exigir PASS explícito, ausencia de FAIL y salida 0. W3 usa disponibilidad fingida
+en software para verificar que ambos Loader están vacíos y el layer de recorte
+apagado; después conecta el renderer real para comprobar su respaldo. No presenta
+esa disponibilidad fingida como compilación, render ni fallo real del shader.
+La inversión abrir→cerrar→abrir conserva geometría (<=1 px) y velocidad al
+retargetear. Se registra aparte el desplazamiento ordinario a 60 Hz; no se exige
+que un recorrido físico completo avance sólo 1 px por cuadro.
+
+En RHI, grabImage cruza el cuello por y=80, x=150..205 del fixture: exige relleno
+en el hueco y salto adyacente de luminancia Rec.709 <=32 unidades de 255.
+El límite admite gradiente/lente y dithering; detecta una costura brusca, no
+certifica todo el contorno ni la continuidad temporal. También verifica caché
+quieta, invalidación por geometría y Loader tras error real del shader.
+
+Resultado local: 17 fixtures PASS; settings-async no carga PanelWindow en
+offscreen. RHI no crea contexto OpenGL. Caché real, píxeles, GPU/PSS y QA Wayland
+siguen pendientes; Claude realiza esa QA. Informe: docs/agua-w3-2026-10-31/REPORT.md.

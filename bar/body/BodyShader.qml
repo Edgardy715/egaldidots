@@ -28,6 +28,7 @@ ShaderEffect {
         fusionRadius, warm, glow, night, spec, outsideOpacity, wallMix, pill, bulge,
         drop0, drop1, drop2, drop3, lightDir, wallOrigin, wallXform, colA, colB, colC,
         colBg, colBase, colTop, fillAlpha, pillRadius, water, reading, edgeExposure,
+        companionBox0, companionShape0, companionBox1, companionShape1, companionBox2, companionShape2, companionBox3, companionShape3, companionBox4, companionShape4,
         shadowExposure, wallpaperSource, fragmentShader, status, cacheOrigin] : null
     onRenderInputsChanged: { unchangedFrames = 0; inputsDirty = true }
     FrameAnimation {
@@ -45,6 +46,16 @@ ShaderEffect {
     property vector4d drop1: Qt.vector4d(0, 0, 0, 0)
     property vector4d drop2: Qt.vector4d(0, 0, 0, 0)
     property vector4d drop3: Qt.vector4d(0, 0, 0, 0)
+    property vector4d companionBox0: Qt.vector4d(0, 0, 0, 0)
+    property vector2d companionShape0: Qt.vector2d(0, 0)
+    property vector4d companionBox1: Qt.vector4d(0, 0, 0, 0)
+    property vector2d companionShape1: Qt.vector2d(0, 0)
+    property vector4d companionBox2: Qt.vector4d(0, 0, 0, 0)
+    property vector2d companionShape2: Qt.vector2d(0, 0)
+    property vector4d companionBox3: Qt.vector4d(0, 0, 0, 0)
+    property vector2d companionShape3: Qt.vector2d(0, 0)
+    property vector4d companionBox4: Qt.vector4d(0, 0, 0, 0)
+    property vector2d companionShape4: Qt.vector2d(0, 0)
     property vector2d lightDir: Qt.vector2d(0, -1)
     property vector2d wallOrigin: Qt.vector2d(x, y)
     property vector4d wallXform: {
