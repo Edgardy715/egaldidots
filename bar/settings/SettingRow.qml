@@ -216,7 +216,7 @@ Item {
                         x: 6; y: (toggle.height - height) / 2
                         implicitWidth: 52; implicitHeight: 30
                         radius: height / 2
-                        scale: root.reducedMotion ? 1 : toggle.down ? 0.94 : toggle.hovered ? 1.04 : 1
+                        scale: root.reducedMotion ? 1 : toggle.down ? 0.94 : 1
                         Behavior on scale { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
                         color: toggle.checked ? (Theme.liquid ? Theme.stateFill : Theme.accent) : Qt.alpha(Theme.foreground, 0.12)
                         gradient: Theme.liquid && toggle.checked ? trackVolume : null
@@ -441,7 +441,7 @@ Item {
                         x: Theme.liquid ? slider.leftPadding + slider.fillWidth - slider.trackHeight / 2 - width / 2
                                         : slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
                         y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                        scale: root.reducedMotion || Theme.liquid ? 1 : slider.pressed ? 1.22 : slider.hovered ? 1.12 : 1
+                        scale: root.reducedMotion || Theme.liquid ? 1 : slider.pressed ? 1.22 : 1
                         Behavior on scale { enabled: !root.reducedMotion && root.visible; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
                         width: size
                         height: size
