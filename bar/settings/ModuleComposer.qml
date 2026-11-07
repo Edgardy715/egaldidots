@@ -54,7 +54,7 @@ Rectangle {
                     Layout.alignment: Qt.AlignHCenter; Layout.preferredWidth: 108; Layout.preferredHeight: 40; radius: 20; color: Qt.alpha(Theme.foreground, Theme.alphaHair)
                     Row { anchors.centerIn: parent; spacing: 8
                         EdotsIcon { iconName: "lock"; font.pixelSize: 14; color: Theme.accent }
-                        Text { text: "Isla"; color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 13 }
+                        Text { text: "Azog"; color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 13 }
                     }
                     Accessible.role: Accessible.StaticText; Accessible.name: qsTr("Isla principal, siempre visible")
                 }

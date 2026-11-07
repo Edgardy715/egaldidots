@@ -161,7 +161,7 @@ FocusScope {
                 Accessible.name: I18n.tr("Editar tu perfil")
                 onClicked: root.showProfile()
             }
-            Text { Layout.fillWidth: true; elide: Text.ElideRight; text: "Edots"; color: Theme.foreground; font.family: Config.appearance.fontDisplayFamily; font.pixelSize: 19 * Math.min(1.35, Config.appearance.fontScale); font.weight: Font.DemiBold }
+            Text { Layout.fillWidth: true; elide: Text.ElideRight; text: "Crucible"; color: Theme.foreground; font.family: Config.appearance.fontDisplayFamily; font.pixelSize: 19 * Math.min(1.35, Config.appearance.fontScale); font.weight: Font.DemiBold }
         }
         RowLayout {
             Layout.row: 0; Layout.column: 1
@@ -187,7 +187,7 @@ FocusScope {
                     selected: search.activeFocus
                 }
             }
-            EdotsButton { text: ""; symbol: "close"; flat: true; implicitWidth: 44; Accessible.name: I18n.tr("Volver a Isla"); onClicked: root.requestClose() }
+            EdotsButton { text: ""; symbol: "close"; flat: true; implicitWidth: 44; Accessible.name: I18n.tr("Volver a Azog"); onClicked: root.requestClose() }
         }
         Item {
             id: navigationFrame
@@ -304,7 +304,7 @@ FocusScope {
         EdotsButton {
             objectName: "updatesSearchResult"
             visible: root.updatesSearchMatch
-            text: I18n.tr("Actualizaciones · Sistema, aplicaciones e Isla"); symbol: "system_update"
+            text: I18n.tr("Actualizaciones · Sistema, aplicaciones e Azog"); symbol: "system_update"
             onClicked: root.showUpdates()
         }
         ModuleComposer {
@@ -335,7 +335,7 @@ FocusScope {
             Column {
                 Layout.fillWidth: true; spacing: 5
                 Text { text: Config.profile.displayName || I18n.tr("Tu espacio personal"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 20; width: parent.width; elide: Text.ElideRight }
-                Text { text: I18n.tr("Así te presenta Isla en la sesión."); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody) }
+                Text { text: I18n.tr("Así te presenta Azog en la sesión."); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody) }
             }
         }
         RowLayout {

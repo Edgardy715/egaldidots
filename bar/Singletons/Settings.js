@@ -10,7 +10,7 @@ var fields = {
         workspaceStyle: { type: "string", default: "numbers", options: ["numbers", "dots", "bars", "capsules", "pacman"], optionLabels: ["Números", "Puntos", "Barras", "Cápsulas", "Pac-Man"], label: "Estilo de espacios de trabajo", control: "choice", description: "Representación visual de los escritorios, compartida por ambos diseños de barra." },
         glassAlpha: { type: "number", default: 0.34, minimum: 0.15, maximum: 1, label: "Opacidad del vidrio", control: "number", description: "Ajusta la opacidad del material de vidrio." },
         reduceTransparency: { type: "boolean", default: false, label: "Reducir transparencia", control: "toggle", options: [false, true], description: "Fondos opacos en la isla, tarjetas y gotas para leer mejor." },
-        materialDepth: { type: "number", default: 0.25, minimum: 0, maximum: 1, label: "Profundidad del material", control: "number", description: "Intensidad de la luz direccional y la sombra interior del vidrio de Isla." },
+        materialDepth: { type: "number", default: 0.25, minimum: 0, maximum: 1, label: "Profundidad del material", control: "number", description: "Intensidad de la luz direccional y la sombra interior del vidrio de Azog." },
         liquidSurfaces: { type: "boolean", default: true, label: "Superficies líquidas", control: "toggle", options: [false, true], description: "Los estados activos se llenan como gotas y las tarjetas pierden el contorno." },
         stateIntensity: { type: "number", default: 1, minimum: 0.3, maximum: 1, label: "Intensidad del color de estado", control: "number", description: "Cuánto acento llena un control activo; la tinta se adapta al contraste del relleno." },
         ambientFps: { type: "number", integer: true, step: 5, unit: "fps", default: 60, minimum: 30, maximum: 240, label: "Frecuencia ambiental", control: "number", description: "Límite de fotogramas del espectro y las ondas multimedia." },
@@ -22,7 +22,7 @@ var fields = {
         bodyBreath: { type: "boolean", default: false, label: "Respiración del cuerpo", control: "toggle", options: [false, true], description: "Movimiento suave en reposo. Se pausa al reducir movimiento." },
         bodyMessenger: { type: "boolean", default: true, label: "Gota de archivos", control: "toggle", options: [false, true], description: "Reúne archivos en una gota. Nunca los mueve ni los borra." },
         menuSelectionAnchor: { type: "boolean", default: true, label: "Alinear selección en menús", control: "toggle", options: [false, true], description: "Alinea la opción elegida con su control." },
-        topGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación superior", control: "number", description: "Multiplicador del espacio entre Isla y el borde superior." },
+        topGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación superior", control: "number", description: "Multiplicador del espacio entre Azog y el borde superior." },
         appGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación del área de aplicaciones", control: "number", description: "Multiplicador del espacio reservado junto a la barra de aplicaciones." },
         uiScale: { type: "number", default: 1, minimum: 0.25, maximum: 3, label: "Escala de interfaz", control: "number", description: "Escala la interfaz respecto a la altura del monitor." },
         fontScale: { type: "number", default: 1, minimum: 0.75, maximum: 1.75, label: "Tamaño de texto", control: "number", description: "Escala los tamaños tipográficos del shell." },
@@ -38,7 +38,7 @@ var fields = {
         clockSeconds: { type: "boolean", default: false, label: "Actualizar reloj cada segundo", control: "toggle", options: [false, true], availability: "partial", description: "Actualiza el dato del reloj cada segundo; la presentación visible actual no muestra segundos." },
     },
     gestures: {
-        enabled: { type: "boolean", default: true, label: "Gestos de arrastre", control: "toggle", options: [false, true], description: "Permite abrir y cerrar la Isla arrastrando la pill." },
+        enabled: { type: "boolean", default: true, label: "Gestos de arrastre", control: "toggle", options: [false, true], description: "Permite abrir y cerrar la Azog arrastrando la pill." },
         pullTarget: { type: "string", default: "auto", options: ["auto", "utils", "media", "notifs", "calendar"], optionLabels: ["Automático", "Controles", "Multimedia", "Notificaciones", "Calendario"], label: "Destino del gesto", control: "choice", description: "Surface que se abre al arrastrar la pill." }
     },
     motion: {
@@ -82,7 +82,7 @@ var fields = {
     },
     paths: {
         userAvatar: { type: "string", path: true, base: "home", suffix: "/.face", label: "Avatar", control: "path", description: "Ruta de la imagen de usuario para sesión y bloqueo." },
-        paletteFile: { type: "string", path: true, base: "cacheHome", suffix: "/matugen/palette.json", label: "Archivo de colores", control: "path", description: "Paleta semántica de Matugen que consume Isla." },
+        paletteFile: { type: "string", path: true, base: "cacheHome", suffix: "/matugen/palette.json", label: "Archivo de colores", control: "path", description: "Paleta semántica de Matugen que consume Azog." },
         wallpaperDir: { type: "string", path: true, picker: "folder", base: "home", suffix: "/Wallpapers", label: "Carpeta de wallpapers", control: "path", description: "Carpeta de origen del selector de wallpapers." },
         wallpaperCacheDir: { type: "string", path: true, picker: "folder", base: "cacheHome", suffix: "/quickshell/wallpapers", label: "Caché de wallpapers", control: "path", description: "Carpeta para miniaturas generadas por el selector." },
         wallpaperApplyScript: { type: "string", path: true, base: "configHome", suffix: "/hypr/scripts/apply-wallpaper.sh", label: "Script de wallpaper", control: "path", description: "Script ejecutado para aplicar el wallpaper seleccionado." }
@@ -93,7 +93,7 @@ var fields = {
         fromNotifications: { type: "boolean", default: true, label: "Progreso de aplicaciones", control: "toggle", options: [false, true], description: "Convierte notificaciones con progreso en actividades." }
     },
     updates: {
-        enabled: { type: "boolean", default: true, label: "Buscar actualizaciones", control: "toggle", options: [false, true], description: "Busca novedades del sistema, AUR, Flatpak e Isla cada seis horas. Nunca instala solo." },
+        enabled: { type: "boolean", default: true, label: "Buscar actualizaciones", control: "toggle", options: [false, true], description: "Busca novedades del sistema, AUR, Flatpak e Azog cada seis horas. Nunca instala solo." },
         notifications: { type: "boolean", default: true, label: "Avisar de actualizaciones", control: "toggle", options: [false, true], description: "Avisa de novedades como mucho una vez al día." }
     }
 }
@@ -133,7 +133,7 @@ function schema(context) {
 var sectionCatalog = [
     { id: "activities", label: "Actividades", description: "Procesos en curso e integración con la terminal." },
     { id: "appearance", label: "Apariencia", description: "Escala, tipografía, color y movimiento." },
-    { id: "gestures", label: "Gestos", description: "Permite abrir y cerrar la Isla arrastrando la pill." },
+    { id: "gestures", label: "Gestos", description: "Permite abrir y cerrar la Azog arrastrando la pill." },
     { id: "motion", label: "Movimiento", description: "Coreografías de la isla con el compositor." },
     { id: "devices", label: "Dispositivos", description: "Conectar y desconectar dispositivos, avisos de carga y privacidad." },
     { id: "regional", label: "Idioma y región", description: "Idioma, zona horaria y formato regional." },
@@ -141,7 +141,7 @@ var sectionCatalog = [
     { id: "modules", label: "Módulos de la barra", description: "Entradas laterales opcionales y sus controles." },
     { id: "profile", label: "Perfil", description: "Datos de presentación de la sesión." },
     { id: "paths", label: "Rutas", description: "Archivos y carpetas que consumen servicios del shell." },
-    { id: "updates", label: "Actualizaciones", description: "Consulta del sistema, aplicaciones e Isla." }
+    { id: "updates", label: "Actualizaciones", description: "Consulta del sistema, aplicaciones e Azog." }
 ]
 
 var requiredModules = [
@@ -184,7 +184,7 @@ var surfaces = [
     { id: "overview", label: "Vista general", availability: "routed", dependsOn: ["hyprland.monitors", "hyprland.workspaces", "hyprland.toplevels"], optionalDependsOn: [] },
     { id: "recording", label: "Grabación de pantalla", availability: "routed", dependsOn: [], optionalDependsOn: ["gpu-screen-recorder"] },
     { id: "session", label: "Sesión y energía", availability: "routed", dependsOn: ["island.session"], optionalDependsOn: ["island.lockscreen", "hyprctl", "systemctl"] },
-    { id: "settings", label: "Ajustes Edots", availability: "routed", dependsOn: ["settings.config"], optionalDependsOn: [] },
+    { id: "settings", label: "Ajustes Crucible", availability: "routed", dependsOn: ["settings.config"], optionalDependsOn: [] },
     { id: "utils", label: "Controles rápidos", availability: "routed", dependsOn: [], optionalDependsOn: ["systemd-inhibit", "sysfs.backlight", "powerprofilesctl"] },
     { id: "wallpaper", label: "Wallpapers", availability: "routed", dependsOn: ["wallpaper.directory"], optionalDependsOn: ["wallpaper.apply-script", "magick", "mpris.players"] }
 ]
@@ -212,7 +212,7 @@ var capabilities = [
     { id: "powerprofilesctl", label: "Perfiles de energía", availability: "external-unprobed", detectedBy: "QuickControlsAdapter profileReader" },
     { id: "wallpaper.apply-script", label: "Aplicador de wallpaper", availability: "path-configured-unprobed", detectedBy: "Wallpapers.applyScript" },
     { id: "wallpaper.directory", label: "Carpeta de wallpapers", availability: "path-configured-unprobed", detectedBy: "Wallpapers.wallDir" },
-    { id: "island.lockscreen", label: "Bloqueador de Isla", availability: "path-configured-unprobed", detectedBy: "Session.lockCmd / quickshell-lockscreen wrapper" },
+    { id: "island.lockscreen", label: "Bloqueador de Azog", availability: "path-configured-unprobed", detectedBy: "Session.lockCmd / quickshell-lockscreen wrapper" },
     { id: "hyprctl", label: "Control Hyprland", availability: "external-unprobed", detectedBy: "Session.logoutCmd / WorkspaceModel" },
     { id: "systemctl", label: "Acciones de energía systemd", availability: "external-unprobed", detectedBy: "Session shutdown/reboot/suspend/hibernate commands" },
     { id: "quickshell.execDetached", label: "Lanzamiento de procesos", availability: "runtime", detectedBy: "Quickshell.execDetached" },

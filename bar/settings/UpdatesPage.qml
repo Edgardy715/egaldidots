@@ -35,7 +35,7 @@ ColumnLayout {
         if (hours < 24) return qsTr("hace %1 h").arg(hours)
         return qsTr("hace %1 d").arg(Math.floor(hours / 24))
     }
-    readonly property string searchTerms: qsTr("actualizaciones actualizar sistema CachyOS Arch Linux paquetes AUR Flatpak aplicaciones shell Isla software")
+    readonly property string searchTerms: I18n.tr("actualizaciones actualizar sistema CachyOS Arch Linux paquetes AUR Flatpak aplicaciones shell Azog software")
 
     ScrollView {
         id: scroll
@@ -141,10 +141,10 @@ ColumnLayout {
             }
             Repeater {
                 model: [
-                    {key: "system", title: qsTr("Sistema · CachyOS"), hint: qsTr("Sistema operativo y aplicaciones de los repositorios oficiales.")},
-                    {key: "aur", title: qsTr("Aplicaciones · AUR"), hint: qsTr("Paquetes de la comunidad, compilados en tu equipo con paru.")},
-                    {key: "flatpak", title: qsTr("Aplicaciones · Flatpak"), hint: qsTr("Aplicaciones y entornos de ejecución instalados con Flatpak.")},
-                    {key: "shell", title: qsTr("Isla · Shell"), hint: qsTr("Novedades de la rama remota configurada en Git.")}
+                    {key: "system", title: I18n.tr("Sistema · CachyOS"), hint: I18n.tr("Sistema operativo y aplicaciones de los repositorios oficiales.")},
+                    {key: "aur", title: I18n.tr("Aplicaciones · AUR"), hint: I18n.tr("Paquetes de la comunidad, compilados en tu equipo con paru.")},
+                    {key: "flatpak", title: I18n.tr("Aplicaciones · Flatpak"), hint: I18n.tr("Aplicaciones y entornos de ejecución instalados con Flatpak.")},
+                    {key: "shell", title: I18n.tr("Azog · Shell"), hint: I18n.tr("Novedades de la rama remota configurada en Git.")}
                 ]
                 UpdateSourceCard {
                     required property var modelData
@@ -168,8 +168,8 @@ ColumnLayout {
             }
             Text {
                 Layout.fillWidth: true; Layout.topMargin: 10
-                text: qsTr("Isla te avisa; tú eliges cuándo instalar. La instalación se hace en segundo plano y puedes cancelarla hasta que empiezan a aplicarse los cambios.")
-                    + (root.controller.result.snapshots ? " " + qsTr("Antes de cada cambio del sistema se guarda un punto de restauración, disponible en el menú de inicio.") : "")
+                text: I18n.tr("Azog te avisa; tú eliges cuándo instalar. La instalación se hace en segundo plano y puedes cancelarla hasta que empiezan a aplicarse los cambios.")
+                    + (root.controller.result.snapshots ? " " + I18n.tr("Antes de cada cambio del sistema se guarda un punto de restauración, disponible en el menú de inicio.") : "")
                 font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody
                 color: Theme.iconSecondary; wrapMode: Text.WordWrap
             }

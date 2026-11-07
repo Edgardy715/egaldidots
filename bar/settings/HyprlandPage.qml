@@ -68,8 +68,8 @@ ColumnLayout {
             spacing: 16
             Text {
                 Layout.fillWidth: true
-                text: qsTr("Los cambios se prueban en la sesión. Abre una ventana o cambia de espacio para verlos. Guarda para conservarlos al iniciar Isla.")
-                color: Qt.alpha(Theme.foreground, 0.72)
+                text: I18n.tr("Los cambios se prueban en la sesión. Abre una ventana o cambia de espacio para verlos. Guarda para conservarlos al iniciar Azog.")
+                color: Qt.alpha(Theme.foreground, Theme.alphaIconSec)
                 font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody
                 wrapMode: Text.WordWrap
             }
@@ -154,9 +154,8 @@ ColumnLayout {
     Text {
         objectName: "hyprlandStatus"
         Layout.fillWidth: true
-        visible: controller.error.length > 0 || controller.busy || controller.dirty || controller.feedback.length > 0
-        text: controller.error || (controller.busy ? qsTr("Aplicando…")
-            : controller.dirty ? qsTr("Vista previa activa · Guarda para usarla en próximos inicios de Isla.")
+        readonly property string current: controller.error || (controller.busy ? I18n.tr("Aplicando…")
+            : controller.dirty ? I18n.tr("Vista previa activa · Guarda para usarla en próximos inicios de Azog.")
             : controller.feedback)
         color: controller.error ? Theme.error : Theme.foreground
         font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody

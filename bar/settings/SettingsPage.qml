@@ -28,7 +28,7 @@ Item {
             const key = id.slice(dot + 1)
             const current = effective[sectionName][key]
             if (current !== draftBases[id] && String(current) !== drafts[id])
-                result[id] = I18n.tr("%1 cambió fuera de Edots. Edita el borrador, restablécelo o descártalo.").arg(config.schema.sections[sectionName][key].label)
+                result[id] = I18n.tr("%1 cambió fuera de Crucible. Edita el borrador, restablécelo o descártalo.").arg(config.schema.sections[sectionName][key].label)
         }
         return result
     }

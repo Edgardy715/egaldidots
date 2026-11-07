@@ -7,7 +7,7 @@ cat > "$apps_dir/edots-settings.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
 Name=Edots
-Comment=Personaliza Isla
+Comment=Personaliza Azog
 Exec="$settings_dir/open.sh"
 Icon=$settings_dir/assets/edots.png
 Terminal=false

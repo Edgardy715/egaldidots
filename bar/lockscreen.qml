@@ -153,7 +153,7 @@ ShellRoot {
         interval: 4000
         onTriggered: {
             if (!sessionLock.secure) {
-                console.error("Isla: no se pudo asegurar la sesión")
+                console.error("Azog: no se pudo asegurar la sesión")
                 Qt.exit(3)
             }
         }
@@ -195,7 +195,7 @@ ShellRoot {
         visible: root.preview
         width: Number(Quickshell.env("QS_LOCK_PREVIEW_WIDTH")) || 1440
         height: Number(Quickshell.env("QS_LOCK_PREVIEW_HEIGHT")) || 900
-        title: "Isla · Vista previa del bloqueo"
+        title: "Azog · Vista previa del bloqueo"
         color: Theme.background
 
         Loader {
