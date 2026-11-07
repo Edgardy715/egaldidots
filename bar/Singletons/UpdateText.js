@@ -21,10 +21,10 @@ function blocked(status) {
     const dirty = status.dirty && status.blocked !== "dirty"
         ? " " + qsTr("También hay cambios sin guardar.") : ""
     switch (status.blocked) {
-    case "dirty": return qsTr("Hay cambios locales sin guardar en Git. Isla no los sobrescribe; guárdalos antes de actualizar.")
+    case "dirty": return qsTr("Hay cambios locales sin guardar en Git. Azog no los sobrescribe; guárdalos antes de actualizar.")
     case "ahead": return (status.ahead === 1 ? qsTr("Tu copia tiene un cambio propio que aún no está en el remoto.")
         : qsTr("Tu copia tiene %1 cambios propios que aún no están en el remoto.").arg(status.ahead || 0))
-        + " " + qsTr("Isla espera para no mezclarlos.") + dirty
+        + " " + qsTr("Azog espera para no mezclarlos.") + dirty
     case "no-upstream": return qsTr("Esta rama no sigue ninguna rama remota, así que no hay de dónde actualizar.") + dirty
     case "detached": return qsTr("Git no está en ninguna rama. Vuelve a una rama para recibir novedades.") + dirty
     default: return ""
@@ -74,7 +74,7 @@ function committed(progress) {
 function outcome(result, source) {
     const r = result || {}
     if (r.result === "success") {
-        if (source === "shell") return qsTr("Isla está actualizada. Se recargará para aplicar los cambios.")
+        if (source === "shell") return qsTr("Azog está al día. Se recargará para aplicar los cambios.")
         return r.reboot ? qsTr("Actualización completada. Reinicia cuando puedas para usar el nuevo sistema.")
             : qsTr("Actualización completada.")
     }
@@ -89,7 +89,7 @@ function outcome(result, source) {
     case "disk": return qsTr("No hay espacio suficiente en el disco. Libera espacio y vuelve a intentarlo.")
     case "conflict": return qsTr("Algunos paquetes necesitan una revisión manual. No se ha cambiado nada.")
     case "signature": return qsTr("Un paquete no superó la verificación de seguridad. No se ha instalado nada.")
-    case "blocked": return qsTr("Isla no puede actualizarse ahora: revisa el estado de Git.")
+    case "blocked": return qsTr("Azog no puede actualizarse ahora: revisa el estado de Git.")
     default: return qsTr("No se pudo completar la actualización.") + restore
     }
 }

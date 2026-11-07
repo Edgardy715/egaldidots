@@ -17,7 +17,7 @@ import Quickshell.Io
  * importado sobre el singleton local → el wrapper nunca se instancia y el
  * IpcHandler nunca se registra. Renombrar a `KeepAwake` evita la colisión.
  *
- * Implementación: `systemd-inhibit --what=idle --who=Isla --why="Keep Awake"
+ * Implementación: `systemd-inhibit --what=idle --who=Azog --why="Keep Awake"
  * sleep 100000000` lanzado/matado via Process. Es el método estándar de
  * systemd (D-Bus a org.freedesktop.login1). Funciona con cualquier compositor
  * que respete inhibidores (Hyprland, Sway, GNOME, KDE).
@@ -78,7 +78,7 @@ Singleton {
     Process {
         id: inhibitProc
         command: ["systemd-inhibit", "--what=idle",
-                  "--who=Isla", "--why=Keep Awake",
+                  "--who=Azog", "--why=Keep Awake",
                   "sleep", "100000000"]
         running: false
     }

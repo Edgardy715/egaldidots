@@ -183,7 +183,7 @@ Singleton {
             _saved = JSON.parse(JSON.stringify(values))
             dirty = false
             _saveRequested = false
-            feedback = "Guardado para próximos inicios de Isla"
+            feedback = "Guardado para próximos inicios de Azog"
         } else if (_operation === "reset") {
             _digest = result.digest
             _saved = JSON.parse(JSON.stringify(_actual.values))

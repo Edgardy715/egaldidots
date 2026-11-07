@@ -6,23 +6,23 @@
 var version = 1
 var fields = {
     appearance: {
-        barLayout: { type: "string", default: "split", options: ["split", "compact"], optionLabels: ["Separada", "Compacta"], label: "Diseño de la barra", control: "choice", description: "Elige la barra separada o la Isla compacta centrada." },
+        barLayout: { type: "string", default: "split", options: ["split", "compact"], optionLabels: ["Separada", "Compacta"], label: "Diseño de la barra", control: "choice", description: "Elige la barra separada o el Bead compacto centrado." },
         workspaceStyle: { type: "string", default: "numbers", options: ["numbers", "dots", "bars", "capsules", "pacman"], optionLabels: ["Números", "Puntos", "Barras", "Cápsulas", "Pac-Man"], label: "Estilo de espacios de trabajo", control: "choice", description: "Representación visual de los escritorios, compartida por ambos diseños de barra." },
         glassAlpha: { type: "number", default: 0.34, minimum: 0.15, maximum: 1, label: "Opacidad del vidrio", control: "number", description: "Ajusta la opacidad del material de vidrio." },
         reduceTransparency: { type: "boolean", default: false, label: "Reducir transparencia", control: "toggle", options: [false, true], description: "Fondos opacos en la isla, tarjetas y gotas para leer mejor." },
-        materialDepth: { type: "number", default: 0.25, minimum: 0, maximum: 1, label: "Profundidad del material", control: "number", description: "Intensidad de la luz direccional y la sombra interior del vidrio de Azog." },
+        materialDepth: { type: "number", default: 0.25, minimum: 0, maximum: 1, label: "Profundidad del material", control: "number", description: "Intensidad de la luz direccional y la sombra interior del vidrio de Bead." },
         liquidSurfaces: { type: "boolean", default: true, label: "Superficies líquidas", control: "toggle", options: [false, true], description: "Los estados activos se llenan como gotas y las tarjetas pierden el contorno." },
         stateIntensity: { type: "number", default: 1, minimum: 0.3, maximum: 1, label: "Intensidad del color de estado", control: "number", description: "Cuánto acento llena un control activo; la tinta se adapta al contraste del relleno." },
         ambientFps: { type: "number", integer: true, step: 5, unit: "fps", default: 60, minimum: 30, maximum: 240, label: "Frecuencia ambiental", control: "number", description: "Límite de fotogramas del espectro y las ondas multimedia." },
         mediaTransitions: { type: "boolean", default: true, label: "Transiciones multimedia", control: "toggle", options: [false, true], description: "Suaviza los cambios de portada y texto al cambiar de canción." },
         notificationDrop: { type: "boolean", default: true, label: "Notificaciones en gota", control: "toggle", options: [false, true], description: "Las notificaciones informativas brotan como gota bajo la isla sin colapsarla." },
-        personality: { type: "boolean", default: true, label: "Cuerpo", control: "toggle", options: [false, true], description: "La pill reacciona al cursor, la música y los eventos como vidrio líquido." },
+        personality: { type: "boolean", default: true, label: "Amalgam", control: "toggle", options: [false, true], description: "La pill reacciona al cursor, la música y los eventos como vidrio líquido." },
         waterBody: { type: "boolean", default: false, label: "Cuerpo líquido en todos los estados", control: "toggle", options: [false, true], description: "Reposo y paneles comparten un mismo vidrio, luz y sombra." },
         waterReactsToMusic: { type: "boolean", default: true, label: "El agua responde a los graves", control: "toggle", options: [false, true], description: "Con música y cuerpo líquido, los graves modulan apenas el brillo del borde." },
         bodyBreath: { type: "boolean", default: false, label: "Respiración del cuerpo", control: "toggle", options: [false, true], description: "Movimiento suave en reposo. Se pausa al reducir movimiento." },
         bodyMessenger: { type: "boolean", default: true, label: "Gota de archivos", control: "toggle", options: [false, true], description: "Reúne archivos en una gota. Nunca los mueve ni los borra." },
         menuSelectionAnchor: { type: "boolean", default: true, label: "Alinear selección en menús", control: "toggle", options: [false, true], description: "Alinea la opción elegida con su control." },
-        topGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación superior", control: "number", description: "Multiplicador del espacio entre Azog y el borde superior." },
+        topGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación superior", control: "number", description: "Multiplicador del espacio entre Bead y el borde superior." },
         appGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación del área de aplicaciones", control: "number", description: "Multiplicador del espacio reservado junto a la barra de aplicaciones." },
         uiScale: { type: "number", default: 1, minimum: 0.25, maximum: 3, label: "Escala de interfaz", control: "number", description: "Escala la interfaz respecto a la altura del monitor." },
         fontScale: { type: "number", default: 1, minimum: 0.75, maximum: 1.75, label: "Tamaño de texto", control: "number", description: "Escala los tamaños tipográficos del shell." },
@@ -38,7 +38,7 @@ var fields = {
         clockSeconds: { type: "boolean", default: false, label: "Actualizar reloj cada segundo", control: "toggle", options: [false, true], availability: "partial", description: "Actualiza el dato del reloj cada segundo; la presentación visible actual no muestra segundos." },
     },
     gestures: {
-        enabled: { type: "boolean", default: true, label: "Gestos de arrastre", control: "toggle", options: [false, true], description: "Permite abrir y cerrar la Azog arrastrando la pill." },
+        enabled: { type: "boolean", default: true, label: "Gestos de arrastre", control: "toggle", options: [false, true], description: "Permite abrir y cerrar Bead arrastrándolo." },
         pullTarget: { type: "string", default: "auto", options: ["auto", "utils", "media", "notifs", "calendar"], optionLabels: ["Automático", "Controles", "Multimedia", "Notificaciones", "Calendario"], label: "Destino del gesto", control: "choice", description: "Surface que se abre al arrastrar la pill." }
     },
     motion: {
@@ -93,7 +93,7 @@ var fields = {
         fromNotifications: { type: "boolean", default: true, label: "Progreso de aplicaciones", control: "toggle", options: [false, true], description: "Convierte notificaciones con progreso en actividades." }
     },
     updates: {
-        enabled: { type: "boolean", default: true, label: "Buscar actualizaciones", control: "toggle", options: [false, true], description: "Busca novedades del sistema, AUR, Flatpak e Azog cada seis horas. Nunca instala solo." },
+        enabled: { type: "boolean", default: true, label: "Buscar actualizaciones", control: "toggle", options: [false, true], description: "Busca novedades del sistema, AUR, Flatpak y Azog cada seis horas. Nunca instala solo." },
         notifications: { type: "boolean", default: true, label: "Avisar de actualizaciones", control: "toggle", options: [false, true], description: "Avisa de novedades como mucho una vez al día." }
     }
 }
@@ -133,19 +133,19 @@ function schema(context) {
 var sectionCatalog = [
     { id: "activities", label: "Actividades", description: "Procesos en curso e integración con la terminal." },
     { id: "appearance", label: "Apariencia", description: "Escala, tipografía, color y movimiento." },
-    { id: "gestures", label: "Gestos", description: "Permite abrir y cerrar la Azog arrastrando la pill." },
+    { id: "gestures", label: "Gestos", description: "Permite abrir y cerrar Bead arrastrándolo." },
     { id: "motion", label: "Movimiento", description: "Coreografías de la isla con el compositor." },
     { id: "devices", label: "Dispositivos", description: "Conectar y desconectar dispositivos, avisos de carga y privacidad." },
     { id: "regional", label: "Idioma y región", description: "Idioma, zona horaria y formato regional." },
-    { id: "companion", label: "Cuerpo", description: "Reacciones del cuerpo de vidrio líquido. Se activa con Cuerpo en Apariencia." },
+    { id: "companion", label: "Amalgam", description: "Reacciones del cuerpo de vidrio líquido. Se activa con Amalgam en Apariencia." },
     { id: "modules", label: "Módulos de la barra", description: "Entradas laterales opcionales y sus controles." },
     { id: "profile", label: "Perfil", description: "Datos de presentación de la sesión." },
     { id: "paths", label: "Rutas", description: "Archivos y carpetas que consumen servicios del shell." },
-    { id: "updates", label: "Actualizaciones", description: "Consulta del sistema, aplicaciones e Azog." }
+    { id: "updates", label: "Actualizaciones", description: "Consulta del sistema, aplicaciones y Azog." }
 ]
 
 var requiredModules = [
-    { id: "pill", label: "Isla principal", configurable: false, required: true,
+    { id: "pill", label: "Bead principal", configurable: false, required: true,
       availability: "always", dependsOn: ["quickshell", "wayland-layer-shell"] }
 ]
 

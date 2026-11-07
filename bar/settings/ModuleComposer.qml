@@ -37,7 +37,7 @@ Rectangle {
             Layout.fillWidth: true; spacing: 8
             Text { text: qsTr("Diseño"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody; Layout.rightMargin: 8 }
             EdotsButton { objectName: "layout-split"; text: qsTr("Separada"); checkable: true; checked: root.config.appearance.barLayout === "split"; accent: checked; enabled: root.config.loaded && !root.config.saving; Accessible.name: qsTr("Barra separada"); onClicked: { root.selectLayout("split"); checked = Qt.binding(() => root.config.appearance.barLayout === "split") } }
-            EdotsButton { objectName: "layout-compact"; text: qsTr("Compacta"); checkable: true; checked: root.config.appearance.barLayout === "compact"; accent: checked; enabled: root.config.loaded && !root.config.saving; Accessible.name: qsTr("Isla compacta"); onClicked: { root.selectLayout("compact"); checked = Qt.binding(() => root.config.appearance.barLayout === "compact") } }
+            EdotsButton { objectName: "layout-compact"; text: qsTr("Compacta"); checkable: true; checked: root.config.appearance.barLayout === "compact"; accent: checked; enabled: root.config.loaded && !root.config.saving; Accessible.name: qsTr("Bead compacto"); onClicked: { root.selectLayout("compact"); checked = Qt.binding(() => root.config.appearance.barLayout === "compact") } }
             Item { Layout.fillWidth: true }
         }
         RowLayout {
@@ -54,9 +54,9 @@ Rectangle {
                     Layout.alignment: Qt.AlignHCenter; Layout.preferredWidth: 108; Layout.preferredHeight: 40; radius: 20; color: Qt.alpha(Theme.foreground, Theme.alphaHair)
                     Row { anchors.centerIn: parent; spacing: 8
                         EdotsIcon { iconName: "lock"; font.pixelSize: 14; color: Theme.accent }
-                        Text { text: "Azog"; color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 13 }
+                        Text { text: "Bead"; color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 13 }
                     }
-                    Accessible.role: Accessible.StaticText; Accessible.name: qsTr("Isla principal, siempre visible")
+                    Accessible.role: Accessible.StaticText; Accessible.name: qsTr("Bead principal, siempre visible")
                 }
             }
             ColumnLayout {

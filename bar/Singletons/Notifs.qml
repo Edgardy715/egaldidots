@@ -98,7 +98,7 @@ Singleton {
     function postLocal(summary, body, actions, localId) {
         const item = notifComp.createObject(root, {
             popup: root.shouldShowPopup(), summary: summary, body: body,
-            appName: "Isla", appIcon: "system-software-update", notificationId: localId || "",
+            appName: "Azog", appIcon: "system-software-update", notificationId: localId || "",
             actions: actions || []
         })
         root.list = [item].concat(root.list)
@@ -222,7 +222,7 @@ Singleton {
         function _restoreActionsText(a, notificationId, appName) {
             if (!a) return []
             return a.map(function(x) {
-                const localUpdate = appName === "Isla" && notificationId === "isla:updates" && x.identifier === "updates"
+                const localUpdate = appName === "Azog" && notificationId === "isla:updates" && x.identifier === "updates"
                 return { identifier: x.identifier || "", text: x.text || "",
                     invoke: function() { if (localUpdate) SystemUpdates.open() } }
             })

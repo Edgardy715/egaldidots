@@ -87,12 +87,12 @@ FocusScope {
          "#Actividades", "activities.enabled", "activities.longCommandSeconds", "activities.fromNotifications",
          "#Dispositivos", "devices.enabled", "devices.bluetooth", "devices.power", "devices.storage", "devices.privacyDots"],
         [],
-        ["#Cuerpo", "appearance.personality", "appearance.waterBody", "appearance.waterReactsToMusic", "appearance.bodyBreath", "appearance.bodyMessenger", "appearance.notificationDrop",
+        ["#Amalgam", "appearance.personality", "appearance.waterBody", "appearance.waterReactsToMusic", "appearance.bodyBreath", "appearance.bodyMessenger", "appearance.notificationDrop",
          "#Reacciones"].concat(Object.keys(Config.schema.sections.companion).map(key => "companion." + key)),
         Object.keys(Config.schema.sections.updates).map(key => "updates." + key)
     ]
     readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "settings", "view_carousel", "sentiment_satisfied", "system_update"]
-    readonly property var titles: [I18n.tr("Apariencia"), I18n.tr("Composición"), I18n.tr("Movimiento"), I18n.tr("Texto"), I18n.tr("Perfil y sistema"), I18n.tr("Hyprland"), I18n.tr("Cuerpo"), I18n.tr("Actualizaciones")]
+    readonly property var titles: [I18n.tr("Apariencia"), I18n.tr("Composición"), I18n.tr("Movimiento"), I18n.tr("Texto"), I18n.tr("Perfil y sistema"), I18n.tr("Hyprland"), I18n.tr("Amalgam"), I18n.tr("Actualizaciones")]
     onPageChanged: if (contentReady && visible && enabled) body.forceActiveFocus()
     EdotsPageMotion {
         id: pageMotion
@@ -304,7 +304,7 @@ FocusScope {
         EdotsButton {
             objectName: "updatesSearchResult"
             visible: root.updatesSearchMatch
-            text: I18n.tr("Actualizaciones · Sistema, aplicaciones e Azog"); symbol: "system_update"
+            text: I18n.tr("Actualizaciones · Sistema, aplicaciones y Azog"); symbol: "system_update"
             onClicked: root.showUpdates()
         }
         ModuleComposer {
