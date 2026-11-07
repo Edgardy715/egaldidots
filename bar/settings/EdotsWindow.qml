@@ -25,6 +25,8 @@ FocusScope {
     property int page: 0
     property var hyprlandController: HyprlandSettings
     property var updatesController: SystemUpdates
+    property var pluginsController: HyprlandPlugins
+    property var bindsController: HyprlandBinds
     readonly property bool updatesActive: !searchShown && pageMotion.displayedPage === 8
     function showUpdates() { root.page = 8; search.text = ""; SystemUpdates.portalRequested = false }
     Connections { target: SystemUpdates; function onOpenRequested() { root.showUpdates() } }
@@ -65,21 +67,32 @@ FocusScope {
     property string saveConfirmation: ""
     property bool savePending: false
     property string feedback: ""
-    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "profile", "paths", "appearance", "companion", "updates"]
+    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "profile", "paths", "appearance", "companion", "updates", "regional"]
+    // "#Etiqueta" abre un grupo dentro de la página (ver SettingsPage.entries).
     readonly property var pageFields: [
-        ["appearance.workspaceStyle", "appearance.liquidSurfaces", "appearance.stateIntensity", "appearance.glassAlpha", "appearance.reduceTransparency", "appearance.materialDepth", "appearance.menuSelectionAnchor", "appearance.uiScale", "appearance.topGap", "appearance.appGap", "appearance.spacingScale", "appearance.radiusScale", "appearance.time12h"],
+        ["#Barra", "appearance.workspaceStyle",
+         "#Material", "appearance.liquidSurfaces", "appearance.glassAlpha", "appearance.materialDepth", "appearance.stateIntensity", "appearance.reduceTransparency",
+         "#Tamaño y espacio", "appearance.uiScale", "appearance.spacingScale", "appearance.radiusScale", "appearance.topGap", "appearance.appGap"],
         ["appearance.barLayout"].concat(Object.keys(Config.schema.sections.modules).map(key => "modules." + key)),
-        ["appearance.motionScale", "appearance.reduceMotion", "appearance.mediaTransitions", "modules.animateChanges"],
-        ["appearance.fontFamily", "appearance.fontMonoFamily", "appearance.fontDisplayFamily", "appearance.fontMediaFamily", "appearance.fontScale"],
+        ["appearance.motionScale", "appearance.reduceMotion", "appearance.mediaTransitions", "modules.animateChanges",
+         "#Gestos", "gestures.enabled", "gestures.pullTarget",
+         "#Lanzamiento", "motion.appLaunchFlight"],
+        ["#Tamaño", "appearance.fontScale",
+         "#Familias", "appearance.fontFamily", "appearance.fontMonoFamily", "appearance.fontDisplayFamily", "appearance.fontMediaFamily"],
         ["profile.displayName", "paths.userAvatar"],
-        ["paths.paletteFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript", "appearance.pillBlur", "appearance.clockSeconds", "appearance.showGlyphs"],
+        ["#Archivos", "paths.paletteFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript",
+         "#Rendimiento", "appearance.ambientFps", "appearance.clockSeconds",
+         "#Actividades", "activities.enabled", "activities.longCommandSeconds", "activities.fromNotifications",
+         "#Dispositivos", "devices.enabled", "devices.bluetooth", "devices.power", "devices.storage", "devices.privacyDots"],
         [],
-        ["appearance.personality", "appearance.bodyBreath", "appearance.bodyMessenger"].concat(Object.keys(Config.schema.sections.companion).map(key => "companion." + key)),
-        Object.keys(Config.schema.sections.updates).map(key => "updates." + key)
+        ["#Cuerpo", "appearance.personality", "appearance.waterBody", "appearance.waterReactsToMusic", "appearance.bodyBreath", "appearance.bodyMessenger", "appearance.notificationDrop",
+         "#Reacciones"].concat(Object.keys(Config.schema.sections.companion).map(key => "companion." + key)),
+        Object.keys(Config.schema.sections.updates).map(key => "updates." + key),
+        ["#Idioma y región", "regional.language", "regional.region", "regional.timeZone",
+         "#Formato", "appearance.time12h"]
     ]
-    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "person", "settings", "view_carousel", "sentiment_satisfied", "system_update"]
-    readonly property var titles: [qsTr("Apariencia"), qsTr("Composición"), qsTr("Movimiento"), qsTr("Tipografía"), qsTr("Tu perfil"), qsTr("Avanzado"), qsTr("Hyprland"), qsTr("Cuerpo"), qsTr("Actualizaciones")]
-    readonly property var subtitles: [qsTr("Dale a Isla tu forma de sentir el escritorio."), qsTr("Elige qué te acompaña. La Isla permanece en el centro."), qsTr("Ajusta el ritmo. Prueba la respuesta antes de guardar."), qsTr("Una lectura cómoda, con tu propia personalidad."), qsTr("Los pequeños detalles que hacen tuyo este espacio."), qsTr("Archivos y carpetas que utiliza tu shell."), qsTr("Elige cómo se organizan y se mueven tus ventanas."), qsTr("Ajusta la luz, las reacciones y la gota de archivos del cuerpo de vidrio líquido."), qsTr("El sistema, tus aplicaciones e Isla en un solo lugar.")]
+    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "person", "settings", "view_carousel", "sentiment_satisfied", "system_update", "language"]
+    readonly property var titles: [I18n.tr("Apariencia"), I18n.tr("Composición"), I18n.tr("Movimiento"), I18n.tr("Tipografía"), I18n.tr("Tu perfil"), I18n.tr("Avanzado"), I18n.tr("Hyprland"), I18n.tr("Cuerpo"), I18n.tr("Actualizaciones"), I18n.tr("Idioma y región")]
     onPageChanged: if (contentReady && visible && enabled) body.forceActiveFocus()
     EdotsPageMotion {
         id: pageMotion
@@ -97,7 +110,7 @@ FocusScope {
         if (!settingsPage.commitDrafts()) { saveConfirmation = "error"; settingsPage.focusFirstError(); return }
         savePending = Config.dirty
         if (savePending) saveConfirmation = "busy"
-        if (!Config.save()) { feedback = qsTr("No se pudo iniciar el guardado."); savePending = false; saveConfirmation = "error" }
+        if (!Config.save()) { feedback = I18n.tr("No se pudo iniciar el guardado."); savePending = false; saveConfirmation = "error" }
     }
     Connections {
         target: Config
@@ -105,7 +118,7 @@ FocusScope {
         function onSavingChanged() {
             if (root.savePending && !Config.saving) {
                 root.saveConfirmation = Config.error ? "error" : "success"
-                root.feedback = Config.error || qsTr("Cambios guardados")
+                root.feedback = Config.error || I18n.tr("Cambios guardados")
                 root.savePending = false
             }
         }
@@ -130,7 +143,10 @@ FocusScope {
         anchors.margins: root.width < 760 || root.height < 620 ? 16 : 28
         columns: 2
         columnSpacing: root.sideRail ? 28 : 12
-        rowSpacing: root.height < 620 ? 10 : 16
+        // Las filas llevan su propio margen superior para que la barra de guardado
+        // pueda plegarse sin dejar un hueco fijo.
+        rowSpacing: 0
+        readonly property real rowGap: root.height < 620 ? 10 : 16
         RowLayout {
             id: brand
             Layout.row: 0; Layout.column: 0
@@ -139,18 +155,13 @@ FocusScope {
             spacing: 12
             TopUserStatus {
                 objectName: "settingsUserAvatar"
-                Layout.preferredWidth: 44; Layout.preferredHeight: 44
+                Layout.preferredWidth: 36; Layout.preferredHeight: 36
                 avatarSource: Config.userAvatarUrl
                 userName: Config.profile.displayName || Config.home.split("/").pop()
-                Accessible.name: qsTr("Editar tu perfil")
+                Accessible.name: I18n.tr("Editar tu perfil")
                 onClicked: root.showProfile()
             }
-            Column {
-                Layout.fillWidth: true
-                spacing: 1
-                Text { text: "Edots"; color: Theme.foreground; font.family: Config.appearance.fontDisplayFamily; font.pixelSize: 22 * Math.min(1.35, Config.appearance.fontScale); font.weight: Font.DemiBold }
-                Text { visible: root.width >= 760; width: parent.width; elide: Text.ElideRight; text: qsTr("Tu Isla, a tu manera"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody) }
-            }
+            Text { Layout.fillWidth: true; elide: Text.ElideRight; text: "Edots"; color: Theme.foreground; font.family: Config.appearance.fontDisplayFamily; font.pixelSize: 19 * Math.min(1.35, Config.appearance.fontScale); font.weight: Font.DemiBold }
         }
         RowLayout {
             Layout.row: 0; Layout.column: 1
@@ -158,9 +169,9 @@ FocusScope {
             Item { Layout.fillWidth: true }
             EdotsTextField {
                 id: search; objectName: "settingsSearch"; Layout.preferredWidth: Math.min(340, root.contentWidth * 0.55); implicitHeight: Math.max(44, Theme.fontSizeBodyLg + 24)
-                Accessible.name: qsTr("Buscar en todos los ajustes")
-                Accessible.description: qsTr("Ctrl+F para buscar. Escape borra la búsqueda.")
-                placeholderText: root.width < 760 ? qsTr("Buscar ajustes") : qsTr("Buscar ajustes  ·  Ctrl+F"); color: Theme.foreground; placeholderTextColor: "transparent"
+                Accessible.name: I18n.tr("Buscar en todos los ajustes")
+                Accessible.description: I18n.tr("Ctrl+F para buscar. Escape borra la búsqueda.")
+                placeholderText: root.width < 760 ? I18n.tr("Buscar ajustes") : I18n.tr("Buscar ajustes  ·  Ctrl+F"); color: Theme.foreground; placeholderTextColor: "transparent"
                 font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody)
                 selectByMouse: true; leftPadding: 40
                 selectionColor: Theme.accent; selectedTextColor: Theme.primaryContent
@@ -176,13 +187,16 @@ FocusScope {
                     selected: search.activeFocus
                 }
             }
-            EdotsButton { text: ""; symbol: "close"; implicitWidth: 44; Accessible.name: qsTr("Volver a Isla"); onClicked: root.requestClose() }
+            EdotsButton { text: ""; symbol: "close"; flat: true; implicitWidth: 44; Accessible.name: I18n.tr("Volver a Isla"); onClicked: root.requestClose() }
         }
         Item {
             id: navigationFrame
             Layout.row: 1; Layout.column: 0
+            Layout.topMargin: body.rowGap
             Layout.columnSpan: root.sideRail ? 1 : 2
-            Layout.rowSpan: root.sideRail ? 2 : 1
+            // Sin barra de guardado no hay segunda fila: si el carril la abarcara,
+            // el layout repartiría su altura y recortaría la página.
+            Layout.rowSpan: root.sideRail && footer.visible ? 2 : 1
             Layout.fillWidth: !root.sideRail
             Layout.fillHeight: root.sideRail
             Layout.preferredWidth: root.sideRail ? root.railWidth : -1
@@ -194,6 +208,8 @@ FocusScope {
             // de atrás lo sigue, de modo que se estira entre secciones.
             LiquidSelection {
                 id: navigationLens
+                opacity: root.searchShown ? 0 : 1
+                Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                 objectName: "settingsNavSelection"
                 readonly property real cellWidth: navigationFrame.width / navigation.columns
                 targetX: (root.page % navigation.columns) * cellWidth + (root.sideRail ? 0 : 4)
@@ -202,9 +218,9 @@ FocusScope {
                 targetHeight: navigationFrame.cellHeight - (root.sideRail ? 0 : 8)
                 immediate: !root.visible || !root.contentReady
                 radius: root.sideRail ? 14 : 16
-                color: Theme.liquid ? Theme.stateFill : Qt.alpha(Theme.accent, 0.17)
+                color: Qt.alpha(Theme.accent, 0.17)
                 volume: true
-                border.width: Theme.liquid ? 0 : 1; border.color: Qt.alpha(Theme.accent, 0.24)
+                border.width: 1; border.color: Qt.alpha(Theme.accent, 0.24)
             }
             Grid {
                 id: navigation
@@ -217,8 +233,8 @@ FocusScope {
                         id: nav
                         required property int index
                         required property string modelData
-                        readonly property bool current: root.page === index
-                        readonly property color ink: current && Theme.liquid ? Theme.stateContent : current ? Theme.foreground : Qt.alpha(Theme.foreground, 0.75)
+                        readonly property bool current: root.page === index && !root.searchShown
+                        readonly property color ink: current ? Theme.foreground : Qt.alpha(Theme.foreground, 0.75)
                         objectName: "settingsNav" + index
                         width: navigationFrame.width / navigation.columns; height: navigationFrame.cellHeight
                         onClicked: { body.forceActiveFocus(); root.page = index; search.text = "" }
@@ -227,7 +243,7 @@ FocusScope {
                         background: Rectangle {
                             anchors.fill: parent; anchors.margins: root.sideRail ? 0 : 4; radius: root.sideRail ? 14 : 16
                             color: nav.hovered && !nav.current ? Qt.alpha(Theme.foreground, 0.06) : "transparent"
-                            border.width: nav.activeFocus ? 2 : 0; border.color: nav.current && Theme.liquid ? Theme.stateContent : Theme.accent
+                            border.width: nav.activeFocus ? 2 : 0; border.color: Theme.accent
                             Behavior on color { ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
                         }
                         contentItem: Item {
@@ -235,14 +251,14 @@ FocusScope {
                                 visible: root.sideRail
                                 anchors.verticalCenter: parent.verticalCenter
                                 x: 14; spacing: 12
-                                EdotsIcon { Accessible.ignored: true; anchors.verticalCenter: parent.verticalCenter; iconName: root.symbols[nav.index]; font.pixelSize: 19; color: nav.current && !Theme.liquid ? Theme.accent : nav.ink; interaction: nav.interaction; selected: nav.current; Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } } }
+                                EdotsIcon { Accessible.ignored: true; anchors.verticalCenter: parent.verticalCenter; iconName: root.symbols[nav.index]; font.pixelSize: 19; color: nav.current ? Theme.accent : nav.ink; interaction: nav.interaction; selected: nav.current; Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } } }
                                 Text { anchors.verticalCenter: parent.verticalCenter; width: nav.width - 59; elide: Text.ElideRight; text: nav.modelData; color: nav.ink; font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(13, Theme.fontSizeBodyLg); font.weight: nav.current ? Font.DemiBold : Font.Normal; Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } } }
                             }
                             Column {
                                 visible: !root.sideRail
                                 anchors.centerIn: parent
                                 spacing: 5
-                                EdotsIcon { visible: !root.compactNavigation; Accessible.ignored: true; anchors.horizontalCenter: parent.horizontalCenter; iconName: root.symbols[nav.index]; font.pixelSize: 19; color: nav.current && !Theme.liquid ? Theme.accent : nav.ink; interaction: nav.interaction; selected: nav.current }
+                                EdotsIcon { visible: !root.compactNavigation; Accessible.ignored: true; anchors.horizontalCenter: parent.horizontalCenter; iconName: root.symbols[nav.index]; font.pixelSize: 19; color: nav.current ? Theme.accent : nav.ink; interaction: nav.interaction; selected: nav.current }
                                 Text { anchors.horizontalCenter: parent.horizontalCenter; width: nav.width - 16; horizontalAlignment: Text.AlignHCenter; elide: Text.ElideRight; text: nav.modelData; color: nav.ink; font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody); Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } } }
                             }
                         }
@@ -252,23 +268,10 @@ FocusScope {
                     }
                 }
             }
-            Image {
-                visible: root.sideRail && navigationFrame.height >= navigation.height + 64
-                Accessible.ignored: true
-                anchors.left: parent.left; anchors.leftMargin: 10; anchors.bottom: parent.bottom
-                source: "assets/edots.png"; sourceSize: Qt.size(96, 96)
-                width: 40; height: 40
-                opacity: brandHover.hovered ? 1 : 0.7
-                scale: Config.appearance.reduceMotion ? 1 : brandHover.hovered ? 1.12 : 1
-                rotation: Config.appearance.reduceMotion ? 0 : brandHover.hovered ? -8 : 0
-                Behavior on opacity { NumberAnimation { duration: Motion.hover } }
-                Behavior on scale { enabled: root.visible && root.contentReady && !Config.appearance.reduceMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
-                Behavior on rotation { enabled: root.visible && root.contentReady && !Config.appearance.reduceMotion; NumberAnimation { duration: Motion.standard; easing.type: Motion.easeStandard } }
-                HoverHandler { id: brandHover }
-            }
         }
         ColumnLayout {
             id: pageContent
+            Layout.topMargin: body.rowGap
             Layout.row: root.sideRail ? 1 : 2
             Layout.column: root.sideRail ? 1 : 0
             Layout.columnSpan: root.sideRail ? 1 : 2
@@ -278,45 +281,30 @@ FocusScope {
             transform: Translate { y: pageMotion.travel }
         RowLayout {
             Layout.fillWidth: true; spacing: 14
-            // Icono de la página sobre una gota de estado, como en Ajustes rápidos.
-            Rectangle {
-                visible: root.height >= 620
-                Layout.preferredWidth: 44; Layout.preferredHeight: 44; Layout.alignment: Qt.AlignTop
-                radius: 14
-                color: Theme.liquid ? Theme.stateFill : Qt.alpha(Theme.accent, 0.17)
-                gradient: Theme.liquid ? badgeVolume : null
-                property Gradient badgeVolume: Gradient {
-                    GradientStop { position: 0; color: Theme.stateFillLight }
-                    GradientStop { position: 1; color: Theme.stateFill }
-                }
-                EdotsIcon {
-                    anchors.centerIn: parent; Accessible.ignored: true
-                    iconName: root.searchShown ? "search" : root.symbols[pageMotion.displayedPage]
-                    font.pixelSize: 22; selected: true
-                    color: Theme.liquid ? Theme.stateContent : Theme.accent
-                }
-            }
-            Column {
-                Layout.fillWidth: true; spacing: 3
-                Text { width: parent.width; elide: Text.ElideRight; text: root.searchShown ? qsTr("Resultados de búsqueda") : root.titles[pageMotion.displayedPage]; color: Theme.foreground; font.family: Config.appearance.fontDisplayFamily; font.pixelSize: 26 * Math.min(1.35, Config.appearance.fontScale); font.weight: Font.DemiBold }
-                Text { visible: root.height >= 620; width: parent.width; text: root.searchShown ? qsTr("%1 resultados en toda la configuración.").arg(root.resultCount) : root.subtitles[pageMotion.displayedPage]; color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(13, Theme.fontSizeBodyLg); wrapMode: Text.WordWrap }
+            // Page changes already ride pageMotion; only the search count/title swap fades here.
+            AnimatedLabel {
+                Layout.fillWidth: true; elide: Text.ElideRight
+                animated: root.searchShown
+                value: root.searchShown ? (root.resultCount === 1 ? I18n.tr("1 resultado") : I18n.tr("%1 resultados").arg(root.resultCount)) : root.titles[pageMotion.displayedPage]
+                color: Theme.foreground; font.family: Config.appearance.fontDisplayFamily
+                font.pixelSize: 22 * Math.min(1.35, Config.appearance.fontScale); font.weight: Font.DemiBold
             }
         }
         EdotsButton {
             visible: root.searchShown && root.resultCount === 0
-            text: qsTr("Limpiar búsqueda")
+            text: I18n.tr("Limpiar búsqueda")
             onClicked: { search.text = ""; search.forceActiveFocus() }
         }
         EdotsButton {
             objectName: "hyprlandSearchResult"
             visible: root.hyprlandSearchMatch
-            text: qsTr("Hyprland · Flujo y animaciones"); symbol: "view_carousel"
+            text: I18n.tr("Hyprland · Flujo y animaciones"); symbol: "view_carousel"
             onClicked: { root.page = 6; search.text = ""; body.forceActiveFocus() }
         }
         EdotsButton {
             objectName: "updatesSearchResult"
             visible: root.updatesSearchMatch
-            text: qsTr("Actualizaciones · Sistema, aplicaciones e Isla"); symbol: "system_update"
+            text: I18n.tr("Actualizaciones · Sistema, aplicaciones e Isla"); symbol: "system_update"
             onClicked: root.showUpdates()
         }
         ModuleComposer {
@@ -330,7 +318,7 @@ FocusScope {
             visible: !root.searchShown && pageMotion.displayedPage === 3 && root.height >= 680
             Column {
                 anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 22 } spacing: 7
-                Text { text: qsTr("Un escritorio que habla tu idioma."); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 21 * Math.min(1.4, Config.appearance.fontScale); width: parent.width; elide: Text.ElideRight }
+                Text { text: I18n.tr("Un escritorio que habla tu idioma."); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 21 * Math.min(1.4, Config.appearance.fontScale); width: parent.width; elide: Text.ElideRight }
                 Text { text: "Aa Bb Cc · 0123456789"; color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontMonoFamily; font.pixelSize: 13 }
             }
         }
@@ -346,14 +334,9 @@ FocusScope {
             }
             Column {
                 Layout.fillWidth: true; spacing: 5
-                Text { text: Config.profile.displayName || qsTr("Tu espacio personal"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 20; width: parent.width; elide: Text.ElideRight }
-                Text { text: qsTr("Así te presenta Isla en la sesión."); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody) }
+                Text { text: Config.profile.displayName || I18n.tr("Tu espacio personal"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 20; width: parent.width; elide: Text.ElideRight }
+                Text { text: I18n.tr("Así te presenta Isla en la sesión."); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody) }
             }
-        }
-        RowLayout {
-            Layout.fillWidth: true; visible: !root.searchShown && pageMotion.displayedPage === 5
-            Text { text: qsTr("Opciones limitadas o sin efecto"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody); Layout.fillWidth: true }
-            EdotsButton { text: settingsPage.showUnavailable ? qsTr("Ocultar") : qsTr("Mostrar"); onClicked: settingsPage.showUnavailable = !settingsPage.showUnavailable }
         }
         RowLayout {
             Layout.fillWidth: true; Layout.fillHeight: true; spacing: 24
@@ -363,15 +346,18 @@ FocusScope {
             fieldSelection: {
                 const page = pageMotion.displayedPage
                 return { active: root.searchShown || (page !== 6 && page !== 8 && (page !== 1 || !root.richComposition)),
-                         section: root.sections[page], keys: root.pageFields[page] }
+                         section: root.sections[page], keys: root.pageFields[page], title: root.titles[page] }
             }
             Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumWidth: 260
             popupBounds: root
+            offerUnavailable: pageMotion.displayedPage === 5
+            showFishIntegration: pageMotion.displayedPage === 5 && !root.searchShown
+            emptyAllowed: root.resultCount === 0
             config: Config; query: root.searchShown ? (search.text || root.heldQuery) : ""
             onEdited: root.feedback = ""
             onErrorFieldRequested: id => {
                 const dot = id.indexOf(".")
-                search.text = Config.schema.sections[id.slice(0, dot)][id.slice(dot + 1)].label
+                search.text = I18n.tr(Config.schema.sections[id.slice(0, dot)][id.slice(dot + 1)].label)
                 // Results swap in at the page transition's midpoint; focus once they exist.
                 if (root.searchShown) Qt.callLater(() => settingsPage.focusFirstError())
                 else root.pendingErrorFocus = true
@@ -390,6 +376,8 @@ FocusScope {
                 visible: root.hyprlandActive
                 Layout.fillWidth: true; Layout.fillHeight: true
                 controller: root.hyprlandController
+                plugins: root.pluginsController
+                binds: root.bindsController
             }
             ColumnLayout {
                 visible: !root.searchShown && pageMotion.displayedPage === 2 && root.contentWidth >= 660 && root.height >= 660 && Config.appearance.fontScale <= 1.35
@@ -400,7 +388,7 @@ FocusScope {
         RowLayout {
             Layout.fillWidth: true; spacing: 8
             Repeater {
-                model: [{label: qsTr("Ágil"), scale: 0.7}, {label: qsTr("Natural"), scale: 1}, {label: qsTr("Pausado"), scale: 1.4}]
+                model: [{label: I18n.tr("Ágil"), scale: 0.7}, {label: I18n.tr("Natural"), scale: 1}, {label: I18n.tr("Pausado"), scale: 1.4}]
                 EdotsButton {
                     required property var modelData
                     text: modelData.label
@@ -418,12 +406,27 @@ FocusScope {
         }
         Item {
             id: footer
-            visible: !root.hyprlandActive
+            // Sólo aparece cuando hay algo que guardar, revisar o confirmar; en reposo
+            // la página llega hasta abajo sin una barra de botones apagados.
+            readonly property bool needed: Config.saving || Config.dirty || settingsPage.hasDrafts || Config.error.length > 0
+                || settingsPage.validationError.length > 0 || root.hyprlandController.dirty || root.saveConfirmation !== ""
+            property real reveal: needed ? 1 : 0
+            Behavior on reveal { enabled: root.visible && root.contentReady && !Config.appearance.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+            visible: !root.hyprlandActive && reveal > 0.001
+            opacity: reveal
+            clip: true
             Layout.row: root.sideRail ? 2 : 3
             Layout.column: root.sideRail ? 1 : 0
             Layout.columnSpan: root.sideRail ? 1 : 2
             Layout.fillWidth: true
+            Layout.topMargin: body.rowGap * reveal
+            Layout.preferredHeight: implicitHeight * reveal
             implicitHeight: footerGrid.implicitHeight + 20
+            Timer {
+                interval: 2200
+                running: root.saveConfirmation === "success"
+                onTriggered: { root.saveConfirmation = ""; root.feedback = "" }
+            }
             readonly property bool inline: root.contentWidth >= 700
             Rectangle { anchors.fill: parent; radius: 20; color: Qt.alpha(Theme.foreground, Theme.liquid ? 0.05 : 0.035) }
             // Cambios pendientes: el líquido brota del botón Guardar y llena la
@@ -447,10 +450,10 @@ FocusScope {
             Text {
                 objectName: "settingsStatus"
                 Layout.fillWidth: true
-                text: Config.saving ? qsTr("Guardando…") : Config.error || (settingsPage.validationError ? qsTr("No se guardaron los cambios. Revisa los ajustes marcados.")
-                    : (Config.dirty || settingsPage.hasDrafts) ? qsTr("Vista previa activa · Guarda para conservar los cambios")
-                    : root.hyprlandController.dirty ? qsTr("Hyprland tiene una vista previa pendiente. Guárdala o reviértela en su sección.")
-                    : root.feedback || qsTr("Todos los cambios están guardados"))
+                text: Config.saving ? I18n.tr("Guardando…") : Config.error || (settingsPage.validationError ? I18n.tr("No se guardaron los cambios. Revisa los ajustes marcados.")
+                    : (Config.dirty || settingsPage.hasDrafts) ? I18n.tr("Vista previa activa · Guarda para conservar los cambios")
+                    : root.hyprlandController.dirty ? I18n.tr("Hyprland tiene una vista previa pendiente. Guárdala o reviértela en su sección.")
+                    : root.feedback || I18n.tr("Todos los cambios están guardados"))
                 color: Config.error || settingsPage.validationError ? Theme.error : footerFill.covered ? Theme.stateContent : Theme.foreground
                 Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                 font.family: Config.appearance.fontFamily
@@ -466,9 +469,9 @@ FocusScope {
                 id: footerButtons
                 Layout.fillWidth: !footer.inline
                 spacing: 8
-                EdotsButton { visible: Config.error.length > 0; text: qsTr("Recargar"); onClicked: { settingsPage.clearValidation(); Config.reload() } }
-                EdotsButton { visible: settingsPage.validationError.length > 0; text: qsTr("Revisar ajuste"); onClicked: settingsPage.focusFirstError() }
-                EdotsButton { visible: root.hyprlandController.dirty; text: qsTr("Ver Hyprland"); onClicked: { root.page = 6; search.text = "" } }
+                EdotsButton { visible: Config.error.length > 0; text: I18n.tr("Recargar"); onClicked: { settingsPage.clearValidation(); Config.reload() } }
+                EdotsButton { visible: settingsPage.validationError.length > 0; text: I18n.tr("Revisar ajuste"); onClicked: settingsPage.focusFirstError() }
+                EdotsButton { visible: root.hyprlandController.dirty; text: I18n.tr("Ver Hyprland"); onClicked: { root.page = 6; search.text = "" } }
                 Item { visible: !footer.inline; Layout.fillWidth: true }
                 ConfirmationIndicator {
                     Layout.preferredWidth: 30
@@ -476,10 +479,10 @@ FocusScope {
                     status: root.saveConfirmation
                     Accessible.ignored: false
                     Accessible.role: Accessible.AlertMessage
-                    Accessible.name: status === "success" ? qsTr("Cambios guardados") : status === "error" ? qsTr("No se guardaron los cambios") : qsTr("Guardando")
+                    Accessible.name: status === "success" ? I18n.tr("Cambios guardados") : status === "error" ? I18n.tr("No se guardaron los cambios") : I18n.tr("Guardando")
                 }
-                EdotsButton { text: qsTr("Descartar"); onFill: footerFill.covered; enabled: (Config.dirty || settingsPage.hasDrafts || settingsPage.validationError.length > 0) && !Config.saving; onClicked: { body.forceActiveFocus(); Config.discard(); settingsPage.clearValidation(); root.saveConfirmation = ""; root.feedback = qsTr("Cambios descartados") } }
-                EdotsButton { id: saveButton; objectName: "settingsSave"; text: qsTr("Guardar"); symbol: "check"; accent: true; onFill: footerFill.covered; enabled: Config.loaded && !Config.saving && !Config.error && (Config.dirty || settingsPage.hasDrafts); onClicked: root.saveChanges() }
+                EdotsButton { text: I18n.tr("Descartar"); onFill: footerFill.covered; enabled: (Config.dirty || settingsPage.hasDrafts || settingsPage.validationError.length > 0) && !Config.saving; onClicked: { body.forceActiveFocus(); Config.discard(); settingsPage.clearValidation(); root.saveConfirmation = ""; root.feedback = I18n.tr("Cambios descartados") } }
+                EdotsButton { id: saveButton; objectName: "settingsSave"; text: I18n.tr("Guardar"); symbol: "check"; accent: true; onFill: footerFill.covered; enabled: Config.loaded && !Config.saving && !Config.error && (Config.dirty || settingsPage.hasDrafts); onClicked: root.saveChanges() }
             }
             }
         }

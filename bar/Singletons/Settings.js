@@ -9,19 +9,19 @@ var fields = {
         barLayout: { type: "string", default: "split", options: ["split", "compact"], optionLabels: ["Separada", "Compacta"], label: "Diseño de la barra", control: "choice", description: "Elige la barra separada o la Isla compacta centrada." },
         workspaceStyle: { type: "string", default: "numbers", options: ["numbers", "dots", "bars", "capsules", "pacman"], optionLabels: ["Números", "Puntos", "Barras", "Cápsulas", "Pac-Man"], label: "Estilo de espacios de trabajo", control: "choice", description: "Representación visual de los escritorios, compartida por ambos diseños de barra." },
         glassAlpha: { type: "number", default: 0.34, minimum: 0.15, maximum: 1, label: "Opacidad del vidrio", control: "number", description: "Ajusta la opacidad del material de vidrio." },
-        reduceTransparency: { type: "boolean", default: false, label: "Reducir transparencia", control: "toggle", options: [false, true], description: "Usa fondos opacos en la isla, tarjetas, notificaciones y gotas para facilitar la lectura. Conserva tu opacidad del vidrio al desactivarlo." },
+        reduceTransparency: { type: "boolean", default: false, label: "Reducir transparencia", control: "toggle", options: [false, true], description: "Fondos opacos en la isla, tarjetas y gotas para leer mejor." },
         materialDepth: { type: "number", default: 0.25, minimum: 0, maximum: 1, label: "Profundidad del material", control: "number", description: "Intensidad de la luz direccional y la sombra interior del vidrio de Isla." },
-        liquidSurfaces: { type: "boolean", default: true, label: "Superficies líquidas", control: "toggle", options: [false, true], description: "Los estados activos se llenan desde su gota, las selecciones se estiran al viajar y las tarjetas pierden el contorno. Desactivado conserva el vidrio clásico." },
+        liquidSurfaces: { type: "boolean", default: true, label: "Superficies líquidas", control: "toggle", options: [false, true], description: "Los estados activos se llenan como gotas y las tarjetas pierden el contorno." },
         stateIntensity: { type: "number", default: 1, minimum: 0.3, maximum: 1, label: "Intensidad del color de estado", control: "number", description: "Cuánto acento llena un control activo; la tinta se adapta al contraste del relleno." },
-        ambientFps: { type: "number", default: 60, minimum: 30, maximum: 240, label: "Frecuencia ambiental", control: "number", description: "Frecuencia máxima del espectro, ondas y giro multimedia; no limita el movimiento interactivo." },
+        ambientFps: { type: "number", integer: true, step: 5, unit: "fps", default: 60, minimum: 30, maximum: 240, label: "Frecuencia ambiental", control: "number", description: "Límite de fotogramas del espectro y las ondas multimedia." },
         mediaTransitions: { type: "boolean", default: true, label: "Transiciones multimedia", control: "toggle", options: [false, true], description: "Suaviza los cambios de portada y texto al cambiar de canción." },
         notificationDrop: { type: "boolean", default: true, label: "Notificaciones en gota", control: "toggle", options: [false, true], description: "Las notificaciones informativas brotan como gota bajo la isla sin colapsarla." },
-        personality: { type: "boolean", default: true, label: "Cuerpo", control: "toggle", options: [false, true], description: "La pill responde al cursor, la música, el foco y los eventos como un cuerpo de vidrio líquido. Se muestra en reposo y cede al abrir un panel." },
-        waterBody: { type: "boolean", default: false, label: "Cuerpo líquido en todos los estados", control: "toggle", options: [false, true], description: "Un único vidrio dibuja reposo y paneles con la misma luz, borde y sombra. Desactivado conserva el material actual." },
-        bodyBreath: { type: "boolean", default: false, label: "Respiración del cuerpo", control: "toggle", options: [false, true], description: "Movimiento suave continuo en reposo. Se detiene al ocultar la pill o reducir movimiento." },
-        bodyMessenger: { type: "boolean", default: true, label: "Gota de archivos", control: "toggle", options: [false, true], description: "Recoge archivos de Isla en una gota. Abrirlos requiere un clic; no se mueven ni se borran." },
-        menuSelectionAnchor: { type: "boolean", default: true, label: "Alinear selección en menús", control: "toggle", options: [false, true], description: "Alinea la opción seleccionada con su control cuando la lista completa cabe en pantalla." },
-        pillBlur: { type: "boolean", default: false, label: "Desenfoque de la pill", control: "toggle", options: [false, true], availability: "inactive", description: "Se conserva en la configuración, pero no tiene consumidor activo." },
+        personality: { type: "boolean", default: true, label: "Cuerpo", control: "toggle", options: [false, true], description: "La pill reacciona al cursor, la música y los eventos como vidrio líquido." },
+        waterBody: { type: "boolean", default: false, label: "Cuerpo líquido en todos los estados", control: "toggle", options: [false, true], description: "Reposo y paneles comparten un mismo vidrio, luz y sombra." },
+        waterReactsToMusic: { type: "boolean", default: true, label: "El agua responde a los graves", control: "toggle", options: [false, true], description: "Con música y cuerpo líquido, los graves modulan apenas el brillo del borde." },
+        bodyBreath: { type: "boolean", default: false, label: "Respiración del cuerpo", control: "toggle", options: [false, true], description: "Movimiento suave en reposo. Se pausa al reducir movimiento." },
+        bodyMessenger: { type: "boolean", default: true, label: "Gota de archivos", control: "toggle", options: [false, true], description: "Reúne archivos en una gota. Nunca los mueve ni los borra." },
+        menuSelectionAnchor: { type: "boolean", default: true, label: "Alinear selección en menús", control: "toggle", options: [false, true], description: "Alinea la opción elegida con su control." },
         topGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación superior", control: "number", description: "Multiplicador del espacio entre Isla y el borde superior." },
         appGap: { type: "number", default: 1, minimum: 0, maximum: 4, label: "Separación del área de aplicaciones", control: "number", description: "Multiplicador del espacio reservado junto a la barra de aplicaciones." },
         uiScale: { type: "number", default: 1, minimum: 0.25, maximum: 3, label: "Escala de interfaz", control: "number", description: "Escala la interfaz respecto a la altura del monitor." },
@@ -34,20 +34,38 @@ var fields = {
         fontDisplayFamily: { type: "string", default: "Rubik", minLength: 1, label: "Familia de títulos", control: "text", description: "Nombre de una familia instalada para texto de display." },
         fontMediaFamily: { type: "string", default: "Inter", minLength: 1, label: "Familia multimedia", control: "text", description: "Nombre de una familia instalada para vistas multimedia y de sesión." },
         reduceMotion: { type: "boolean", default: false, label: "Reducir movimiento", control: "toggle", options: [false, true], description: "Reduce o desactiva animaciones compatibles con esta opción." },
-        time12h: { type: "boolean", default: true, label: "Reloj de 12 horas", control: "toggle", options: [false, true], description: "Afecta el calendario y la pantalla de bloqueo; el reloj compacto de la pill conserva formato de 12 horas." },
+        time12h: { type: "boolean", default: true, label: "Reloj de 12 horas", control: "toggle", options: [false, true], description: "Calendario y pantalla de bloqueo; la pill no cambia." },
         clockSeconds: { type: "boolean", default: false, label: "Actualizar reloj cada segundo", control: "toggle", options: [false, true], availability: "partial", description: "Actualiza el dato del reloj cada segundo; la presentación visible actual no muestra segundos." },
-        showGlyphs: { type: "boolean", default: true, label: "Mostrar glifos", control: "toggle", options: [false, true], availability: "inactive", description: "Se conserva en la configuración, pero no tiene consumidor activo." }
+    },
+    gestures: {
+        enabled: { type: "boolean", default: true, label: "Gestos de arrastre", control: "toggle", options: [false, true], description: "Permite abrir y cerrar la Isla arrastrando la pill." },
+        pullTarget: { type: "string", default: "auto", options: ["auto", "utils", "media", "notifs", "calendar"], optionLabels: ["Automático", "Controles", "Multimedia", "Notificaciones", "Calendario"], label: "Destino del gesto", control: "choice", description: "Surface que se abre al arrastrar la pill." }
+    },
+    motion: {
+        appLaunchFlight: { type: "boolean", default: true, label: "Las apps nacen de la isla", control: "toggle", options: [false, true], description: "Al lanzar una app, su icono sale de la isla como una gota y se abre en la ventana." }
+    },
+    devices: {
+        enabled: { type: "boolean", default: true, label: "Dispositivos", control: "toggle", options: [false, true], description: "Conectar y desconectar dispositivos, avisos de carga y privacidad." },
+        bluetooth: { type: "boolean", default: true, label: "Bluetooth", control: "toggle", options: [false, true], description: "Momentos al conectar dispositivos Bluetooth y avisos de batería baja." },
+        power: { type: "boolean", default: true, label: "Corriente", control: "toggle", options: [false, true], description: "Momentos breves al conectar o desconectar el cargador." },
+        storage: { type: "boolean", default: true, label: "Almacenamiento USB", control: "toggle", options: [false, true], description: "Avisos al conectar y expulsar almacenamiento extraíble." },
+        privacyDots: { type: "boolean", default: true, label: "Indicadores de privacidad", control: "toggle", options: [false, true], description: "Indica cuándo una aplicación usa el micrófono o la cámara." }
+    },
+    regional: {
+        language: { type: "string", default: "system", options: ["system", "es", "en"], optionLabels: ["Del sistema", "Español", "English"], label: "Idioma", control: "choice", description: "Idioma de la shell. «Del sistema» sigue LANG." },
+        region: { type: "string", default: "system", options: ["system", "es_DO", "es_ES", "es_MX", "es_AR", "en_US", "en_GB"], optionLabels: ["Del sistema", "República Dominicana", "España", "México", "Argentina", "Estados Unidos", "Reino Unido"], label: "Región", control: "choice", description: "Días, meses y primer día de la semana." },
+        timeZone: { type: "string", default: "system", options: ["system", "America/Santo_Domingo", "America/Mexico_City", "America/Bogota", "America/Lima", "America/Argentina/Buenos_Aires", "America/Santiago", "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "Europe/Madrid", "Europe/London", "Europe/Paris", "Europe/Berlin", "Asia/Tokyo", "Asia/Shanghai", "Asia/Kolkata", "Australia/Sydney", "UTC"], optionLabels: ["Del sistema", "Santo Domingo", "Ciudad de México", "Bogotá", "Lima", "Buenos Aires", "Santiago", "Nueva York", "Chicago", "Denver", "Los Ángeles", "Madrid", "Londres", "París", "Berlín", "Tokio", "Shanghái", "Calcuta", "Sídney", "UTC"], label: "Zona horaria", control: "choice", description: "Hora del reloj, el calendario y el bloqueo. No cambia la del sistema." }
     },
     companion: {
-        sleepAfterSeconds: { type: "number", integer: true, default: 180, minimum: 60, maximum: 1800, label: "Dormir tras la ausencia", control: "number", description: "Segundos de ausencia que informa el compositor antes de dormir el cuerpo." },
+        sleepAfterSeconds: { type: "number", integer: true, step: 10, unit: "s", default: 180, minimum: 60, maximum: 1800, label: "Dormir tras la ausencia", control: "number", description: "Segundos de ausencia que informa el compositor antes de dormir el cuerpo." },
         reactToCode: { type: "boolean", default: true, label: "Reaccionar al código", control: "toggle", options: [false, true], description: "Se concentra cuando trabajas con código." },
         reactToMusic: { type: "boolean", default: true, label: "Reaccionar a la música", control: "toggle", options: [false, true], description: "El cuerpo sigue la energía real del reproductor activo mediante Cava." },
         reactAtNight: { type: "boolean", default: true, label: "Adormecerse de noche", control: "toggle", options: [false, true], description: "El cuerpo descansa entre las 23:00 y las 06:00; la luz sigue siempre la hora local." },
         followPointer: { type: "boolean", default: true, label: "Seguir el puntero", control: "toggle", options: [false, true], description: "El cuerpo se inclina hacia el puntero sobre la pill." },
         mischief: { availability: "inactive", type: "string", default: "rare", options: ["never", "rare", "normal"], optionLabels: ["Nunca", "Raras", "Normales"], label: "Travesuras", control: "choice", description: "Frecuencia de los pequeños gestos espontáneos de Iris." },
-        remember: { availability: "inactive", type: "boolean", default: true, label: "Recordar tus horas", control: "toggle", options: [false, true], description: "Iris guarda en este equipo sólo cuántas veces fue tu primera actividad del día en cada hora, para saludarte según tu costumbre. Desactivado no lee ni escribe nada y no borra lo ya guardado." },
+        remember: { availability: "inactive", type: "boolean", default: true, label: "Recordar tus horas", control: "toggle", options: [false, true], description: "Aprende, sólo en este equipo, a qué hora sueles empezar el día para saludarte. Desactivado no lee, escribe ni borra nada." },
         reactToSystem: { type: "boolean", default: true, label: "Reaccionar al sistema", control: "toggle", options: [false, true], description: "Reacción breve del cuerpo a avisos críticos, foco completado y grabaciones guardadas." },
-        followFocus: { availability: "inactive", type: "boolean", default: true, label: "Mirar lo que haces", control: "toggle", options: [false, true], description: "Mientras escribes en el lanzador o recorres letras, fondos y ventanas, la mirada de Iris sigue el punto que importa en la superficie abierta. Desactivado, sólo sigue al puntero sobre la pill." }
+        followFocus: { availability: "inactive", type: "boolean", default: true, label: "Mirar lo que haces", control: "toggle", options: [false, true], description: "La mirada de Iris sigue lo que recorres en la superficie abierta; desactivado, sólo el puntero." }
     },
     modules: {
         workspaceRail: { type: "boolean", default: true, label: "Espacios de trabajo", control: "toggle", options: [false, true], description: "Muestra el rail de navegación de workspaces." },
@@ -56,7 +74,7 @@ var fields = {
         audio: { type: "boolean", default: true, label: "Audio", control: "toggle", options: [false, true], description: "Muestra el acceso al mezclador; sin salida PipeWire presenta el estado sin audio." },
         network: { type: "boolean", default: true, label: "Red", control: "toggle", options: [false, true], description: "Muestra el indicador Wi-Fi conectado o desconectado." },
         battery: { type: "boolean", default: true, label: "Batería", control: "toggle", options: [false, true], availability: "conditional", description: "Solo se muestra cuando UPower informa una batería de laptop presente." },
-        userAvatar: { type: "boolean", default: true, label: "Avatar en la barra", control: "toggle", options: [false, true], description: "Muestra el avatar del perfil arriba a la derecha; el avatar de Configuración permanece disponible." },
+        userAvatar: { type: "boolean", default: true, label: "Avatar en la barra", control: "toggle", options: [false, true], description: "Muestra tu avatar arriba a la derecha." },
         animateChanges: { type: "boolean", default: true, label: "Animar cambios de módulos", control: "toggle", options: [false, true], description: "Anima la entrada y retirada de módulos; no desactiva el resto de animaciones." }
     },
     profile: {
@@ -69,9 +87,14 @@ var fields = {
         wallpaperCacheDir: { type: "string", path: true, picker: "folder", base: "cacheHome", suffix: "/quickshell/wallpapers", label: "Caché de wallpapers", control: "path", description: "Carpeta para miniaturas generadas por el selector." },
         wallpaperApplyScript: { type: "string", path: true, base: "configHome", suffix: "/hypr/scripts/apply-wallpaper.sh", label: "Script de wallpaper", control: "path", description: "Script ejecutado para aplicar el wallpaper seleccionado." }
     },
+    activities: {
+        enabled: { type: "boolean", default: true, label: "Actividades vivas", control: "toggle", options: [false, true], description: "Muestra procesos en curso en la isla." },
+        longCommandSeconds: { type: "number", integer: true, step: 1, unit: "s", default: 10, minimum: 3, maximum: 600, label: "Comandos largos (segundos)", control: "number", description: "Avisa cuando termina un comando largo en otra ventana." },
+        fromNotifications: { type: "boolean", default: true, label: "Progreso de aplicaciones", control: "toggle", options: [false, true], description: "Convierte notificaciones con progreso en actividades." }
+    },
     updates: {
-        enabled: { type: "boolean", default: true, label: "Buscar actualizaciones", control: "toggle", options: [false, true], description: "Comprueba el sistema, AUR, Flatpak e Isla al iniciar y cada seis horas. Nunca instala automáticamente." },
-        notifications: { type: "boolean", default: true, label: "Avisar de actualizaciones", control: "toggle", options: [false, true], description: "Muestra un aviso cuando hay novedades, como máximo una vez al día para el mismo resultado." }
+        enabled: { type: "boolean", default: true, label: "Buscar actualizaciones", control: "toggle", options: [false, true], description: "Busca novedades del sistema, AUR, Flatpak e Isla cada seis horas. Nunca instala solo." },
+        notifications: { type: "boolean", default: true, label: "Avisar de actualizaciones", control: "toggle", options: [false, true], description: "Avisa de novedades como mucho una vez al día." }
     }
 }
 
@@ -108,7 +131,12 @@ function schema(context) {
 }
 
 var sectionCatalog = [
+    { id: "activities", label: "Actividades", description: "Procesos en curso e integración con la terminal." },
     { id: "appearance", label: "Apariencia", description: "Escala, tipografía, color y movimiento." },
+    { id: "gestures", label: "Gestos", description: "Permite abrir y cerrar la Isla arrastrando la pill." },
+    { id: "motion", label: "Movimiento", description: "Coreografías de la isla con el compositor." },
+    { id: "devices", label: "Dispositivos", description: "Conectar y desconectar dispositivos, avisos de carga y privacidad." },
+    { id: "regional", label: "Idioma y región", description: "Idioma, zona horaria y formato regional." },
     { id: "companion", label: "Cuerpo", description: "Reacciones del cuerpo de vidrio líquido. Se activa con Cuerpo en Apariencia." },
     { id: "modules", label: "Módulos de la barra", description: "Entradas laterales opcionales y sus controles." },
     { id: "profile", label: "Perfil", description: "Datos de presentación de la sesión." },
@@ -144,7 +172,6 @@ var optionalModules = [
 // probe. `availability` describes runtime behavior; capabilities below identify
 // which existing consumer performs a check when the project has one.
 var surfaces = [
-    { id: "appearance", label: "Apariencia", availability: "routed", dependsOn: ["settings.config"], optionalDependsOn: [] },
     { id: "auth", label: "Autenticación", availability: "routed", dependsOn: ["quickshell.polkit", "isla-sudo-askpass"], optionalDependsOn: [] },
     { id: "calendar", label: "Calendario", availability: "routed", dependsOn: ["system-clock"], optionalDependsOn: ["curl", "weather.wttr.in"] },
     { id: "clipboard", label: "Portapapeles", availability: "routed", dependsOn: ["cliphist"], optionalDependsOn: ["wl-copy", "magick"] },
@@ -159,8 +186,7 @@ var surfaces = [
     { id: "session", label: "Sesión y energía", availability: "routed", dependsOn: ["island.session"], optionalDependsOn: ["island.lockscreen", "hyprctl", "systemctl"] },
     { id: "settings", label: "Ajustes Edots", availability: "routed", dependsOn: ["settings.config"], optionalDependsOn: [] },
     { id: "utils", label: "Controles rápidos", availability: "routed", dependsOn: [], optionalDependsOn: ["systemd-inhibit", "sysfs.backlight", "powerprofilesctl"] },
-    { id: "wallpaper", label: "Wallpapers", availability: "routed", dependsOn: ["wallpaper.directory"], optionalDependsOn: ["wallpaper.apply-script", "magick", "mpris.players"] },
-    { id: "workspaces", label: "Espacios de trabajo", availability: "routed", dependsOn: ["hyprland.workspaces"], optionalDependsOn: [] }
+    { id: "wallpaper", label: "Wallpapers", availability: "routed", dependsOn: ["wallpaper.directory"], optionalDependsOn: ["wallpaper.apply-script", "magick", "mpris.players"] }
 ]
 
 var capabilities = [

@@ -13,7 +13,6 @@ Item {
         enabled: root.motionReady && !root.reducedMotion && root.visible
         NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard }
     }
-    HoverHandler { id: rowHover }
     required property string fieldKey
     required property var field
     required property var value
@@ -35,12 +34,20 @@ Item {
     readonly property bool modified: value !== field.default || draftText !== undefined
     readonly property bool ranged: field.type === "number" && field.minimum !== undefined && field.maximum !== undefined
     readonly property bool fontField: ["fontFamily", "fontMonoFamily", "fontDisplayFamily", "fontMediaFamily"].includes(fieldKey)
+    // Controles compactos a la derecha de la etiqueta cuando hay anchura: la fila
+    // se lee como «nombre → valor» y no como un formulario apilado.
+    readonly property var options: field.options || []
+    readonly property bool selectField: field.control === "choice" && options.length > 6
+    readonly property bool chipField: field.control === "choice" && !selectField
+    readonly property bool wide: width >= 600
+    readonly property bool inlineControl: wide && ((chipField && options.length <= 3) || selectField || ranged)
     property string localError: ""
     onDraftTextChanged: { if (draftText === undefined) localError = "" }
 
     function focusEditor() {
         if (!root.editable) return false
         if (fontPicker.visible && fontPicker.status === Loader.Ready) fontPicker.item.contentItem.forceActiveFocus()
+        else if (selectLoader.visible && selectLoader.status === Loader.Ready) selectLoader.item.forceActiveFocus()
         else if (textLoader.visible && textLoader.status === Loader.Ready) textLoader.item.editor.forceActiveFocus()
         else if (sliderLoader.visible && sliderLoader.status === Loader.Ready) sliderLoader.item.editor.forceActiveFocus()
         else if (toggleLoader.visible && toggleLoader.status === Loader.Ready) toggleLoader.item.forceActiveFocus()
@@ -60,18 +67,18 @@ Item {
         if (field.type === "number" && (text.trim() === "" || !isFinite(next)
             || (field.minimum !== undefined && next < field.minimum)
             || (field.maximum !== undefined && next > field.maximum))) {
-            localError = qsTr("Introduce un número dentro del rango permitido.")
+            localError = I18n.tr("Introduce un número dentro del rango permitido.")
         } else if (field.type === "string" && (next.length < (field.minLength === undefined ? 1 : field.minLength)
                    || next.indexOf("\u0000") !== -1
                    || (field.path && next.charAt(0) !== "/" && next !== "~" && next.indexOf("~/") !== 0))) {
-            localError = field.path ? qsTr("Usa una ruta absoluta o que empiece por ~/.")
-                                    : qsTr("Introduce un texto válido.")
+            localError = field.path ? I18n.tr("Usa una ruta absoluta o que empiece por ~/.")
+                                    : I18n.tr("Introduce un texto válido.")
         } else {
             localError = ""
             if (next !== root.value) changeRequested(next)
             else accepted()
         }
-        if (localError) validationFailed(qsTr("%1: %2").arg(field.label).arg(localError))
+        if (localError) validationFailed(I18n.tr("%1: %2").arg(I18n.tr(field.label)).arg(localError))
     }
 
     // Filas agrupadas: cada sección es una tarjeta continua; sólo la primera y
@@ -80,20 +87,20 @@ Item {
     property bool groupLast: true
     readonly property real cardRadius: 18
     readonly property real headerSpace: sectionLabel.length > 0 ? sectionHeader.implicitHeight + 10 : 0
-    readonly property real groupGap: groupLast ? 14 : 0
-    implicitHeight: headerSpace + content.implicitHeight + 30 + groupGap
+    readonly property real groupGap: groupLast ? 28 : 0
+    implicitHeight: headerSpace + content.implicitHeight + 32 + groupGap
 
     Text {
         id: sectionHeader
         visible: root.sectionLabel.length > 0
         anchors.left: parent.left
-        anchors.leftMargin: 8
+        anchors.leftMargin: 20
         text: root.sectionLabel
         color: Qt.alpha(Theme.foreground, 0.72)
         font.family: Config.appearance.fontFamily
-        font.pixelSize: Theme.fontSizeBody
+        font.pixelSize: Theme.fontSizeSmall
         font.weight: Font.DemiBold
-        font.letterSpacing: 0.4
+        font.letterSpacing: 0.3
     }
 
     Rectangle {
@@ -112,40 +119,35 @@ Item {
         bottomRightRadius: bottomLeftRadius
         border.width: Theme.liquid ? 0 : 1
         border.color: Qt.alpha(Theme.foreground, 0.05)
-        Rectangle {
-            anchors.fill: parent
-            topLeftRadius: card.topLeftRadius; topRightRadius: card.topRightRadius
-            bottomLeftRadius: card.bottomLeftRadius; bottomRightRadius: card.bottomRightRadius
-            color: Theme.accent
-            opacity: rowHover.hovered && root.editable ? 0.05 : 0
-            Behavior on opacity { enabled: !root.reducedMotion && root.visible; NumberAnimation { duration: Motion.hover } }
-        }
     }
 
+    // Cabecera: etiqueta | restablecer | control en línea o interruptor.
+    // Lo que no cabe en línea va debajo, a todo el ancho.
     ColumnLayout {
         id: content
         anchors.left: card.left
         anchors.right: card.right
         anchors.top: card.top
         anchors.leftMargin: 20
-        anchors.rightMargin: 20
-        anchors.topMargin: 15
+        anchors.rightMargin: 16
+        anchors.topMargin: 16
         spacing: 10
-
         RowLayout {
+            id: headerRow
             Layout.fillWidth: true
-            spacing: 14
+            spacing: 12
 
             ColumnLayout {
                 Layout.fillWidth: true
-                spacing: 3
+                Layout.alignment: Qt.AlignVCenter
+                spacing: 2
                 RowLayout {
                     Layout.fillWidth: true
                     spacing: 8
                     // Marca de valor propio: una gota pequeña junto al título.
                     Rectangle {
                         Layout.preferredWidth: 7; Layout.preferredHeight: 7; radius: 3.5
-                        Layout.alignment: Qt.AlignVCenter
+            Layout.alignment: Qt.AlignVCenter
                         color: Theme.liquid ? Theme.stateFill : Theme.accent
                         visible: scale > 0.01
                         scale: root.modified ? 1 : 0
@@ -153,7 +155,7 @@ Item {
                     }
                     Text {
                         Layout.fillWidth: true
-                        text: root.field.label
+                        text: I18n.tr(root.field.label)
                         color: root.editable ? Theme.foreground : Qt.alpha(Theme.foreground, 0.72)
                         font.family: Config.appearance.fontFamily
                         font.pixelSize: Theme.fontSizeTitle
@@ -164,10 +166,10 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     visible: text.length > 0
-                    text: root.fontField ? qsTr("Elige una fuente instalada o escribe su nombre.") : root.field.description || ""
+                    text: root.fontField ? "" : I18n.tr(root.field.description || "")
                     color: Qt.alpha(Theme.foreground, 0.72)
                     font.family: Config.appearance.fontFamily
-                    font.pixelSize: Theme.fontSizeBody
+                    font.pixelSize: Theme.fontSizeSmall
                     wrapMode: Text.WordWrap
                 }
             }
@@ -178,11 +180,15 @@ Item {
                 Layout.alignment: Qt.AlignVCenter
                 sourceComponent: EdotsButton {
                     enabled: root.editable
-                    text: qsTr("Restablecer")
+                    flat: true
+                    objectName: "settingReset"
                     symbol: "refresh"
-                    implicitHeight: Math.max(36, Theme.fontSizeBody * 1.5 + 14)
-                    font.pixelSize: Theme.fontSizeBody
-                    Accessible.description: qsTr("%1 tiene un valor personalizado").arg(root.field.label)
+                    implicitWidth: 40; implicitHeight: 40
+                    Accessible.name: I18n.tr("Restablecer")
+                    ToolTip.visible: hovered
+                    ToolTip.delay: 500
+                    ToolTip.text: I18n.tr("Restablecer")
+                    Accessible.description: I18n.tr("%1 tiene un valor personalizado").arg(I18n.tr(root.field.label))
                     onClicked: root.restoreDefault()
                     opacity: 0
                     Component.onCompleted: opacity = 1
@@ -202,7 +208,7 @@ Item {
                     checked: !!root.value
                     focusPolicy: Qt.StrongFocus
                     Accessible.name: root.field.label
-                    Accessible.description: root.field.description || ""
+                    Accessible.description: I18n.tr(root.field.description || "")
                     onToggled: root.changeRequested(checked)
                     implicitWidth: 64; implicitHeight: 44
                     indicator: Rectangle {
@@ -261,30 +267,44 @@ Item {
         Text {
             visible: !root.supported
             Layout.fillWidth: true
-            text: root.field.availability === "partial" ? qsTr("Disponible parcialmente · edición desactivada")
-                                                        : qsTr("Sin efecto actualmente · edición desactivada")
+            text: root.field.availability === "partial" ? I18n.tr("Disponible parcialmente · edición desactivada")
+                                                        : I18n.tr("Sin efecto actualmente · edición desactivada")
             color: Qt.alpha(Theme.foreground, 0.72)
             font.family: Config.appearance.fontFamily
-            font.pixelSize: Theme.fontSizeBody
+            font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.WordWrap
         }
 
         Loader {
             id: choiceLoader
-            active: root.field.control === "choice"
+            active: root.chipField
             visible: active
-            Layout.fillWidth: true
+            // En línea pasa a la cabecera, tras el botón de restablecer.
+            parent: root.inlineControl ? headerRow : content
+            Layout.fillWidth: !root.inlineControl
+            Layout.alignment: Qt.AlignVCenter
             // Control segmentado: la selección es una gota que viaja entre opciones.
             sourceComponent: Item {
                 id: choiceGroup
                 objectName: "settingChoices"
                 property alias choices: choiceRepeater
                 implicitHeight: choiceFlow.implicitHeight + 8
+                implicitWidth: (root.inlineControl ? rowWidth : choiceFlow.implicitWidth) + 8
                 readonly property int selectedIndex: (root.field.options || []).indexOf(root.value)
                 // itemAt() no notifica: la revisión obliga a releerlo cuando el Repeater crea o retira chips.
                 property int chipRevision: 0
                 readonly property Item selectedChip: chipRevision >= 0 && selectedIndex >= 0 ? choiceRepeater.itemAt(selectedIndex) : null
                 property bool placed: false
+                // En línea el Flow no puede deducir su ancho del implícito (los apila en columna):
+                // se le da la suma exacta de las opciones para que quepan en una fila.
+                readonly property real rowWidth: {
+                    let width = 0
+                    for (let i = 0; chipRevision >= 0 && i < choiceRepeater.count; i++) {
+                        const chip = choiceRepeater.itemAt(i)
+                        if (chip) width += chip.implicitWidth + (i > 0 ? 4 : 0)
+                    }
+                    return width
+                }
                 Timer { interval: 60; running: true; onTriggered: choiceGroup.placed = true }
                 Rectangle {
                     width: Math.min(parent.width, choiceFlow.childrenRect.width + 8)
@@ -309,7 +329,7 @@ Item {
                 Flow {
                     id: choiceFlow
                     x: 4; y: 4
-                    width: parent.width - 8
+                    width: root.inlineControl ? choiceGroup.rowWidth : parent.width - 8
                     spacing: 4
                     Repeater {
                         id: choiceRepeater
@@ -322,7 +342,7 @@ Item {
                             required property int index
                             readonly property bool selected: root.value === choice.modelData
                             objectName: "choice-" + modelData
-                            text: root.field.optionLabels ? root.field.optionLabels[index] : modelData
+                            text: root.field.optionLabels ? I18n.tr(root.field.optionLabels[index]) : modelData
                             checkable: false
                             checked: selected
                             enabled: root.editable
@@ -330,11 +350,11 @@ Item {
                             implicitWidth: choiceLabel.implicitWidth + 32
                             font.family: Config.appearance.fontFamily
                             font.pixelSize: Theme.fontSizeBodyLg
-                            Accessible.name: root.field.label + ": " + text
+                            Accessible.name: I18n.tr(root.field.label) + ": " + text
                             Accessible.role: Accessible.RadioButton
                             Accessible.checkable: true
                             Accessible.checked: selected
-                            Accessible.description: root.field.description || ""
+                            Accessible.description: I18n.tr(root.field.description || "")
                             onClicked: root.changeRequested(choice.modelData)
                             background: Rectangle {
                                 radius: 11
@@ -362,7 +382,11 @@ Item {
             id: sliderLoader
             active: root.field.type === "number" && root.ranged
             visible: active
-            Layout.fillWidth: true
+            // En línea pasa a la cabecera, tras el botón de restablecer.
+            parent: root.inlineControl ? headerRow : content
+            Layout.fillWidth: !root.inlineControl
+            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredWidth: root.inlineControl ? Math.min(300, root.width * 0.4) : -1
             sourceComponent: RowLayout {
                 property alias editor: slider
                 spacing: 14
@@ -375,10 +399,10 @@ Item {
                     from: root.field.minimum ?? 0
                     to: root.field.maximum ?? 1
                     value: Number(root.value)
-                    stepSize: root.field.integer ? 1 : 0.01
+                    stepSize: root.field.step ?? (root.field.integer ? 1 : 0.01)
                     focusPolicy: Qt.StrongFocus
                     Accessible.name: root.field.label
-                    Accessible.description: root.field.description || ""
+                    Accessible.description: I18n.tr(root.field.description || "")
                     onMoved: root.changeRequested(root.field.integer ? Math.round(value) : Math.round(value * 100) / 100)
                     // Con Superficies líquidas el carril es un tubo grueso: el relleno
                     // nunca baja de una gota y el botón flota dentro de su extremo.
@@ -451,7 +475,7 @@ Item {
                     Text {
                         id: valueText
                         anchors.centerIn: parent
-                        text: Number(slider.pressed ? slider.value : root.value).toFixed(root.field.integer ? 0 : 2)
+                        text: Number(slider.pressed ? slider.value : root.value).toFixed(root.field.integer ? 0 : 2) + (root.field.unit ? " " + root.field.unit : "")
                         color: slider.pressed ? Theme.stateContent : Theme.foreground
                         font.family: Config.appearance.fontFamily
                         font.features: Theme.fontNumeric
@@ -488,9 +512,9 @@ Item {
                     objectName: "browsePath"
                     visible: !!root.field.path
                     enabled: root.editable
-                    text: qsTr("Elegir…")
+                    text: I18n.tr("Elegir…")
                     symbol: "folder_open"
-                    Accessible.name: qsTr("Seleccionar %1").arg(root.field.label)
+                    Accessible.name: I18n.tr("Seleccionar %1").arg(I18n.tr(root.field.label))
                     onClicked: root.browseRequested()
                 }
             }
@@ -515,6 +539,31 @@ Item {
             }
         }
 
+        // Más de seis opciones: un menú en lugar de un muro de chips.
+        Loader {
+            id: selectLoader
+            active: root.selectField
+            visible: active
+            // En línea pasa a la cabecera, tras el botón de restablecer.
+            parent: root.inlineControl ? headerRow : content
+            Layout.fillWidth: !root.inlineControl
+            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredWidth: root.inlineControl ? 240 : -1
+            sourceComponent: EdotsComboBox {
+                objectName: "settingSelect"
+                editable: false
+                previewFonts: false
+                enabled: root.editable
+                popupBounds: root.popupBounds
+                model: (root.field.optionLabels || root.options).map(label => I18n.tr(String(label)))
+                readonly property int selectedIndex: root.options.indexOf(root.value)
+                configuredText: selectedIndex >= 0 ? model[selectedIndex] : ""
+                Accessible.name: I18n.tr(root.field.label)
+                Accessible.description: I18n.tr(root.field.description || "")
+                onActivated: index => { if (root.options[index] !== root.value) root.changeRequested(root.options[index]) }
+            }
+        }
+
         Text {
             objectName: "settingValidation"
             id: validation
@@ -532,10 +581,10 @@ Item {
             text: held
             color: Theme.error
             font.family: Config.appearance.fontFamily
-            font.pixelSize: Theme.fontSizeBody
+            font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.WordWrap
             Accessible.role: Accessible.StaticText
-            Accessible.name: qsTr("%1: %2").arg(root.field.label).arg(text)
+            Accessible.name: I18n.tr("%1: %2").arg(I18n.tr(root.field.label)).arg(text)
         }
     }
 

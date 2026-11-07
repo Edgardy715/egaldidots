@@ -13,6 +13,9 @@ Item {
     property var fieldKeys: []
     property var fieldSelection: ({ section: root.section, keys: root.fieldKeys, active: true })
     property bool showUnavailable: false
+    // Avanzado ofrece, al final de la lista, las opciones sin efecto en este equipo.
+    property bool offerUnavailable: false
+    property bool showFishIntegration: false
     property var drafts: ({})
     property var draftBases: ({})
     property var rowErrors: ({})
@@ -25,7 +28,7 @@ Item {
             const key = id.slice(dot + 1)
             const current = effective[sectionName][key]
             if (current !== draftBases[id] && String(current) !== drafts[id])
-                result[id] = qsTr("%1 cambió fuera de Edots. Edita el borrador, restablécelo o descártalo.").arg(config.schema.sections[sectionName][key].label)
+                result[id] = I18n.tr("%1 cambió fuera de Edots. Edita el borrador, restablécelo o descártalo.").arg(config.schema.sections[sectionName][key].label)
         }
         return result
     }
@@ -45,7 +48,7 @@ Item {
         pickerKey = key
         const field = config.schema.sections[sectionName][key]
         const path = effective[sectionName][key]
-        pathPicker.start(qsTr("Seleccionar %1").arg(field.label), path, field.picker === "folder",
+        pathPicker.start(I18n.tr("Seleccionar %1").arg(I18n.tr(field.label)), path, field.picker === "folder",
             key === "userAvatar" ? "image" : key === "paletteFile" ? "json" : "all")
     }
 
@@ -80,12 +83,29 @@ Item {
                        config.wallpaperCacheDir, config.wallpaperApplyScript]
         return config.snapshot().effective
     }
+    property bool emptyAllowed: true
     readonly property var entries: {
         const selection = fieldSelection
         if (!selection.active) return []
         const fieldKeys = selection.keys
         const terms = normalize(query).trim().split(/\s+/).filter(Boolean)
         const sections = config.schema.sections
+        // Sin búsqueda, la página sigue el orden de fieldKeys; "#Etiqueta" abre un grupo.
+        if (!terms.length && fieldKeys.length) {
+            const ordered = []
+            let group = ""
+            for (const id of fieldKeys) {
+                if (id.charAt(0) === "#") { group = id.slice(1); continue }
+                const dot = id.indexOf(".")
+                const name = id.slice(0, dot)
+                const key = id.slice(dot + 1)
+                const field = (sections[name] || {})[key]
+                if (!field) continue
+                if (!showUnavailable && (field.availability === "inactive" || field.availability === "partial")) continue
+                ordered.push({ section: name, key: key, field: field, group: group })
+            }
+            return ordered
+        }
         const names = terms.length || fieldKeys.length ? Object.keys(sections) : [selection.section]
         const result = []
         for (const name of names) {
@@ -94,16 +114,22 @@ Item {
                 const field = fields[key]
                 const id = name + "." + key
                 if (terms.length) {
-                    const haystack = normalize(field.label + " " + field.description + " " + (field.optionLabels || []).join(" ") + " " + key + " " + name)
+                    const haystack = normalize(I18n.tr(field.label) + " " + I18n.tr(field.description) + " " + (field.optionLabels || []).map(l => I18n.tr(l)).join(" ") + " " + key + " " + name)
                     if (!terms.every(term => haystack.includes(term))) continue
                 } else {
                     if (fieldKeys.length && fieldKeys.indexOf(id) === -1) continue
                     if (!showUnavailable && (field.availability === "inactive" || field.availability === "partial")) continue
                 }
-                result.push({ section: name, key: key, field: field })
+                result.push({ section: name, key: key, field: field, group: "" })
             }
         }
         return result
+    }
+
+    // En búsqueda las tarjetas se agrupan por sección; en una página, por su grupo.
+    function groupOf(index) {
+        const entry = entries[index]
+        return query.trim() ? entry.section : entry.group || entry.section
     }
 
     function normalize(text) {
@@ -156,10 +182,16 @@ Item {
         if (entry < 0) { errorFieldRequested(id); return }
         const wrapper = rows.itemAt(entry)
         if (!wrapper) return
-        scroll.contentItem.contentY = Math.max(0, Math.min(scroll.contentItem.contentHeight - scroll.height, wrapper.y))
+        const flick = scroll.contentItem
+        flick.contentY = Math.max(0, Math.min(flick.contentHeight - scroll.height, wrapper.y))
         wrapper.focusEditor()
-        const bottom = wrapper.mapToItem(scroll.contentItem, 0, wrapper.height).y
-        scroll.contentItem.contentY = Math.max(0, Math.min(scroll.contentItem.contentHeight - scroll.height, scroll.contentItem.contentY + bottom - scroll.height + 12))
+        // Se muestra el editor enfocado: con letra grande la fila entera puede no caber.
+        const focused = root.Window.activeFocusItem
+        const target = focused && wrapper.contains(wrapper.mapFromItem(focused, 0, 0)) ? focused : wrapper
+        const top = target.mapToItem(flick.contentItem, 0, 0).y
+        let y = Math.max(flick.contentY, top + target.height - scroll.height + 12)
+        y = Math.min(y, top - 12)
+        flick.contentY = Math.max(0, Math.min(flick.contentHeight - scroll.height, y))
     }
     signal errorFieldRequested(string id)
 
@@ -176,18 +208,18 @@ Item {
             const field = config.schema.sections[sectionName][key]
             const text = drafts[id].trim()
             if (field.type === "number" && (text === "" || !isFinite(Number(text)))) {
-                setError(id, qsTr("%1: introduce un número válido.").arg(field.label))
+                setError(id, I18n.tr("%1: introduce un número válido.").arg(I18n.tr(field.label)))
                 invalid = true
                 continue
             }
             if (field.type === "string" && field.path
                     && !text.startsWith("/") && text !== "~" && !text.startsWith("~/")) {
-                setError(id, qsTr("%1: usa una ruta absoluta o que empiece por ~/.").arg(field.label))
+                setError(id, I18n.tr("%1: usa una ruta absoluta o que empiece por ~/.").arg(I18n.tr(field.label)))
                 invalid = true
                 continue
             }
             if (field.type === "string" && (text.length < (field.minLength === undefined ? 1 : field.minLength) || text.includes("\u0000"))) {
-                setError(id, qsTr("%1: introduce un texto válido.").arg(field.label))
+                setError(id, I18n.tr("%1: introduce un texto válido.").arg(I18n.tr(field.label)))
                 invalid = true
                 continue
             }
@@ -262,9 +294,12 @@ Item {
                     readonly property var modelData: rowEntry.modelData
                     popupBounds: root.popupBounds
                     // Una tarjeta por sección consecutiva; en búsqueda, con su encabezado.
-                    groupFirst: rowEntry.index === 0 || root.entries[rowEntry.index - 1].section !== modelData.section
-                    groupLast: rowEntry.index === root.entries.length - 1 || root.entries[rowEntry.index + 1].section !== modelData.section
-                    sectionLabel: root.query.trim() && groupFirst ? root.config.catalog.sectionOrder.find(item => item.id === modelData.section).label : ""
+                    groupFirst: rowEntry.index === 0 || root.groupOf(rowEntry.index - 1) !== root.groupOf(rowEntry.index)
+                    groupLast: rowEntry.index === root.entries.length - 1 || root.groupOf(rowEntry.index + 1) !== root.groupOf(rowEntry.index)
+                    sectionLabel: !groupFirst ? ""
+                        : root.query.trim() ? I18n.tr(root.config.catalog.sectionOrder.find(item => item.id === modelData.section).label)
+                        // Un grupo que repite el título de la página no necesita encabezado.
+                        : I18n.tr(modelData.group) === root.fieldSelection.title ? "" : I18n.tr(modelData.group)
                     fieldKey: modelData.key
                     field: modelData.field
                     value: root.effective[modelData.section] ? root.effective[modelData.section][fieldKey] : undefined
@@ -282,17 +317,43 @@ Item {
                 }
             }
 
+            Loader {
+                width: root.width
+                active: root.showFishIntegration
+                sourceComponent: FishIntegration { width: root.width }
+            }
+
             Text {
-                visible: root.entries.length === 0
+                opacity: root.entries.length === 0 && root.emptyAllowed ? 1 : 0
+                visible: opacity > 0.01
+                transform: Translate { y: Flags.reduceMotion ? 0 : 4 * (1 - opacity) }
+                Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                 width: root.width
                 topPadding: 28
                 leftPadding: 28
                 rightPadding: 28
-                text: qsTr("No hay ajustes que coincidan con la búsqueda.")
+                text: I18n.tr("No hay ajustes que coincidan con la búsqueda.")
                 color: Qt.alpha(Theme.foreground, 0.72)
                 font.family: Config.appearance.fontFamily
-                font.pixelSize: 14
+                font.pixelSize: Theme.fontSizeBody
                 wrapMode: Text.WordWrap
+            }
+
+            Item {
+                opacity: root.offerUnavailable && !root.query.trim() ? 1 : 0
+                visible: opacity > 0.01
+                transform: Translate { y: Flags.reduceMotion ? 0 : 4 * (1 - opacity) }
+                Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                width: root.width
+                implicitHeight: unavailableToggle.implicitHeight + 24
+                EdotsButton {
+                    id: unavailableToggle
+                    x: 12; y: 12
+                    flat: true
+                    symbol: root.showUnavailable ? "visibility_off" : "visibility"
+                    text: root.showUnavailable ? I18n.tr("Ocultar opciones sin efecto") : I18n.tr("Mostrar opciones sin efecto")
+                    onClicked: root.showUnavailable = !root.showUnavailable
+                }
             }
         }
     }
