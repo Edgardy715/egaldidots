@@ -54,10 +54,10 @@ ShellRoot {
                         Config.update({appearance:{fontScale:scale,reduceMotion:true}})
                         for (const size of [{w:1000,h:700},{w:640,h:560}]) {
                             window.width=size.w; window.height=size.h
-                            editor.page=7; wait(350)
+                            editor.systemTab="updates"; editor.page=5; wait(350)
                             const page=findChild(editor,"updatesPage")
                             const scroll=findChild(editor,"updatesScroll")
-                            const tab=findChild(editor,"settingsNav7")
+                            const tab=findChild(editor,"settingsNav5")
                             assert(page.visible, "updates page shown")
                             assert(tab.width >= 44 && tab.height >= 44 && tab.mapToItem(editor,0,tab.height).y <= editor.height,"navigation fits")
                             assert(scroll.height>80,"usable scroll viewport: "+scroll.height)
@@ -95,8 +95,8 @@ ShellRoot {
                     const pageMotion=findChild(editor,"settingsPageMotion"); assert(!!pageMotion,"page motion reachable")
                     tryVerify(() => !pageMotion.transitioning, 2000, "search results settled")
                     mouseClick(hit); wait(150)
-                    assert(editor.page===7 && !editor.searchQuery,"search opens portal")
-                    backend.error=""; editor.page=7; editor.searchQuery=""
+                    assert(editor.page===5 && editor.systemTab==="updates" && !editor.searchQuery,"search opens portal")
+                    backend.error=""; editor.systemTab="updates"; editor.page=5; editor.searchQuery=""
                     Config.update({appearance:{fontScale:1,reduceMotion:false}})
                     wait(650)
                     const scroll=findChild(editor,"updatesScroll")
@@ -131,7 +131,7 @@ ShellRoot {
                     window.visible=true; wait(150)
                     editor.page=0; wait(650)
                     assert(!spinner.animating,"hidden portal stops activity")
-                    editor.page=7; wait(650)
+                    editor.systemTab="updates"; editor.page=5; wait(650)
                     Config.update({appearance:{reduceMotion:true}}); wait(30)
                     assert(!spinner.animating,"reduced motion stops activity")
                     assert(findChild(editor,"updatesMessage-shell").text.includes("cambios locales"),"paused Git explains itself")
@@ -165,7 +165,7 @@ ShellRoot {
                     assert(findChild(editor,"updatesMessage-aur").text.startsWith("Sin conexión"),"friendly check error")
                     capture("partial-error")
                     Config.update({appearance:{reduceMotion:false}})
-                    editor.page=0; wait(35); editor.page=7; wait(40); editor.page=2; wait(25); editor.page=7; wait(650)
+                    editor.page=0; wait(35); editor.systemTab="updates"; editor.page=5; wait(40); editor.page=2; wait(25); editor.systemTab="updates"; editor.page=5; wait(650)
                     assert(findChild(editor,"updatesPage").visible,"rapid navigation ends at requested page")
                     Config.discard()
                     console.log("PASS: Updates UI, actions, protections, search and responsive layout")

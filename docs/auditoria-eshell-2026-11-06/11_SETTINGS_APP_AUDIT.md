@@ -149,6 +149,8 @@ Fila 24 (parcial): "Tipografía" e "Idioma y región" se fusionaron en "Texto" (
 
 Fila 24 (segunda parte): "Tu perfil" se fusionó con "Avanzado" como "Perfil y sistema" (9 → 8 páginas; nombre visible y avatar van como sección "Perfil" al inicio). Índices nuevos: 0 Apariencia, 1 Composición, 2 Movimiento, 3 Texto, 4 Perfil y sistema, 5 Hyprland, 6 Cuerpo, 7 Actualizaciones. Se actualizaron las regresiones activities, hyprland-settings, updates y settings-navigation. Capturada la página 4. PASS: navigation, updates, controls, companion, module-composer. Fallan igual sin el cambio: settings-ux, hyprland-settings, activities (compare en TestCase:987) y settings-surface-switch.
 
+Fila 24 (completa): 7 páginas. Hyprland y Actualizaciones pasan a ser pestañas de una página **Sistema** (General · Hyprland · Actualizaciones) con `IslaSegmented`; las vistas propias se conservan intactas, así que su guardado y su búsqueda no cambian. General recoge Rendimiento, Actividades y Dispositivos; la página 4 queda como Perfil y archivos. Índices: 0 Apariencia, 1 Composición, 2 Movimiento, 3 Texto, 4 Perfil y archivos, 5 Sistema (`systemTab`), 6 Amalgam. Se corrigió además una condición obsoleta (`page !== 6 && page !== 8`) del formulario. Capturadas las tres pestañas. PASS: navigation, updates, controls, companion, module-composer, settings. Fallan igual que antes: hyprland-settings (revert), activities (compare) y settings-ux (lastIndexOf).
+
 ## 8. Contraste con las referencias (añadido tras revisión)
 
 - **Corrección al doc 05:** motion-primitives.com y uiverse.io **sí cargan en el navegador integrado** (la herramienta de lectura plana dio 403). Se comprobó: la home de motion-primitives y el catálogo de switches de Uiverse (460 componentes).
