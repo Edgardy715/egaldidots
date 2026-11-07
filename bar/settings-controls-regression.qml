@@ -3,6 +3,7 @@ import QtTest
 import Quickshell
 import "Singletons"
 import "settings"
+import "kit"
 
 ShellRoot {
     settings.watchFiles: false
@@ -41,7 +42,7 @@ ShellRoot {
                 onAccepted: draftText = undefined
             }
             EdotsTextField { id: input; x: 0; y: 620; width: 400; placeholderText: "Nombre" }
-            EdotsComboBox {
+            IslaComboBox {
                 id: shortCombo
                 x: 650; y: 350; width: 160
                 popupBounds: bounds
@@ -71,7 +72,7 @@ ShellRoot {
                 return null
             }
             function findReset(item) {
-                if (item.text === "Restablecer" && typeof item.clicked === "function") return item
+                if (item.objectName === "settingReset" && typeof item.clicked === "function") return item
                 for (const child of item.children || []) { const found = findReset(child); if (found) return found }
                 return null
             }
@@ -145,7 +146,7 @@ ShellRoot {
                 compare(input.selectedText, "isla")
                 keyClick(Qt.Key_Backspace)
                 compare(input.text, "")
-                const toggle = findType(switchRow, "Switch")
+                const toggle = findType(switchRow, "IslaSwitch")
                 verify(toggle)
                 const beforeToggle = Config.appearance.time12h
                 mouseClick(toggle, toggle.width / 2, toggle.height / 2)
@@ -168,7 +169,7 @@ ShellRoot {
                 keyClick(Qt.Key_Tab, Qt.ShiftModifier)
                 verify(window.activeFocusItem && window.activeFocusItem.visible && window.activeFocusItem.Accessible.name.length > 0,
                        "Shift+Tab remains usable after reset")
-                const slider = findType(sliderRow, "Slider")
+                const slider = findType(sliderRow, "IslaSlider")
                 verify(slider)
                 mouseClick(slider, slider.width * 0.75, slider.height / 2)
                 verify(Config.appearance.fontScale > 1)

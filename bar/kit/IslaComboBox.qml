@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls.Basic
 import "../components"
 import "../Singletons"
+import "../settings"
 
 // Native ComboBox owns editing, completion, keyboard navigation and activation.
 ComboBox {
@@ -9,6 +10,9 @@ ComboBox {
     property string configuredText: ""
     property bool invalid: false
     property Item popupBounds: null
+    // Con previewFonts cada opción se dibuja en su propia familia (selector de fuentes);
+    // sin él es un menú de opciones normal.
+    property bool previewFonts: true
     readonly property bool motionActive: visible && (!Window.window || Window.window.visible)
     readonly property real optionHeight: Math.max(42, Theme.fontSizeBodyLg * 1.5 + 16)
     signal textEdited(string text)
@@ -25,6 +29,7 @@ ComboBox {
     focusPolicy: Qt.StrongFocus
 
     function syncText() {
+        if (!editable) { currentIndex = model.indexOf(configuredText); return }
         if (editText === configuredText) return
         currentIndex = model.indexOf(configuredText)
         editText = configuredText
@@ -44,7 +49,7 @@ ComboBox {
         id: editor
         chrome: false
         leftPadding: 0; rightPadding: 0
-        text: root.editText
+        text: root.editable ? root.editText : root.displayText
         enabled: root.editable
         readOnly: root.down
         font: root.font
@@ -77,7 +82,7 @@ ComboBox {
     background: Rectangle {
         radius: 12
         color: Qt.alpha(Theme.foreground, root.popup.visible || editor.activeFocus ? 0.085 : root.hovered ? 0.065 : 0.035)
-        border.width: 1
+        border.width: root.editable ? 1 : 0
         border.color: root.invalid ? Theme.error : root.popup.visible || root.activeFocus ? Theme.accent : Qt.alpha(Theme.foreground, 0.12)
         opacity: root.enabled ? 1 : 0.45
         Behavior on color { enabled: root.motionActive; ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
@@ -101,7 +106,7 @@ ComboBox {
         highlighted: root.highlightedIndex === index
         hoverEnabled: true
         contentItem: Text {
-            text: option.modelData; font.family: option.modelData; font.pixelSize: Theme.fontSizeBodyLg
+            text: option.modelData; font.family: root.previewFonts ? option.modelData : Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBodyLg
             color: Theme.foreground; elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
         }

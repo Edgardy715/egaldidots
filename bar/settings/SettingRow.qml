@@ -335,7 +335,7 @@ Item {
             active: root.fontField
             visible: root.fontField
             Layout.fillWidth: true
-            sourceComponent: EdotsComboBox {
+            sourceComponent: IslaComboBox {
                 enabled: root.editable
                 configuredText: root.draftText !== undefined ? root.draftText : root.value === undefined ? "" : String(root.value)
                 popupBounds: root.popupBounds
@@ -359,7 +359,7 @@ Item {
             Layout.fillWidth: !root.inlineControl
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredWidth: root.inlineControl ? 240 : -1
-            sourceComponent: EdotsComboBox {
+            sourceComponent: IslaComboBox {
                 objectName: "settingSelect"
                 editable: false
                 previewFonts: false
