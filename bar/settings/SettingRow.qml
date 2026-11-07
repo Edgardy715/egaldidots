@@ -3,6 +3,7 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import "../components" as Components
 import "../Singletons"
+import "../kit"
 
 Item {
     id: root
@@ -201,65 +202,15 @@ Item {
                 active: root.field.control === "toggle"
                 visible: active
                 Layout.alignment: Qt.AlignVCenter
-                sourceComponent: Switch {
+                sourceComponent: IslaSwitch {
                     id: toggle
                     objectName: "settingToggle"
                     enabled: root.editable
                     checked: !!root.value
-                    focusPolicy: Qt.StrongFocus
+                    reducedMotion: root.reducedMotion
                     Accessible.name: root.field.label
                     Accessible.description: I18n.tr(root.field.description || "")
                     onToggled: root.changeRequested(checked)
-                    implicitWidth: 64; implicitHeight: 44
-                    indicator: Rectangle {
-                        id: track
-                        x: 6; y: (toggle.height - height) / 2
-                        implicitWidth: 52; implicitHeight: 30
-                        radius: height / 2
-                        scale: root.reducedMotion ? 1 : toggle.down ? 0.94 : 1
-                        Behavior on scale { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
-                        color: toggle.checked ? (Theme.liquid ? Theme.stateFill : Theme.accent) : Qt.alpha(Theme.foreground, 0.12)
-                        gradient: Theme.liquid && toggle.checked ? trackVolume : null
-                        property Gradient trackVolume: Gradient {
-                            GradientStop { position: 0; color: Theme.stateFillLight }
-                            GradientStop { position: 1; color: Theme.stateFill }
-                        }
-                        opacity: toggle.enabled ? 1 : 0.45
-                        border.width: Theme.liquid ? 0 : 1
-                        border.color: Qt.alpha(Theme.foreground, toggle.hovered ? 0.24 : 0.10)
-                        Behavior on color { enabled: root.visible; ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                        Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.fast } }
-                        Behavior on border.color { enabled: root.visible; ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
-                        Rectangle {
-                            anchors.fill: parent; anchors.margins: -3; radius: parent.radius + 3
-                            color: "transparent"; border.width: 2; border.color: Theme.accent
-                            opacity: toggle.activeFocus ? 0.35 : 0
-                            Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.hover } }
-                        }
-                        Rectangle {
-                            id: knob
-                            // Centro de masa del botón; con Superficies líquidas se
-                            // alarga hacia su destino mientras viaja y se recoge al llegar.
-                            readonly property real target: toggle.checked ? 26 : 4
-                            property real travel: target
-                            Behavior on travel { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: 0.7; epsilon: 0.01 } }
-                            readonly property real stretch: Theme.liquid ? Math.min(9, Math.abs(target - travel) * 0.8) : 0
-                            x: target > travel ? travel : travel - stretch
-                            y: 4
-                            width: 22 + stretch; height: 22; radius: 11
-                            color: toggle.checked ? (Theme.liquid ? Theme.stateContent : Theme.primaryContent) : Theme.foreground
-                            Behavior on color { enabled: root.visible; ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                            EdotsIcon {
-                                anchors.centerIn: parent; iconName: "check"; font.pixelSize: Theme.fontSizeBody
-                                color: Theme.liquid ? Theme.stateFill : Theme.accent; selected: toggle.checked
-                                controlHovered: toggle.hovered; controlPressed: toggle.down
-                                Accessible.ignored: true
-                                opacity: toggle.checked && knob.stretch < 2 ? 1 : 0
-                                visible: opacity > 0.01
-                                Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.fast } }
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -390,78 +341,19 @@ Item {
             sourceComponent: RowLayout {
                 property alias editor: slider
                 spacing: 14
-                Slider {
+                IslaSlider {
                     id: slider
                     objectName: "settingSlider"
-                    implicitHeight: 44
                     Layout.fillWidth: true
                     enabled: root.editable
                     from: root.field.minimum ?? 0
                     to: root.field.maximum ?? 1
                     value: Number(root.value)
                     stepSize: root.field.step ?? (root.field.integer ? 1 : 0.01)
-                    focusPolicy: Qt.StrongFocus
+                    reducedMotion: root.reducedMotion
                     Accessible.name: root.field.label
                     Accessible.description: I18n.tr(root.field.description || "")
                     onMoved: root.changeRequested(root.field.integer ? Math.round(value) : Math.round(value * 100) / 100)
-                    // Con Superficies líquidas el carril es un tubo grueso: el relleno
-                    // nunca baja de una gota y el botón flota dentro de su extremo.
-                    readonly property real trackHeight: Theme.liquid ? (pressed ? 30 : hovered ? 28 : 26) : (hovered || pressed ? 7 : 5)
-                    readonly property real fillWidth: Theme.liquid ? Math.max(trackHeight, visualPosition * availableWidth) : visualPosition * availableWidth
-                    background: Rectangle {
-                        x: slider.leftPadding
-                        y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                        width: slider.availableWidth
-                        height: slider.trackHeight
-                        radius: height / 2
-                        Behavior on height { enabled: root.visible && !root.reducedMotion; NumberAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
-                        color: Qt.alpha(Theme.foreground, Theme.liquid ? 0.09 : 0.18)
-                        opacity: slider.enabled ? 1 : 0.5
-                        Rectangle {
-                            width: slider.fillWidth
-                            height: parent.height
-                            radius: parent.radius
-                            color: Theme.liquid ? Theme.stateFill : Theme.accent
-                            gradient: Theme.liquid ? fillVolume : null
-                            property Gradient fillVolume: Gradient {
-                                GradientStop { position: 0; color: Theme.stateFillLight }
-                                GradientStop { position: 1; color: Theme.stateFill }
-                            }
-                            // Menisco: brillo fino en la superficie del líquido.
-                            Rectangle {
-                                visible: Theme.liquid
-                                x: parent.radius * 0.6; y: 1
-                                width: Math.max(0, parent.width - 2 * x); height: 1
-                                color: Qt.alpha("#ffffff", 0.3)
-                            }
-                        }
-                    }
-                    handle: Rectangle {
-                        readonly property real size: Theme.liquid ? slider.trackHeight - (slider.pressed ? 10 : 12) : 20
-                        x: Theme.liquid ? slider.leftPadding + slider.fillWidth - slider.trackHeight / 2 - width / 2
-                                        : slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
-                        y: slider.topPadding + slider.availableHeight / 2 - height / 2
-                        scale: root.reducedMotion || Theme.liquid ? 1 : slider.pressed ? 1.22 : 1
-                        Behavior on scale { enabled: !root.reducedMotion && root.visible; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
-                        width: size
-                        height: size
-                        radius: size / 2
-                        color: Theme.liquid ? Qt.alpha(Theme.stateContent, slider.pressed ? 0.9 : 0.72) : Theme.foreground
-                        border.width: Theme.liquid ? 0 : 1
-                        border.color: Qt.alpha(Theme.background, 0.15)
-                        Rectangle {
-                            anchors.fill: parent; anchors.margins: -4; radius: width / 2
-                            color: "transparent"; border.width: 2; border.color: Theme.liquid ? Theme.stateContent : Theme.accent
-                            opacity: slider.activeFocus ? 0.5 : 0
-                            Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.hover } }
-                        }
-                        Rectangle {
-                            anchors.centerIn: parent; width: 6; height: 6; radius: 3
-                            color: Theme.liquid ? Theme.stateFill : Theme.background
-                            opacity: slider.pressed ? 0.65 : slider.hovered ? 0.25 : 0
-                            Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.hover } }
-                        }
-                    }
                 }
                 // Valor en una cápsula que crece al arrastrar.
                 Rectangle {
