@@ -143,7 +143,9 @@ Hecho y subido (`feat(settings)`): S1/S2 (entero, paso y unidad), S3/S4/S5 (plur
 S9 aplicado: muelle del pulgar del switch con `damping: 0.7` (antes 0.5), menos rebote; valor elegido por criterio, **sin medir** ni comparar en vídeo.
 Fila 23 (parcial): `IslaSwitch`, `IslaSlider`, `IslaSegmented` e `IslaComboBox` (antes `EdotsComboBox`) viven en `bar/kit/`; `SettingRow` los usa. Verificado por capturas (Movimiento, Tipografía) y por `settings-controls-regression.qml` (PASS).
 S10 (parcial): 26 alfas de primer plano pasaron a `Theme.alpha*`.
-Pendiente: S10 (resto) (literales; el menisco `#ffffff` es un brillo especular intencionado y el tema no tiene token blanco), S6 (nombre, decisión de producto), fila 23 (extraer al kit), fila 24 (7 páginas; índices fijos en el código).
+Pendiente: S10 (resto) (literales; el menisco `#ffffff` es un brillo especular intencionado y el tema no tiene token blanco), S6 (nombre, decisión de producto), fila 23 (extraer al kit), fila 24 (parcial, ver abajo).
+
+Fila 24 (parcial): "Tipografía" e "Idioma y región" se fusionaron en "Texto" (10 → 9 páginas; la fusión toca la última página, así que no desplaza índices). Se probó con captura y con settings-navigation, updates, controls y companion (PASS). **No se hizo** el resto de las 7 páginas: Hyprland (índice 6) y Actualizaciones (8) son vistas propias con guardado y búsqueda específicos, y diez regresiones fijan índices; fusionarlas exige rediseñar esas vistas como secciones. `settings-ux-regression` (lastIndexOf de null) y `hyprland-settings-regression` (revert) fallan igual sin este cambio.
 
 ## 8. Contraste con las referencias (añadido tras revisión)
 

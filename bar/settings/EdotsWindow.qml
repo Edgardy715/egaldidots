@@ -67,7 +67,7 @@ FocusScope {
     property string saveConfirmation: ""
     property bool savePending: false
     property string feedback: ""
-    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "profile", "paths", "appearance", "companion", "updates", "regional"]
+    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "profile", "paths", "appearance", "companion", "updates"]
     // "#Etiqueta" abre un grupo dentro de la página (ver SettingsPage.entries).
     readonly property var pageFields: [
         ["#Barra", "appearance.workspaceStyle",
@@ -78,7 +78,9 @@ FocusScope {
          "#Gestos", "gestures.enabled", "gestures.pullTarget",
          "#Lanzamiento", "motion.appLaunchFlight"],
         ["#Tamaño", "appearance.fontScale",
-         "#Familias", "appearance.fontFamily", "appearance.fontMonoFamily", "appearance.fontDisplayFamily", "appearance.fontMediaFamily"],
+         "#Familias", "appearance.fontFamily", "appearance.fontMonoFamily", "appearance.fontDisplayFamily", "appearance.fontMediaFamily",
+         "#Idioma y región", "regional.language", "regional.region", "regional.timeZone",
+         "#Formato", "appearance.time12h"],
         ["profile.displayName", "paths.userAvatar"],
         ["#Archivos", "paths.paletteFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript",
          "#Rendimiento", "appearance.ambientFps", "appearance.clockSeconds",
@@ -87,12 +89,10 @@ FocusScope {
         [],
         ["#Cuerpo", "appearance.personality", "appearance.waterBody", "appearance.waterReactsToMusic", "appearance.bodyBreath", "appearance.bodyMessenger", "appearance.notificationDrop",
          "#Reacciones"].concat(Object.keys(Config.schema.sections.companion).map(key => "companion." + key)),
-        Object.keys(Config.schema.sections.updates).map(key => "updates." + key),
-        ["#Idioma y región", "regional.language", "regional.region", "regional.timeZone",
-         "#Formato", "appearance.time12h"]
+        Object.keys(Config.schema.sections.updates).map(key => "updates." + key)
     ]
-    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "person", "settings", "view_carousel", "sentiment_satisfied", "system_update", "language"]
-    readonly property var titles: [I18n.tr("Apariencia"), I18n.tr("Composición"), I18n.tr("Movimiento"), I18n.tr("Tipografía"), I18n.tr("Tu perfil"), I18n.tr("Avanzado"), I18n.tr("Hyprland"), I18n.tr("Cuerpo"), I18n.tr("Actualizaciones"), I18n.tr("Idioma y región")]
+    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "person", "settings", "view_carousel", "sentiment_satisfied", "system_update"]
+    readonly property var titles: [I18n.tr("Apariencia"), I18n.tr("Composición"), I18n.tr("Movimiento"), I18n.tr("Texto"), I18n.tr("Tu perfil"), I18n.tr("Avanzado"), I18n.tr("Hyprland"), I18n.tr("Cuerpo"), I18n.tr("Actualizaciones")]
     onPageChanged: if (contentReady && visible && enabled) body.forceActiveFocus()
     EdotsPageMotion {
         id: pageMotion
