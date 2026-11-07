@@ -273,25 +273,19 @@ Item {
                     Accessible.description: I18n.tr(root.field.description || "")
                     onMoved: root.changeRequested(root.field.integer ? Math.round(value) : Math.round(value * 100) / 100)
                 }
-                // Valor en una cápsula que crece al arrastrar.
-                Rectangle {
-                    Layout.preferredWidth: Math.max(56, valueText.implicitWidth + 22)
-                    Layout.preferredHeight: 32
-                    radius: 16
-                    color: slider.pressed ? Theme.stateFill : Qt.alpha(Theme.foreground, 0.07)
-                    scale: slider.pressed && !root.reducedMotion ? 1.08 : 1
+                // Valor como lectura tabular, sin cápsula: al arrastrar toma el acento.
+                Text {
+                    id: valueText
+                    objectName: "settingValue"
+                    Layout.preferredWidth: Math.max(48, implicitWidth)
+                    horizontalAlignment: Text.AlignRight
+                    text: Number(slider.pressed ? slider.value : root.value).toFixed(root.field.integer ? 0 : 2) + (root.field.unit ? " " + root.field.unit : "")
+                    color: slider.pressed ? Theme.accent : Qt.alpha(Theme.foreground, 0.78)
                     Behavior on color { enabled: root.visible; ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                    Behavior on scale { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
-                    Text {
-                        id: valueText
-                        anchors.centerIn: parent
-                        text: Number(slider.pressed ? slider.value : root.value).toFixed(root.field.integer ? 0 : 2) + (root.field.unit ? " " + root.field.unit : "")
-                        color: slider.pressed ? Theme.stateContent : Theme.foreground
-                        font.family: Config.appearance.fontFamily
-                        font.features: Theme.fontNumeric
-                        font.pixelSize: Theme.fontSizeBodyLg
-                        font.weight: Font.Medium
-                    }
+                    font.family: Config.appearance.fontFamily
+                    font.features: Theme.fontNumeric
+                    font.pixelSize: Theme.fontSizeBodyLg
+                    font.weight: Font.Medium
                 }
             }
         }

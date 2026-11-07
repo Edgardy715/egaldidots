@@ -1,61 +1,55 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import "../Singletons"
-import "../settings"
 
-// Interruptor del kit: pista 52x30, pulgar con muelle, marca de estado.
+// Interruptor Quicksilver: una gota de mercurio en un canal hundido.
+// Apagado: plata a la izquierda. Encendido: la gota se tiñe de cinabrio y
+// el canal toma un reflejo tenue. Al viajar se estira hacia su destino y se
+// aplasta (squish); al pulsar se ensancha como una gota apretada.
 Switch {
     property bool reducedMotion: false
     id: toggle
     focusPolicy: Qt.StrongFocus
     implicitWidth: 64; implicitHeight: 44
-    indicator: Rectangle {
+    indicator: MercuryChannel {
         id: track
-        x: 6; y: (toggle.height - height) / 2
-        implicitWidth: 52; implicitHeight: 30
-        radius: height / 2
-        scale: toggle.reducedMotion ? 1 : toggle.down ? 0.94 : 1
-        Behavior on scale { enabled: toggle.visible && !toggle.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
-        color: toggle.checked ? (Theme.liquid ? Theme.stateFill : Theme.accent) : Qt.alpha(Theme.foreground, 0.12)
-        gradient: Theme.liquid && toggle.checked ? trackVolume : null
-        property Gradient trackVolume: Gradient {
-            GradientStop { position: 0; color: Theme.stateFillLight }
-            GradientStop { position: 1; color: Theme.stateFill }
-        }
+        x: 8; y: (toggle.height - height) / 2
+        implicitWidth: 48; implicitHeight: 26
         opacity: toggle.enabled ? 1 : 0.45
-        border.width: Theme.liquid ? 0 : 1
-        border.color: Qt.alpha(Theme.foreground, toggle.hovered ? 0.24 : 0.10)
-        Behavior on color { enabled: toggle.visible; ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+        tintAmount: knob.tintAmount
         Behavior on opacity { enabled: toggle.visible; NumberAnimation { duration: Motion.fast } }
-        Behavior on border.color { enabled: toggle.visible; ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
         Rectangle {
             anchors.fill: parent; anchors.margins: -3; radius: parent.radius + 3
             color: "transparent"; border.width: 2; border.color: Theme.accent
-            opacity: toggle.activeFocus ? 0.35 : 0
+            opacity: toggle.activeFocus ? 0.45 : 0
             Behavior on opacity { enabled: toggle.visible; NumberAnimation { duration: Motion.hover } }
         }
+        // Hilo de cinabrio: el mercurio deja rastro hasta donde ha llegado.
         Rectangle {
+            objectName: "switchThread"
+            x: 4; anchors.verticalCenter: parent.verticalCenter
+            height: 4; radius: 2
+            width: Math.max(0, knob.x + knob.width / 2 - x)
+            color: knob.ink
+            opacity: knob.tintAmount
+            visible: opacity > 0.01
+        }
+        MercuryBead {
             id: knob
-            // Centro de masa del botón; con Superficies líquidas se
-            // alarga hacia su destino mientras viaja y se recoge al llegar.
-            readonly property real target: toggle.checked ? 26 : 4
+            readonly property real rest: 20
+            readonly property real target: toggle.checked ? track.width - rest - 3 : 3
             property real travel: target
-            Behavior on travel { enabled: toggle.visible && !toggle.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: 0.7; epsilon: 0.01 } }
-            readonly property real stretch: Theme.liquid ? Math.min(9, Math.abs(target - travel) * 0.8) : 0
-            x: target > travel ? travel : travel - stretch
-            y: 4
-            width: 22 + stretch; height: 22; radius: 11
-            color: toggle.checked ? (Theme.liquid ? Theme.stateContent : Theme.primaryContent) : Theme.foreground
-            Behavior on color { enabled: toggle.visible; ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-            EdotsIcon {
-                anchors.centerIn: parent; iconName: "check"; font.pixelSize: Theme.fontSizeBody
-                color: Theme.liquid ? Theme.stateFill : Theme.accent; selected: toggle.checked
-                controlHovered: toggle.hovered; controlPressed: toggle.down
-                Accessible.ignored: true
-                opacity: toggle.checked && knob.stretch < 2 ? 1 : 0
-                visible: opacity > 0.01
-                Behavior on opacity { enabled: toggle.visible; NumberAnimation { duration: Motion.fast } }
-            }
+            Behavior on travel { enabled: toggle.visible && !toggle.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: 0.62; epsilon: 0.01 } }
+            readonly property real stretch: toggle.reducedMotion ? 0 : Math.min(10, Math.abs(target - travel) * 0.9)
+            property real squeeze: toggle.down && !toggle.reducedMotion ? 4 : 0
+            Behavior on squeeze { enabled: toggle.visible && !toggle.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
+            property real tintAmount: toggle.checked ? 1 : 0
+            Behavior on tintAmount { enabled: toggle.visible && !toggle.reducedMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+            width: rest + stretch + squeeze
+            height: rest - stretch * 0.28 - squeeze * 0.4
+            x: Math.max(1, Math.min(track.width - width - 1, (target > travel ? travel : travel - stretch) - squeeze / 2))
+            y: (track.height - height) / 2
+            glint: toggle.hovered ? 1 : 0.85
         }
     }
 }

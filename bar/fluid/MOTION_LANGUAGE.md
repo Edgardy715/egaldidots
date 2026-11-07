@@ -613,3 +613,21 @@ El cierre animado del launcher libera teclado desde el primer tramo. Las accione
 de aplicación/workspace se programan fuera del contexto descargable del panel;
 Escape respeta primero búsqueda y popups locales. No añadir una segunda espera
 de morph para ejecutar o enfocar la aplicación.
+
+### Quicksilver: controles y reproductor (2026-11-06, sustituye Swiftify/Material)
+
+Petición del usuario: los controles y el media de Bead parecían Material You;
+se quiere identidad propia (refs Squish Switch, Rubber Segment, Wake Slider).
+Lenguaje: canal hundido (`kit/MercuryChannel`) donde corre el mercurio y gota
+cromada (`kit/MercuryBead`) que es lo que se toca; el acento entra saturado como
+hilo de cinabrio o tinte de la gota, nunca como relleno tonal.
+- Switch: gota 20 que se estira hacia el destino y se aplasta al pulsar; hilo
+  de acento detrás. Slider: hilo con estela (muelle sólo al arrastrar) y gota
+  que se aplasta al pulsar. Segmented: pastilla de vidrio elevada con gota-punto.
+- Play principal: gota de mercurio teñida con el color de portada (círculo en
+  pausa; al sonar respira con dos ondas cos(2t)/cos(3t) a 40°/s, sin girar).
+  `primaryInk` se calcula sobre el cuerpo plateado. Activo secundario
+  (aleatorio/repetir): gota-punto bajo el glifo, sin contenedor tonal.
+- Timeline: canal hundido + hilo de mercurio teñido + gota cabeza 9→14·s al
+  apuntar. La fase (wavelength/1.6 s) mueve reflejos sobre el hilo; pausa,
+  oculto y reducido los apagan. Sin onda, sin huecos, sin tirador de barra.

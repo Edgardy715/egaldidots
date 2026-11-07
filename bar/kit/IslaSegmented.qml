@@ -2,7 +2,8 @@ import QtQuick
 import "../components" as Components
 import "../Singletons"
 
-// Control segmentado del kit: la selección es una gota que viaja entre opciones.
+// Control segmentado Quicksilver: canal hundido; la opción elegida se eleva
+// como vidrio y una gota de cinabrio viaja debajo de su etiqueta.
 Item {
     id: group
     property var options: []
@@ -33,14 +34,14 @@ Item {
         return width
     }
     Timer { interval: 60; running: true; onTriggered: group.placed = true }
-    Rectangle {
+    MercuryChannel {
         width: Math.min(parent.width, flow.childrenRect.width + 8)
         height: parent.height
         radius: 15
-        color: Qt.alpha(Theme.foreground, Theme.liquid ? Theme.alphaFaint : Theme.alphaGhost)
         opacity: group.editable ? 1 : 0.5
     }
     Components.LiquidSelection {
+        id: lozenge
         readonly property Item chip: group.selectedChip
         targetX: chip ? flow.x + chip.x : 0
         targetY: chip ? flow.y + chip.y : 0
@@ -48,10 +49,27 @@ Item {
         targetHeight: chip ? chip.height : 0
         immediate: !group.placed || !group.visible
         radius: 11
-        color: Theme.stateFill
-        volume: true
+        color: Qt.alpha(Theme.foreground, Theme.dark ? 0.10 : 0.06)
+        border.width: 1
+        border.color: Qt.alpha(Theme.foreground, Theme.dark ? 0.10 : 0.12)
         opacity: chip ? (group.editable ? 1 : 0.5) : 0
         Behavior on opacity { enabled: group.visible; NumberAnimation { duration: Motion.fast } }
+        // Luz cenital del vidrio elevado.
+        Rectangle {
+            x: parent.radius * 0.7; y: 1
+            width: Math.max(0, parent.width - 2 * x); height: 1
+            color: Qt.alpha("#ffffff", Theme.dark ? 0.16 : 0.5)
+        }
+        // La gota marca la elección; se estira con el vidrio al viajar.
+        MercuryBead {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom; anchors.bottomMargin: 4
+            width: Math.min(parent.width * 0.5, 12 + Math.max(0, parent.width - (lozenge.chip ? lozenge.chip.width : parent.width)) * 0.5)
+            height: 5
+            tintAmount: 1
+            glint: 0.7
+            border.width: 0
+        }
     }
     Flow {
         id: flow
@@ -96,7 +114,7 @@ Item {
                     font: choice.font
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
-                    color: choice.selected ? Theme.stateContent : Qt.alpha(Theme.foreground, 0.82)
+                    color: choice.selected ? Theme.foreground : Qt.alpha(Theme.foreground, 0.62)
                     Behavior on color { enabled: group.visible; ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                 }
             }
