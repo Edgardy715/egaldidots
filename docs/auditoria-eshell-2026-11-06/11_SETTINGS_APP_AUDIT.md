@@ -148,3 +148,9 @@ Pendiente: S9 (ζ del muelle, requiere decidir valor), S10 (literales; el menisc
 - **Animate UI, Switch (Radix):** pista de 32×18 px, pulgar de 16 px, estados por `data-checked` [V navegador y código]. La inspección por JavaScript no capturó el estiramiento del pulgar bajo `pointerdown`, así que **no se confirma** esa animación [no verificado].
 - **Uiverse:** el catálogo es variado y mayoritariamente skeuomórfico o decorativo (interruptor de balancín, sol/luna, botón rojo); sirve de inventario de ideas, no de patrón de producto [V captura].
 - **Sigue sin hacerse:** interacción real con sliders, tabs y segmentados de Animate UI, React Bits, Aceternity y Magic UI. Las propuestas de controles de Ajustes siguen apoyadas en el código propio y en `SETTINGS_APP_RESEARCH.md`, no en esa comparación.
+
+### 8.1 Intento de comparación interactiva (2026-11-06)
+
+- **Animate UI, Slider (Radix):** pista de 4 px, pulgar de 12 px, transición solo de color y sombra (0.15 s) [V medido en el navegador]. Es la geometría genérica de shadcn; el tubo de 26 px de Ajustes es más distintivo y no pierde frente a él [I].
+- **Animate UI, Tabs:** existe un elemento `tabs-highlight` que se mueve entre pestañas (indicador compartido, el mismo patrón que `LiquidSelection`) [V DOM]. **No se pudo medir su curva**: el muestreo con `requestAnimationFrame` se detuvo porque el panel del navegador estaba en segundo plano (6 muestras en 6 s) [no verificado].
+- **No se llegó a** Magic UI, Aceternity ni React Bits en esta pasada. La conclusión de §8 sigue en pie: las propuestas de controles de Ajustes no están contrastadas con esas tres.
