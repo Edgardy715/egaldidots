@@ -20,7 +20,7 @@ Rectangle {
         ScriptAction { script: root.displayedScene = root.scene }
         NumberAnimation { target: root; property: "sceneExposure"; to: 1; duration: Motion.fast; easing.type: Motion.easeStandard }
     }
-    color: Qt.alpha(Theme.foreground, 0.035)
+    color: Qt.alpha(Theme.foreground, Theme.alphaGhost)
     radius: 16
     implicitHeight: 270
     readonly property bool reduced: Config.appearance.reduceMotion
@@ -33,7 +33,7 @@ Rectangle {
         Item {
             Layout.fillWidth: true; Layout.fillHeight: true
             Rectangle {
-                x: 8; y: 20; width: 88; height: 30; radius: 15; color: Qt.alpha(Theme.foreground, 0.08)
+                x: 8; y: 20; width: 88; height: 30; radius: 15; color: Qt.alpha(Theme.foreground, Theme.alphaHair)
                 opacity: Config.modules.workspaceRail && root.width > 560 ? 1 : 0
                 Behavior on opacity { NumberAnimation { duration: root.reduced ? 0 : Motion.standardSmall; easing.type: Motion.easeStandard } }
                 Row { anchors.centerIn: parent; spacing: 12
@@ -41,7 +41,7 @@ Rectangle {
                 }
             }
             Rectangle {
-                anchors.right: parent.right; anchors.rightMargin: 8; y: 20; width: 80; height: 30; radius: 15; color: Qt.alpha(Theme.foreground, 0.08)
+                anchors.right: parent.right; anchors.rightMargin: 8; y: 20; width: 80; height: 30; radius: 15; color: Qt.alpha(Theme.foreground, Theme.alphaHair)
                 opacity: Config.modules.systemStatus && root.width > 560 ? 1 : 0
                 Behavior on opacity { NumberAnimation { duration: root.reduced ? 0 : Motion.standardSmall; easing.type: Motion.easeStandard } }
                 Row { anchors.centerIn: parent; spacing: 12

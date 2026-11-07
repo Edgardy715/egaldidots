@@ -203,7 +203,7 @@ FocusScope {
             Layout.maximumWidth: root.sideRail ? root.railWidth : Number.POSITIVE_INFINITY
             implicitHeight: root.sideRail ? navigation.implicitHeight : root.compactNavigation ? root.navigationRows * 48 : 64
             readonly property real cellHeight: root.sideRail ? 46 : height / root.navigationRows
-            Rectangle { visible: !root.sideRail; anchors.fill: parent; radius: 20; color: Qt.alpha(Theme.foreground, 0.035) }
+            Rectangle { visible: !root.sideRail; anchors.fill: parent; radius: 20; color: Qt.alpha(Theme.foreground, Theme.alphaGhost) }
             // La selección es una gota: el borde que va delante llega antes y el
             // de atrás lo sigue, de modo que se estira entre secciones.
             LiquidSelection {
@@ -218,9 +218,9 @@ FocusScope {
                 targetHeight: navigationFrame.cellHeight - (root.sideRail ? 0 : 8)
                 immediate: !root.visible || !root.contentReady
                 radius: root.sideRail ? 14 : 16
-                color: Qt.alpha(Theme.accent, 0.17)
+                color: Qt.alpha(Theme.accent, Theme.alphaSubtle)
                 volume: true
-                border.width: 1; border.color: Qt.alpha(Theme.accent, 0.24)
+                border.width: 1; border.color: Qt.alpha(Theme.accent, Theme.alphaEmphasis)
             }
             Grid {
                 id: navigation
@@ -242,7 +242,7 @@ FocusScope {
                         Keys.onDownPressed: if (root.sideRail && index < root.titles.length - 1) { root.page = index + 1; navigation.children[index + 1].forceActiveFocus() }
                         background: Rectangle {
                             anchors.fill: parent; anchors.margins: root.sideRail ? 0 : 4; radius: root.sideRail ? 14 : 16
-                            color: nav.hovered && !nav.current ? Qt.alpha(Theme.foreground, 0.06) : "transparent"
+                            color: nav.hovered && !nav.current ? Qt.alpha(Theme.foreground, Theme.alphaFaint) : "transparent"
                             border.width: nav.activeFocus ? 2 : 0; border.color: Theme.accent
                             Behavior on color { ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
                         }
@@ -319,7 +319,7 @@ FocusScope {
             Column {
                 anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter; margins: 22 } spacing: 7
                 Text { text: I18n.tr("Un escritorio que habla tu idioma."); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 21 * Math.min(1.4, Config.appearance.fontScale); width: parent.width; elide: Text.ElideRight }
-                Text { text: "Aa Bb Cc · 0123456789"; color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontMonoFamily; font.pixelSize: 13 }
+                Text { text: "Aa Bb Cc · 0123456789"; color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontMonoFamily; font.pixelSize: 13 }
             }
         }
         RowLayout {
@@ -335,7 +335,7 @@ FocusScope {
             Column {
                 Layout.fillWidth: true; spacing: 5
                 Text { text: Config.profile.displayName || I18n.tr("Tu espacio personal"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 20; width: parent.width; elide: Text.ElideRight }
-                Text { text: I18n.tr("Así te presenta Isla en la sesión."); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody) }
+                Text { text: I18n.tr("Así te presenta Isla en la sesión."); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Math.max(12, Theme.fontSizeBody) }
             }
         }
         RowLayout {

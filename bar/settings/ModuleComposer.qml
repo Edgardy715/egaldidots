@@ -9,7 +9,7 @@ Rectangle {
     required property var config
     signal editFailed(string message)
     signal edited()
-    color: Qt.alpha(Theme.foreground, 0.035)
+    color: Qt.alpha(Theme.foreground, Theme.alphaGhost)
     radius: 14
     implicitHeight: content.implicitHeight + 36
     function selectLayout(layout) {
@@ -49,9 +49,9 @@ Rectangle {
             }
             ColumnLayout {
                 Layout.fillWidth: true; Layout.preferredWidth: (root.width - 60) / 3; Layout.maximumWidth: Infinity; spacing: 9
-                Text { text: qsTr("Centro"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody; Layout.alignment: Qt.AlignHCenter }
+                Text { text: I18n.tr("Centro"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody; Layout.alignment: Qt.AlignHCenter }
                 Rectangle {
-                    Layout.alignment: Qt.AlignHCenter; Layout.preferredWidth: 108; Layout.preferredHeight: 40; radius: 20; color: Qt.alpha(Theme.foreground, 0.08)
+                    Layout.alignment: Qt.AlignHCenter; Layout.preferredWidth: 108; Layout.preferredHeight: 40; radius: 20; color: Qt.alpha(Theme.foreground, Theme.alphaHair)
                     Row { anchors.centerIn: parent; spacing: 8
                         EdotsIcon { iconName: "lock"; font.pixelSize: 14; color: Theme.accent }
                         Text { text: "Isla"; color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 13 }
@@ -61,7 +61,7 @@ Rectangle {
             }
             ColumnLayout {
                 Layout.fillWidth: true; Layout.preferredWidth: (root.width - 60) / 3; Layout.maximumWidth: Infinity; spacing: 9
-                Text { Layout.alignment: Qt.AlignRight; text: qsTr("Derecha"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody }
+                Text { Layout.alignment: Qt.AlignRight; text: I18n.tr("Derecha"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody }
                 RowLayout {
                     Layout.alignment: Qt.AlignRight
                     spacing: 6
@@ -72,7 +72,7 @@ Rectangle {
         }
         RowLayout {
             Layout.fillWidth: true; spacing: 6
-            Text { text: root.config.modules.systemStatus ? qsTr("En Estado") : qsTr("En Estado · oculto"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody; Layout.rightMargin: 8 }
+            Text { text: root.config.modules.systemStatus ? I18n.tr("En Estado") : I18n.tr("En Estado · oculto"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody; Layout.rightMargin: 8 }
             Repeater {
                 model: [{key:"apps",label:qsTr("Apps"),icon:"apps"}, {key:"audio",label:qsTr("Audio"),icon:"volume_up"}, {key:"network",label:qsTr("Red"),icon:"wifi"}, {key:"battery",label:qsTr("Batería"),icon:"battery_full"}]
                 ModuleButton {

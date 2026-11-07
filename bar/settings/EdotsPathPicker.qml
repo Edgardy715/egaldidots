@@ -87,7 +87,7 @@ Popup {
         radius: 24
         color: Theme.surfaceContainer
         border.width: 1
-        border.color: Qt.alpha(Theme.foreground, 0.18)
+        border.color: Qt.alpha(Theme.foreground, Theme.alphaSubtle)
     }
     Overlay.modal: Rectangle { color: Qt.alpha(Theme.background, 0.65) }
     enter: Transition {
@@ -104,7 +104,7 @@ Popup {
             ColumnLayout {
                 Layout.fillWidth: true; spacing: 4
                 Text { Layout.fillWidth: true; wrapMode: Text.WordWrap; text: root.title; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeHero; font.weight: Font.DemiBold }
-                Text { visible: root.height >= 600; Layout.fillWidth: true; wrapMode: Text.WordWrap; text: root.folderMode ? qsTr("Abre una carpeta y confirma tu elección.") : qsTr("Explora, revisa y elige tu archivo."); color: Qt.alpha(Theme.foreground, 0.72); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody }
+                Text { visible: root.height >= 600; Layout.fillWidth: true; wrapMode: Text.WordWrap; text: root.folderMode ? I18n.tr("Abre una carpeta y confirma tu elección.") : I18n.tr("Explora, revisa y elige tu archivo."); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody }
             }
             Item { Layout.fillWidth: true }
             EdotsButton { text: ""; symbol: "close"; implicitWidth: 44; Accessible.name: qsTr("Cancelar selección"); onClicked: root.close() }
@@ -149,7 +149,7 @@ Popup {
             }
             Rectangle {
                 Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumWidth: 180
-                color: Qt.alpha(Theme.foreground, 0.025); radius: 16
+                color: Qt.alpha(Theme.foreground, Theme.alphaGhost); radius: 16
                 GridView {
                     id: grid
                     objectName: "pickerGrid"
@@ -208,7 +208,7 @@ Popup {
                 Layout.fillHeight: true; spacing: 12
                 Rectangle {
                     Layout.fillWidth: true; Layout.fillHeight: true
-                    radius: 16; color: Qt.alpha(Theme.foreground, 0.035)
+                    radius: 16; color: Qt.alpha(Theme.foreground, Theme.alphaGhost)
                     Image {
                         id: preview
                         objectName: "pickerPreview"
@@ -224,7 +224,7 @@ Popup {
                         anchors.centerIn: parent; spacing: 12; width: parent.width - 32
                         visible: preview.status !== Image.Ready
                         EdotsIcon { anchors.horizontalCenter: parent.horizontalCenter; iconName: root.folderMode ? "folder" : root.selectedIsDirectory ? "folder" : root.selectedIsImage ? "image" : "description"; color: Theme.accent; font.pixelSize: 44 }
-                        Text { width: parent.width; text: root.selectedIsImage ? (preview.status === Image.Error ? qsTr("No se puede mostrar esta imagen") : qsTr("Cargando imagen…")) : root.selectedName || qsTr("Vista previa"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody; horizontalAlignment: Text.AlignHCenter; wrapMode: Text.Wrap }
+                        Text { width: parent.width; text: root.selectedIsImage ? (preview.status === Image.Error ? I18n.tr("No se puede mostrar esta imagen") : I18n.tr("Cargando imagen…")) : root.selectedName || I18n.tr("Vista previa"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody; horizontalAlignment: Text.AlignHCenter; wrapMode: Text.Wrap }
                     }
                 }
                 Text { Layout.fillWidth: true; text: root.selectedName || (root.folderMode ? root.pathText(root.folder).split("/").pop() || "/" : (root.filterKind === "image" ? qsTr("Selecciona una imagen") : qsTr("Selecciona un archivo"))); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg; wrapMode: Text.Wrap }
@@ -233,7 +233,7 @@ Popup {
         }
         RowLayout {
             Layout.fillWidth: true; spacing: 10
-            Text { visible: root.width >= 720; text: qsTr("%1 elementos").arg(files.count); color: Qt.alpha(Theme.foreground, 0.72); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody }
+            Text { visible: root.width >= 720; text: I18n.tr("%1 elementos").arg(files.count); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody }
             Item { Layout.fillWidth: true }
             EdotsButton { text: qsTr("Cancelar"); onClicked: root.close() }
             EdotsButton { objectName: "confirmPath"; text: root.folderMode ? qsTr("Elegir carpeta") : qsTr("Usar archivo"); symbol: "check"; accent: true; enabled: root.folderMode ? files.status === FolderListModel.Ready : String(root.selectedUrl).length > 0 && !root.selectedIsDirectory; onClicked: root.confirm() }

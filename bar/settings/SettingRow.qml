@@ -96,7 +96,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: 20
         text: root.sectionLabel
-        color: Qt.alpha(Theme.foreground, 0.72)
+        color: Qt.alpha(Theme.foreground, Theme.alphaIconSec)
         font.family: Config.appearance.fontFamily
         font.pixelSize: Theme.fontSizeSmall
         font.weight: Font.DemiBold
@@ -156,7 +156,7 @@ Item {
                     Text {
                         Layout.fillWidth: true
                         text: I18n.tr(root.field.label)
-                        color: root.editable ? Theme.foreground : Qt.alpha(Theme.foreground, 0.72)
+                        color: root.editable ? Theme.foreground : Qt.alpha(Theme.foreground, Theme.alphaIconSec)
                         font.family: Config.appearance.fontFamily
                         font.pixelSize: Theme.fontSizeTitle
                         font.weight: Font.Medium
@@ -167,7 +167,7 @@ Item {
                     Layout.fillWidth: true
                     visible: text.length > 0
                     text: root.fontField ? "" : I18n.tr(root.field.description || "")
-                    color: Qt.alpha(Theme.foreground, 0.72)
+                    color: Qt.alpha(Theme.foreground, Theme.alphaIconSec)
                     font.family: Config.appearance.fontFamily
                     font.pixelSize: Theme.fontSizeSmall
                     wrapMode: Text.WordWrap
@@ -269,7 +269,7 @@ Item {
             Layout.fillWidth: true
             text: root.field.availability === "partial" ? I18n.tr("Disponible parcialmente · edición desactivada")
                                                         : I18n.tr("Sin efecto actualmente · edición desactivada")
-            color: Qt.alpha(Theme.foreground, 0.72)
+            color: Qt.alpha(Theme.foreground, Theme.alphaIconSec)
             font.family: Config.appearance.fontFamily
             font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.WordWrap

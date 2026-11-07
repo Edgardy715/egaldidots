@@ -333,7 +333,7 @@ Item {
                 leftPadding: 28
                 rightPadding: 28
                 text: I18n.tr("No hay ajustes que coincidan con la búsqueda.")
-                color: Qt.alpha(Theme.foreground, 0.72)
+                color: Qt.alpha(Theme.foreground, Theme.alphaIconSec)
                 font.family: Config.appearance.fontFamily
                 font.pixelSize: Theme.fontSizeBody
                 wrapMode: Text.WordWrap

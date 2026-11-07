@@ -168,7 +168,7 @@ ComboBox {
             transformOrigin: menu.opensBelow ? Item.Top : Item.Bottom
             radius: 15
             color: Theme.surfaceContainer
-            border.width: 1; border.color: Qt.alpha(Theme.foreground, 0.18)
+            border.width: 1; border.color: Qt.alpha(Theme.foreground, Theme.alphaSubtle)
         }
         // Scale grows from the edge nearest the combobox (top when opening below).
         property bool opensBelow: true
