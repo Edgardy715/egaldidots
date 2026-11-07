@@ -147,6 +147,8 @@ Pendiente: S10 (resto) (literales; el menisco `#ffffff` es un brillo especular i
 
 Fila 24 (parcial): "Tipografía" e "Idioma y región" se fusionaron en "Texto" (10 → 9 páginas; la fusión toca la última página, así que no desplaza índices). Se probó con captura y con settings-navigation, updates, controls y companion (PASS). **No se hizo** el resto de las 7 páginas: Hyprland (índice 6) y Actualizaciones (8) son vistas propias con guardado y búsqueda específicos, y diez regresiones fijan índices; fusionarlas exige rediseñar esas vistas como secciones. `settings-ux-regression` (lastIndexOf de null) y `hyprland-settings-regression` (revert) fallan igual sin este cambio.
 
+Fila 24 (segunda parte): "Tu perfil" se fusionó con "Avanzado" como "Perfil y sistema" (9 → 8 páginas; nombre visible y avatar van como sección "Perfil" al inicio). Índices nuevos: 0 Apariencia, 1 Composición, 2 Movimiento, 3 Texto, 4 Perfil y sistema, 5 Hyprland, 6 Cuerpo, 7 Actualizaciones. Se actualizaron las regresiones activities, hyprland-settings, updates y settings-navigation. Capturada la página 4. PASS: navigation, updates, controls, companion, module-composer. Fallan igual sin el cambio: settings-ux, hyprland-settings, activities (compare en TestCase:987) y settings-surface-switch.
+
 ## 8. Contraste con las referencias (añadido tras revisión)
 
 - **Corrección al doc 05:** motion-primitives.com y uiverse.io **sí cargan en el navegador integrado** (la herramienta de lectura plana dio 403). Se comprobó: la home de motion-primitives y el catálogo de switches de Uiverse (460 componentes).

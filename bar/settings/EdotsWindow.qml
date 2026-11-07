@@ -27,8 +27,8 @@ FocusScope {
     property var updatesController: SystemUpdates
     property var pluginsController: HyprlandPlugins
     property var bindsController: HyprlandBinds
-    readonly property bool updatesActive: !searchShown && pageMotion.displayedPage === 8
-    function showUpdates() { root.page = 8; search.text = ""; SystemUpdates.portalRequested = false }
+    readonly property bool updatesActive: !searchShown && pageMotion.displayedPage === 7
+    function showUpdates() { root.page = 7; search.text = ""; SystemUpdates.portalRequested = false }
     Connections { target: SystemUpdates; function onOpenRequested() { root.showUpdates() } }
     Component.onCompleted: { if (SystemUpdates.portalRequested) root.showUpdates() }
     readonly property bool searchShown: pageMotion.displayedSearching
@@ -43,7 +43,7 @@ FocusScope {
         pendingErrorFocus = false
         Qt.callLater(() => settingsPage.focusFirstError())
     }
-    readonly property bool hyprlandActive: !searchShown && pageMotion.displayedPage === 6
+    readonly property bool hyprlandActive: !searchShown && pageMotion.displayedPage === 5
     readonly property bool hyprlandSearchMatch: {
         const terms = settingsPage.normalize(search.text).trim().split(/\s+/).filter(Boolean)
         const haystack = settingsPage.normalize(hyprlandPage.searchTerms)
@@ -67,7 +67,7 @@ FocusScope {
     property string saveConfirmation: ""
     property bool savePending: false
     property string feedback: ""
-    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "profile", "paths", "appearance", "companion", "updates"]
+    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "paths", "appearance", "companion", "updates"]
     // "#Etiqueta" abre un grupo dentro de la página (ver SettingsPage.entries).
     readonly property var pageFields: [
         ["#Barra", "appearance.workspaceStyle",
@@ -81,8 +81,8 @@ FocusScope {
          "#Familias", "appearance.fontFamily", "appearance.fontMonoFamily", "appearance.fontDisplayFamily", "appearance.fontMediaFamily",
          "#Idioma y región", "regional.language", "regional.region", "regional.timeZone",
          "#Formato", "appearance.time12h"],
-        ["profile.displayName", "paths.userAvatar"],
-        ["#Archivos", "paths.paletteFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript",
+        ["#Perfil", "profile.displayName", "paths.userAvatar",
+         "#Archivos", "paths.paletteFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript",
          "#Rendimiento", "appearance.ambientFps", "appearance.clockSeconds",
          "#Actividades", "activities.enabled", "activities.longCommandSeconds", "activities.fromNotifications",
          "#Dispositivos", "devices.enabled", "devices.bluetooth", "devices.power", "devices.storage", "devices.privacyDots"],
@@ -91,8 +91,8 @@ FocusScope {
          "#Reacciones"].concat(Object.keys(Config.schema.sections.companion).map(key => "companion." + key)),
         Object.keys(Config.schema.sections.updates).map(key => "updates." + key)
     ]
-    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "person", "settings", "view_carousel", "sentiment_satisfied", "system_update"]
-    readonly property var titles: [I18n.tr("Apariencia"), I18n.tr("Composición"), I18n.tr("Movimiento"), I18n.tr("Texto"), I18n.tr("Tu perfil"), I18n.tr("Avanzado"), I18n.tr("Hyprland"), I18n.tr("Cuerpo"), I18n.tr("Actualizaciones")]
+    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "settings", "view_carousel", "sentiment_satisfied", "system_update"]
+    readonly property var titles: [I18n.tr("Apariencia"), I18n.tr("Composición"), I18n.tr("Movimiento"), I18n.tr("Texto"), I18n.tr("Perfil y sistema"), I18n.tr("Hyprland"), I18n.tr("Cuerpo"), I18n.tr("Actualizaciones")]
     onPageChanged: if (contentReady && visible && enabled) body.forceActiveFocus()
     EdotsPageMotion {
         id: pageMotion
@@ -299,7 +299,7 @@ FocusScope {
             objectName: "hyprlandSearchResult"
             visible: root.hyprlandSearchMatch
             text: I18n.tr("Hyprland · Flujo y animaciones"); symbol: "view_carousel"
-            onClicked: { root.page = 6; search.text = ""; body.forceActiveFocus() }
+            onClicked: { root.page = 5; search.text = ""; body.forceActiveFocus() }
         }
         EdotsButton {
             objectName: "updatesSearchResult"
@@ -350,8 +350,8 @@ FocusScope {
             }
             Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumWidth: 260
             popupBounds: root
-            offerUnavailable: pageMotion.displayedPage === 5
-            showFishIntegration: pageMotion.displayedPage === 5 && !root.searchShown
+            offerUnavailable: pageMotion.displayedPage === 4
+            showFishIntegration: pageMotion.displayedPage === 4 && !root.searchShown
             emptyAllowed: root.resultCount === 0
             config: Config; query: root.searchShown ? (search.text || root.heldQuery) : ""
             onEdited: root.feedback = ""
@@ -471,7 +471,7 @@ FocusScope {
                 spacing: 8
                 EdotsButton { visible: Config.error.length > 0; text: I18n.tr("Recargar"); onClicked: { settingsPage.clearValidation(); Config.reload() } }
                 EdotsButton { visible: settingsPage.validationError.length > 0; text: I18n.tr("Revisar ajuste"); onClicked: settingsPage.focusFirstError() }
-                EdotsButton { visible: root.hyprlandController.dirty; text: I18n.tr("Ver Hyprland"); onClicked: { root.page = 6; search.text = "" } }
+                EdotsButton { visible: root.hyprlandController.dirty; text: I18n.tr("Ver Hyprland"); onClicked: { root.page = 5; search.text = "" } }
                 Item { visible: !footer.inline; Layout.fillWidth: true }
                 ConfirmationIndicator {
                     Layout.preferredWidth: 30

@@ -50,7 +50,7 @@ ShellRoot {
                 page.entriesChanged.connect(() => observedCounts.push(page.entries.length))
                 for (let cycle = 0; cycle < 2; cycle++) {
                     intervals = []; lastFrame = 0; sampling = true
-                    for (const destination of [1, 2, 3, 4, 5, 0]) {
+                    for (const destination of [1, 2, 3, 4, 0]) {
                         const first = intervals.length
                         observedCounts.length = 0
                         editor.page = destination
@@ -83,7 +83,7 @@ ShellRoot {
                 wait(40)
                 editor.page = 4
                 Config.update({appearance: {reduceMotion: true}})
-                tryVerify(() => page.entries.length === 2 && page.entries.some(entry => entry.key === "displayName"))
+                tryVerify(() => page.entries.some(entry => entry.key === "displayName"))
                 verify(page.hasDrafts, "navigation retains drafts")
                 verify(page.commitDrafts(), "hidden draft can still be committed")
                 compare(Config.profile.displayName, "Navigation draft")

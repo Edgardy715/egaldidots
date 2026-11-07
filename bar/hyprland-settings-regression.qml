@@ -37,12 +37,51 @@ ShellRoot {
         function discard() { values = JSON.parse(JSON.stringify(baseline)); dirty = false }
         function resetSaved() { persistenceError = ""; error = ""; feedback = "Archivo recuperado" }
     }
+    QtObject {
+        id: pluginsBackend
+        property var plugins: [
+            {id: "hyprglass", name: "Hyprglass", version: "1.1.1", state: "loaded", latest: "1.1.1", updateAvailable: false, stale: false, message: ""},
+            {id: "scrolloverview", name: "Scroll overview", version: "abc", state: "incompatible", latest: "def", updateAvailable: true, stale: true, message: ""}]
+        property string hyprlandVersion: "0.57.1"
+        property int staleCount: 1
+        property string error: ""
+        property string feedback: ""
+        property string updatingId: ""
+        property bool busy: false
+        property int statusCalls: 0
+        property int checkCalls: 0
+        property string updated: ""
+        function status() { statusCalls++ }
+        function check() { checkCalls++ }
+        function update(id) { updated = id; return true }
+    }
+    QtObject {
+        id: bindsBackend
+        property var binds: [
+            {id: "app.terminal", label: "Terminal", group: "Aplicaciones", default: "SUPER + Q", key: "SUPER + Q", enabled: true, overridden: false, conflicts: []},
+            {id: "app.browser", label: "Navegador", group: "Aplicaciones", default: "SUPER + B", key: "SUPER + CTRL + B", enabled: true, overridden: true, conflicts: ["Terminal"]},
+            {id: "window.drag", label: "Mover ventana", group: "Ventanas", default: "SUPER + mouse:272", key: "SUPER + mouse:272", enabled: true, overridden: false, conflicts: []}]
+        property int conflictCount: 1
+        property string error: ""
+        property string feedback: ""
+        property bool busy: false
+        property int loadCalls: 0
+        property var set: ({})
+        property string disabledId: ""
+        property string resetId: ""
+        property int resetAllCalls: 0
+        function load() { loadCalls++ }
+        function setKey(id, keys) { set = {id: id, keys: keys}; return true }
+        function disable(id) { disabledId = id }
+        function reset(id) { resetId = id }
+        function resetAll() { resetAllCalls++ }
+    }
     Window {
         id: window
         visible: true; width: 1000; height: 700
         color: Theme.background
         Rectangle { anchors.fill: parent; color: Theme.background }
-        EdotsWindow { id: editor; anchors.fill: parent; hyprlandController: backend }
+        EdotsWindow { id: editor; anchors.fill: parent; hyprlandController: backend; pluginsController: pluginsBackend; bindsController: bindsBackend }
         TestCase {
             id: checks
             when: Config.loaded && window.visible
@@ -60,11 +99,11 @@ ShellRoot {
                         Config.update({appearance: {fontScale: scale, reduceMotion: true}})
                         for (const size of [{w:1000,h:700}, {w:640,h:560}]) {
                             window.width = size.w; window.height = size.h
-                            editor.page = 6; wait(350)
+                            editor.page = 5; wait(350)
                             const page = findChild(editor, "hyprlandPage")
                             const save = findChild(editor, "hyprlandSave")
                             const scroll = findChild(editor, "hyprlandScroll")
-                            const tab = findChild(editor, "settingsNav6")
+                            const tab = findChild(editor, "settingsNav5")
                             assert(page.visible && backend.initialized, "page initialized")
                             assert(tab.width >= 44 && tab.height >= 44 && tab.mapToItem(editor, 0, tab.height).y <= editor.height, "new navigation fits")
                             assert(scroll.height > 80, "usable scroll viewport: " + scroll.height)
@@ -83,7 +122,7 @@ ShellRoot {
                     Config.discard()
                     editor.page = 0; wait(50)
                     assert(findChild(editor,"settingsStatus").text.includes("Hyprland"), "pending compositor preview visible on other pages")
-                    editor.page = 6; wait(50)
+                    editor.page = 5; wait(50)
                     assert(!findChild(editor,"hyprlandRefresh").enabled, "refresh cannot lose preview")
                     mouseClick(findChild(editor, "hyprlandDiscard")); wait(50)
                     assert(backend.values.layout === "scrolling" && !backend.dirty, "revert")
@@ -105,13 +144,58 @@ ShellRoot {
                     assert(!layout.editable && findChild(editor,"hyprlandRecover").visible, "invalid file recovery explicit")
                     mouseClick(findChild(editor,"hyprlandRecover")); wait(50)
                     assert(!backend.persistenceError && layout.editable, "recover returns control")
+                    editor.page = 5; wait(100)
+                    assert(pluginsBackend.statusCalls > 0, "plugins state requested on open")
+                    assert(findChild(editor,"hyprlandPlugins").visible, "plugins section visible")
+                    assert(findChild(editor,"hyprlandPluginsStale").visible, "stale plugins warned")
+                    const checkButton = findChild(editor,"hyprlandPluginsCheck")
+                    scroll.contentItem.contentY += checkButton.mapToItem(scroll, 0, 0).y - scroll.height / 3; wait(100)
+                    mouseClick(checkButton); wait(50)
+                    assert(pluginsBackend.checkCalls === 1, "check button runs check")
+                    assert(!findChild(editor,"hyprlandPluginUpdate-hyprglass").visible, "up-to-date plugin has no update")
+                    const updateButton = findChild(editor,"hyprlandPluginUpdate-scrolloverview")
+                    scroll.contentItem.contentY += updateButton.mapToItem(scroll, 0, 0).y - scroll.height / 2; wait(100)
+                    mouseClick(updateButton); wait(50)
+                    assert(pluginsBackend.updated === "scrolloverview", "update button updates that plugin")
+                    pluginsBackend.busy = true; wait(50)
+                    assert(!findChild(editor,"hyprlandPluginsCheck").enabled, "check disabled while busy")
+                    pluginsBackend.busy = false
+                    capture("hyprland-plugins")
+                    assert(bindsBackend.loadCalls > 0, "binds requested on open")
+                    assert(findChild(editor,"hyprlandKeybinds").visible, "keybinds section visible")
+                    assert(findChild(editor,"hyprlandBindsConflicts").visible, "conflicts warned")
+                    const group = findChild(editor,"hyprlandBindGroup-Aplicaciones")
+                    scroll.contentItem.contentY += group.mapToItem(scroll, 0, 0).y - scroll.height / 3; wait(100)
+                    assert(!findChild(editor,"hyprlandBind-app.terminal"), "groups start collapsed")
+                    mouseClick(group); wait(100)
+                    assert(findChild(editor,"hyprlandBind-app.terminal"), "group expands on click")
+                    assert(findChild(editor,"hyprlandBindReset-app.browser").visible, "overridden bind can restore")
+                    assert(!findChild(editor,"hyprlandBindReset-app.terminal").visible, "default bind has no restore")
+                    mouseClick(findChild(editor,"hyprlandBindToggle-app.terminal")); wait(50)
+                    assert(bindsBackend.disabledId === "app.terminal", "disable button disables that bind")
+                    mouseClick(findChild(editor,"hyprlandBindReset-app.browser")); wait(50)
+                    assert(bindsBackend.resetId === "app.browser", "restore button resets that bind")
+                    const change = findChild(editor,"hyprlandBindChange-app.terminal")
+                    mouseClick(change); wait(50)
+                    assert(findChild(editor,"hyprlandBindCapturePrompt").visible, "capture prompt shown")
+                    keyClick(Qt.Key_Escape); wait(50)
+                    assert(!findChild(editor,"hyprlandBindCapturePrompt").visible && !bindsBackend.set.id, "Esc cancels capture")
+                    mouseClick(change); wait(50)
+                    keyClick(Qt.Key_Shift, Qt.ShiftModifier); wait(30)
+                    assert(findChild(editor,"hyprlandBindCapturePrompt").visible, "modifier alone keeps capturing")
+                    keyClick(Qt.Key_T, Qt.MetaModifier | Qt.ShiftModifier); wait(50)
+                    assert(bindsBackend.set.id === "app.terminal" && bindsBackend.set.keys === "SUPER + SHIFT + T", "captured combination is sent: " + JSON.stringify(bindsBackend.set))
+                    assert(!findChild(editor,"hyprlandBindChange-window.drag") || !findChild(editor,"hyprlandBindChange-window.drag").visible, "mouse binds are not remappable")
+                    mouseClick(findChild(editor,"hyprlandBindsResetAll")); wait(50)
+                    assert(bindsBackend.resetAllCalls === 1, "reset all")
+                    capture("hyprland-keybinds")
                     backend.available = false; backend.error = "Sin sesión Hyprland"; wait(50)
                     assert(!layout.editable && !findChild(editor,"hyprlandSave").enabled, "unavailable controls disabled")
                     capture("hyprland-unavailable")
                     editor.searchQuery = "workspace"; wait(100)
                     assert(findChild(editor,"hyprlandSearchResult").visible, "global search locates compositor page")
                     mouseClick(findChild(editor,"hyprlandSearchResult")); wait(100)
-                    assert(editor.page === 6 && !editor.searchQuery, "search opens page")
+                    assert(editor.page === 5 && !editor.searchQuery, "search opens page")
                     Config.discard()
                     console.log("PASS: Hyprland settings UI, preview, revert, save, inheritance, offline and responsive layout")
                     finish.start()

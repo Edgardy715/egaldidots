@@ -9,7 +9,7 @@ ShellRoot {
     }
     IpcHandler {
         target: "edotsTest"
-        function page(index: int): void { window.page = Math.max(0, Math.min(5, index)) }
+        function page(index: int): void { window.page = Math.max(0, Math.min(8, index)) }
         function size(w: int, h: int): void { preview.implicitWidth = w; preview.implicitHeight = h }
         function scene(index: int): void { window.previewScene = index }
         function search(text: string): void { window.searchQuery = text }
