@@ -242,7 +242,7 @@ Item {
                             // alarga hacia su destino mientras viaja y se recoge al llegar.
                             readonly property real target: toggle.checked ? 26 : 4
                             property real travel: target
-                            Behavior on travel { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: 0.5; epsilon: 0.01 } }
+                            Behavior on travel { enabled: root.visible && !root.reducedMotion; SpringAnimation { spring: Motion.controlSpring; damping: 0.7; epsilon: 0.01 } }
                             readonly property real stretch: Theme.liquid ? Math.min(9, Math.abs(target - travel) * 0.8) : 0
                             x: target > travel ? travel : travel - stretch
                             y: 4

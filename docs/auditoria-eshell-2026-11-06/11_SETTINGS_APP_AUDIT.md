@@ -140,7 +140,8 @@ La escala es la del doc 09. Se añaden como filas 21–26 a esa matriz (versión
 ## 7. Estado de implementación (2026-11-06)
 
 Hecho y subido (`feat(settings)`): S1/S2 (entero, paso y unidad), S3/S4/S5 (plural, vacío, rail en búsqueda), S11 (indicador tonal; verificado también en tema claro con una paleta hecha a mano), S8 (sin escala en hover del switch ni del pulgar).
-Pendiente: S9 (ζ del muelle, requiere decidir valor), S10 (literales; el menisco `#ffffff` es un brillo especular intencionado y el tema no tiene token blanco), S6 (nombre, decisión de producto), fila 23 (extraer al kit), fila 24 (7 páginas; índices fijos en el código).
+S9 aplicado: muelle del pulgar del switch con `damping: 0.7` (antes 0.5), menos rebote; valor elegido por criterio, **sin medir** ni comparar en vídeo.
+Pendiente: S10 (literales; el menisco `#ffffff` es un brillo especular intencionado y el tema no tiene token blanco), S6 (nombre, decisión de producto), fila 23 (extraer al kit), fila 24 (7 páginas; índices fijos en el código).
 
 ## 8. Contraste con las referencias (añadido tras revisión)
 
@@ -153,4 +154,8 @@ Pendiente: S9 (ζ del muelle, requiere decidir valor), S10 (literales; el menisc
 
 - **Animate UI, Slider (Radix):** pista de 4 px, pulgar de 12 px, transición solo de color y sombra (0.15 s) [V medido en el navegador]. Es la geometría genérica de shadcn; el tubo de 26 px de Ajustes es más distintivo y no pierde frente a él [I].
 - **Animate UI, Tabs:** existe un elemento `tabs-highlight` que se mueve entre pestañas (indicador compartido, el mismo patrón que `LiquidSelection`) [V DOM]. **No se pudo medir su curva**: el muestreo con `requestAnimationFrame` se detuvo porque el panel del navegador estaba en segundo plano (6 muestras en 6 s) [no verificado].
-- **No se llegó a** Magic UI, Aceternity ni React Bits en esta pasada. La conclusión de §8 sigue en pie: las propuestas de controles de Ajustes no están contrastadas con esas tres.
+- **Magic UI, Aceternity, React Bits (solo catálogo, 2026-11-06) [V navegador]:** se listaron sus componentes de control; no se probó ninguno en marcha.
+  - Magic UI: 158 entradas, sin switch, slider ni tabs; solo botones (Shimmer, Ripple, Pulsating, Interactive Hover), Dock y Theme Toggler. Poco útil para Ajustes.
+  - Aceternity: 248 entradas; relevantes Animated Tabs, Notch, Sidebar, Stateful Button, Floating Dock. Sin switch ni slider.
+  - React Bits: 469 entradas; relevantes Squish Switch, Rubber Segment, Wake Slider, Morph Slider, Elastic Slider, Pill Nav, Glide Select. Son los únicos con equivalentes directos de switch, segmentado y slider; candidatos a revisar si se rediseñan esos controles.
+- **Sigue sin medirse** la curva del indicador de tabs de Animate UI ni el comportamiento de los componentes de React Bits. Las propuestas de controles de Ajustes siguen apoyadas en el código propio y en `SETTINGS_APP_RESEARCH.md`.
