@@ -234,98 +234,16 @@ Item {
             parent: root.inlineControl ? headerRow : content
             Layout.fillWidth: !root.inlineControl
             Layout.alignment: Qt.AlignVCenter
-            // Control segmentado: la selección es una gota que viaja entre opciones.
-            sourceComponent: Item {
-                id: choiceGroup
+            sourceComponent: IslaSegmented {
                 objectName: "settingChoices"
-                property alias choices: choiceRepeater
-                implicitHeight: choiceFlow.implicitHeight + 8
-                implicitWidth: (root.inlineControl ? rowWidth : choiceFlow.implicitWidth) + 8
-                readonly property int selectedIndex: (root.field.options || []).indexOf(root.value)
-                // itemAt() no notifica: la revisión obliga a releerlo cuando el Repeater crea o retira chips.
-                property int chipRevision: 0
-                readonly property Item selectedChip: chipRevision >= 0 && selectedIndex >= 0 ? choiceRepeater.itemAt(selectedIndex) : null
-                property bool placed: false
-                // En línea el Flow no puede deducir su ancho del implícito (los apila en columna):
-                // se le da la suma exacta de las opciones para que quepan en una fila.
-                readonly property real rowWidth: {
-                    let width = 0
-                    for (let i = 0; chipRevision >= 0 && i < choiceRepeater.count; i++) {
-                        const chip = choiceRepeater.itemAt(i)
-                        if (chip) width += chip.implicitWidth + (i > 0 ? 4 : 0)
-                    }
-                    return width
-                }
-                Timer { interval: 60; running: true; onTriggered: choiceGroup.placed = true }
-                Rectangle {
-                    width: Math.min(parent.width, choiceFlow.childrenRect.width + 8)
-                    height: parent.height
-                    radius: 15
-                    color: Qt.alpha(Theme.foreground, Theme.liquid ? 0.06 : 0.04)
-                    opacity: root.editable ? 1 : 0.5
-                }
-                Components.LiquidSelection {
-                    readonly property Item chip: choiceGroup.selectedChip
-                    targetX: chip ? choiceFlow.x + chip.x : 0
-                    targetY: chip ? choiceFlow.y + chip.y : 0
-                    targetWidth: chip ? chip.width : 0
-                    targetHeight: chip ? chip.height : 0
-                    immediate: !choiceGroup.placed || !root.visible
-                    radius: 11
-                    color: Theme.stateFill
-                    volume: true
-                    opacity: chip ? (root.editable ? 1 : 0.5) : 0
-                    Behavior on opacity { enabled: root.visible; NumberAnimation { duration: Motion.fast } }
-                }
-                Flow {
-                    id: choiceFlow
-                    x: 4; y: 4
-                    width: root.inlineControl ? choiceGroup.rowWidth : parent.width - 8
-                    spacing: 4
-                    Repeater {
-                        id: choiceRepeater
-                        model: root.field.options || []
-                        onItemAdded: choiceGroup.chipRevision++
-                        onItemRemoved: choiceGroup.chipRevision++
-                        Components.MotionButton {
-                            id: choice
-                            required property string modelData
-                            required property int index
-                            readonly property bool selected: root.value === choice.modelData
-                            objectName: "choice-" + modelData
-                            text: root.field.optionLabels ? I18n.tr(root.field.optionLabels[index]) : modelData
-                            checkable: false
-                            checked: selected
-                            enabled: root.editable
-                            implicitHeight: Math.max(36, Theme.fontSizeBodyLg * 1.5 + 14)
-                            implicitWidth: choiceLabel.implicitWidth + 32
-                            font.family: Config.appearance.fontFamily
-                            font.pixelSize: Theme.fontSizeBodyLg
-                            Accessible.name: I18n.tr(root.field.label) + ": " + text
-                            Accessible.role: Accessible.RadioButton
-                            Accessible.checkable: true
-                            Accessible.checked: selected
-                            Accessible.description: I18n.tr(root.field.description || "")
-                            onClicked: root.changeRequested(choice.modelData)
-                            background: Rectangle {
-                                radius: 11
-                                color: !choice.selected && choice.hovered ? Qt.alpha(Theme.foreground, 0.07) : "transparent"
-                                border.width: choice.activeFocus ? 2 : 0
-                                border.color: Theme.accent
-                                Behavior on color { enabled: root.visible; ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
-                            }
-                            contentItem: Text {
-                                id: choiceLabel
-                                text: choice.text
-                                font: choice.font
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                                color: choice.selected ? Theme.stateContent : Qt.alpha(Theme.foreground, 0.82)
-                                Behavior on color { enabled: root.visible; ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
-                            }
-                        }
-                    }
-                }
+                options: root.field.options || []
+                optionLabels: root.field.optionLabels || null
+                current: root.value
+                editable: root.editable
+                inline: root.inlineControl
+                label: root.field.label
+                description: root.field.description || ""
+                onChosen: value => root.changeRequested(value)
             }
         }
 

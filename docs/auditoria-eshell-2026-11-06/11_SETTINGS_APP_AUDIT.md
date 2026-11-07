@@ -141,7 +141,7 @@ La escala es la del doc 09. Se añaden como filas 21–26 a esa matriz (versión
 
 Hecho y subido (`feat(settings)`): S1/S2 (entero, paso y unidad), S3/S4/S5 (plural, vacío, rail en búsqueda), S11 (indicador tonal; verificado también en tema claro con una paleta hecha a mano), S8 (sin escala en hover del switch ni del pulgar).
 S9 aplicado: muelle del pulgar del switch con `damping: 0.7` (antes 0.5), menos rebote; valor elegido por criterio, **sin medir** ni comparar en vídeo.
-Fila 23 (parcial): `IslaSwitch` e `IslaSlider` extraídos a `bar/kit/`; `SettingRow` los usa. Verificado por captura en Movimiento (mismo aspecto). Faltan chips segmentados y combo.
+Fila 23 (parcial): `IslaSwitch`, `IslaSlider` e `IslaSegmented` extraídos a `bar/kit/`; `SettingRow` los usa. Verificado por captura en Movimiento (mismo aspecto). Falta el combo.
 S10 (parcial): 26 alfas de primer plano pasaron a `Theme.alpha*`.
 Pendiente: S10 (resto) (literales; el menisco `#ffffff` es un brillo especular intencionado y el tema no tiene token blanco), S6 (nombre, decisión de producto), fila 23 (extraer al kit), fila 24 (7 páginas; índices fijos en el código).
 
