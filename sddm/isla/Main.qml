@@ -418,6 +418,9 @@ Item {
                 echoMode: TextInput.Password
                 passwordMaskDelay: 0
                 cursorVisible: false
+                // Focus turns cursorVisible back on; the beads are the caret, so
+                // replace the style's blinking bar with nothing.
+                cursorDelegate: Item {}
                 // Greeter only: no clipboard, prediction or capitalisation on the secret.
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                 opacity: Math.max(0, 1 - root.successProgress * 4)
