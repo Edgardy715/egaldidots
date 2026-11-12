@@ -141,7 +141,7 @@ B("isla.clipboard", "Portapapeles", "Isla", mainMod .. " + V", exec('qs -c bar i
 -- Screenshot / lockscreen
 B("system.shot", "Captura de región", "Sistema", mainMod .. " + SHIFT + S", exec("hyprshot -m region"))
 B("system.shot_annotate", "Captura con anotaciones", "Sistema", mainMod .. " + ALT + S", exec("~/.config/hypr/scripts/screenshot-annotate.sh"))
-B("system.lock", "Bloquear pantalla", "Sistema", mainMod .. " + L", exec("~/.local/share/quickshell-lockscreen/lock.sh"))
+B("system.lock", "Bloquear pantalla", "Sistema", mainMod .. " + L", exec("[ -x ~/.local/bin/isla-lock ] && exec ~/.local/bin/isla-lock || exec hyprlock"))
 
 -- Mover el foco con mainMod + flechas
 B("focus.left", "Foco a la izquierda", "Foco", mainMod .. " + left", hl.dsp.layout("focus l"))

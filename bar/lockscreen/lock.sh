@@ -26,14 +26,56 @@ if command -v grim >/dev/null 2>&1 && command -v hyprctl >/dev/null 2>&1 && comm
     fi
 fi
 
-quickshell --path "$lock_dir/../lockscreen.qml"
+# Fail-safe: never leave a lock request unlocked. Hyprland reports the real state
+# (`hyprctl -j locked`); without it, fall back to the exit code as before.
+session_locked() { timeout 1 hyprctl -j locked 2>/dev/null | grep -q '"locked": *true'; }
+can_verify=0
+# hyprctl answers "unknown request" (exit 0) on Hyprland without `locked`.
+command -v hyprctl >/dev/null 2>&1 \
+    && timeout 1 hyprctl -j locked 2>/dev/null | grep -q '"locked": *\(true\|false\)' && can_verify=1
+
+# Someone else (hyprlock, a previous lock) already holds the session.
+if (( can_verify )) && session_locked; then
+    exit 0
+fi
+
+fallback() {
+    command -v hyprlock >/dev/null 2>&1 && exec hyprlock
+    printf 'isla lock: lock screen failed and hyprlock is not installed\n' >&2
+    exit 1
+}
+
+# No crash handler: a relaunched lockscreen would race hyprlock unsupervised.
+# Close the flock fd so only lock.sh (and hyprlock after exec) holds it.
+QS_DISABLE_CRASH_HANDLER=1 quickshell --path "$lock_dir/../lockscreen.qml" 9>&- &
+qs_pid=$!
+
+if (( can_verify )); then
+    # Wait for the session lock; Quickshell exiting first or never locking is a failure.
+    confirm=${ISLA_LOCK_CONFIRM_SECONDS:-5}
+    [[ $confirm =~ ^[0-9]+$ ]] || confirm=5
+    deadline=$(( SECONDS + confirm ))
+    until session_locked; do
+        if ! kill -0 "$qs_pid" 2>/dev/null || (( SECONDS >= deadline )); then
+            kill "$qs_pid" 2>/dev/null
+            wait "$qs_pid" 2>/dev/null
+            cleanup
+            snapshot_dir=""
+            fallback
+        fi
+        sleep 0.1
+    done
+fi
+
+wait "$qs_pid"
 result=$?
 cleanup
 snapshot_dir=""
 
-# If Quickshell could not create a session lock, retain a working lock screen.
-if (( result != 0 )) && command -v hyprlock >/dev/null 2>&1; then
-    exec hyprlock
+# Quickshell crashed while locked, or could not lock and we could not verify:
+# keep a working lock screen.
+if (( result != 0 )) || { (( can_verify )) && session_locked; }; then
+    fallback
 fi
 
 exit "$result"

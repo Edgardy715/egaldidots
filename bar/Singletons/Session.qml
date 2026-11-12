@@ -22,8 +22,8 @@ Singleton {
     Component.onCompleted: console.log("[Session] singleton instanciado")
 
     // Comandos predeterminados del sistema.
-    readonly property string lockCmd: (Quickshell.env("XDG_DATA_HOME")
-        || Quickshell.env("HOME") + "/.local/share") + "/quickshell-lockscreen/lock.sh"
+    // isla-lock verifies the lock and falls back to hyprlock; if it is not installed, hyprlock directly.
+    readonly property string lockCmd: "l=\"$HOME/.local/bin/isla-lock\"; [ -x \"$l\" ] && exec \"$l\"; exec hyprlock"
     readonly property string logoutCmd: "if command -v uwsm >/dev/null 2>&1 && uwsm check is-active >/dev/null 2>&1; then uwsm stop; else loginctl terminate-session \"${XDG_SESSION_ID:?}\"; fi"
     readonly property string shutdownCmd: "systemctl poweroff"
     readonly property string rebootCmd: "systemctl reboot"
@@ -35,7 +35,7 @@ Singleton {
         try { Quickshell.execDetached(["sh", "-c", cmd]) } catch (e) {}
     }
 
-    function lock(): void { Quickshell.execDetached([lockCmd]) }
+    function lock(): void { _run(lockCmd) }
     function logout(): void { _run(logoutCmd) }
     function shutdown(): void { _run(shutdownCmd) }
     function reboot(): void { _run(rebootCmd) }

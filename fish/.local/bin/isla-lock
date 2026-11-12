@@ -1,3 +1,11 @@
 #!/usr/bin/env bash
-set -euo pipefail
-exec "${XDG_DATA_HOME:-$HOME/.local/share}/quickshell-lockscreen/lock.sh" "$@"
+# Lock entry point (hypridle, SUPER+L, Session). Falls back to hyprlock if the
+# Isla launcher is missing or cannot run, so a lock request never leaves the session open.
+set -u
+launcher="${XDG_DATA_HOME:-$HOME/.local/share}/quickshell-lockscreen/lock.sh"
+if [[ -x "$launcher" ]]; then
+    "$launcher" "$@"
+    status=$?
+    (( status == 126 || status == 127 )) || exit "$status"
+fi
+exec hyprlock
