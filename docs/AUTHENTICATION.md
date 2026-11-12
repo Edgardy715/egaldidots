@@ -25,6 +25,25 @@ Quickshell lock falls back to hyprlock when available.
 The installed launcher points at the checkout. Reinstall it after moving the
 repository. Never use preview mode as a real lockscreen.
 
+## Login screen (SDDM)
+
+After a reboot SDDM handles login, not the lockscreen. `sddm/isla` is an SDDM
+theme with the lockscreen's layout. Install it as your normal user; the script
+asks for sudo only to copy files:
+
+```sh
+sddm/install.sh               # install, or refresh after changing the wallpaper
+sddm/install.sh --uninstall   # restore the previous theme
+sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/isla   # preview
+```
+
+The script copies the current wallpaper, the Inter font and the Matugen colours
+into `/usr/share/sddm/themes/isla` (root-owned, mode 644), so the greeter never
+reads your home directory. Colours must be `#rrggbb`; anything else is dropped.
+It changes only `[Theme] Current=` in `/etc/sddm.conf` and records the previous
+theme for `--uninstall`. It does not enable autologin. SDDM and PAM still
+validate the password; the theme only calls `sddm.login()`.
+
 ## Requests
 
 Enter submits once; Escape cancels. If the account selector is open, Escape
@@ -53,6 +72,7 @@ python bar/tests/auth-backend.py
 python bar/tests/auth-bridge.py
 python bar/tests/auth-transport.py
 python bar/tests/lockscreen-launcher.py
+python scripts/test-sddm-theme.py
 ```
 
 These use temporary processes, sockets and simulated responses. The transport
