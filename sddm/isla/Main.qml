@@ -24,7 +24,8 @@ Item {
         const v = parseFloat(cfg(key))
         return isFinite(v) ? Math.max(lo, Math.min(hi, v)) : 1
     }
-    function asset(key) { return /^[A-Za-z0-9._-]+$/.test(cfg(key)) ? Qt.resolvedUrl(cfg(key)) : "" }
+    // A file in the theme, or in live/ (the wallpaper sddm/sync.sh keeps current).
+    function asset(key) { return /^(live\/)?[A-Za-z0-9_-][A-Za-z0-9._-]*$/.test(cfg(key)) ? Qt.resolvedUrl(cfg(key)) : "" }
 
     FontLoader { id: textFont; source: root.asset("font") }
     FontLoader { id: iconFont; source: root.asset("iconFont") }

@@ -37,7 +37,7 @@ size or 12-hour clock settings, which it copies from Isla's config. Install it a
 asks for sudo only to copy files:
 
 ```sh
-sddm/install.sh               # install, or refresh after changing the wallpaper
+sddm/install.sh               # install, or refresh after changing settings
 sddm/install.sh --uninstall   # restore the previous theme
 sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/isla   # preview
 ```
@@ -48,7 +48,11 @@ is hidden and a submitted password stays on "Verificando…".
 
 The script copies the current wallpaper, fonts, components and Matugen colours
 into `/usr/share/sddm/themes/isla` (root-owned, mode 644), so the greeter never
-reads your home directory. Colours must be `#rrggbb`; anything else is dropped.
+reads your home directory. It also creates `/var/lib/isla-sddm`, owned by you:
+after each wallpaper change Isla runs `sddm/sync.sh`, which copies the new
+wallpaper and colours there without sudo. The theme reads them through
+`theme.conf.user` and `live/`, and `--uninstall` removes the folder. Wallpapers
+set outside Isla reach the login screen on the next Isla change or `sync.sh` run. Colours must be `#rrggbb`; anything else is dropped.
 It changes only `[Theme] Current=` in `/etc/sddm.conf` and records the previous
 theme for `--uninstall`. It does not enable autologin. SDDM and PAM still
 validate the password; the theme only calls `sddm.login()`.

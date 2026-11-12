@@ -87,6 +87,7 @@ Singleton {
             if (success || exitCode === 3) {
                 root.appliedInSession = true
                 root.current = path
+                sddmSync.running = true
             }
             if (exitCode === 3) root.applyError = "El fondo cambió, pero no se actualizaron los colores."
             else if (!success) root.applyError = "No se pudo aplicar el fondo. Comprueba Matugen y awww."
@@ -184,6 +185,13 @@ Singleton {
         Component.onCompleted: {
             forceRefresh()
         }
+    }
+
+    // Keeps the Isla login screen's wallpaper and colours in step; a no-op
+    // unless sddm/install.sh set up its user-owned copy.
+    Process {
+        id: sddmSync
+        command: ["bash", Quickshell.shellDir + "/../sddm/sync.sh"]
     }
 
     Process {

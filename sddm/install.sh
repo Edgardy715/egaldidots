@@ -22,6 +22,9 @@ die() { printf 'isla sddm: %s\n' "$*" >&2; exit 1; }
 
 theme_dir="${root%/}/usr/share/sddm/themes/isla"
 conf="${root%/}/etc/sddm.conf"
+# User-owned copy of the wallpaper and colours that sddm/sync.sh refreshes after
+# each wallpaper change; the theme reads it through theme.conf.user and live/.
+live="${root%/}/var/lib/isla-sddm"
 as_root=(sudo)
 [[ "$root" != / ]] && as_root=()
 
@@ -77,7 +80,7 @@ if [[ $mode == uninstall ]]; then
             "${as_root[@]}" install -m644 "$stage/sddm.conf" "$conf"
         fi
     fi
-    "${as_root[@]}" rm -rf -- "$theme_dir"
+    "${as_root[@]}" rm -rf -- "$theme_dir" "$live"
     printf 'Isla SDDM theme removed; login theme: %s\n' "${previous:-SDDM default}"
     exit 0
 fi
@@ -105,30 +108,7 @@ grep -q '^QtObject {' "$stage/isla/Singletons/Motion.qml" || die "unexpected Mot
 palette="${XDG_CACHE_HOME:-$HOME/.cache}/matugen/palette.json"
 # Only colours, a locale and file names reach theme.conf; nothing from the user's
 # home is read by the greeter itself.
-python3 - "$palette" "$stage/isla" <<'EOF' > "$stage/isla/theme.conf"
-import json, re, sys, shutil, os
-palette, out = sys.argv[1], sys.argv[2]
-hexre = re.compile(r"^#[0-9a-fA-F]{6}$")
-try:
-    data = json.load(open(palette))
-except Exception:
-    data = {}
-colors = data.get("colors", {}) if isinstance(data, dict) else {}
-keys = {"bgColor": "background", "foreground": "on_surface", "secondary": "on_surface_variant",
-        "accent": "primary", "error": "error", "cardTop": "surface_container_high",
-        "cardBot": "surface_container_low", "outline": "outline_variant"}
-print("[General]")
-for k, v in keys.items():
-    c = colors.get(v)
-    if isinstance(c, str) and hexre.match(c):
-        print(f"{k}={c}")
-wall = data.get("wallpaper") if isinstance(data, dict) else None
-if isinstance(wall, str) and os.path.isfile(wall):
-    ext = os.path.splitext(wall)[1].lower()
-    if ext in (".png", ".jpg", ".jpeg", ".webp"):
-        shutil.copyfile(wall, os.path.join(out, "background" + ext))
-        print("background=background" + ext)
-EOF
+python3 "$(dirname -- "$src")/theme-colors.py" "$palette" "$stage/isla" "" > "$stage/isla/theme.conf"
 
 font="$(fc-match -f '%{file}' 'Inter:weight=500' 2>/dev/null || true)"
 if [[ -f "$font" && "$(fc-query -f '%{family[0]}\n' "$font" 2>/dev/null | head -1)" == Inter ]]; then
@@ -181,6 +161,10 @@ done
 (cd "$stage/isla" && find . -type f) | while read -r f; do
     "${as_root[@]}" install -m644 "$stage/isla/$f" "$theme_dir/$f"
 done
+"${as_root[@]}" ln -s -- "$live" "$theme_dir/live"
+"${as_root[@]}" ln -s -- "$live/theme.conf.user" "$theme_dir/theme.conf.user"
+"${as_root[@]}" install -d -m755 -o "$(id -un)" -g "$(id -gn)" "$live"
+ISLA_SDDM_LIVE="$live" bash "$(dirname -- "$src")/sync.sh"
 "${as_root[@]}" install -d -m755 "$(dirname -- "$conf")"
 "${as_root[@]}" install -m644 "$stage/sddm.conf" "$conf"
 printf 'Isla SDDM theme installed (previous: %s). Preview: sddm-greeter-qt6 --test-mode --theme %s\n' \

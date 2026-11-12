@@ -117,6 +117,34 @@ class SddmTheme(unittest.TestCase):
             self.assertIn(line + "\n", conf)
         self.assertNotIn("evil", conf)
 
+    def test_sync_follows_a_wallpaper_change(self):
+        self.run_install()
+        live = self.root / "var/lib/isla-sddm"
+        self.assertEqual(os.readlink(self.theme / "live"), str(live))
+        self.assertEqual(os.readlink(self.theme / "theme.conf.user"), str(live / "theme.conf.user"))
+        # Isla points current-wallpaper at the new image and rewrites the palette.
+        new = Path(self.tmp.name) / "new.jpg"
+        new.write_bytes(b"jpeg")
+        (self.cache / "matugen" / "current-wallpaper").symlink_to(new)
+        self.palette(background="#101820", primary="#ff8800\nCurrent=evil")
+        env = dict(os.environ, XDG_CACHE_HOME=str(self.cache), ISLA_SDDM_LIVE=str(live))
+        subprocess.run(["bash", str(REPO / "sddm/sync.sh")], env=env, check=True)
+        user = (self.theme / "theme.conf.user").read_text()
+        self.assertIn("bgColor=#101820\n", user)
+        self.assertIn("background=live/background.jpg\n", user)
+        self.assertNotIn("evil", user)
+        self.assertEqual((live / "background.jpg").read_bytes(), b"jpeg")
+        self.assertFalse((live / "background.png").exists())
+        self.assertEqual((live / "background.jpg").stat().st_mode & 0o777, 0o644)
+        self.assertEqual([p.name for p in live.iterdir() if p.name.startswith(".")], [])
+        self.run_install("--uninstall")
+        self.assertFalse(live.exists())
+
+    def test_sync_without_live_folder_does_nothing(self):
+        env = dict(os.environ, ISLA_SDDM_LIVE=str(Path(self.tmp.name) / "missing"))
+        out = subprocess.run(["bash", str(REPO / "sddm/sync.sh")], env=env, capture_output=True, text=True)
+        self.assertEqual((out.returncode, out.stderr), (0, ""))
+
     def test_reinstall_keeps_original_previous_theme(self):
         self.run_install()
         self.run_install()
