@@ -1,0 +1,11 @@
+#!/bin/sh
+# Launcher for the Azog file explorer: opens $1 (default: $HOME) through the running shell.
+# Used by azog-files.desktop (xdg-open inode/directory) and keybinds.
+target=${1:-$HOME}
+case $target in
+    file://*)
+        # file:// URI: drop the scheme and decode %xx (python3 keeps the bytes exact).
+        target=$(python3 -c 'import sys, urllib.parse; sys.stdout.write(urllib.parse.unquote(sys.argv[1][7:]))' "$target") || exit 1 ;;
+esac
+[ -e "$target" ] || { echo "isla-files: no existe: $target" >&2; exit 1; }
+exec qs -c bar ipc call files open "$target"

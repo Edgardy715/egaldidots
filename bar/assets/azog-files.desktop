@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Azog Files
+Name[es]=Azog Archivos
+Comment=File explorer for the Azog shell
+Comment[es]=Explorador de archivos de la shell Azog
+Exec=/home/zdito/.config/quickshell/bar/scripts/isla-files %f
+Icon=system-file-manager
+Terminal=false
+Categories=System;FileTools;FileManager;
+MimeType=inode/directory;
