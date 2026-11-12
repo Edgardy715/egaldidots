@@ -1,0 +1,179 @@
+#!/usr/bin/env python3
+"""Emit mounted removable USB volumes from the udisksctl event stream."""
+
+import ast
+import atexit
+import ctypes
+import json
+import os
+import signal
+import re
+import shutil
+import subprocess
+import sys
+
+OBJECT = re.compile(r"/org/freedesktop/UDisks2/([A-Za-z0-9_/]+)")
+QUOTED = re.compile(r"'(?:\\.|[^'\\])*'")
+
+
+def fields(output):
+    result = {}
+    for line in output.splitlines():
+        match = re.match(r"\s*([A-Za-z][A-Za-z0-9]*):\s*(.*?)\s*$", line)
+        if match:
+            result[match.group(1)] = match.group(2)
+    return result
+
+
+def quoted(value):
+    match = QUOTED.search(value)
+    if not match:
+        return ""
+    try:
+        return ast.literal_eval(match.group(0))
+    except (SyntaxError, ValueError):
+        return ""
+
+
+def mountpoints(value):
+    points = []
+    for match in QUOTED.finditer(value):
+        try:
+            points.append(ast.literal_eval(match.group(0)))
+        except (SyntaxError, ValueError):
+            continue
+    return points
+
+
+def read_info(object_path, run):
+    return run(["udisksctl", "info", "-p", object_path],
+               text=True, capture_output=True, check=True).stdout
+
+
+def device_event(object_path, run):
+    block = fields(read_info(object_path, run))
+    device = quoted(block.get("Device", ""))
+    drive_path = quoted(block.get("Drive", ""))
+    points = mountpoints(block.get("MountPoints", ""))
+    if not device.startswith("/dev/") or not drive_path.startswith("/org/freedesktop/UDisks2/") or not points:
+        return None
+    drive_object = drive_path.removeprefix("/org/freedesktop/UDisks2/")
+    drive = fields(read_info(drive_object, run))
+    if drive.get("Removable", "").lower() != "true" or quoted(drive.get("ConnectionBus", "")).lower() != "usb":
+        return None
+    try:
+        size = int(block.get("Size", "0"))
+    except ValueError:
+        size = 0
+    return {"event": "mounted", "id": "/org/freedesktop/UDisks2/" + object_path,
+            "name": quoted(block.get("IdLabel", "")) or quoted(block.get("Name", "")) or device.rsplit("/", 1)[-1],
+            "size": size, "mountPoint": points[0], "device": device,
+            "drive": quoted(drive.get("Device", ""))}
+
+
+def process_lines(lines, run, emit):
+    active = set()
+    for line in lines:
+        if not line.startswith(("Added ", "Removed ")) and "PropertiesChanged" not in line:
+            continue
+        match = OBJECT.search(line)
+        if not match:
+            continue
+        object_path = match.group(1).rstrip("/")
+        if line.startswith("Removed "):
+            object_id = "/org/freedesktop/UDisks2/" + object_path
+            if object_id in active:
+                active.remove(object_id)
+                emit({"event": "removed", "id": object_id})
+            continue
+        try:
+            event = device_event(object_path, run)
+        except (subprocess.SubprocessError, OSError):
+            continue  # An object can disappear while its info is being read.
+        if event and event["id"] not in active:
+            active.add(event["id"])
+            emit(event)
+
+
+def die_with_parent():
+    """Ask the kernel to SIGTERM us when the parent (Quickshell) dies."""
+    try:
+        ctypes.CDLL("libc.so.6", use_errno=True).prctl(1, signal.SIGTERM)  # PR_SET_PDEATHSIG
+    except (OSError, AttributeError):
+        pass
+    if os.getppid() == 1:  # Parent already gone before prctl took effect.
+        sys.exit(0)
+
+
+def child_dies_with_us():
+    try:
+        ctypes.CDLL("libc.so.6").prctl(1, signal.SIGTERM)
+    except (OSError, AttributeError):
+        pass
+
+
+def monitor(popen=subprocess.Popen, run=subprocess.run):
+    if not shutil.which("udisksctl"):
+        print(json.dumps({"event": "error", "message": "udisksctl no está instalado"}), flush=True)
+        return 1
+    try:
+        child = popen(["udisksctl", "monitor"], stdout=subprocess.PIPE,
+                      stderr=subprocess.DEVNULL, text=True, bufsize=1,
+                      preexec_fn=child_dies_with_us)
+    except OSError as error:
+        print(json.dumps({"event": "error", "message": str(error)}), flush=True)
+        return 1
+    def reap(*_):
+        if child.poll() is None:
+            child.terminate()
+    atexit.register(reap)
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))  # runs atexit -> reap
+    try:
+        process_lines(child.stdout, run, lambda item: print(json.dumps(item, ensure_ascii=False), flush=True))
+        return child.wait()
+    except KeyboardInterrupt:
+        child.terminate()
+        child.wait()
+        return 0
+
+
+def self_test():
+    calls = []
+    def fake_run(args, **kwargs):
+        calls.append(args)
+        obj = args[-1]
+        if obj == "block_devices/sdb1":
+            output = """  Device: '/dev/sdb1'\n  Drive: '/org/freedesktop/UDisks2/drives/USB_DISK'\n  IdLabel: 'Travel \\\'Disk'\n  Size: 4096\n  MountPoints: ['/run/media/user/Travel\\040Disk']\n"""
+        elif obj == "drives/USB_DISK":
+            output = "  Device: '/dev/sdb'\n  Removable: true\n  ConnectionBus: 'usb'\n"
+        elif obj == "block_devices/nvme0n1p1":
+            output = "  Device: '/dev/nvme0n1p1'\n  Drive: '/org/freedesktop/UDisks2/drives/NVME'\n  Size: 4096\n  MountPoints: ['/home']\n"
+        else:
+            output = "  Device: '/dev/nvme0n1'\n  Removable: false\n  ConnectionBus: 'pci'\n"
+        return type("Result", (), {"stdout": output})()
+
+    emitted = []
+    process_lines([
+        "Monitoring the udisks daemon.",
+        "Added /org/freedesktop/UDisks2/block_devices/sdb1",
+        "/org/freedesktop/UDisks2/block_devices/sdb1: org.freedesktop.DBus.Properties.PropertiesChanged",
+        "Added /org/freedesktop/UDisks2/block_devices/nvme0n1p1",
+        "Removed /org/freedesktop/UDisks2/block_devices/sdb1",
+        "Removed /org/freedesktop/UDisks2/block_devices/sdb1",
+    ], fake_run, emitted.append)
+    assert len(emitted) == 2, emitted
+    assert emitted[0] == {"event": "mounted", "id": "/org/freedesktop/UDisks2/block_devices/sdb1",
+                          "name": "Travel 'Disk", "size": 4096,
+                          "mountPoint": "/run/media/user/Travel Disk", "device": "/dev/sdb1", "drive": "/dev/sdb"}
+    assert emitted[1] == {"event": "removed", "id": emitted[0]["id"]}
+    assert len(calls) == 6, calls
+    assert all(";" not in arg and "$(" not in arg for call in calls for arg in call)
+    print("self-test: PASS")
+    return 0
+
+
+if __name__ == "__main__":
+    if sys.argv[1:] == ["--self-test"]:
+        sys.exit(self_test())
+    die_with_parent()
+    sys.exit(monitor())

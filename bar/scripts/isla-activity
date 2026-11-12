@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+"""Send activity events to the running Isla shell, or wrap a command."""
+import getopt
+import json
+import os
+import socket
+import sys
+import time
+from types import SimpleNamespace
+
+SOCKET = os.path.join(os.environ.get("XDG_RUNTIME_DIR", ""), "isla", "activity.sock")
+_warned = False
+
+
+def send(event):
+    global _warned
+    try:
+        data = (json.dumps(event, separators=(",", ":"), ensure_ascii=False) + "\n").encode()
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as client:
+            client.settimeout(.04)
+            client.connect(SOCKET)
+            client.sendall(data)
+        return True
+    except (OSError, ValueError):
+        if not _warned:
+            print("isla-activity: Isla no está disponible; se omiten las actividades.", file=sys.stderr)
+            _warned = True
+        return False
+
+
+def fields(args):
+    result = {"op": args.command}
+    for name in ("id", "title", "subtitle", "icon", "progress", "source", "state"):
+        value = getattr(args, name, None)
+        if value is not None:
+            result[name] = value
+    return result
+
+
+USAGE = """Usage: isla-activity start --id ID --title TITLE [--icon ICON] [--progress -1|0..1]
+       isla-activity update --id ID [--progress 0..1] [--subtitle TEXT]
+       isla-activity end --id ID --state done|failed [--subtitle TEXT]
+       isla-activity run --title TITLE [--id ID] [--icon ICON] -- command args...
+       isla-activity pipe --id ID [--title TITLE]
+start/update/end also accept --title, --subtitle, --icon and --source.
+"""
+
+
+def parse_args():
+    if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
+        print(USAGE, end="")
+        raise SystemExit(0 if len(sys.argv) > 1 else 2)
+    command = sys.argv[1]
+    allowed = {"start": "id title subtitle icon source progress", "update": "id title subtitle icon source progress",
+               "end": "id title subtitle icon source state progress", "run": "id title subtitle icon source", "pipe": "id title"}
+    try:
+        if command not in allowed:
+            raise ValueError("comando desconocido: " + command)
+        options, rest = getopt.getopt(sys.argv[2:], "h", [key + "=" for key in allowed[command].split()] + ["help"])
+        values = dict.fromkeys("id title subtitle icon source state progress".split())
+        for option, value in options:
+            if option in ("-h", "--help"):
+                print(USAGE, end=""); raise SystemExit(0)
+            values[option[2:]] = float(value) if option == "--progress" else value
+        if command == "run":
+            values["id"] = values["id"] or f"run-{os.getpid()}"
+        if not values["id"] or command in ("start", "run") and not values["title"]:
+            raise ValueError("se requieren --id y --title (run genera su id)")
+        if command == "end" and values["state"] not in ("done", "failed"):
+            raise ValueError("--state debe ser done o failed")
+        if rest and command != "run":
+            raise ValueError("argumentos inesperados")
+        return SimpleNamespace(command=command, cmdline=rest, **values)
+    except (getopt.GetoptError, ValueError) as exc:
+        print("isla-activity: " + str(exc), file=sys.stderr)
+        raise SystemExit(2)
+
+
+def main():
+    args = parse_args()
+    if args.command in ("start", "update", "end"):
+        send(fields(args))
+        return 0
+    if args.command == "run":
+        command = args.cmdline[1:] if args.cmdline[:1] == ["--"] else args.cmdline
+        if not command:
+            print("isla-activity: falta el comando después de --", file=sys.stderr)
+            return 2
+        start = time.monotonic()
+        send({key: value for key, value in {"op": "start", "id": args.id, "title": args.title,
+              "subtitle": args.subtitle, "icon": args.icon, "source": args.source, "progress": -1}.items()
+             if value is not None})
+        subprocess = __import__("subprocess")
+        signal = __import__("signal")
+        child = None
+        previous = {}
+        try:
+            child = subprocess.Popen(command)
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                previous[sig] = signal.getsignal(sig)
+                signal.signal(sig, lambda received, frame: child.send_signal(received) if child.poll() is None else None)
+            code = child.wait()
+        except OSError as exc:
+            print(f"isla-activity: {exc}", file=sys.stderr)
+            code = 127
+        finally:
+            for sig, handler in previous.items():
+                signal.signal(sig, handler)
+        if code < 0:
+            code = 128 - code
+        elapsed = time.monotonic() - start
+        duration = f"{int(elapsed // 60)} m {int(elapsed % 60)} s" if elapsed >= 60 else f"{elapsed:.0f} s"
+        send({"op": "end", "id": args.id, "state": "done" if code == 0 else "failed", "subtitle": duration})
+        return code
+    re = __import__("re")
+    send({"op": "start", "id": args.id, "title": args.title or args.id, "progress": -1})
+    last = 0.0
+    pending = None
+    for line in sys.stdin:
+        match = re.search(r"(?<!\d)(\d{1,3})%", line)
+        if not match:
+            continue
+        pending = min(100, int(match.group(1))) / 100
+        now = time.monotonic()
+        if now - last >= 1 / 30:
+            send({"op": "update", "id": args.id, "progress": pending})
+            pending, last = None, now
+    if pending is not None:
+        send({"op": "update", "id": args.id, "progress": pending})
+    send({"op": "end", "id": args.id, "state": "done"})
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
