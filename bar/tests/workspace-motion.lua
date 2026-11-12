@@ -1,3 +1,6 @@
+local here = debug.getinfo(1, "S").source:match("^@(.*)/[^/]+$") or "."
+local hypr = here .. "/../../hypr/.config/hypr"
+package.path = hypr .. "/?.lua;" .. package.path
 local startup
 local commands = {}
 local pluginCalls = {}
@@ -14,7 +17,7 @@ hl = {
     config = function(value) config = value end,
 }
 
-local motion = dofile(os.getenv("HOME") .. "/.config/hypr/modules/workspace_motion.lua")
+local motion = dofile(hypr .. "/modules/workspace_motion.lua")
 assert(startup, "loader must be registered for compositor startup")
 assert(#commands == 0, "config parse must not load a plugin")
 assert(config == nil, "plugin options require a loaded plugin")
@@ -24,7 +27,7 @@ motion.navigate("left")
 motion.selectClick()
 assert(#commands == 0, "missing plugin must leave IPC routing to the bind script")
 startup()
-assert(commands[1] == "/home/zdito/.config/quickshell/scripts/scrolloverview-load.sh")
+assert(commands[1]:match("^'/.+/scripts/scrolloverview%-load%.sh'$"), commands[1])
 
 hl.plugin.scrolloverview = {
     overview = function(action) pluginCalls[#pluginCalls + 1] = "overview:" .. action end,
@@ -33,7 +36,7 @@ hl.plugin.scrolloverview = {
 }
 commands = {}
 config = nil
-motion = dofile(os.getenv("HOME") .. "/.config/hypr/modules/workspace_motion.lua")
+motion = dofile(hypr .. "/modules/workspace_motion.lua")
 assert(#commands == 0, "plugin config reload must not load a plugin")
 assert(config.plugin.scrolloverview.scale == 0.48)
 assert(config.plugin.scrolloverview.layout == "vertical")
