@@ -16,6 +16,8 @@ Singleton {
     property int conflictCount: 0
     property bool canUndo: false
     property bool loaded: false
+    // False when Hyprland has no binds.lua: live binds are shown read-only.
+    property bool catalogReady: true
     property string error: ""
     property string feedback: ""
     readonly property bool busy: _running
@@ -83,6 +85,7 @@ Singleton {
         if (!result) { error = I18n.tr("No se pudo leer los atajos de Hyprland."); return }
         if (!result.ok) { error = result.error || I18n.tr("No se pudo aplicar el atajo."); return }
         error = ""
+        if (result.catalog !== undefined) catalogReady = result.catalog !== false
         binds = result.binds || []
         external = result.external || []
         conflictCount = result.conflictCount || 0

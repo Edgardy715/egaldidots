@@ -57,6 +57,15 @@ class T(unittest.TestCase):
     def test_list(self):
         f = Fx(); d = f.run("list")
         self.assertTrue(d["ok"]); self.assertEqual(len(d["binds"]), 3); self.assertEqual(d["conflictCount"], 0)
+        self.assertTrue(d["catalog"])
+
+    def test_missing_catalog_lists_live_binds_read_only(self):
+        f = Fx(); (f.user.parent / "cat.json").unlink()
+        d = f.run("list")
+        self.assertTrue(d["ok"], d); self.assertFalse(d["catalog"])
+        self.assertEqual(d["binds"], []); self.assertEqual(len(d["external"]), 1)
+        r = f.run("set", "a.one", "SUPER + X")
+        self.assertFalse(r["ok"]); self.assertFalse(f.user.exists())
 
     def test_set_normalizes_and_saves(self):
         f = Fx()

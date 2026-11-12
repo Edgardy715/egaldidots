@@ -163,7 +163,13 @@ def dispatcher_name(b):
 
 
 def build():
-    catalog, user = load()
+    # Without binds.lua (Azog without egaldidots) Hyprland never publishes the
+    # catalog: list the live binds read-only instead of failing; writes still refuse.
+    try:
+        catalog, user = load()
+        has_catalog = True
+    except BindError:
+        catalog, user, has_catalog = [], read_user(), False
     live = live_binds()
     rows = merged(catalog, user)
     external = external_rows(live)
@@ -196,7 +202,7 @@ def build():
                 pass
     for r in external:
         r["conflicts"] = []
-    return {"ok": True, "binds": rows, "external": external,
+    return {"ok": True, "catalog": has_catalog, "binds": rows, "external": external,
             "conflictCount": sum(1 for r in rows if r["conflicts"]),
             "canUndo": bool(backups())}
 

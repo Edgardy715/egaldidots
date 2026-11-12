@@ -67,6 +67,7 @@ ShellRoot {
         property int conflictCount: 1
         property bool canUndo: true
         property bool loaded: true
+        property bool catalogReady: true
         property string error: ""
         property string feedback: ""
         property bool busy: false
@@ -188,6 +189,11 @@ ShellRoot {
                     const row = id => findChild(editor, "keybindRow-" + id)
                     assert(kb.visible && bindsBackend.loadCalls > 0, "shortcuts tab loads binds")
                     assert(title() === "Terminal", "first bind inspected: " + title())
+                    const bindsStatus = () => findChild(editor, "hyprlandBindsStatus").text
+                    assert(!bindsStatus().includes("sólo lectura"), "editable catalog shows no read-only notice")
+                    bindsBackend.catalogReady = false; wait(20)
+                    assert(bindsStatus().includes("sólo lectura"), "missing binds.lua announces read-only: " + bindsStatus())
+                    bindsBackend.catalogReady = true; wait(20)
                     mouseClick(row("app.browser")); wait(50)
                     assert(title() === "Navegador" && findChild(editor,"keybindConflicts").visible, "conflict shown in inspector")
                     assert(findChild(editor,"keybindAction").text === "zen-browser", "command shown")

@@ -10,6 +10,7 @@ var strings = {
  "Avisa cuando termina un comando largo en otra ventana.": "Notify when a long command finishes in another window.",
  "Progreso de aplicaciones": "App progress",
  "Convierte notificaciones con progreso en actividades.": "Turn progress notifications into activities.",
+ "Esta configuración de Hyprland no publica atajos editables; se muestran en sólo lectura.": "This Hyprland config does not publish editable shortcuts; they are shown read-only.",
  "Procesos en curso e integración con la terminal.": "Ongoing processes and terminal integration.",
  "Procesos en curso y recientes": "Ongoing and recent processes",
  "Procesos": "Processes",

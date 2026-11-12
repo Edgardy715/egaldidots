@@ -657,7 +657,8 @@ RowLayout {
                 objectName: "hyprlandBindsStatus"
                 Layout.fillWidth: true
                 visible: text.length > 0
-                text: !root.binds ? "" : root.binds.error || (root.binds.busy ? I18n.tr("Aplicando…") : root.binds.feedback)
+                text: !root.binds ? "" : root.binds.error || (root.binds.busy ? I18n.tr("Aplicando…") : root.binds.feedback
+                    || (root.binds.catalogReady !== false ? "" : I18n.tr("Esta configuración de Hyprland no publica atajos editables; se muestran en sólo lectura.")))
                 color: root.binds && root.binds.error ? Theme.error : Qt.alpha(Theme.foreground, Theme.alphaIconSec)
                 font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody
                 wrapMode: Text.WordWrap
