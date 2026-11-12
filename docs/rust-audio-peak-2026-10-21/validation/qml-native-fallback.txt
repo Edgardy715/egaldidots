@@ -1,0 +1,3 @@
+PASS: fallback QML snapshot, private silent meter, close/reopen, maps and cleanup
+PASS: native QML snapshot, private silent meter, close/reopen, maps and cleanup
+PASS: private sink removed and defaults preserved

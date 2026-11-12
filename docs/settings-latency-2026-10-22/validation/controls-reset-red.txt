@@ -1,0 +1,12 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/settings-controls-regression.qml"
+  INFO: Shell ID: "dc5e78827a5b05f6018f5de080ff99a2" Path ID "dc5e78827a5b05f6018f5de080ff99a2"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/dolx5lbnt/log.qslog"
+  INFO: Configuration Loaded
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb3981db060 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb3981db060 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb3981db060 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb3981db060 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb3981db060 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb3981db060 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb3981db060 but 0x0 is focused
+ ERROR qml: FAIL: Edots controls: Shift+Tab remains usable after reset

@@ -1,0 +1,114 @@
+INFO: Launching config: "/home/zdito/.config/quickshell/bar/shell.qml"
+  INFO: Shell ID: "be929ca39a1b6350aa82474c1ae2952d" Path ID "be929ca39a1b6350aa82474c1ae2952d"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/qrobddfcnt/log.qslog"
+ DEBUG qml: [Auth] Polkit agent registered: false
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  WARN quickshell.io.socket: Deleted existing file at "/run/user/1000/isla-sudo-askpass.sock" to create socket
+  INFO: Configuration Loaded
+ DEBUG qml: [Auth] Polkit agent registered: true
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  INFO: Reloading configuration...
+ ERROR: Failed to load configuration
+ ERROR:   caused by @shell.qml[41:5]: Type ShellRuntime unavailable
+ ERROR:   caused by @components/ShellRuntime.qml[-1:-1]: Type AmbientClock unavailable
+ ERROR:   caused by @Singletons/AmbientClock.qml[-1:-1]: Type Apps unavailable
+ ERROR:   caused by @Singletons/Apps.qml[-1:-1]: Type Auth unavailable
+ ERROR:   caused by @Singletons/Auth.qml[-1:-1]: Type Brightness unavailable
+ ERROR:   caused by @Singletons/Brightness.qml[-1:-1]: Type Cava unavailable
+ ERROR:   caused by @Singletons/Cava.qml[98:5]: Type AmbientSubscription unavailable
+ ERROR:   caused by @components/AmbientSubscription.qml[-1:-1]: Type Config unavailable
+ ERROR:   caused by @Singletons/Config.qml[-1:-1]: Type DesktopStatus unavailable
+ ERROR:   caused by @Singletons/DesktopStatus.qml[-1:-1]: Type Flags unavailable
+ ERROR:   caused by @Singletons/Flags.qml[-1:-1]: Type FocusSession unavailable
+ ERROR:   caused by @Singletons/FocusSession.qml[-1:-1]: Type GlowClock unavailable
+ ERROR:   caused by @Singletons/GlowClock.qml[-1:-1]: Type HyprlandSettings unavailable
+ ERROR:   caused by @Singletons/HyprlandSettings.qml[-1:-1]: Type Icons unavailable
+ ERROR:   caused by @Singletons/Icons.qml[-1:-1]: Type IslaPalette unavailable
+ ERROR:   caused by @Singletons/IslaPalette.qml[-1:-1]: Type IslandGeometry unavailable
+ ERROR:   caused by @Singletons/IslandGeometry.qml[-1:-1]: Type KeepAwake unavailable
+ ERROR:   caused by @Singletons/KeepAwake.qml[-1:-1]: Type MediaPalette unavailable
+ ERROR:   caused by @Singletons/MediaPalette.qml[-1:-1]: Type Motion unavailable
+ ERROR:   caused by @Singletons/Motion.qml[-1:-1]: Type Nmcli unavailable
+ ERROR:   caused by @Singletons/Nmcli.qml[-1:-1]: Type Notifs unavailable
+ ERROR:   caused by @Singletons/Notifs.qml[241:9]: Type NotifData unavailable
+ ERROR:   caused by @Singletons/NotifData.qml[-1:-1]: Type Players unavailable
+ ERROR:   caused by @Singletons/Players.qml[102:5]: Property value set multiple times
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fb7b520de60 but 0x0 is focused
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ ERROR: Failed to load configuration
+ ERROR:   caused by @shell.qml[41:5]: Type ShellRuntime unavailable
+ ERROR:   caused by @components/ShellRuntime.qml[-1:-1]: Type AmbientClock unavailable
+ ERROR:   caused by @Singletons/AmbientClock.qml[-1:-1]: Type Apps unavailable
+ ERROR:   caused by @Singletons/Apps.qml[-1:-1]: Type Auth unavailable
+ ERROR:   caused by @Singletons/Auth.qml[-1:-1]: Type Brightness unavailable
+ ERROR:   caused by @Singletons/Brightness.qml[-1:-1]: Type Cava unavailable
+ ERROR:   caused by @Singletons/Cava.qml[98:5]: Type AmbientSubscription unavailable
+ ERROR:   caused by @components/AmbientSubscription.qml[-1:-1]: Type Config unavailable
+ ERROR:   caused by @Singletons/Config.qml[-1:-1]: Type DesktopStatus unavailable
+ ERROR:   caused by @Singletons/DesktopStatus.qml[-1:-1]: Type Flags unavailable
+ ERROR:   caused by @Singletons/Flags.qml[-1:-1]: Type FocusSession unavailable
+ ERROR:   caused by @Singletons/FocusSession.qml[-1:-1]: Type GlowClock unavailable
+ ERROR:   caused by @Singletons/GlowClock.qml[-1:-1]: Type HyprlandSettings unavailable
+ ERROR:   caused by @Singletons/HyprlandSettings.qml[-1:-1]: Type Icons unavailable
+ ERROR:   caused by @Singletons/Icons.qml[-1:-1]: Type IslaPalette unavailable
+ ERROR:   caused by @Singletons/IslaPalette.qml[-1:-1]: Type IslandGeometry unavailable
+ ERROR:   caused by @Singletons/IslandGeometry.qml[-1:-1]: Type KeepAwake unavailable
+ ERROR:   caused by @Singletons/KeepAwake.qml[-1:-1]: Type MediaPalette unavailable
+ ERROR:   caused by @Singletons/MediaPalette.qml[-1:-1]: Type Motion unavailable
+ ERROR:   caused by @Singletons/Motion.qml[-1:-1]: Type Nmcli unavailable
+ ERROR:   caused by @Singletons/Nmcli.qml[-1:-1]: Type Notifs unavailable
+ ERROR:   caused by @Singletons/Notifs.qml[241:9]: Type NotifData unavailable
+ ERROR:   caused by @Singletons/NotifData.qml[-1:-1]: Type Players unavailable
+ ERROR:   caused by @Singletons/Players.qml[128:5]: Property value set multiple times
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded

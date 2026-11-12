@@ -1,0 +1,1 @@
+ DEBUG qml: PASS: continuous capture at 30/60/144/240 Hz, compact/playing/hover/card, coverage and return

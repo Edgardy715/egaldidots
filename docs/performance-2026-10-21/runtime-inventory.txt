@@ -1,0 +1,143 @@
+bar/fluid/FluidIslandDemo.qml:156:    Timer {
+bar/windows/IslandOverlay.qml:55:    Timer {
+bar/windows/IslandOverlay.qml:244:        Timer {
+bar/lockscreen/LockSurface.qml:69:    Timer { id: entranceTimer; interval: Flags.reduceMotion ? 0 : 32; onTriggered: root.entered = true }
+bar/lockscreen/LockSurface.qml:70:    Timer { id: idleReturn; interval: 15000; running: root.authActive && !password.text.length && !root.busy && !root.authenticated; onTriggered: root.authActive = false }
+bar/lockscreen/LockSurface.qml:99:    Timer {
+bar/lockscreen/LockSurface.qml:140:    Timer { interval: 1000; repeat: true; running: root.visible; onTriggered: root.now = new Date() }
+bar/lockscreen/LockSurface.qml:141:    Timer { id: confirmation; interval: 3500; onTriggered: root.pendingPower = "" }
+bar/settings/EdotsIcon.qml:23:    Timer { id: arrival; interval: Motion.iconGesture; onTriggered: {} }
+bar/Singletons/Wallpapers.qml:80:    Process {
+bar/Singletons/Wallpapers.qml:112:    Timer {
+bar/Singletons/Wallpapers.qml:189:    Process {
+bar/Singletons/WinMap.qml:79:    Timer { id: debounce; interval: 40; repeat: false; onTriggered: root.flush() }
+bar/Singletons/WinMap.qml:102:    Process {
+bar/Singletons/WinMap.qml:118:    Process {
+bar/Singletons/WinMap.qml:134:    Process {
+bar/Singletons/WinMap.qml:145:    Process {
+bar/Singletons/Recording.qml:101:    Timer {
+bar/Singletons/Recording.qml:114:    Process {
+bar/Singletons/Recording.qml:128:    Timer { id: retry; interval: 3000; onTriggered: if (root.observe && !root.dependencyMissing) bridge.running = true }
+bar/Singletons/Cava.qml:44:    Timer { id: sourceRestart; interval: 150 }
+bar/Singletons/Cava.qml:60:    Process {
+bar/Singletons/Cava.qml:69:    Process {
+bar/Singletons/Cava.qml:96:    FrameAnimation {
+bar/Singletons/Players.qml:57:    Timer {
+bar/Singletons/FocusSession.qml:71:    Timer {
+bar/Singletons/Notifs.qml:116:    Timer {
+bar/Singletons/Notifs.qml:215:    Process {
+bar/components/AppItem.qml:31:    Timer {
+bar/Singletons/MediaPalette.qml:53:    Timer { id: debounce; interval: 120; onTriggered: root.sync() }
+bar/Singletons/MediaPalette.qml:54:    Timer { id: watchdog; objectName: "mediaPaletteWatchdog"; interval: root.requestTimeout; onTriggered: extractor.running = false }
+bar/Singletons/MediaPalette.qml:55:    Timer { id: retryDelay; interval: 800; onTriggered: root.sync() }
+bar/Singletons/MediaPalette.qml:56:    Process {
+bar/Singletons/NotifData.qml:47:    readonly property Timer expireTimer: Timer {
+bar/Singletons/NotifData.qml:55:    readonly property Timer timeStrTimer: Timer {
+bar/components/IslandMediaMetadata.qml:75:        Timer {
+bar/components/IslandMediaMetadata.qml:84:            loops: Animation.Infinite
+bar/components/BreatheBorder.qml:40:        loops: Animation.Infinite
+bar/components/BatteryChip.qml:43:    Timer { id: batChipHide; interval: 3000; onTriggered: root.shown = false }
+bar/components/IslandRestStatus.qml:48:        Timer {
+bar/Singletons/HyprlandSettings.qml:226:    Timer { id: preview; interval: 70; onTriggered: root.launch("apply") }
+bar/Singletons/HyprlandSettings.qml:228:    Process {
+bar/components/PillSurfaceHost.qml:54:    Timer {
+bar/components/MediaSession.qml:109:    property Timer positionTimer: Timer {
+bar/components/NotificationChoreography.qml:90:    property Timer notifHoldInObject: Timer {
+bar/components/NotificationChoreography.qml:102:    property Timer notifExpandTimerObject: Timer {
+bar/components/NotificationChoreography.qml:114:    property Timer notifHoldTimerObject: Timer {
+bar/components/NotificationChoreography.qml:130:    property Timer notifCollapseOutTimerObject: Timer {
+bar/components/NotificationChoreography.qml:142:    property Timer notifReturnTimerObject: Timer {
+bar/components/NotificationChoreography.qml:159:    property Timer surfaceRestoreTimerObject: Timer {
+bar/components/VolumeChip.qml:45:    Timer {
+bar/components/SurfaceRouter.qml:111:    property Timer resultsTimer: Timer {
+bar/components/SurfaceRouter.qml:122:    property Timer pillTimer: Timer {
+bar/components/FluidCompanion.qml:252:    Timer {
+bar/components/FluidCompanion.qml:282:    FrameAnimation {
+bar/Singletons/DesktopStatus.qml:73:    Timer {
+bar/Singletons/DesktopStatus.qml:79:    Process {
+bar/Singletons/DesktopStatus.qml:100:    Timer {
+bar/components/OsdOverlay.qml:111:    Timer {
+bar/Singletons/Apps.qml:166:    Timer {
+bar/components/InputCaret.qml:39:    Timer { id: hold; interval: Math.max(500, Qt.styleHints.cursorFlashTime / 2) }
+bar/components/InputCaret.qml:43:        loops: Animation.Infinite
+bar/components/StaggerItem.qml:71:    Timer {
+bar/components/QuickControlsAdapter.qml:62:    Timer {
+bar/components/QuickControlsAdapter.qml:68:    Process {
+bar/components/QuickControlsAdapter.qml:75:    Process {
+bar/Singletons/Brightness.qml:114:    Process {
+bar/Singletons/Brightness.qml:138:    Process {
+bar/Singletons/Brightness.qml:154:    Process {
+bar/Singletons/Brightness.qml:173:    Process {
+bar/Singletons/Config.qml:119:    Process {
+bar/components/InnerGlow.qml:15:    FrameAnimation {
+bar/components/IslandCompanion.qml:33:    Timer { id: cooldown; interval: 2400 }
+bar/components/TopAppStrip.qml:24:    Timer { id: intro; interval: 1800 }
+bar/Singletons/Auth.qml:149:    Timer {
+bar/Singletons/Auth.qml:196:    Timer {
+bar/components/IslandStatusAdapter.qml:23:    Timer {
+bar/components/IslandMediaCover.qml:47:    Timer {
+bar/Singletons/KeepAwake.qml:58:    Timer {
+bar/Singletons/KeepAwake.qml:78:    Process {
+bar/components/SwiftMediaTimeline.qml:88:    FrameAnimation {
+bar/components/TopWorkspaceRail.qml:131:        FrameAnimation {
+bar/components/SessionView.qml:38:    Timer {
+bar/components/SessionView.qml:80:    Timer { interval: 60000; repeat: true; running: root.open; onTriggered: root.now = new Date() }
+bar/components/MediaTransportButton.qml:54:    FrameAnimation {
+bar/components/WallpaperView.qml:96:    Timer { id: navigateTimer; interval: 2000; onTriggered: root.navigating = false }
+bar/components/WallpaperView.qml:97:    Timer {
+bar/components/WallpaperView.qml:102:    Timer {
+bar/components/WallpaperView.qml:242:                    loops: Animation.Infinite
+bar/components/WallpaperView.qml:672:                            loops: Animation.Infinite
+bar/components/WallpaperView.qml:729:                loops: Animation.Infinite
+bar/components/Calculator.js:10:    while ((match = lexer.exec(source)) !== null) {
+bar/components/Calculator.js:56:        while (["*", "/", "%", "×", "÷"].indexOf(tokens[index]) !== -1) {
+bar/components/Calculator.js:67:        while (tokens[index] === "+" || tokens[index] === "-") {
+bar/components/PillContentAdapter.qml:30:    Timer {
+bar/components/CalendarData.qml:86:    Timer { interval: 1000; repeat: true; running: root.observe; onTriggered: root.today = new Date() }
+bar/components/CalendarData.qml:87:    Timer { interval: 15 * 60 * 1000; repeat: true; running: root.observe; onTriggered: root.refresh() }
+bar/components/CalendarData.qml:88:    Process {
+bar/components/ConnectivityAdapter.qml:70:    Timer {
+bar/components/ConnectivityAdapter.qml:80:    Timer {
+bar/components/BarLayoutTransition.qml:32:    Timer {
+bar/components/LyricsController.qml:105:    property Timer debounce: Timer { interval: 150; onTriggered: root.load() }
+bar/components/LyricsController.qml:106:    property Timer timeout: Timer {
+bar/components/LyricsController.qml:118:    property Timer retryDelay: Timer {
+bar/components/ClipboardController.qml:54:    Process {
+bar/components/ClipboardController.qml:80:            Process {
+bar/components/ClipboardController.qml:118:            Process {
+bar/components/ClipboardController.qml:200:    Timer {
+bar/components/ClipboardController.qml:216:    Process {
+bar/components/ClipboardController.qml:332:    Process {
+bar/components/ClipboardController.qml:419:    Process {
+bar/components/ClipboardController.qml:433:    Process {
+bar/components/CalendarView.qml:66:    Timer {
+bar/components/CalendarView.qml:314:                        Timer {
+bar/Singletons/Nmcli.qml:490:        CommandProcess {}
+bar/Singletons/Nmcli.qml:498:    Timer {
+bar/Singletons/Nmcli.qml:521:    Timer {
+bar/Singletons/Nmcli.qml:551:    Process {
+bar/Singletons/Nmcli.qml:557:    Process {
+bar/Singletons/Nmcli.qml:568:    Timer {
+bar/Singletons/Nmcli.qml:574:    component CommandProcess: Process {
+bar/components/PillMorphMotion.qml:55:        loops: Animation.Infinite
+bar/components/MediaAmbient.qml:24:    Timer {
+bar/components/ConnectivityView.qml:59:        while (ancestor && ancestor !== networkList.contentItem) ancestor = ancestor.parent
+bar/components/ConnectivityView.qml:105:    Timer {
+bar/components/ConnectivityView.qml:164:                loops: Animation.Infinite
+bar/components/ConfirmationIndicator.qml:45:        from: 0; to: 1; duration: 1100; loops: Animation.Infinite
+bar/components/ConfirmationIndicator.qml:69:                from: 0; to: 360; duration: 1100; loops: Animation.Infinite
+bar/components/LyricsView.qml:22:    Timer {
+bar/components/AudioController.qml:76:    Process {
+bar/components/AudioController.qml:98:    Timer {
+bar/components/AudioController.qml:104:    Timer {
+bar/components/LyricsData.js:41:        while ((match = tags.exec(raw)) !== null) {
+bar/components/LyricsData.js:63:    while (low <= high) {
+bar/components/NotifCardView.qml:116:                running: critical && card.visible && !Flags.reduceMotion; loops: Animation.Infinite
+bar/components/ClipboardPreviewAdapter.qml:13:    Process {
+bar/components/LauncherController.qml:46:    Timer {
+bar/components/MediaTimeline.qml:106:    Timer {
+bar/components/MediaTimeline.qml:117:    FrameAnimation {
+bar/components/LauncherView.qml:372:    Timer {
+bar/components/LauncherView.qml:382:    Timer {
+bar/components/audio/AudioFader.qml:18:    Timer { id: confirmation; interval: 1600; onTriggered: root.pending = false }
+bar/components/ClipboardView.qml:724:    Timer {

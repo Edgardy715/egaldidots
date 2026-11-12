@@ -1,0 +1,23 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/settings-navigation-regression.qml"
+  INFO: Shell ID: "e76e7b1a287e982c291c8d110d540acd" Path ID "e76e7b1a287e982c291c8d110d540acd"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/lpbttkbnt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f994ae5c1c0 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f994ae5c1c0 but 0x0 is focused
+ DEBUG qml: METRIC: page=1 cycle=0 maxms=16
+ DEBUG qml: METRIC: page=2 cycle=0 maxms=28
+ DEBUG qml: METRIC: page=3 cycle=0 maxms=25
+ DEBUG qml: METRIC: page=4 cycle=0 maxms=27
+ DEBUG qml: METRIC: page=5 cycle=0 maxms=27
+ DEBUG qml: METRIC: page=0 cycle=0 maxms=38
+ DEBUG qml: METRIC: settings navigation cold frames=584 p95ms=12 maxms=38
+ DEBUG qml: METRIC: page=1 cycle=1 maxms=11
+ DEBUG qml: METRIC: page=2 cycle=1 maxms=23
+ DEBUG qml: METRIC: page=3 cycle=1 maxms=26
+ DEBUG qml: METRIC: page=4 cycle=1 maxms=11
+ DEBUG qml: METRIC: page=5 cycle=1 maxms=14
+ DEBUG qml: METRIC: page=0 cycle=1 maxms=76
+ DEBUG qml: METRIC: settings navigation warm frames=565 p95ms=11 maxms=76
+ DEBUG qml: PASS: settings navigation cold/warm and retained drafts

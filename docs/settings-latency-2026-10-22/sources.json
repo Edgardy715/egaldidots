@@ -1,0 +1,9 @@
+{
+  "bar/settings/SettingRow.qml": "e469869f5b8fc2101d6eef2ed738520861c06245ada4fc2a128400dba593b3c8",
+  "bar/settings-controls-regression.qml": "2d193ca60515c1de43b121faf9b2a5a2d8b21831e6be3dfe7bacd06e9eb87157",
+  "bar/tests/settings-navigation-performance.py": "30bf9a3ce14fba67a519418f0af69a274b6ed6cb992978a2c520523c595b6c3d",
+  "bar/settings-navigation-regression.qml": "2b2415837c970a00a4b1afd2bc480967110335e4f0f093f125ec95395a98486b",
+  "bar/settings-ux-regression.qml": "4ffc0fef29500e324eae453b328c17767a833aa9a48d301e0895a44528e884d1",
+  "bar/settings-motion-regression.qml": "3edac53b3f898a7f2dff559e712c646ee356d58d7231a0f393743c8f74ce3d87",
+  "bar/settings-async-regression.qml": "dc8cfd7f0cdaed99c66f4c85334eb0dfb113a0266034b128208ba6dede7344b7"
+}

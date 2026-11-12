@@ -1,0 +1,1 @@
+ DEBUG qml: PASS: companion refresh independence, 80ms stall, velocity at target, capture reopen, geometric neck pinch and live reduced motion

@@ -1,0 +1,8 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/companion-delight-regression.qml"
+  INFO: Shell ID: "89cfac638def945a6adc6468f185e3b8" Path ID "89cfac638def945a6adc6468f185e3b8"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/ew12hu8gnt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: companion material, story phases, interruptions, scales, opt-out, reduced and hidden

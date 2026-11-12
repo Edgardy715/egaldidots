@@ -1,0 +1,687 @@
+ M bar/CtrlBtn.qml
+ M bar/Pill.qml
+ M bar/PillSurface.qml
+ M bar/Singletons/Apps.qml
+ M bar/Singletons/Brightness.qml
+ M bar/Singletons/Config.qml
+ M bar/Singletons/DesktopStatus.qml
+ M bar/Singletons/Flags.qml
+ M bar/Singletons/Motion.qml
+ M bar/Singletons/NotifData.qml
+ M bar/Singletons/Notifs.qml
+ M bar/Singletons/Players.qml
+ M bar/Singletons/Settings.js
+ M bar/Singletons/Theme.qml
+ M bar/Singletons/qmldir
+ M bar/TESTING.md
+ M bar/battery-indicator-regression.qml
+ M bar/components/ActivityView.qml
+ M bar/components/AnimatedLabel.qml
+ M bar/components/AppItem.qml
+ M bar/components/AppearanceView.qml
+ M bar/components/AuthPromptView.qml
+ M bar/components/BatteryChip.qml
+ M bar/components/BatteryIndicator.qml
+ M bar/components/BreatheBorder.qml
+ M bar/components/CalendarData.qml
+ M bar/components/CalendarView.qml
+ M bar/components/ClipboardChip.qml
+ M bar/components/ClipboardDetails.qml
+ M bar/components/ClipboardEntryRow.qml
+ M bar/components/ClipboardView.qml
+ M bar/components/ConfirmationIndicator.qml
+ M bar/components/ConnectivityView.qml
+ M bar/components/FluidCompanion.qml
+ M bar/components/FluidMediaCompanion.qml
+ M bar/components/FocusTimerView.qml
+ M bar/components/GlassCard.qml
+ M bar/components/InnerGlow.qml
+ M bar/components/InputCaret.qml
+ M bar/components/InteractionMotion.qml
+ M bar/components/IslandActivityChip.qml
+ M bar/components/IslandCompanion.qml
+ M bar/components/IslandRestStatus.qml
+ M bar/components/LauncherView.qml
+ M bar/components/LyricsView.qml
+ M bar/components/MaterialIcon.qml
+ M bar/components/MediaAmbient.qml
+ M bar/components/MediaSession.qml
+ M bar/components/MediaTimeline.qml
+ M bar/components/MediaTransportButton.qml
+ M bar/components/MediaView.qml
+ M bar/components/MixerView.qml
+ M bar/components/MotionList.qml
+ M bar/components/NotifCardView.qml
+ M bar/components/NotificationChoreography.qml
+ M bar/components/NotifsView.qml
+ M bar/components/OsdOverlay.qml
+ M bar/components/OverlayInputPolicy.qml
+ M bar/components/OverviewView.qml
+ M bar/components/PillContentAdapter.qml
+ M bar/components/PillGeometry.qml
+ M bar/components/PillHeaderView.qml
+ M bar/components/PillMaterial.qml
+ M bar/components/PillMorphMotion.qml
+ M bar/components/PillSurfaceHost.qml
+ M bar/components/QuickControlsAdapter.qml
+ M bar/components/QuickControlsView.qml
+ M bar/components/ReceptionPulse.qml
+ M bar/components/RecordingView.qml
+ M bar/components/ShellRuntime.qml
+ M bar/components/Slider.qml
+ M bar/components/SurfaceHeader.qml
+ M bar/components/SurfaceRouter.qml
+ M bar/components/Toggle.qml
+ M bar/components/TopAudioStatus.qml
+ M bar/components/TopBarModules.qml
+ M bar/components/TopNetworkStatus.qml
+ M bar/components/TopSystemStatus.qml
+ M bar/components/TopUserStatus.qml
+ M bar/components/TopWorkspaceRail.qml
+ M bar/components/VolumeChip.qml
+ M bar/components/WallpaperView.qml
+ M bar/components/WifiCredentials.qml
+ M bar/components/WorkspaceModel.qml
+ M bar/components/WorkspacesView.qml
+ M bar/components/audio/AudioChoice.qml
+ M bar/components/audio/AudioEndpoint.qml
+ M bar/components/audio/AudioFader.qml
+ M bar/components/audio/AudioHardware.qml
+ M bar/config-draft-conflict-regression.qml
+ M bar/confirmation-indicator-regression.qml
+ M bar/fluid/MOTION_LANGUAGE.md
+ M bar/launcher-pending-regression.qml
+ M bar/lockscreen-motion-regression.qml
+ M bar/lockscreen/LockButton.qml
+ M bar/lockscreen/LockMedia.qml
+ M bar/lockscreen/LockSurface.qml
+ M bar/lyrics-view-regression.qml
+ M bar/matugen-palette-regression.qml
+ M bar/notifs-surface-regression.qml
+ M bar/overlay-input-policy-regression.qml
+ M bar/overlay-native-input-regression.qml
+ M bar/personality-regression.qml
+ D bar/pets-media-gather-regression.qml
+ D bar/pets-media-perch-regression.qml
+ D bar/pets-overlay-regression.qml
+ D bar/pets-performance.qml
+ D bar/pets-preview-regression.qml
+ D bar/pets-qa.qml
+ D bar/pets-rail-regression.qml
+ D bar/pets-regression.qml
+ D bar/pets/PetActor.qml
+ D bar/pets/PetApps.js
+ D bar/pets/PetLayer.qml
+ D bar/pets/PetPack.qml
+ D bar/pets/PetPerch.qml
+ D bar/pets/PetSprite.qml
+ D bar/pets/packs/mimo/atlas-arena.png
+ D bar/pets/packs/mimo/atlas-coral.png
+ D bar/pets/packs/mimo/atlas-lavanda.png
+ D bar/pets/packs/mimo/atlas.json
+ D bar/pets/packs/mimo/atlas.png
+ D bar/pets/packs/mimo/pet.json
+ D bar/pets/qmldir
+ D bar/pets/shaders/pet_palette.frag
+ D bar/pets/shaders/pet_palette.frag.qsb
+ D bar/pets/tools/petpack.py
+ M bar/pill-composition-regression.qml
+ M bar/pill-interface-regression.qml
+ M bar/quick-controls-regression.qml
+ M bar/recording-view-regression.qml
+ M bar/settings-ux-regression.qml
+ M bar/settings/EdotsButton.qml
+ M bar/settings/EdotsComboBox.qml
+ M bar/settings/EdotsPageMotion.qml
+ M bar/settings/EdotsPathPicker.qml
+ M bar/settings/EdotsTextField.qml
+ M bar/settings/EdotsWindow.qml
+ M bar/settings/IslandStudio.qml
+ D bar/settings/PetPreview.qml
+ M bar/settings/SettingRow.qml
+ M bar/settings/SettingsPage.qml
+ M bar/shell.json.example
+ M bar/shell.qml
+ M bar/surface-router-regression.qml
+ M bar/surfaces/LauncherSurface.qml
+ M bar/surfaces/MediaSurface.qml
+ M bar/surfaces/NotifsSurface.qml
+ M bar/surfaces/OverviewSurface.qml
+ M bar/surfaces/SettingsSurface.qml
+ M bar/surfaces/WallpaperSurface.qml
+ M bar/surfaces/WorkspacesSurface.qml
+ M bar/tests/overlay-native-input.py
+ D bar/tests/pet-events.cjs
+ D bar/tests/pets-palette.py
+ D bar/tests/pets-performance.py
+ D bar/tests/pets.py
+ M bar/tests/sample-process.py
+ M bar/tests/session-soak.py
+ M bar/tests/settings-integration.py
+ M bar/tests/settings.cjs
+ M bar/windows/IslandOverlay.qml
+ M bar/workspace-styles-regression.qml
+ D docs/ESHELL_PETS_PLAN.md
+ M docs/SHELL_ARCHITECTURE.md
+ D docs/eshell-pets-2026-10-22/REPORT.md
+ D docs/eshell-pets-2026-10-22/legacy-code/README.md
+ D docs/eshell-pets-2026-10-22/legacy-code/bar/pets-media-regression.qml
+ D docs/eshell-pets-2026-10-22/legacy-code/bar/pets-overlay-regression.qml
+ D docs/eshell-pets-2026-10-22/legacy-code/bar/pets-regression.qml
+ D docs/eshell-pets-2026-10-22/legacy-code/bar/pets-surfaces-regression.qml
+ D docs/eshell-pets-2026-10-22/legacy-code/bar/pets/BuiltinPet.qml
+ D docs/eshell-pets-2026-10-22/legacy-code/bar/pets/PetHost.qml
+ D docs/eshell-pets-2026-10-22/legacy-code/bar/pets/PetRuntime.qml
+ D docs/eshell-pets-2026-10-22/legacy-code/bar/tests/pets-surfaces.py
+ D docs/eshell-pets-2026-10-22/legacy-code/bar/tests/pets.py
+ D docs/eshell-pets-2026-10-22/phase2/REPORT.md
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/REPORT.md
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/comparison.json
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/results.json
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/sources/bar/components/IslandCompanion.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/sources/bar/pets-performance.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/sources/bar/pets/GhostPet.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/sources/bar/pets/PetHost.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/sources/bar/pets/PetRuntime.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/sources/bar/tests/pets-performance.py
+ D docs/eshell-pets-2026-10-22/phase2/performance-cached/sources/bar/tests/sample-process.py
+ D docs/eshell-pets-2026-10-22/phase2/performance/REPORT.md
+ D docs/eshell-pets-2026-10-22/phase2/performance/results.json
+ D docs/eshell-pets-2026-10-22/phase2/performance/sources/bar/components/IslandCompanion.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance/sources/bar/pets-performance.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance/sources/bar/pets/GhostPet.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance/sources/bar/pets/PetHost.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance/sources/bar/pets/PetRuntime.qml
+ D docs/eshell-pets-2026-10-22/phase2/performance/sources/bar/tests/pets-performance.py
+ D docs/eshell-pets-2026-10-22/phase2/performance/sources/bar/tests/sample-process.py
+ D docs/eshell-pets-2026-10-22/phase2/performance/validation.json
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-compact.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-000.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-001.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-002.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-003.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-004.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-005.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-006.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-007.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-008.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-009.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-010.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-011.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-012.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-013.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-014.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-015.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-016.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-017.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-018.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-019.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-020.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-021.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-022.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-023.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-024.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-025.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-026.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-027.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-028.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-029.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-030.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-031.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-032.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-033.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-034.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-motion-035.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/compositor-split.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/frames.json
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/motion.concat
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-compact.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-000.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-001.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-002.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-003.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-004.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-005.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-006.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-007.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-008.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-009.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-010.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-011.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-012.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-013.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-014.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-015.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-016.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-017.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-018.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-019.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-020.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-021.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-022.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-023.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-024.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-025.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-026.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-027.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-028.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-029.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-030.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-031.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-032.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-033.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-034.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-motion-035.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/overlay-split.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/reaction.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/reduced.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/rest.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/scale-150.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/size-16.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/size-32.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/size-fallback.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/sleep-entry.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/sleep-reduced.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/sleep-settled.png
+ D docs/eshell-pets-2026-10-22/phase2/qa-compositor/wake.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/overlay-compact.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/overlay-split.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/reaction.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/reduced.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/rest.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/scale-150.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/size-16.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/size-32.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/size-fallback.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/sleep-entry.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/sleep-reduced.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/sleep-settled.png
+ D docs/eshell-pets-2026-10-22/phase2/qa/wake.png
+ D docs/eshell-pets-2026-10-22/phase2/sleep-wake.mp4
+ D docs/eshell-pets-2026-10-22/phase3/REPORT.md
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-compact-paused.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-compact.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-disabled.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-paused.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-playing.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-scale-150.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-size-32.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-split-paused.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-split.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/media-track.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/overlay-compact.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/overlay-split.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/reaction.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/reduced.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/rest.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/scale-150.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/size-16.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/size-32.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/size-fallback.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/sleep-entry.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/sleep-reduced.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/sleep-settled.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/wake.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/wallpaper-compact-applied.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/wallpaper-compact-selection.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/wallpaper-compact-settled.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/wallpaper-split-applied.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/wallpaper-split-selection.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/wallpaper-split-settled.png
+ D docs/eshell-pets-2026-10-22/phase3/qa/workspaces.png
+ D docs/eshell-pets-2026-10-22/phase3/sources.json
+ D docs/eshell-pets-2026-10-22/phase4/REPORT.md
+ D docs/eshell-pets-2026-10-22/phase4/qa/characters-preview.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-blob-eating.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-blob-idle.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-blob-sleeping.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-compact-paused.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-compact.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-disabled.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-ghost-eating.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-ghost-idle.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-ghost-sleeping.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-octopus-eating.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-octopus-idle.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-octopus-sleeping.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-paused.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-playing.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-scale-150.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-size-32.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-split-paused.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-split.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/media-track.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/native-media-blob-eating.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/native-media-blob-idle.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/native-media-blob-sleeping.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/native-media-ghost-eating.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/native-media-ghost-idle.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/native-media-ghost-sleeping.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/native-media-octopus-eating.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/native-media-octopus-idle.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/native-media-octopus-sleeping.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/overlay-compact.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/overlay-split.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/reaction.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/reduced.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/rest.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/scale-150.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/size-16.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/size-32.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/size-fallback.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/sleep-entry.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/sleep-reduced.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/sleep-settled.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/wake.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/wallpaper-compact-applied.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/wallpaper-compact-selection.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/wallpaper-compact-settled.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/wallpaper-split-applied.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/wallpaper-split-selection.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/wallpaper-split-settled.png
+ D docs/eshell-pets-2026-10-22/phase4/qa/workspaces.png
+ D docs/eshell-pets-2026-10-22/phase4/sources.json
+ D docs/eshell-pets-2026-10-22/qa/overlay-compact.png
+ D docs/eshell-pets-2026-10-22/qa/overlay-split.png
+ D docs/eshell-pets-2026-10-22/qa/reaction.png
+ D docs/eshell-pets-2026-10-22/qa/reduced.png
+ D docs/eshell-pets-2026-10-22/qa/rest.png
+ D docs/eshell-pets-2026-10-22/qa/scale-150.png
+ D docs/eshell-pets-2026-10-22/qa/size-16.png
+ D docs/eshell-pets-2026-10-22/qa/size-32.png
+ D docs/eshell-pets-2026-10-22/qa/size-fallback.png
+ D docs/eshell-pets-redesign-2026-10-23/PHASE2.md
+ D docs/eshell-pets-redesign-2026-10-23/PROPOSAL.md
+ D docs/eshell-pets-redesign-2026-10-23/REPORT-PHASE2.md
+ D docs/eshell-pets-redesign-2026-10-23/design/accessories.png
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-code.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-dance.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-doze.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-happy.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-hop.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-idle.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-idle_breath.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-love.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-react.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-sit.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-sleep.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-sneeze.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-stretch.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-twirl.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-wake.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-walk.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-wave.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/anim-yawn.gif
+ D docs/eshell-pets-redesign-2026-10-23/design/mimo.pet.json
+ D docs/eshell-pets-redesign-2026-10-23/design/mock-edots.png
+ D docs/eshell-pets-redesign-2026-10-23/design/mock-launcher.png
+ D docs/eshell-pets-redesign-2026-10-23/design/mock-media.png
+ D docs/eshell-pets-redesign-2026-10-23/design/mock-pill.png
+ D docs/eshell-pets-redesign-2026-10-23/design/palettes.png
+ D docs/eshell-pets-redesign-2026-10-23/design/poses-dark.png
+ D docs/eshell-pets-redesign-2026-10-23/design/poses-light.png
+ D docs/eshell-pets-redesign-2026-10-23/design/src/anims.py
+ D docs/eshell-pets-redesign-2026-10-23/design/src/build.py
+ D docs/eshell-pets-redesign-2026-10-23/design/src/frames.json
+ D docs/eshell-pets-redesign-2026-10-23/design/src/mimo.py
+ D docs/eshell-pets-redesign-2026-10-23/design/src/mock.py
+ D docs/eshell-pets-redesign-2026-10-23/design/src/sheet.py
+ D docs/eshell-pets-redesign-2026-10-23/perf/after-isolated/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/before-isolated-swap/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/before-isolated/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/before-live/samples.jsonl
+ D docs/eshell-pets-redesign-2026-10-23/perf/before-live/shell-end.txt
+ D docs/eshell-pets-redesign-2026-10-23/perf/before-live/shell-start.txt
+ D docs/eshell-pets-redesign-2026-10-23/perf/before-live/status.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/cpu-probe/probe.py
+ D docs/eshell-pets-redesign-2026-10-23/perf/cpu-probe/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/flight-gate24/probe.py
+ D docs/eshell-pets-redesign-2026-10-23/perf/flight-gate24/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase1-matched/compare.py
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase1-matched/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase1-matched/source-sha256.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase1-matched/source.tar.gz
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase2-attempt-flight-cpu/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase2-attempt-hidden-tick/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase2-attempt-idle-walk/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase2-before-flight-count/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase2-fixes/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase2/final-results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase2/flying-five-starts/probe.py
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase2/flying-five-starts/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/phase2/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/pilot/results.json
+ D docs/eshell-pets-redesign-2026-10-23/perf/vida/results.json
+ D docs/eshell-pets-redesign-2026-10-23/proposal.html
+ D docs/eshell-pets-redesign-2026-10-23/qa-media-gather/after-start-seq.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-media-gather/after-stop-seq.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-media-gather/before-stop-seq.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/bar-niche-entry.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/capture.py
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/compact-land-retarget-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/compact-land-retarget-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/launcher-reopen-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/launcher-reopen-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/no-perch-surface-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/no-perch-surface-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/samples.json
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/split-land-retarget-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/split-land-retarget-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2-fixes/verdicts.json
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/bar-launcher-1-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/bar-launcher-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/bar-launcher-2-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/bar-launcher-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/capture.py
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/coding-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/coding.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-hover-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-hover.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-launcher-rail-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-launcher-rail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-1-2-1-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-1-2-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-1-2-2-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-1-2-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-1-5-1-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-1-5-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-1-5-2-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-1-5-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-launcher-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rail-launcher.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rapid-1-5-2-1-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rapid-1-5-2-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rapid-1-5-2-2-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/compact-rapid-1-5-2-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/launcher-bar-1-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/launcher-bar-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/launcher-bar-2-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/launcher-bar-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/media-launcher-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/media-launcher.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/mischief-frequent-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/mischief-frequent.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/music-eight-seconds-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/music-eight-seconds.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/probe-rail-top.json
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/probe-rail-top.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/reduced-bar-launcher-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/reduced-bar-launcher.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/reduced-launcher-bar-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/reduced-launcher-bar.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/reduced-rail-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/reduced-rail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/samples.json
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-hover-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-hover.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-launcher-rail-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-launcher-rail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-1-2-1-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-1-2-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-1-2-2-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-1-2-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-1-5-1-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-1-5-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-1-5-2-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-1-5-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-launcher-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rail-launcher.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rapid-1-5-2-1-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rapid-1-5-2-1.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rapid-1-5-2-2-detail.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/split-rapid-1-5-2-2.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-phase2/summary.json
+ D docs/eshell-pets-redesign-2026-10-23/qa-vida/capture.py
+ D docs/eshell-pets-redesign-2026-10-23/qa-vida/doze-sleep.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-vida/gaze-left.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-vida/gaze-right.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-vida/love.png
+ D docs/eshell-pets-redesign-2026-10-23/qa-vida/verdicts.json
+ D docs/eshell-pets-redesign-2026-10-23/qa-vida/wake.png
+ D docs/eshell-pets-redesign-2026-10-23/validation-phase2/focus-probe.qml
+ D docs/eshell-pets-redesign-2026-10-23/validation-phase2/offscreen-cleanup.json
+ D docs/eshell-pets-redesign-2026-10-23/validation-phase2/regressions.json
+ D docs/eshell-pets-redesign-2026-10-23/validation-phase2/review.md
+ D docs/eshell-pets-redesign-2026-10-23/validation-phase2/sources.json
+ M gtk/.config/gtk-3.0/settings.ini
+ M gtk/.config/gtk-4.0/settings.ini
+ M hypr/.config/hypr/modules/envVars.conf
+ M hypr/.config/hypr/modules/monitors.conf
+ M install.sh
+ M matugen/.config/matugen/README.md
+ M matugen/.config/matugen/generate.py
+ M scripts/test-install.py
+ M scripts/test-matugen.py
+?? :memory:.ses
+?? bar/Singletons/IrisMemory.qml
+?? bar/Singletons/SystemUpdates.qml
+?? bar/Singletons/UpdateText.js
+?? bar/Singletons/Visitors.js
+?? bar/body-demo.qml
+?? bar/body-drop-regression.qml
+?? bar/body-regression.qml
+?? bar/body/
+?? bar/calendar-design-regression.qml
+?? bar/companion-delight-regression.qml
+?? bar/companion-preview.qml
+?? bar/components/CompanionBehavior.qml
+?? bar/components/ErrorShake.qml
+?? bar/components/LevelDial.qml
+?? bar/components/LevelStroke.qml
+?? bar/components/LiquidFill.qml
+?? bar/components/LiquidSelection.qml
+?? bar/components/LockGlyph.qml
+?? bar/components/PlayPauseGlyph.qml
+?? bar/components/PlusCheckGlyph.qml
+?? bar/components/RadioGlyph.qml
+?? bar/components/SpinSettle.qml
+?? bar/components/SpringValue.qml
+?? bar/components/TimeRing.qml
+?? bar/components/VolumeGlyph.qml
+?? bar/desktop-status-capslock-regression.qml
+?? bar/frame-time-regression.qml
+?? bar/iris-continuity-regression.qml
+?? bar/iris-delight-regression.qml
+?? bar/iris-memory-regression.qml
+?? bar/iris-system-regression.qml
+?? bar/launcher-focus-regression.qml
+?? bar/launcher-media-clearance-regression.qml
+?? bar/material-accessibility-regression.qml
+?? bar/notification-drop-regression.qml
+?? bar/scripts/system-updates.py
+?? bar/settings/UpdateSourceCard.qml
+?? bar/settings/UpdatesPage.qml
+?? bar/stroke-language-regression.qml
+?? bar/surface-materialize-capture.qml
+?? bar/surface-materialize-regression.qml
+?? bar/tests/body-brain.cjs
+?? bar/tests/body-drop.cjs
+?? bar/tests/desktop-integration.py
+?? bar/tests/launcher-media-clearance.py
+?? bar/tests/system-updates.py
+?? bar/tests/updates-notice.py
+?? bar/tests/updates-service.py
+?? bar/tests/updates-ui.py
+?? bar/updates-notice-regression.qml
+?? bar/updates-regression.qml
+?? bar/updates-service-regression.qml
+?? docs/PROJECT_MEMORY_ARCHIVE-2026-10-18.md
+?? docs/PROJECT_MEMORY_ARCHIVE-2026-10-22.md
+?? docs/PROMPT-companion-polish.md
+?? docs/TASK_STATE_ARCHIVE-2026-09.md
+?? docs/TASK_STATE_ARCHIVE-2026-10-01_13.md
+?? docs/claude-audit-2026-10-22/
+?? docs/compact-audit-2026-10-18/
+?? docs/companion-delight-2026-10-25/
+?? docs/companion-firefly-2026-10-25/
+?? docs/companion-interaction-2026-10-25/
+?? docs/companion-legacy-ideas-2026-10-24.md
+?? docs/companion-polish-2026-10-25/
+?? docs/connectivity-2026-10-18/
+?? docs/cuerpo-fase1-2026-10-30/
+?? docs/cuerpo-fase2-2026-10-30/
+?? docs/design-accessibility-2026-10-26/
+?? docs/design-competition-2026-10-26/
+?? docs/design-fixes-2026-10-26/
+?? docs/desktop-integration-2026-10-26/
+?? docs/drop-gather-2026-10-22/
+?? docs/drop-neck-2026-10-22/
+?? docs/iris-continuity-2026-10-25/
+?? docs/iris-delight-2026-10-25/
+?? docs/iris-visual-2026-10-26/
+?? docs/lockscreen-type-2026-10-18/
+?? docs/nusa-coucou-2026-10-21/
+?? docs/performance-2026-10-21/
+?? docs/performance-2026-10-22/PROMPT_SOL.md
+?? docs/performance-2026-10-23/collector-output.txt
+?? docs/performance-2026-10-23/normal-use-01/
+?? docs/personality-2026-10-21/
+?? docs/plan-cuerpo-isla-2026-10-30.md
+?? docs/plan-trazo-pill-2026-10-30.md
+?? docs/previews/
+?? docs/prompts/
+?? docs/propuesta-tidemark-motion-language.md
+?? docs/recording-2026-10-21/
+?? docs/rest-track-transition-2026-10-18/
+?? docs/rust-audio-peak-2026-10-21/
+?? docs/rust-cava-2026-10-21/
+?? docs/rust-clipboard-list-2026-10-21/
+?? docs/settings-fluency-2026-10-18/
+?? docs/settings-latency-2026-10-22/REPORT.md
+?? docs/settings-latency-2026-10-22/baseline-red-before-0.txt
+?? docs/settings-latency-2026-10-22/baseline-red.json
+?? docs/settings-latency-2026-10-22/baseline.json
+?? docs/settings-latency-2026-10-22/comparison-after-0.txt
+?? docs/settings-latency-2026-10-22/comparison-after-1.txt
+?? docs/settings-latency-2026-10-22/comparison-after-2.txt
+?? docs/settings-latency-2026-10-22/comparison-before-0.txt
+?? docs/settings-latency-2026-10-22/comparison-before-1.txt
+?? docs/settings-latency-2026-10-22/comparison-before-2.txt
+?? docs/settings-latency-2026-10-22/comparison-final-after-0.txt
+?? docs/settings-latency-2026-10-22/comparison-final-after-1.txt
+?? docs/settings-latency-2026-10-22/comparison-final-before-0.txt
+?? docs/settings-latency-2026-10-22/comparison-final-before-1.txt
+?? docs/settings-latency-2026-10-22/comparison-final.json
+?? docs/settings-latency-2026-10-22/comparison.json
+?? docs/settings-latency-2026-10-22/config-profile.json
+?? docs/settings-latency-2026-10-22/controls-final.txt
+?? docs/settings-latency-2026-10-22/qa-after.txt
+?? docs/settings-latency-2026-10-22/qa-after/
+?? docs/settings-latency-2026-10-22/qa-before.txt
+?? docs/settings-latency-2026-10-22/qa-before/
+?? docs/settings-latency-2026-10-22/qa-final.txt
+?? docs/settings-latency-2026-10-22/qa-final/
+?? docs/settings-latency-2026-10-22/review.txt
+?? docs/settings-latency-2026-10-22/settings-async-regression.qml.txt
+?? docs/settings-latency-2026-10-22/settings-motion-regression.qml.txt
+?? docs/settings-latency-2026-10-22/source-final.tar.gz
+?? docs/settings-latency-2026-10-22/sources.json
+?? docs/settings-latency-2026-10-22/summary-final.json
+?? docs/settings-latency-2026-10-22/summary.json
+?? docs/settings-latency-2026-10-22/validation/
+?? docs/shell-audit-2026-10-18/
+?? docs/shell-visual-qa-2026-10-30/
+?? docs/surface-materialize-2026-10-25/
+?? docs/system-updates-2026-10-29/
+?? docs/wallpaper-media-2026-10-18/
+?? docs/workspace-width-2026-10-18/

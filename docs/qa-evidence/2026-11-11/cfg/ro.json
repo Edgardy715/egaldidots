@@ -1,0 +1,63 @@
+{
+  "appearance": {
+    "glassAlpha": 0.34,
+    "pillBlur": false,
+    "topGap": 1,
+    "appGap": 1,
+    "uiScale": 1,
+    "fontScale": 1.1,
+    "spacingScale": 1,
+    "radiusScale": 1,
+    "motionScale": 0.7,
+    "fontFamily": "Google Sans Flex",
+    "fontMonoFamily": "JetBrainsMono Nerd Font",
+    "fontDisplayFamily": "Rubik",
+    "fontMediaFamily": "Inter",
+    "reduceMotion": false,
+    "time12h": true,
+    "clockSeconds": false,
+    "showGlyphs": true,
+    "workspaceStyle": "pacman",
+    "barLayout": "split",
+    "personality": true,
+    "waterBody": true,
+    "bodyBreath": false
+  },
+  "version": 1,
+  "modules": {
+    "workspaceRail": true,
+    "systemStatus": true,
+    "apps": true,
+    "audio": true,
+    "network": true,
+    "battery": true,
+    "userAvatar": true,
+    "animateChanges": true
+  },
+  "paths": {
+    "userAvatar": "/home/zdito/Descargas/killuapfp.jpg"
+  },
+  "profile": {
+    "displayName": "EGALDITO"
+  },
+  "pets": {
+    "enabled": false,
+    "size": 26.45,
+    "profile": "balanced",
+    "character": "ghost",
+    "scale": "normal",
+    "barSurface": true,
+    "palette": "marea",
+    "pack": "pip"
+  },
+  "companion": {
+    "mischief": "rare"
+  },
+  "regional": {
+    "language": "es",
+    "timeZone": "America/Santo_Domingo"
+  },
+  "files": {
+    "view": "grid"
+  }
+}

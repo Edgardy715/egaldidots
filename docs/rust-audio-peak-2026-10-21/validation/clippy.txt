@@ -1,0 +1,2 @@
+    Checking isla-audio-peak v0.1.0 (/home/zdito/.config/quickshell/rust/audio-peak)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.07s

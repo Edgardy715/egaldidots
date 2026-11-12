@@ -1,0 +1,8 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/companion-continuity-regression.qml"
+  INFO: Shell ID: "c646676bb9d9dd2e776fa25ad5f9ee43" Path ID "c646676bb9d9dd2e776fa25ad5f9ee43"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/oqz1jr8gnt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: companion refresh independence, 80ms stall, velocity at target, capture reopen, geometric neck pinch and live reduced motion

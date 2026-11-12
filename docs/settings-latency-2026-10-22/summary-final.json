@@ -1,0 +1,149 @@
+{
+  "metric": "FrameAnimation driver maximum interval per transition, not screen FPS",
+  "pages": {
+    "0": {
+      "before": {
+        "median": 62.5,
+        "max": 70,
+        "samples": [
+          60,
+          63,
+          70,
+          62
+        ]
+      },
+      "after": {
+        "median": 21.0,
+        "max": 23,
+        "samples": [
+          21,
+          15,
+          21,
+          23
+        ]
+      }
+    },
+    "1": {
+      "before": {
+        "median": 11.0,
+        "max": 12,
+        "samples": [
+          11,
+          11,
+          11,
+          12
+        ]
+      },
+      "after": {
+        "median": 13.5,
+        "max": 16,
+        "samples": [
+          11,
+          16,
+          11,
+          16
+        ]
+      }
+    },
+    "2": {
+      "before": {
+        "median": 27.5,
+        "max": 32,
+        "samples": [
+          22,
+          32,
+          23,
+          32
+        ]
+      },
+      "after": {
+        "median": 11.5,
+        "max": 15,
+        "samples": [
+          11,
+          11,
+          15,
+          12
+        ]
+      }
+    },
+    "3": {
+      "before": {
+        "median": 32.5,
+        "max": 35,
+        "samples": [
+          22,
+          33,
+          35,
+          32
+        ]
+      },
+      "after": {
+        "median": 16.0,
+        "max": 20,
+        "samples": [
+          12,
+          20,
+          16,
+          16
+        ]
+      }
+    },
+    "4": {
+      "before": {
+        "median": 12.0,
+        "max": 13,
+        "samples": [
+          11,
+          13,
+          12,
+          12
+        ]
+      },
+      "after": {
+        "median": 11.0,
+        "max": 12,
+        "samples": [
+          11,
+          11,
+          11,
+          12
+        ]
+      }
+    },
+    "5": {
+      "before": {
+        "median": 24.0,
+        "max": 30,
+        "samples": [
+          27,
+          21,
+          30,
+          21
+        ]
+      },
+      "after": {
+        "median": 14.5,
+        "max": 18,
+        "samples": [
+          14,
+          14,
+          15,
+          18
+        ]
+      }
+    }
+  },
+  "config_calls": {
+    "before": {
+      "snapshots": 0,
+      "validations": 0
+    },
+    "after": {
+      "snapshots": 0,
+      "validations": 0
+    }
+  },
+  "before_qt_core_median_ms": 0.53,
+  "after_qt_core_median_ms": 0.515
+}

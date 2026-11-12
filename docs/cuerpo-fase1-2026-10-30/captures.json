@@ -1,0 +1,182 @@
+[
+  {
+    "scene": "reposo",
+    "time": 1793393724.9567513,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 2660,
+      "pill": [
+        960,
+        90,
+        110.409423828125,
+        19.19352912902832
+      ]
+    }
+  },
+  {
+    "scene": "curiosa-derecha",
+    "time": 1793393728.3661568,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 3477,
+      "pill": [
+        965.8706665039062,
+        90,
+        108.8436279296875,
+        19.95624351501465
+      ]
+    }
+  },
+  {
+    "scene": "timida",
+    "time": 1793393731.7682908,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "timida",
+      "frames": true,
+      "timer": false,
+      "count": 4289,
+      "pill": [
+        947.4847412109375,
+        90,
+        89.78424072265625,
+        16.05607795715332
+      ]
+    }
+  },
+  {
+    "scene": "dormida",
+    "time": 1793393735.116631,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "dormida",
+      "frames": true,
+      "timer": false,
+      "count": 5097,
+      "pill": [
+        960,
+        93,
+        101.2383804321289,
+        13.26807689666748
+      ]
+    }
+  },
+  {
+    "scene": "contenta",
+    "time": 1793393738.5336666,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "contenta",
+      "frames": true,
+      "timer": false,
+      "count": 5915,
+      "pill": [
+        960,
+        90,
+        111.25799560546875,
+        19.534528732299805
+      ]
+    }
+  },
+  {
+    "scene": "hora-06",
+    "time": 1793393741.9429808,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "curiosa",
+      "frames": false,
+      "timer": true,
+      "count": 6466,
+      "pill": [
+        960,
+        90,
+        109.78125,
+        18.917808532714844
+      ]
+    }
+  },
+  {
+    "scene": "hora-12",
+    "time": 1793393745.3521082,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "curiosa",
+      "frames": false,
+      "timer": true,
+      "count": 7004,
+      "pill": [
+        960,
+        90,
+        108.98886108398438,
+        18.541791915893555
+      ]
+    }
+  },
+  {
+    "scene": "hora-18",
+    "time": 1793393748.7595026,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "curiosa",
+      "frames": false,
+      "timer": true,
+      "count": 7545,
+      "pill": [
+        960,
+        90,
+        109.59842681884766,
+        18.81057357788086
+      ]
+    }
+  },
+  {
+    "scene": "hora-02",
+    "time": 1793393752.1750782,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "curiosa",
+      "frames": false,
+      "timer": true,
+      "count": 8111,
+      "pill": [
+        960,
+        90,
+        111.01203918457031,
+        19.445629119873047
+      ]
+    }
+  },
+  {
+    "scene": "musica",
+    "time": 1793393755.6247945,
+    "status": {
+      "shader": 0,
+      "log": "",
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 8924,
+      "pill": [
+        960,
+        90,
+        150.79061889648438,
+        23.31905174255371
+      ]
+    }
+  }
+]

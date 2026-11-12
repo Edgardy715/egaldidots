@@ -1,0 +1,17 @@
+{
+  "files": {
+    "bar/services/audio_meter.py": "d9368496f364c8934bed4d9d1c66724f5928d74dc7b807b4ff2fe3eb8f76cc15",
+    "rust/audio-peak/src/lib.rs": "0e9a4679d2757686d910ed6c66a0ffb2208ab8d555c40dcb5a2e03f072f93828",
+    "rust/audio-peak/Cargo.toml": "92557e1b640b6efb152eec22f267ea3a2399201e93cd9b9979c97417b792909f",
+    "rust/audio-peak/Cargo.lock": "a7c3388d64834648736ad7572d08ef84bc7ce62af3707d2e02bda0284bd04b42",
+    "scripts/build-cava-helper.sh": "c8b2ee3b88db82d81a4b18fec07ee0326840178d80b4fedc8a0e1c2b36d3caa3",
+    "install.sh": "c308104b2b752e83658de27a49ab51a4d18084f43e35ddaee0437a6f1bece54c",
+    "bar/services/audio_bridge.py": "66769c59592e8d9618c3052effd511d4562d6e1c2948245ead9775052114051d",
+    "baseline/bar/services/audio_meter.py": "1c7c64d2fc2af8fcd686f395ff4c0e000b126e862046c6caa9e21641ccb7b6df",
+    "baseline/bar/services/audio_bridge.py": "66769c59592e8d9618c3052effd511d4562d6e1c2948245ead9775052114051d"
+  },
+  "python": "3.14.8 (main, Oct 13 2026, 10:33:10) [GCC 16.2.1 20260810]",
+  "platform": "Linux-7.2.9-2-cachyos-x86_64-with-glibc2.44",
+  "machine": "x86_64",
+  "cpu": "model name\t: Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz"
+}

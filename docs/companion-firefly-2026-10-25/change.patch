@@ -1,0 +1,241 @@
+--- before/bar/components/IslandCompanion.qml
++++ after/bar/components/IslandCompanion.qml
+@@ -63,8 +63,16 @@
+     // Late at night the upper lid hangs flat over the eye; attention lifts it.
+     property real droop: !sleepy || asleep || smiling || mood !== "rest" ? 0 : engaged ? 0.22 : 0.48
+     property real smile: smiling && !asleep ? 1 - touch * 0.65 : 0
+-    property real gazeX: reduced || asleep ? 0 : Math.max(-1, Math.min(1, followsPointer && (pointerOver || lingering) ? localLook : lookX)) * 3 * s
+-    property real gazeY: reduced || asleep ? 0
++    property bool fireflyOwnsGaze: false
++    property real fireflyProgress: 0
++    property real fireflyStartX: 0
++    property real fireflyStartY: 0
++    readonly property bool chasing: gesture === "firefly"
++    readonly property real fireflyPresence: chasing ? Math.min(1, fireflyProgress * 8, (1 - fireflyProgress) * 8) : 0
++    readonly property real fireflyX: (3 + 24 * fireflyProgress) * s
++    readonly property real fireflyY: (5 - 2 * Math.sin(fireflyProgress * Math.PI * 2)) * s
++    property real gazeX: reduced || asleep ? 0 : chasing ? (fireflyStartX * (1 - fireflyPresence) + (fireflyX / s - 15) * 0.23 * fireflyPresence) * s : Math.max(-1, Math.min(1, followsPointer && (pointerOver || lingering) ? localLook : lookX)) * 3 * s
++    property real gazeY: reduced || asleep ? 0 : chasing ? (fireflyStartY * (1 - fireflyPresence) + (fireflyY / s - 13) * 0.2 * fireflyPresence) * s
+         : mood === "working" ? 1.2 * s : Math.max(-1, Math.min(1, lookY)) * 1.8 * s
+     // Transient body language, always returning to zero.
+     property real hop: 0
+@@ -75,21 +83,24 @@
+     Accessible.ignored: true
+ 
+     function stopMoment() {
++        fireflyOwnsGaze = false
+         touchRelease.stop()
+         touchBehavior.enabled = false
+         touchTarget = 0
+         touch = Qt.binding(() => root.touchTarget)
+         touchBehavior.enabled = Qt.binding(() => root.interactive)
+         blink.stop(); lid = 1
+-        celebration.stop(); swayMotion.stop(); patMotion.stop(); wakeMotion.stop(); specialMotion.stop(); dozeMotion.stop(); heldSneeze.stop()
++        celebration.stop(); swayMotion.stop(); patMotion.stop(); wakeMotion.stop(); specialMotion.stop(); dozeMotion.stop(); heldSneeze.stop(); fireflyMotion.stop()
+         winkLid = 1; lowerLid = 0; roll = 0; breath = 1; hop = 0; tilt = 0; squash = 1
+         gesture = ""
++        fireflyProgress = 0
+     }
+     function interact(choice) {
+         if (suspended || !visible || asleep) return
+         const now = Date.now()
+         clickCount = now - lastClick < 1100 ? clickCount + 1 : 1
+         lastClick = now
++        if (clickCount === 5) { play("firefly"); return }
+         if (clickCount === 4) { play("holdSneeze"); return }
+         if (clickCount >= 3) { play("squint"); return }
+         approach.stop()
+@@ -97,10 +108,15 @@
+     }
+     function play(kind) {
+         if (reduced || suspended || !visible || (asleep && kind !== "yawn")) return
++        const startX = gazeX / s, startY = gazeY / s
+         stopMoment()
++        fireflyStartX = startX; fireflyStartY = startY
++        fireflyOwnsGaze = kind === "firefly"
+         gesture = kind
+         if (kind === "squint") { cheerful = true; cheerHold.restart() }
+-        if (kind === "holdSneeze") { cheerHold.stop(); cheerful = false; heldSneeze.restart() }
++        if (kind === "holdSneeze" || kind === "firefly") { cheerHold.stop(); cheerful = false }
++        if (kind === "firefly") fireflyMotion.restart()
++        else if (kind === "holdSneeze") heldSneeze.restart()
+         else if (kind === "doze") dozeMotion.restart()
+         else specialMotion.restart()
+     }
+@@ -109,7 +125,7 @@
+         approach.stop(); linger.stop()
+         if (!interactive) return
+         if (inside) {
+-            if (gesture === "holdSneeze") stopMoment()
++            if (gesture === "holdSneeze" || chasing) stopMoment()
+             lingering = false
+             if (Date.now() < affectionUntil) { cheerful = true; cheerHold.restart() }
+             greet(); approach.restart()
+@@ -202,8 +218,8 @@
+     Behavior on open { enabled: !root.reduced && !root.suspended && root.visible; SpringAnimation { id: openMotion; spring: 5; damping: 0.42; epsilon: 0.005 } }
+     Behavior on smile { enabled: !root.reduced && !root.suspended && root.visible; SpringAnimation { id: smileMotion; spring: 5; damping: 0.5; epsilon: 0.005 } }
+     Behavior on droop { enabled: !root.reduced && !root.suspended && root.visible; NumberAnimation { id: droopMotion; duration: 520; easing.type: Easing.InOutSine } }
+-    Behavior on gazeX { enabled: !root.reduced && !root.suspended && root.visible; SpringAnimation { id: gazeXMotion; spring: 4; damping: 0.4; epsilon: 0.01 } }
+-    Behavior on gazeY { enabled: !root.reduced && !root.suspended && root.visible; SpringAnimation { id: gazeYMotion; spring: 4; damping: 0.4; epsilon: 0.01 } }
++    Behavior on gazeX { enabled: !root.fireflyOwnsGaze && !root.reduced && !root.suspended && root.visible; SpringAnimation { id: gazeXMotion; spring: 4; damping: 0.4; epsilon: 0.01 } }
++    Behavior on gazeY { enabled: !root.fireflyOwnsGaze && !root.reduced && !root.suspended && root.visible; SpringAnimation { id: gazeYMotion; spring: 4; damping: 0.4; epsilon: 0.01 } }
+     Behavior on touchDirection { enabled: root.interactive; SmoothedAnimation { id: directionMotion; duration: 180; velocity: -1 } }
+     Behavior on touch { id: touchBehavior; enabled: root.interactive; SmoothedAnimation { id: touchMotion; duration: 220; velocity: -1 } }
+     Timer { id: touchRelease; interval: 260; onTriggered: root.touchTarget = 0 }
+@@ -253,6 +269,11 @@
+         NumberAnimation { target: root; property: "winkLid"; to: 1; duration: 240; easing.type: Easing.OutCubic }
+         ScriptAction { script: root.gesture = "" }
+     }
++    SequentialAnimation {
++        id: fireflyMotion
++        NumberAnimation { target: root; property: "fireflyProgress"; from: 0; to: 1; duration: 2600; easing.type: Easing.InOutSine }
++        ScriptAction { script: { root.fireflyOwnsGaze = false; root.gesture = ""; root.fireflyProgress = 0 } }
++    }
+     // One exclusive finite moment: anticipation, expression, then release.
+     SequentialAnimation {
+         id: specialMotion
+@@ -313,6 +334,19 @@
+         ScriptAction { script: { cooldown.stop(); root.greet() } }
+     }
+ 
++    Rectangle {
++        objectName: "companionFirefly"
++        visible: root.chasing && opacity > 0.001
++        x: root.fireflyX - width / 2; y: root.fireflyY - height / 2
++        width: 6 * root.s; height: width; radius: width / 2
++        color: Qt.alpha(Theme.accentStrong, 0.18)
++        opacity: root.fireflyPresence
++        Rectangle {
++            anchors.centerIn: parent
++            width: 2 * root.s; height: width; radius: width / 2
++            color: Theme.accentStrong
++        }
++    }
+     Item {
+         id: face
+         anchors.fill: parent
+--- before/bar/components/CompanionBehavior.qml
++++ after/bar/components/CompanionBehavior.qml
+@@ -42,7 +42,7 @@
+         if (!running || blocked || options.mischief === "never" || now - lastMischief < traits.mischiefInterval) return false
+         if (chance >= (options.mischief === "normal" ? 0.28 : 0.08)) return false
+         lastMischief = now
+-        gestureRequested(chance < 0.025 ? "holdSneeze" : chance < 0.05 ? "roll" : "wink")
++        gestureRequested(chance < 0.0125 ? "firefly" : chance < 0.025 ? "holdSneeze" : chance < 0.05 ? "roll" : "wink")
+         return true
+     }
+     function tryYawn(now, chance) {
+--- before/bar/personality-regression.qml
++++ after/bar/personality-regression.qml
+@@ -48,7 +48,7 @@
+             // Every moment is finite and returns the body to rest.
+             function companionMoments() {
+                 const newStill = () => face.gesture === "" && face.winkLid === 1 && face.lowerLid === 0 && face.roll === 0 && face.breath === 1
+-                for (const kind of ["wink", "curious", "roll", "sneeze", "yawn", "squint", "doze", "holdSneeze"]) {
++                for (const kind of ["wink", "curious", "roll", "sneeze", "yawn", "squint", "doze", "holdSneeze", "firefly"]) {
+                     face.play(kind)
+                     check(face.gesture === kind, kind + " starts")
+                     eventually(newStill, 3000, kind + " returns to rest")
+@@ -137,6 +137,7 @@
+                 face.interact(); check(face.gesture === "roll", "second click plays")
+                 face.interact(); check(face.gesture === "squint", "third click asks for a pause")
+                 face.interact(); check(face.gesture === "holdSneeze", "fourth click discovers a small story")
++                face.interact(); check(face.gesture === "firefly", "fifth click discovers the firefly")
+                 check(!face.cheerful, "story clears the third click's cheerful expression")
+                 face.lastClick = Date.now() - 1200
+                 face.interact(); check(face.gesture === "curious", "click sequence resets after a pause")
+--- before/bar/companion-delight-regression.qml
++++ after/bar/companion-delight-regression.qml
+@@ -47,6 +47,7 @@
+                     && face.breath === 1 && face.squash === 1 && face.tilt === 0
+                     && face.touch === 0 && face.materialX === 0 && face.materialY === 0
+                     && face.materialScaleX === 1 && face.materialScaleY === 1
++                    && !face.fireflyOwnsGaze && face.fireflyProgress === 0 && !findChild(face, "companionFirefly").visible
+             }
+             function test_touchAndStory() {
+                 try {
+@@ -105,16 +106,63 @@
+                         check(still(face) || (stop === "asleep" && face.gesture === "yawn"), stop + " cancels story")
+                         face.reduced = false; actual.visible = true; policy.active = true; policy.blocked = false; face.asleep = false; face.settle()
+                     }
++                    for (const f of faces) { f.settle(); f.play("firefly") }
++                    wait(800)
++                    for (const f of faces) {
++                        const light = findChild(f, "companionFirefly")
++                        check(light.visible && light.opacity > 0.5, "firefly appears at scale " + f.s)
++                        check(f.gazeX < -0.5 * f.s && f.gazeY < 0, "eyes notice the light on the left: s=" + f.s + " gaze=" + f.gazeX + "," + f.gazeY + " progress=" + f.fireflyProgress)
++                        check(light.x >= 0 && light.x + light.width <= f.width && light.y >= 0, "firefly fits the face")
++                    }
++                    shot("firefly-left", "Una visita diminuta · descubre la luciérnaga")
++                    wait(900)
++                    for (const f of faces) check(f.gazeX > 0.5 * f.s, "eyes follow the light across the face")
++                    shot("firefly-right", "La sigue con la mirada · después vuelve al reposo")
++                    wait(1600)
++                    check(faces.every(still), "firefly departs without another event")
++                    for (const delay of [120, 1100, 2300]) {
++                        face.play("firefly"); wait(delay); face.stroke(120, 1, 0.7)
++                        check(face.gesture === "" && face.fireflyProgress === 0, "touch cancels every firefly phase")
++                        wait(650); check(still(face), "interrupted firefly cannot return")
++                    }
++                    face.play("firefly"); wait(120); face.approachPointer(true)
++                    check(!face.chasing && face.fireflyProgress === 0, "approaching cancels the firefly")
++                    face.settle()
++                    for (const stop of ["reduced", "hidden", "suspended", "blocked", "asleep"]) {
++                        face.play("firefly"); wait(120)
++                        if (stop === "reduced") face.reduced = true
++                        else if (stop === "hidden") actual.visible = false
++                        else if (stop === "suspended") policy.active = false
++                        else if (stop === "blocked") policy.blocked = true
++                        else face.asleep = true
++                        check(!face.chasing && face.fireflyProgress === 0, stop + " cancels the firefly")
++                        face.reduced = false; actual.visible = true; policy.active = true; policy.blocked = false; face.asleep = false; face.settle()
++                    }
++                    face.lookX = 1; face.lookY = 1
++                    wait(2200)
++                    const initialX = face.gazeX, initialY = face.gazeY
++                    check(initialX > 2 * face.s, "nonzero gaze before continuity check")
++                    face.play("firefly")
++                    check(Math.abs(face.gazeX - initialX) < 0.01 && Math.abs(face.gazeY - initialY) < 0.01, "firefly starts at the current gaze")
++                    wait(1100)
++                    const interruptedX = face.gazeX, interruptedY = face.gazeY
++                    face.stopMoment()
++                    check(Math.abs(face.gazeX - interruptedX) < 0.01 && Math.abs(face.gazeY - interruptedY) < 0.01, "interruption preserves gaze for spring return: before=" + interruptedX + "," + interruptedY + " after=" + face.gazeX + "," + face.gazeY)
++                    face.lookX = 0; face.lookY = 0; face.settle()
++                    policy.lastMischief = 0
++                    check(policy.tryMischief(700000, 0.01) && face.chasing, "existing rare opportunity launches firefly")
++                    check(!policy.tryMischief(800000, 0.01), "firefly keeps ten minute cadence")
++                    for (const f of faces) f.settle()
+                     policy.options = Object.assign({}, policy.options, {followPointer: false})
+                     face.stroke(120, 1, 1); wait(120)
+                     check(face.touch > 0 && face.materialX === 0, "followPointer opt-out keeps touch without lateral tracking")
+                     face.reduced = true
+                     check(still(face), "reduced resets material immediately")
+-                    face.stroke(120, 1, 1); face.play("holdSneeze"); wait(300)
++                    face.stroke(120, 1, 1); face.play("holdSneeze"); face.play("firefly"); wait(300)
+                     check(still(face), "reduced refuses new motion")
+                     for (const f of faces) f.settle()
+                     shot("settled", "Reposo · sin movimiento pendiente")
+-                    console.log("PASS: companion material, story phases, interruptions, scales, opt-out, reduced and hidden")
++                    console.log("PASS: companion material, story phases, firefly gaze and cadence, interruptions, scales, opt-out, reduced and hidden")
+                     exitTimer.start()
+                 } catch (error) { console.error("FAIL: companion delight " + error); Qt.exit(1) }
+             }
+--- before/bar/companion-preview.qml
++++ after/bar/companion-preview.qml
+@@ -9,7 +9,7 @@
+     settings.watchFiles: false
+     Window {
+         id: win
+-        width: 980; height: 780
++        width: 980; height: 900
+         visible: true
+         title: "Isla · compañero · PROTOTIPO"
+         color: Theme.surface
+@@ -104,6 +104,7 @@
+             Card { caption: "curiosidad · clic"; pose: "curious" }
+             Card { caption: "mirada traviesa · clic"; pose: "roll" }
+             Card { caption: "contener estornudo · cuarto clic"; pose: "holdSneeze" }
++            Card { caption: "luciérnaga · quinto clic"; pose: "firefly" }
+             Card { caption: "bostezo · noche / ausencia"; pose: "doze" }
+             Card { caption: "contento · clics repetidos"; pose: "squint" }
+             Card { id: wake; caption: "estirarse · volver"; asleep: true; Timer { interval: 800; running: true; onTriggered: wake.asleep = false } }

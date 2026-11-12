@@ -1,0 +1,8 @@
+{
+  "bar/services/clipboard_library.py": "3ea38dc22b1f402c8980badca0adfd5f37cbb56174bd08a38ac9f314f36ff464",
+  "bar/components/ClipboardController.qml": "e43ac1a74fb8242deff48f095568c55ea796ac7fd2f2fa9f0543fd2334f31d1e",
+  "install.sh": "b728d424f014769c40314f904f7648d956ba29a00f5950325957f80f9a1bf020",
+  "README.md": "aaa51b8fe382b085cacc515826513643185bd34494d09b1868db6718977bb47d",
+  "docs/SHELL_ARCHITECTURE.md": "9bd5e3bcee2d61c9c455ccaac7c42faf08182c169926309a94840a09a659dc97",
+  "bar/TESTING.md": "719a2bfe39eb71a93d69e09898e8950bea3b89b8b286b4059673fc586b7c274b"
+}

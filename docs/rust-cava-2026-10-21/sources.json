@@ -1,0 +1,35 @@
+{
+  "files": {
+    "bar/Singletons/Cava.qml": "e11e8705e59d633420a789e4089807f9925019c020a4431307e774d6f9ac53cf",
+    "bar/services/cava-stream.sh": "f34870019fe69b9e188c17e428727b606a8134ed65d65343ef4f79d2fb451d4d",
+    "bar/services/cava_stream.py": "d686cc7eaab8591b6fdce883f919351bcb27901b86af7bc274ff69b0578d6f00",
+    "bar/services/audio_discovery.py": "8d1ca95e6c3324d6446d37a3443e1a799cd4588e72edd7fa12da6ee716d0f7fe",
+    "scripts/build-cava-helper.sh": "c8b2ee3b88db82d81a4b18fec07ee0326840178d80b4fedc8a0e1c2b36d3caa3",
+    "install.sh": "c308104b2b752e83658de27a49ab51a4d18084f43e35ddaee0437a6f1bece54c",
+    "bar/tests/cava-stream.py": "d16ea13ab9d9ccdba34f3df84ec6b7eb5daf012cfc4003ccdc76abfd1cfef3bb",
+    "bar/tests/cava-backend.py": "aa35b8570287de53fa0cf2898ca87b9a1f99f3b6c3f729f2b2369d24a09be480",
+    "bar/tests/cava-rust-lifecycle.py": "c9357123c7d77e07922a40aba6331e84c35d16f35102423ab16e2a483d865c0e",
+    "bar/tests/cava-hybrid-performance.py": "5894d07764a08702760de670ba425028324c114b8aa8d128b1b4640b66486281",
+    "rust/cava-stream/src/identity.rs": "604167ee5d4d918c780727e65c5e4515ae87fad8c48ab4c79f190833022271bf",
+    "rust/cava-stream/src/main.rs": "b4c64e64f87445db979052399aec1c47152deb93acacfe3ba2645a28206d58ed",
+    "rust/cava-stream/src/tests.rs": "be1b36590f33cc978a03775d4e6aacdf0c4d1cab16157fac01b5a5077691940d",
+    "rust/cava-stream/Cargo.toml": "a2e1f5cef3a063a290bbd92bbdc05868f76739b1f5293eebb85da24ca677b5ae",
+    "rust/cava-stream/Cargo.lock": "9b3eda6e77f6e34f264f1676f17e7732c3eed99eb67f08b2c04ed3b6e18b9f14",
+    "docs/rust-cava-2026-10-21/REPORT.md": "eaa20a9712fc5c1124e69693d96ac77e2954ba9384b6a2f8b9b8762ff51c89dd"
+  },
+  "installed_binary": {
+    "path": "/home/zdito/.local/share/isla/bin/isla-cava-stream",
+    "sha256": "fc1449e66e05622dbba50f4e5f9b0e473da3660df662af8a4397bb4f1a63bda4",
+    "size": 449776
+  },
+  "logs": {
+    "comparison": "/home/zdito/.cache/codex-economy/output-45cwrgzi.log",
+    "parity": "/home/zdito/.cache/codex-economy/output-47gq8yu3.log",
+    "lifecycle_installed": "/home/zdito/.cache/codex-economy/output-vczwror0.log",
+    "backend_qml": "/home/zdito/.cache/codex-economy/output-0ytleigo.log",
+    "envelope": "/home/zdito/.cache/codex-economy/output-r6czmj9v.log",
+    "build_installed": "/home/zdito/.cache/codex-economy/output-tpb4n0x0.log",
+    "configuration": "/home/zdito/.cache/codex-economy/output-l3r_i0rk.log"
+  },
+  "benchmark_binary_matches_installed": true
+}

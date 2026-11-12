@@ -1,0 +1,1 @@
+ DEBUG qml: PASS: companion moments, pat, reception, charging, shared surface feedback, eyes, reduced motion, visibility and opt-out

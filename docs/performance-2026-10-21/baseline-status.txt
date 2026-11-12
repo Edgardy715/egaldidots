@@ -1,0 +1,111 @@
+ M README.md
+ M bar/Pill.qml
+ M bar/PillSurface.qml
+ M bar/Singletons/Brightness.qml
+ M bar/Singletons/Config.qml
+ M bar/Singletons/DesktopStatus.qml
+ M bar/Singletons/IslandGeometry.qml
+ M bar/Singletons/Nmcli.qml
+ M bar/Singletons/Notifs.qml
+ M bar/Singletons/Settings.js
+ M bar/Singletons/qmldir
+ M bar/TESTING.md
+ M bar/cava-center-regression.qml
+ M bar/clipboard-library-regression.qml
+ M bar/compact-island-regression.qml
+ M bar/components/ArtworkImage.qml
+ M bar/components/BreatheBorder.qml
+ M bar/components/ClipboardController.qml
+ M bar/components/CompactMediaStatus.qml
+ M bar/components/ConnectivityAdapter.qml
+ M bar/components/ConnectivityView.qml
+ M bar/components/CrossfadeLabel.qml
+ M bar/components/FluidCompanion.qml
+ M bar/components/FluidMediaCompanion.qml
+ M bar/components/IslandMediaCover.qml
+ M bar/components/IslandMediaMetadata.qml
+ M bar/components/IslandMediaSummary.qml
+ M bar/components/IslandMediaVisualizer.qml
+ M bar/components/IslandRestStatus.qml
+ M bar/components/IslandStatusAdapter.qml
+ M bar/components/LauncherController.qml
+ M bar/components/LauncherView.qml
+ M bar/components/NotificationChoreography.qml
+ M bar/components/OverlayInputPolicy.qml
+ M bar/components/PillHeaderView.qml
+ M bar/components/PillMaterial.qml
+ M bar/components/PillSurfaceHost.qml
+ M bar/components/QuickControlsView.qml
+ M bar/components/ShellRuntime.qml
+ M bar/components/SurfaceRouter.qml
+ M bar/components/TopBarModules.qml
+ M bar/components/TopWorkspaceRail.qml
+ M bar/components/WallpaperView.qml
+ M bar/components/WifiCredentials.qml
+ M bar/fluid/MOTION_LANGUAGE.md
+ M bar/lockscreen/LockMedia.qml
+ M bar/lockscreen/LockSurface.qml
+ M bar/overlay-input-policy-regression.qml
+ M bar/settings/EdotsComboBox.qml
+ M bar/settings/EdotsWindow.qml
+ M bar/settings/SettingRow.qml
+ M bar/settings/SettingsPage.qml
+ M bar/shell.json.example
+ M bar/shell.qml
+ M bar/surface-router-regression.qml
+ M bar/surfaces/ClipboardSurface.qml
+ M bar/surfaces/ConnectivitySurface.qml
+ M bar/surfaces/OverviewSurface.qml
+ M bar/surfaces/SettingsSurface.qml
+ M bar/tests/clipboard-library-regression.sh
+ M bar/tests/settings-integration.py
+ M bar/tests/settings.cjs
+ M bar/tests/surface-boundaries.cjs
+ M bar/windows/IslandOverlay.qml
+?? bar/Singletons/FocusSession.qml
+?? bar/Singletons/Recording.qml
+?? bar/breathe-border-regression.qml
+?? bar/clipboard-preview-jobs-regression.qml
+?? bar/components/ActivityView.qml
+?? bar/components/FluidRecordingCompanion.qml
+?? bar/components/FocusTimerView.qml
+?? bar/components/IslandActivityChip.qml
+?? bar/components/IslandCompanion.qml
+?? bar/components/ReceptionPulse.qml
+?? bar/components/RecordingGlyph.qml
+?? bar/components/RecordingView.qml
+?? bar/connectivity-design-regression.qml
+?? bar/connectivity-host-regression.qml
+?? bar/focus-session-regression.qml
+?? bar/launcher-pending-regression.qml
+?? bar/media-dock-surfaces-regression.qml
+?? bar/notification-attention-regression.qml
+?? bar/notification-priority-regression.qml
+?? bar/personality-regression.qml
+?? bar/recording-drop-regression.qml
+?? bar/recording-integration-regression.qml
+?? bar/recording-view-regression.qml
+?? bar/rest-media-transition-regression.qml
+?? bar/services/gpu_recording.py
+?? bar/settings-navigation-regression.qml
+?? bar/surfaces/FocusSurface.qml
+?? bar/surfaces/RecordingSurface.qml
+?? bar/tests/brightness-service.py
+?? bar/tests/gpu-recording.py
+?? bar/tests/nmcli-service.py
+?? bar/tests/wallpaper-source.py
+?? bar/wallpaper-media-header-regression.qml
+?? bar/wallpaper-source-regression.qml
+?? bar/workspace-width-regression.qml
+?? docs/PROJECT_MEMORY_ARCHIVE-2026-10-18.md
+?? docs/compact-audit-2026-10-18/
+?? docs/connectivity-2026-10-18/
+?? docs/lockscreen-type-2026-10-18/
+?? docs/nusa-coucou-2026-10-21/
+?? docs/personality-2026-10-21/
+?? docs/recording-2026-10-21/
+?? docs/rest-track-transition-2026-10-18/
+?? docs/settings-fluency-2026-10-18/
+?? docs/shell-audit-2026-10-18/
+?? docs/wallpaper-media-2026-10-18/
+?? docs/workspace-width-2026-10-18/

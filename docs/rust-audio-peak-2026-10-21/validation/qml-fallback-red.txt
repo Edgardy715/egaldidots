@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/zdito/.config/quickshell/bar/tests/audio-peak-qml.py", line 64, in <module>
+    assert not [pid for pid in observed if tree(pid)], "children survived controller close"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: children survived controller close

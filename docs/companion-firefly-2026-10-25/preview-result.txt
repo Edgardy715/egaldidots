@@ -1,0 +1,7 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/companion-preview.qml"
+  INFO: Shell ID: "a64b89e0f7cce3654a89ba9500bb864b" Path ID "a64b89e0f7cce3654a89ba9500bb864b"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/zza2m89gnt/log.qslog"
+  WARN: --- WARNING ---
+  WARN: WAYLAND_DISPLAY is present but QT_QPA_PLATFORM is "offscreen"
+  WARN: If you are actually running wayland, set QT_QPA_PLATFORM to "wayland" or most functionality will be broken.
+  INFO: Configuration Loaded

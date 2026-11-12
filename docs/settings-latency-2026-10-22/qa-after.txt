@@ -1,0 +1,11 @@
+  INFO: Launching config: "/tmp/isla-settings-qa-ialzot9e/after/bar/settings-ux-regression.qml"
+  INFO: Shell ID: "cb77ab5a73dc73630f72391a1b9e9bad" Path ID "cb77ab5a73dc73630f72391a1b9e9bad"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/c1i11lbnt/log.qslog"
+  INFO: Configuration Loaded
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7face7bb6ca0 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7face7bb6ca0 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7face7bb6ca0 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7face7bb6ca0 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7face7bb6ca0 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7face7bb6ca0 but 0x0 is focused
+ DEBUG qml: PASS: settings UX navigation, responsive layouts, font scaling, save state, hidden validation focus, empty search and dark/light contrast

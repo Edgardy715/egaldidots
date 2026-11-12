@@ -1,0 +1,190 @@
+# gpu         pid   type     sm    mem    enc    dec    jpg    ofa    command 
+# Idx           #    C/G      %      %      %      %      %      %    name 
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G     31     11      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G      -      -      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      -      -      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     26      5      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      -      -      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     24      4      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G     19     10      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     11      2      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G     19     10      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     11      2      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+# gpu         pid   type     sm    mem    enc    dec    jpg    ofa    command 
+# Idx           #    C/G      %      %      %      %      %      %    name 
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      -      -      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     27      6      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G     25      5      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G      -      -      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      -      -      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     14      2      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G     17      3      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      -      -      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     17      4      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G     17      3      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      -      -      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     31      7      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+# gpu         pid   type     sm    mem    enc    dec    jpg    ofa    command 
+# Idx           #    C/G      %      %      %      %      %      %    name 
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G     11      2      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     14      3      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G     11      2      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     19     11      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      -      -      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     38     15      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      9      2      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     19      4      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      9      2      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     11      2      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+# gpu         pid   type     sm    mem    enc    dec    jpg    ofa    command 
+# Idx           #    C/G      %      %      %      %      %      %    name 
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      -      -      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     27      4      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G      -      -      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     15      2      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G     19     10      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G     10      2      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G      -      -      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G     19     10      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G     27      8      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G      -      -      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     
+    0       1225     G      -      -      -      -      -      -    Xorg           
+    0       1877     G     16      6      -      -      -      -    Hyprland       
+    0       2013     G      -      -      -      -      -      -    Xwayland       
+    0      62581     G     11      2      -      -      -      -                   
+    0     433884     G      -      -      -      -      -      -    zen-bin        
+# gpu         pid   type     sm    mem    enc    dec    jpg    ofa    command 
+# Idx           #    C/G      %      %      %      %      %      %    name 
+    0     487750     G      -      -      -      -      -      -    Codex --change-
+    0     583618     G      -      -      -      -      -      -    qs             
+    0     665734     G      -      -      -      -      -      -    renderD129 --cr
+    0     705831     G      -      -      -      -      -      -    quickshell     

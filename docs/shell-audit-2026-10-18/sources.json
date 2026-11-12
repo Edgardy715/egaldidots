@@ -1,0 +1,22 @@
+{
+  "bar/Singletons/Nmcli.qml": "ab9afacc08e8cf4ac9d21f053883a8999fe81c02153367eb4e81ad08b0fbb21a",
+  "bar/Singletons/Brightness.qml": "c8b196dd2876c9664b630c564a7d18d50e1a87c6daafec86527aaa872fbb2879",
+  "bar/components/BreatheBorder.qml": "2bbedfee4411f8a3406cfb629e9d711ff119d505528d4955934f765bd2b5967c",
+  "bar/components/ClipboardController.qml": "e43ac1a74fb8242deff48f095568c55ea796ac7fd2f2fa9f0543fd2334f31d1e",
+  "bar/components/LauncherController.qml": "79db01559ff53b1a22352573dd0d2f3279f5e1e901454c802b9875099c5a00ec",
+  "bar/components/LauncherView.qml": "fc5bc94243d3fdd9970bddf374af13177e0639e60ae42e518411d7495918a8d3",
+  "bar/components/ShellRuntime.qml": "9b44dd922d21a297b28c6fa10adc6119db3b162f4ec4f7ac72867787c81f3929",
+  "bar/components/SurfaceRouter.qml": "d5ba26242c03ff63c0a4786ebe3ad833452e3d33d9368ac33aa9376779b8b3aa",
+  "bar/surfaces/OverviewSurface.qml": "e675ba7a48f4a58a27896aa40ba38c5628f8d40c53a9d9d65b31015271162220",
+  "bar/lockscreen/LockSurface.qml": "d05ba61709a9f3c58d4851e1b6315604da29be25162341d3fe16aa682db2694d",
+  "bar/tests/nmcli-service.py": "be9fd18a3703c577d18e627ca9fc0473bdcc076e94e192bb155d14f61756b0cf",
+  "bar/tests/brightness-service.py": "1527deb2c5c8521fee453f1cf3c9d498581a996cc076357bdb5db25d01146b4a",
+  "bar/tests/wallpaper-source.py": "06bcf103500f3d2cd4ebb2f81b6892264f8f23760e568c1ce0e0092a16b10d52",
+  "bar/breathe-border-regression.qml": "d4a968068aefbdf69728230a99ca93538674519ae686f43ad210457230b464f7",
+  "bar/clipboard-preview-jobs-regression.qml": "c866acfd24e148a524c0ebef71e8a389752238a5c4685cac3654be82542bfb7c",
+  "bar/launcher-pending-regression.qml": "29700a229e68893cc9458c3287d0404ac7248035d950a3e50374a5c021cdffab",
+  "bar/wallpaper-source-regression.qml": "d92955eab0386d64fa7ee09a8703271364fb596c3982063e76448ab77af00305",
+  "bar/clipboard-library-regression.qml": "4213905be37e83b338f703d2bbd7ab62c22d7344a585c29bc7546cda50e9bc0c",
+  "bar/surface-router-regression.qml": "ef8b32cc394d84e62a009e2f44e51487c4c39f239d2728ccad19de8ecdb197f1",
+  "bar/tests/clipboard-library-regression.sh": "85bc3abeaf06ed45755063415b03e837161af5d8fa8ef0d498da095b771119ff"
+}

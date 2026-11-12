@@ -1,0 +1,8 @@
+{
+  "installed_library": "/home/zdito/.local/share/isla/lib/libisla_audio_peak.so",
+  "sha256": "c02d51815203d06ce7a1325446354afa33407178e8d7324fe053fe92f8fde5a1",
+  "bytes": 269400,
+  "bridges_at_check": [],
+  "qml_test_orphans": [],
+  "whole_shell_restarted": false
+}

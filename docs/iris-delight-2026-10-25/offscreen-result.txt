@@ -1,0 +1,2 @@
+[34m DEBUG[97m qml[0m: PASS: Iris delight (visitors, clock choice, gaze, interruptions, sightings, dust, eye tint and pupil)
+exit=0

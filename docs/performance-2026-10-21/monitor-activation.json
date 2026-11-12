@@ -1,0 +1,12 @@
+{
+  "shell_pid": 12806,
+  "previous_monitor": 12836,
+  "monitor": 20567,
+  "argv": [
+    "nmcli",
+    "monitor"
+  ],
+  "helper_loaded_on_qml_reload": true,
+  "one_per_shell": true,
+  "old_monitor_removed": true
+}

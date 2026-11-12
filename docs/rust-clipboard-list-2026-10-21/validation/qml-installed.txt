@@ -1,0 +1,1 @@
+PASS: clipboard library save, collections, filters, wipe, reopen, preview and exact copy

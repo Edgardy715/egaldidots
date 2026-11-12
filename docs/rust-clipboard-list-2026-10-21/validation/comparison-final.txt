@@ -1,0 +1,4 @@
+entries 0 CLI median ms {'python': 61.17, 'rust': 0.94}
+entries 100 CLI median ms {'python': 41.24, 'rust': 1.26}
+entries 1000 CLI median ms {'python': 95.01, 'rust': 10.94}
+PASS: equal private data, alternating CLI/QML, metadata unchanged

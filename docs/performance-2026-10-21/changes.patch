@@ -1,0 +1,1956 @@
+--- a/bar/Singletons/Cava.qml
++++ b/bar/Singletons/Cava.qml
+@@ -45,11 +45,13 @@
+ 
+     function reset() {
+         root.hasFrame = false
++        root.envelopeActive = false
+         root.targets = []
+         root.values = Array(root.bars).fill(0)
+     }
+ 
+     property bool hasFrame: false
++    property bool envelopeActive: false
+ 
+     // ---- probe: ¿cava está instalado? ----
+     // Al cargar el singleton Y de forma perezosa: si algo pide el viz (wanted=true)
+@@ -87,13 +89,16 @@
+         root.targets = frame
+         root.lastFrameAt = Date.now()
+         root.hasFrame = true
++        if (frame.some(value => value > 0) || root.values.some(value => value > 0))
++            root.envelopeActive = true
+     }
+ 
+     FrameAnimation {
+-        running: root.wanted && root.hasFrame
++        running: root.wanted && root.hasFrame && root.envelopeActive
+         onTriggered: {
+             var fresh = Date.now() - root.lastFrameAt < 250
+             root.values = Spectrum.advance(root.values, fresh ? root.targets : [], frameTime)
++            if (root.values.every(value => value === 0)) root.envelopeActive = false
+         }
+     }
+ 
+--- a/bar/Singletons/Nmcli.qml
++++ b/bar/Singletons/Nmcli.qml
+@@ -557,7 +557,8 @@
+     Process {
+         id: monitorProc
+         running: true
+-        command: ["nmcli", "monitor"]
++        command: ["python3", decodeURIComponent(Qt.resolvedUrl("../services/nmcli_monitor.py").toString().replace(/^file:\/\//, "")),
++                  Quickshell.processId.toString()]
+         environment: ({ LANG: "C.UTF-8", LC_ALL: "C.UTF-8" })
+         stdout: SplitParser {
+             onRead: root.getNetworks(() => {})
+--- a/bar/Singletons/DesktopStatus.qml
++++ b/bar/Singletons/DesktopStatus.qml
+@@ -27,12 +27,12 @@
+     signal batteryOSD(int percent, string status)
+ 
+     function showVolumeOSD() {
+-        var sink = Pipewire.defaultAudioSink
++        var sink = root._pwSink
+         if (sink && sink.audio)
+             root.volumeOSD(sink.audio.muted ? 0 : sink.audio.volume, sink.audio.muted)
+     }
+     function showSourceVolumeOSD() {
+-        var source = Pipewire.defaultAudioSource
++        var source = root._pwSource
+         if (source && source.audio)
+             root.micOSD(source.audio.muted ? 0 : source.audio.volume, source.audio.muted)
+     }
+@@ -41,7 +41,7 @@
+             root.brightnessOSD(Brightness.percent / 100)
+     }
+     function adjustVolume(delta) {
+-        var sink = Pipewire.defaultAudioSink
++        var sink = root._pwSink
+         if (sink && sink.audio && sink.ready) {
+             sink.audio.volume = Math.max(0, Math.min(1, sink.audio.volume + delta))
+             root.showVolumeOSD()
+@@ -116,62 +116,24 @@
+         function onPercentageChanged() { root.showBatteryOSD() }
+     }
+ 
+-    property var _pwSink: Pipewire.defaultAudioSink
+-    property var _pwAudio: null
+-    property var _pwSource: Pipewire.defaultAudioSource
+-    property var _pwSourceAudio: null
+-    function rebindSink() {
+-        audioSinkConn.target = root._pwSink
+-        var audio = root._pwSink ? root._pwSink.audio : null
+-        audioAudioConn.target = audio
+-        root._pwAudio = audio
+-    }
+-    function rebindSource() {
+-        audioSourceConn.target = root._pwSource
+-        var audio = root._pwSource ? root._pwSource.audio : null
+-        audioSourceAudioConn.target = audio
+-        root._pwSourceAudio = audio
+-    }
+-    on_PwSinkChanged: if (root.monitorServices) rebindSink()
+-    on_PwSourceChanged: if (root.monitorServices) rebindSource()
+-    Timer {
+-        interval: 500
+-        repeat: true
+-        running: root.monitorServices
+-        onTriggered: {
+-            var sink = Pipewire.defaultAudioSink
+-            var audio = sink ? sink.audio : null
+-            if (sink !== root._pwSink || audio !== root._pwAudio) {
+-                root._pwSink = sink
+-                root.rebindSink()
+-            }
+-            var source = Pipewire.defaultAudioSource
+-            var sourceAudio = source ? source.audio : null
+-            if (source !== root._pwSource || sourceAudio !== root._pwSourceAudio) {
+-                root._pwSource = source
+-                root.rebindSource()
+-            }
+-        }
+-    }
+-    Component.onCompleted: {
+-        if (!root.monitorServices) return
+-        root.rebindSink()
+-        root.rebindSource()
+-        getKbdState.running = true
+-    }
++    property var _pwSink: Pipewire.defaultAudioSink || null
++    property var _pwAudio: root._pwSink ? root._pwSink.audio : null
++    property var _pwSource: Pipewire.defaultAudioSource || null
++    property var _pwSourceAudio: root._pwSource ? root._pwSource.audio : null
++    Component.onCompleted: if (root.monitorServices) getKbdState.running = true
+     PwObjectTracker {
+         objects: root.monitorServices ? [root._pwSink, root._pwSource].filter(node => node) : []
+     }
+     Connections {
+         id: audioSinkConn
+-        target: null
++        target: root._pwSink || null
+         enabled: root.monitorServices
+         ignoreUnknownSignals: true
+         function onPropertiesChanged() { root.showVolumeOSD() }
+     }
+     Connections {
+         id: audioAudioConn
+-        target: null
++        target: root._pwAudio || null
+         enabled: root.monitorServices
+         ignoreUnknownSignals: true
+         function onVolumesChanged() { root.showVolumeOSD() }
+@@ -179,14 +141,14 @@
+     }
+     Connections {
+         id: audioSourceConn
+-        target: null
++        target: root._pwSource || null
+         enabled: root.monitorServices
+         ignoreUnknownSignals: true
+         function onPropertiesChanged() { root.showSourceVolumeOSD() }
+     }
+     Connections {
+         id: audioSourceAudioConn
+-        target: null
++        target: root._pwSourceAudio || null
+         enabled: root.monitorServices
+         ignoreUnknownSignals: true
+         function onVolumesChanged() { root.showSourceVolumeOSD() }
+--- a/bar/surfaces/MediaSurface.qml
++++ b/bar/surfaces/MediaSurface.qml
+@@ -19,31 +19,7 @@
+     cavaAvailable: Cava.available
+     cavaHasFrame: Cava.hasFrame
+     cavaValues: Cava.values
+-    playback: ({
+-        hasPlayer: session.hasPlayer,
+-        isPlaying: session.isPlaying,
+-        albumDistinct: session.albumDistinct,
+-        title: session.title,
+-        artist: session.artist,
+-        album: session.album,
+-        canSeek: session.canSeek,
+-        canShuffle: session.canShuffle,
+-        canRepeat: session.canRepeat,
+-        canPrevious: session.canPrevious,
+-        canNext: session.canNext,
+-        canToggle: session.canToggle,
+-        dragging: session.dragging,
+-        dragFraction: session.dragFraction,
+-        progress: session.progress,
+-        displayPosition: session.displayPosition,
+-        remaining: session.remaining,
+-        repeatOne: session.repeatOne,
+-        shuffleEnabled: session.shuffleEnabled,
+-        repeatEnabled: session.repeatEnabled,
+-        length: session.player ? session.player.length : 0,
+-        displayTime: session.formatTime(session.displayPosition),
+-        remainingTime: session.formatTime(session.remaining)
+-    })
++    playback: session
+     readonly property string consumerId: "media:" + (root.screenName || "default")
+     property string registeredConsumerId: ""
+ 
+--- a/bar/components/IslandMediaVisualizer.qml
++++ b/bar/components/IslandMediaVisualizer.qml
+@@ -29,7 +29,7 @@
+     Row {
+         id: spectrumBars
+         objectName: "smallCavaGlow"
+-        readonly property real energy: root.isPlaying && root.hasFrame && !Flags.reduceMotion
++        readonly property real energy: root.visible && root.isPlaying && root.hasFrame && !Flags.reduceMotion
+             ? Spectrum.band(root.values, 0, 1) : 0
+         layer.enabled: root.visible && energy > 0.001
+         layer.effect: MultiEffect {
+@@ -51,7 +51,7 @@
+                 required property int index
+                 readonly property real minHeight: 2.5 * root.s
+                 readonly property real maxHeight: 18 * root.s
+-                readonly property real signal: root.isPlaying && root.hasFrame && !Flags.reduceMotion
++                readonly property real signal: root.visible && root.isPlaying && root.hasFrame && !Flags.reduceMotion
+                     ? Spectrum.band(root.values, index, 5) : 0
+                 width: 2.5 * root.s
+                 height: root.height
+--- a/bar/components/MediaSession.qml
++++ b/bar/components/MediaSession.qml
+@@ -40,6 +40,9 @@
+ 
+     readonly property real displayPosition: dragging && player ? dragFraction * player.length : position
+     readonly property real remaining: player ? Math.max(0, player.length - displayPosition) : 0
++    readonly property real length: player ? player.length : 0
++    readonly property string displayTime: formatTime(displayPosition)
++    readonly property string remainingTime: formatTime(remaining)
+     readonly property bool shuffleEnabled: !!player && canShuffle && player.shuffle
+     readonly property bool repeatEnabled: !!player && canRepeat && player.loopState !== loopNone
+ 
+--- a/bar/services/cava_stream.py
++++ b/bar/services/cava_stream.py
+@@ -7,7 +7,8 @@
+ import json
+ import os
+ from pathlib import Path
+-import selectors
++import re
++import select
+ import signal
+ import subprocess
+ import sys
+@@ -22,6 +23,9 @@
+ ZERO = " ".join(["0"] * BARS)
+ PR_SET_PDEATHSIG = 1
+ LIBC = ctypes.CDLL(None, use_errno=True)
++# Each pactl query emits client events itself; reacting to those loops forever.
++DISCOVERY_EVENT = re.compile(rb" on (?:sink-input|sink|server)(?:\s|$)")
++CLIENT_EVENT = re.compile(rb"'change' on client #(\d+)(?:\s|$)")
+ 
+ 
+ def die_with_parent(expected_parent):
+@@ -88,6 +92,21 @@
+     return result
+ 
+ 
++def stream_clients(state):
++    owners = {str(item.get("client") if item.get("client") is not None
++                  else (item.get("properties") or {}).get("client.id", ""))
++              for item in state.get("sink-inputs") or []}
++    return owners | {str(client.get("index")) for client in state.get("clients") or []
++                     if str((client.get("properties") or {}).get("object.id")) in owners}
++
++
++def discovery_event(line, clients):
++    if DISCOVERY_EVENT.search(line):
++        return True
++    match = CLIENT_EVENT.search(line)
++    return bool(match and match[1].decode("ascii") in clients)
++
++
+ def config(fifo):
+     return f"""[general]
+ bars = 24
+@@ -186,14 +205,16 @@
+         self.cava = None
+         self.frames.clear()
+ 
+-    def pump(self, timeout):
+-        if not self.cava or not self.parec:
+-            time.sleep(timeout)
+-            return
+-        with selectors.DefaultSelector() as selected:
+-            selected.register(self.cava.stdout, selectors.EVENT_READ)
+-            for key, _ in selected.select(timeout):
+-                data = os.read(key.fileobj.fileno(), 65536)
++    def pump(self, timeout, events=None):
++        readers = [events] if events else []
++        if self.cava and self.parec:
++            readers.append(self.cava.stdout)
++        event_data = None
++        for source in select.select(readers, [], [], timeout)[0]:
++            if source is events:
++                event_data = os.read(source.fileno(), 4096)
++            else:
++                data = os.read(source.fileno(), 65536)
+                 if not data:
+                     raise RuntimeError("audio child exited")
+                 self.frames.extend(data)
+@@ -210,6 +231,7 @@
+                             print(" ".join(map(str, bands)), flush=True)
+                 if len(self.frames) > 4096:
+                     self.frames.clear()
++        return event_data
+ 
+ 
+ def main():
+@@ -227,17 +249,41 @@
+     signal.signal(signal.SIGTERM, request_stop)
+     signal.signal(signal.SIGINT, request_stop)
+     active = None
++    selected = None
++    clients = set()
+     last_zero = 0.0
++    subscription = None
++    event_buffer = b""
++    retry_at = 0.0
++    refresh_at = 0.0
+     with tempfile.TemporaryDirectory(prefix="isla-cava-") as directory:
+         capture = Capture(directory)
+         try:
+             while not stopping:
+                 started = time.monotonic()
+-                try:
+-                    selected = select_stream(snapshot(), args.identity, args.desktop, args.bus)
+-                except (OSError, subprocess.SubprocessError, ValueError, json.JSONDecodeError) as exc:
+-                    print(f"cava_stream: discovery: {exc}", file=sys.stderr)
+-                    selected = None
++                if subscription is None and started >= retry_at:
++                    try:
++                        parent = os.getpid()
++                        subscription = subprocess.Popen(
++                            ["pactl", "subscribe"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
++                            env={**os.environ, "LC_ALL": "C"},
++                            preexec_fn=lambda: die_with_parent(parent))
++                        event_buffer = b""
++                        refresh_at = started
++                    except OSError as exc:
++                        print(f"cava_stream: subscription: {exc}", file=sys.stderr)
++                        retry_at = started + 1
++                if started >= refresh_at:
++                    try:
++                        state = snapshot()
++                        clients = stream_clients(state)
++                        selected = select_stream(state, args.identity, args.desktop, args.bus)
++                        # Reconcile rarely as well: servers can omit metadata events.
++                        refresh_at = started + (30 if subscription else 1)
++                    except (OSError, subprocess.SubprocessError, ValueError, json.JSONDecodeError) as exc:
++                        print(f"cava_stream: discovery: {exc}", file=sys.stderr)
++                        selected = None
++                        refresh_at = time.monotonic() + 1
+                 if selected != active or (selected and
+                                           (capture.cava.poll() is not None or capture.parec.poll() is not None)):
+                     capture.stop()
+@@ -253,15 +299,36 @@
+                     print(ZERO, flush=True)
+                     last_zero = started
+                 while not stopping and time.monotonic() - started < 1:
++                    now = time.monotonic()
++                    if now >= refresh_at:
++                        break
+                     try:
+-                        capture.pump(min(0.1, max(0, 1 - (time.monotonic() - started))))
++                        data = capture.pump(min(0.1, max(0, 1 - (now - started)),
++                                                max(0, refresh_at - now)),
++                                            subscription.stdout if subscription else None)
++                        if data == b"":
++                            stop_process(subscription)
++                            subscription = None
++                            capture.stop()
++                            active = selected = None
++                            retry_at = refresh_at = time.monotonic() + 1
++                        elif data:
++                            event_buffer += data
++                            while b"\n" in event_buffer:
++                                line, event_buffer = event_buffer.split(b"\n", 1)
++                                if discovery_event(line, clients):
++                                    refresh_at = min(refresh_at, time.monotonic() + 0.05)
++                            if len(event_buffer) > 4096:
++                                event_buffer = b""
+                     except (OSError, RuntimeError) as exc:
+                         print(f"cava_stream: stream: {exc}", file=sys.stderr)
+                         capture.stop()
+                         active = None
++                        refresh_at = time.monotonic()
+                         break
+         finally:
+             capture.stop()
++            stop_process(subscription)
+ 
+ 
+ if __name__ == "__main__":
+--- a/bar/tests/cava-stream.py
++++ b/bar/tests/cava-stream.py
+@@ -2,6 +2,7 @@
+ """Exact stream selection and bounded capture lifecycle."""
+ 
+ import importlib.util
++import json
+ import os
+ from pathlib import Path
+ import signal
+@@ -129,6 +130,200 @@
+                 except ProcessLookupError:
+                     pass
+ 
++    def test_subscription_event_filter(self):
++        for line in (b"Event 'new' on sink-input #4", b"Event 'remove' on sink #1",
++                     b"Event 'change' on server #0"):
++            self.assertIsNotNone(stream.DISCOVERY_EVENT.search(line), line)
++        for line in (b"Event 'new' on client #9", b"Event 'remove' on client #9",
++                     b"Event 'change' on client #9",
++                     b"Event 'new' on source-output #2", b"Event 'change' on source #1"):
++            self.assertIsNone(stream.DISCOVERY_EVENT.search(line), line)
++        owners = stream.stream_clients(fixture())
++        self.assertEqual(owners, {"116", "88"})
++        self.assertTrue(stream.discovery_event(b"Event 'change' on client #116", owners))
++        self.assertFalse(stream.discovery_event(b"Event 'change' on client #9", owners))
++        data = fixture()
++        data["sink-inputs"][0]["client"] = None
++        self.assertIn("116", stream.stream_clients(data), "PipeWire client object ID resolves to Pulse index")
++
++    def test_discovery_events_reconcile_and_reconnect_without_polling(self):
++        with tempfile.TemporaryDirectory(prefix="isla-cava-events-") as directory:
++            root = Path(directory)
++            log = root / "calls"
++            events = root / "events"
++            os.mkfifo(events, 0o600)
++            # An unresolved player never starts parec or Cava; only read-only discovery runs.
++            pactl = root / "pactl"
++            pactl.write_text('''#!/usr/bin/env python3
++import json, os, sys
++from pathlib import Path
++root = Path(os.environ["ISLA_CAVA_FIXTURE"])
++with (root / "calls").open("a") as log:
++    log.write(json.dumps({"pid": os.getpid(), "args": sys.argv[1:]}) + "\\n")
++if sys.argv[1:] == ["subscribe"]:
++    with (root / "events").open() as events:
++        for line in events:
++            if line.strip() == "disconnect":
++                break
++            sys.stdout.write(line)
++            sys.stdout.flush()
++elif (root / "fail").exists():
++    sys.exit(1)
++else:
++    data = json.loads((root / "state").read_text()) if (root / "state").exists() else {}
++    print(json.dumps(data.get(sys.argv[-1], [])))
++''')
++            pactl.chmod(0o755)
++            cava = root / "cava"
++            cava.write_text(r'''#!/usr/bin/env python3
++import json, os, sys, time
++from pathlib import Path
++root = Path(os.environ["ISLA_CAVA_FIXTURE"])
++with (root / "captures").open("a") as log:
++    log.write(json.dumps({"kind": "cava", "pid": os.getpid()}) + "\n")
++config = Path(sys.argv[2]).read_text()
++fifo = next(line.split(" = ", 1)[1] for line in config.splitlines() if line.startswith("source = "))
++reader = os.open(fifo, os.O_RDONLY)
++os.set_blocking(reader, False)
++while True:
++    try:
++        os.read(reader, 65536)
++    except BlockingIOError:
++        pass
++    print(" ".join(["32768"] * 24), flush=True)
++    time.sleep(0.02)
++''')
++            cava.chmod(0o755)
++            parec = root / "parec"
++            parec.write_text(r'''#!/usr/bin/env python3
++import json, os, sys
++from pathlib import Path
++root = Path(os.environ["ISLA_CAVA_FIXTURE"])
++with (root / "captures").open("a") as log:
++    log.write(json.dumps({"kind": "parec", "pid": os.getpid(), "args": sys.argv[1:]}) + "\n")
++while True:
++    os.write(1, b"\0" * 4096)
++''')
++            parec.chmod(0o755)
++            env = {**os.environ, "PATH": str(root) + ":" + os.environ["PATH"],
++                   "ISLA_CAVA_FIXTURE": str(root)}
++            proc = subprocess.Popen([sys.executable, str(PATH), "--identity", "isla-test-unresolved"],
++                                    env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
++            writer = None
++
++            def calls():
++                return [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
++
++            def query_count():
++                return sum(item["args"] != ["subscribe"] for item in calls())
++
++            def captures():
++                path = root / "captures"
++                return [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
++
++            def capture_gone(pids):
++                return all(not Path(f"/proc/{pid}").exists() for pid in pids)
++
++            def wait_for(condition, message):
++                deadline = time.monotonic() + 5
++                while time.monotonic() < deadline:
++                    if condition():
++                        return
++                    self.assertIsNone(proc.poll(), "discovery process exited early")
++                    time.sleep(0.02)
++                self.fail(message)
++
++            def connect():
++                nonlocal writer
++                if writer is not None:
++                    os.close(writer)
++                    writer = None
++                def opened():
++                    nonlocal writer
++                    try:
++                        writer = os.open(events, os.O_WRONLY | os.O_NONBLOCK)
++                        return True
++                    except OSError:
++                        return False
++                wait_for(opened, "subscription failed to open")
++
++            try:
++                connect()
++                wait_for(lambda: query_count() == 3, "initial snapshot missing")
++                time.sleep(1.2)
++                self.assertEqual(query_count(), 3, "unchanged streams were polled")
++                os.write(writer, b"Event 'new' on client #4\nEvent 'change' on client #4\nEvent 'remove' on client #4\n")
++                time.sleep(0.2)
++                self.assertEqual(query_count(), 3, "client discovery caused a feedback loop")
++                # Partial lines wait for newline; a burst must produce one snapshot.
++                os.write(writer, b"Event 'change' on sink-in")
++                time.sleep(0.1)
++                self.assertEqual(query_count(), 3)
++                os.write(writer, b"put #4\n" + b"Event 'change' on sink-input #4\n" * 20)
++                wait_for(lambda: query_count() >= 6, "event snapshot missing")
++                time.sleep(0.2)
++                self.assertEqual(query_count(), 6, "event burst was not coalesced")
++                (root / "fail").touch()
++                os.write(writer, b"Event 'remove' on sink-input #4\n")
++                wait_for(lambda: query_count() > 6, "failed discovery not attempted")
++                (root / "fail").unlink()
++                before = query_count()
++                wait_for(lambda: query_count() >= before + 3, "discovery did not retry after failure")
++                os.write(writer, b"disconnect\n")
++                os.close(writer)
++                writer = None
++                wait_for(lambda: sum(c["args"] == ["subscribe"] for c in calls()) >= 2,
++                         "subscription did not reconnect")
++                connect()
++                before = query_count()
++                os.write(writer, b"Event 'change' on server #0\n")
++                wait_for(lambda: query_count() >= before + 3, "reconnected discovery did not refresh")
++
++                # Real main/Capture/pipe multiplexing, with synthetic producers only.
++                data = fixture()
++                data["clients"][0]["properties"].update({
++                    "application.name": "isla-test-unresolved", "application.process.binary": "isla-test-unresolved"})
++                (root / "state").write_text(json.dumps(data))
++                os.write(writer, b"Event 'new' on sink-input #117\n")
++                wait_for(lambda: len(captures()) >= 2, "selected stream did not start synthetic capture")
++                first_pids = [item["pid"] for item in captures()]
++                first_parec = next(item for item in captures() if item["kind"] == "parec")
++                self.assertEqual(first_parec["args"][:4], ["--monitor-stream", "117", "--device", "actual.monitor"])
++
++                # Metadata of an owning client matters; unrelated pactl clients do not.
++                data["clients"][0]["properties"].update({"application.name": "other", "application.process.binary": "other"})
++                (root / "state").write_text(json.dumps(data))
++                os.write(writer, b"Event 'change' on client #116\n")
++                wait_for(lambda: capture_gone(first_pids), "client identity change kept stale capture alive")
++
++                data["clients"][0]["properties"].update({
++                    "application.name": "isla-test-unresolved", "application.process.binary": "isla-test-unresolved"})
++                data["sink-inputs"][0]["sink"] = 57
++                (root / "state").write_text(json.dumps(data))
++                os.write(writer, b"Event 'change' on sink-input #117\n")
++                wait_for(lambda: len(captures()) >= 4, "rerouted stream did not restart capture")
++                self.assertEqual([item for item in captures() if item["kind"] == "parec"][-1]["args"][:4],
++                                 ["--monitor-stream", "117", "--device", "default.monitor"])
++                active_pids = [item["pid"] for item in captures()][-2:]
++                subscriptions = sum(c["args"] == ["subscribe"] for c in calls())
++                os.write(writer, b"disconnect\n")
++                os.close(writer)
++                writer = None
++                wait_for(lambda: capture_gone(active_pids), "disconnect leaked active capture")
++                wait_for(lambda: sum(c["args"] == ["subscribe"] for c in calls()) > subscriptions,
++                         "active capture did not reconnect")
++                connect()
++                wait_for(lambda: len(captures()) >= 6, "capture did not resume after reconnection")
++            finally:
++                if writer is not None:
++                    os.close(writer)
++                proc.terminate()
++                proc.wait(timeout=4)
++            for call in calls():
++                if call["args"] == ["subscribe"]:
++                    self.assertFalse(Path(f'/proc/{call["pid"]}').exists(), "subscription leaked")
++            self.assertTrue(capture_gone([item["pid"] for item in captures()]), "capture children leaked")
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
+--- a/bar/tests/nmcli-service.py
++++ b/bar/tests/nmcli-service.py
+@@ -119,6 +119,7 @@
+ with tempfile.TemporaryDirectory(prefix='isla-nmcli-') as directory:
+     work = Path(directory)
+     (work / 'Singletons').mkdir()
++    (work / 'services').symlink_to(ROOT / 'services', target_is_directory=True)
+     # Instrument lifecycle only in the temporary copy; no production test hooks.
+     source = (ROOT / 'Singletons/Nmcli.qml').read_text()
+     source = source.replace('property list<var> activeProcesses: []',
+--- a/bar/windows/IslandOverlay.qml
++++ b/bar/windows/IslandOverlay.qml
+@@ -392,6 +392,7 @@
+                 : overlay.compact || overlay.surfaceOpen && !overlay.sessionOpen ? 0 : fluidCompanion.captureExtra
+             fluidCaptureLeftExtra: Math.max(sessionCompanion.captureExtra, recordingCompanion.captureExtra)
+             opacity: overlay.monFullscreen ? 0 : 1
++            visible: opacity > 0.005
+             Behavior on opacity {
+                 NumberAnimation {
+                     duration: Motion.morph
+@@ -491,6 +492,7 @@
+             objectName: "islandMediaCompanion"
+             z: fluidCompanion.cardFraction > 0.05 ? 3 : 1
+             opacity: overlay.monFullscreen || overlay.compact ? 0 : 1
++            visible: opacity > 0.005
+             anchors.fill: parent
+             body: pill
+             open: !overlay.layoutChanging && !overlay.compact && (Players.has || overlay.mediaOpen) && !overlay.launcherOpen && !overlay.mediaPanelOpen
+--- a/wpscan/WallpaperScanner.cpp
++++ b/wpscan/WallpaperScanner.cpp
+@@ -13,6 +13,7 @@
+ #include <QtConcurrent/QtConcurrent>
+ #include <QSet>
+ #include <QFutureWatcher>
++#include <QPointer>
+ #include <algorithm>
+ 
+ static QString thumbMetadataPath(const QString &cachePath) {
+@@ -143,37 +144,57 @@
+ 
+ void WallpaperScanner::startScan(const QString &wallDir, const QString &cacheDir,
+                                  int thumbW, int thumbH, int quality) {
+-    const int serial = ++m_scanSerial;
+-
+-    QDir().mkpath(cacheDir);
+-
+-    QStringList images;
+-    QDirIterator it(wallDir, QDir::Files | QDir::Readable);
+-    while (it.hasNext()) {
+-        it.next();
+-        if (isValidImage(it.filePath()))
+-            images.append(it.filePath());
+-    }
+-    images.sort(Qt::CaseInsensitive);
+-
+-    QJsonArray result;
+-    for (const auto &abs : images) {
+-        QFileInfo fi(abs);
+-        QString thumbFile = cacheDir + "/" + scanHash(abs) + ".jpg";
+-
+-        QJsonObject rec;
+-        rec.insert("path", abs);
+-        rec.insert("name", fi.fileName());
+-        rec.insert("baseName", fi.completeBaseName());
+-        rec.insert("thumb", thumbFile);
+-        rec.insert("thumbReady", isCurrentThumbnail(abs, thumbFile, thumbW, thumbH, quality));
+-        result.append(rec);
+-    }
+-
+-    emit scanDone(result);
+-
+-    if (serial == m_scanSerial)
+-        emit scanFinished();
++    m_pendingScan = {wallDir, cacheDir, thumbW, thumbH, quality, ++m_scanSerial};
++    if (!m_scanRunning)
++        startPendingScan();
++}
++
++void WallpaperScanner::startPendingScan() {
++    const auto request = m_pendingScan;
++    m_scanRunning = true;
++    auto *watcher = new QFutureWatcher<QJsonArray>(this);
++    connect(watcher, &QFutureWatcher<QJsonArray>::finished, this, [this, watcher, serial = request.serial]() {
++        const auto result = watcher->result();
++        watcher->deleteLater();
++        m_scanRunning = false;
++        if (serial != m_scanSerial) {
++            startPendingScan();
++            return;
++        }
++        m_doneSerial = serial;
++        const QPointer<WallpaperScanner> guard(this);
++        emit scanDone(result);
++        if (guard && serial == m_scanSerial)
++            emit scanFinished();
++    });
++    watcher->setFuture(QtConcurrent::run([request]() {
++        QDir().mkpath(request.cacheDir);
++
++        QStringList images;
++        QDirIterator it(request.wallDir, QDir::Files | QDir::Readable);
++        while (it.hasNext()) {
++            it.next();
++            if (isValidImage(it.filePath()))
++                images.append(it.filePath());
++        }
++        images.sort(Qt::CaseInsensitive);
++
++        QJsonArray result;
++        for (const auto &abs : images) {
++            QFileInfo fi(abs);
++            QString thumbFile = request.cacheDir + "/" + scanHash(abs) + ".jpg";
++
++            QJsonObject rec;
++            rec.insert("path", abs);
++            rec.insert("name", fi.fileName());
++            rec.insert("baseName", fi.completeBaseName());
++            rec.insert("thumb", thumbFile);
++            rec.insert("thumbReady", isCurrentThumbnail(abs, thumbFile, request.thumbW,
++                                                       request.thumbH, request.quality));
++            result.append(rec);
++        }
++        return result;
++    }));
+ }
+ 
+ void WallpaperScanner::generateThumb(const QString &sourcePath,
+--- a/wpscan/WallpaperScanner.h
++++ b/wpscan/WallpaperScanner.h
+@@ -27,6 +27,18 @@
+                     bool cacheAvailable, bool updated, const QString &errorString);
+ 
+ private:
++    struct ScanRequest {
++        QString wallDir;
++        QString cacheDir;
++        int thumbW;
++        int thumbH;
++        int quality;
++        int serial;
++    };
++    void startPendingScan();
++
++    ScanRequest m_pendingScan;
++    bool m_scanRunning = false;
+     int m_scanSerial = 0;
+     int m_doneSerial = 0;
+ };
+--- /dev/null
++++ b/bar/tests/sample-process.py
+@@ -0,0 +1,90 @@
++#!/usr/bin/env python3
++"""Sample an existing Linux process without changing its state (CPU = one core)."""
++import argparse
++import json
++import os
++from pathlib import Path
++import time
++
++
++def counters(stat):
++    fields = stat[stat.rindex(")") + 2:].split()
++    return {"cpu_ticks": int(fields[11]) + int(fields[12]),
++            "child_cpu_ticks": int(fields[13]) + int(fields[14]),
++            "start_ticks": int(fields[19]), "threads": int(fields[17]),
++            "rss_kib": int(fields[21]) * os.sysconf("SC_PAGE_SIZE") // 1024}
++
++
++def memory(process):
++    values = {}
++    for line in (process / "smaps_rollup").read_text().splitlines():
++        if line.startswith(("Rss:", "Pss:", "Private_Dirty:")):
++            name, value, _ = line.split()
++            values[name[:-1] + "_kib"] = int(value)
++    return values
++
++
++def sample(pid, duration, interval):
++    process = Path("/proc") / str(pid)
++    first = counters((process / "stat").read_text())
++    result = {"pid": pid, "clock_ticks": os.sysconf("SC_CLK_TCK"),
++              "memory_before": memory(process), "samples": []}
++    started = time.monotonic()
++    previous_time, previous = started, first
++    while previous_time - started < duration:
++        time.sleep(min(interval, duration - (previous_time - started)))
++        current = counters((process / "stat").read_text())
++        now = time.monotonic()
++        if current["start_ticks"] != first["start_ticks"]:
++            raise RuntimeError("PID was reused")
++        elapsed = now - previous_time
++        result["samples"].append({
++            "elapsed_s": now - started,
++            "cpu_percent": 100 * (current["cpu_ticks"] - previous["cpu_ticks"]) / result["clock_ticks"] / elapsed,
++            "child_cpu_percent": 100 * (current["child_cpu_ticks"] - previous["child_cpu_ticks"]) / result["clock_ticks"] / elapsed,
++            "rss_kib": current["rss_kib"], "threads": current["threads"]})
++        previous_time, previous = now, current
++    result["duration_s"] = previous_time - started
++    result["cpu_percent"] = 100 * (previous["cpu_ticks"] - first["cpu_ticks"]) / result["clock_ticks"] / result["duration_s"]
++    result["child_cpu_percent"] = 100 * (previous["child_cpu_ticks"] - first["child_cpu_ticks"]) / result["clock_ticks"] / result["duration_s"]
++    result["memory_after"] = memory(process)
++    return result
++
++
++def positive(value):
++    parsed = float(value)
++    if not 0 < parsed < float("inf"):
++        raise argparse.ArgumentTypeError("must be a finite positive number")
++    return parsed
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--pid", type=int)
++    parser.add_argument("--seconds", type=positive, default=30)
++    parser.add_argument("--interval", type=positive, default=1)
++    parser.add_argument("--output", type=Path)
++    parser.add_argument("--self-test", action="store_true")
++    args = parser.parse_args()
++    if args.self_test:
++        fields = ["0"] * 22
++        for index, value in {11: 3, 12: 4, 13: 5, 14: 6, 17: 2, 19: 42, 21: 10}.items():
++            fields[index] = str(value)
++        parsed = counters("123 (name with ) spaces) " + " ".join(fields))
++        assert parsed["cpu_ticks"] == 7 and parsed["child_cpu_ticks"] == 11
++        assert parsed["start_ticks"] == 42 and parsed["threads"] == 2
++        live = sample(os.getpid(), 0.02, 0.01)
++        assert live["duration_s"] >= 0.02 and len(live["samples"]) >= 2
++        assert live["memory_after"]["Pss_kib"] > 0
++        print("PASS: proc parsing, PID identity, bounded sampling and PSS")
++        return
++    if args.pid is None or args.pid <= 0:
++        parser.error("--pid must identify a running process")
++    result = sample(args.pid, args.seconds, args.interval)
++    if args.output:
++        args.output.write_text(json.dumps(result, indent=2) + "\n")
++    print(json.dumps({key: value for key, value in result.items() if key != "samples"}, indent=2))
++
++
++if __name__ == "__main__":
++    main()
+--- /dev/null
++++ b/bar/tests/cava-envelope.py
+@@ -0,0 +1,31 @@
++"""Exercise the real envelope with synthetic frames and capture processes disabled."""
++import argparse
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import tempfile
++
++parser = argparse.ArgumentParser(description=__doc__)
++parser.add_argument("--source", type=Path, default=Path(__file__).resolve().parents[1])
++parser.add_argument("--baseline", action="store_true")
++args = parser.parse_args()
++with tempfile.TemporaryDirectory(prefix="isla-envelope-") as directory:
++    root = Path(directory)
++    shutil.copytree(args.source, root / "bar")
++    shutil.copy(Path(__file__).resolve().parents[1] / "cava-envelope-regression.qml", root / "bar")
++    source = root / "bar/Singletons/Cava.qml"
++    text = source.read_text()
++    assert "running: root.wanted && root.available && !sourceRestart.running" in text
++    text = text.replace("running: root.wanted && root.available && !sourceRestart.running", "running: false")
++    text = text.replace("Component.onCompleted: probe.running = true", "Component.onCompleted: {}")
++    text = text.replace("onWantedChanged: if (root.wanted && !root.available) probe.running = true", "onWantedChanged: {}")
++    source.write_text(text)
++    (root / "config.json").write_text("{}")
++    env = dict(os.environ, ISLA_CONFIG=str(root / "config.json"), QT_QPA_PLATFORM="offscreen",
++               XDG_STATE_HOME=str(root / "state"), ISLA_EXPECT_BASELINE="1" if args.baseline else "0")
++    result = subprocess.run(["qs", "-p", str(root / "bar/cava-envelope-regression.qml")],
++                            env=env, capture_output=True, text=True, timeout=15)
++    output = result.stdout + result.stderr
++    print(output)
++    assert result.returncode == 0 and "PASS:" in output and "FAIL:" not in output
+--- /dev/null
++++ b/bar/cava-envelope-regression.qml
+@@ -0,0 +1,63 @@
++import QtQuick
++import Quickshell
++import "Singletons"
++
++ShellRoot {
++    id: test
++    settings.watchFiles: false
++    property int updates: 0
++    property int step: 0
++    property int settledUpdates: 0
++    readonly property string zero: Array(24).fill("0").join(" ")
++    readonly property string tone: Array(24).fill("32768").join(" ")
++    function check(ok, message) {
++        if (!ok) { console.error("FAIL: " + message); Qt.exit(1) }
++    }
++    Window { visible: true; width: 100; height: 50 }
++    Connections {
++        target: Cava
++        function onValuesChanged() { test.updates++ }
++    }
++    Component.onCompleted: {
++        Cava.wanted = true
++        Cava.parseFrame(zero)
++        updates = 0
++    }
++    Timer {
++        id: advance
++        interval: 600; running: true; repeat: true
++        onTriggered: {
++            if (test.step === 0) {
++                console.log("CAVA_SILENCE_UPDATES " + test.updates)
++                if (Quickshell.env("ISLA_EXPECT_BASELINE") !== "1")
++                    test.check(test.updates === 0, "initial silence must not publish frames")
++                Cava.parseFrame(test.tone)
++            } else if (test.step === 1) {
++                test.check(Cava.values.every(v => v > 0 && v < 1), "tone attacks without overshoot")
++                Cava.parseFrame(test.zero)
++                advance.interval = 2600
++            } else if (test.step === 2) {
++                test.check(Cava.values.every(v => v === 0), "silence settles exactly")
++                test.settledUpdates = test.updates
++                Cava.parseFrame(test.zero)
++                advance.interval = 600
++            } else if (test.step === 3) {
++                console.log("CAVA_SETTLED_UPDATES " + (test.updates - test.settledUpdates))
++                if (Quickshell.env("ISLA_EXPECT_BASELINE") !== "1")
++                    test.check(test.updates === test.settledUpdates, "settled silence stays asleep")
++                Cava.parseFrame(test.tone)
++            } else if (test.step === 4) {
++                test.check(Cava.values.some(v => v > 0), "new audio resumes the envelope")
++                Cava.reset()
++                test.check(!Cava.hasFrame && Cava.values.every(v => v === 0), "reset clears envelope")
++                Cava.wanted = false
++                console.log(Quickshell.env("ISLA_EXPECT_BASELINE") === "1"
++                    ? "PASS: baseline envelope activity measured; attack/release/resume/reset preserved"
++                    : "PASS: silence suspends envelope, attack/release/resume/reset preserved")
++                Qt.quit()
++            }
++            test.step++
++        }
++    }
++    Timer { interval: 10000; running: true; onTriggered: { console.error("FAIL: envelope timeout"); Qt.exit(1) } }
++}
+--- /dev/null
++++ b/bar/tests/cava-discovery-performance.py
+@@ -0,0 +1,63 @@
++"""Compare read-only Cava discovery on a real audio server, without capturing audio."""
++import argparse
++import importlib.util
++import json
++from pathlib import Path
++import subprocess
++import sys
++import time
++
++HERE = Path(__file__).resolve().parent
++spec = importlib.util.spec_from_file_location("process_sample", HERE / "sample-process.py")
++sampler = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(sampler)
++
++
++def measure(script, seconds):
++    # No real MPRIS player uses this test identity; unresolved discovery stays silent.
++    identity = "isla-performance-unresolved-" + __import__("uuid").uuid4().hex
++    proc = subprocess.Popen([sys.executable, str(script), "--identity", identity],
++                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
++    try:
++        time.sleep(0.5)
++        child_ids = (Path(f"/proc/{proc.pid}/task/{proc.pid}/children").read_text().split())
++        children = {}
++        for pid in child_ids:
++            path = Path("/proc") / pid
++            try:
++                assert (path / "comm").read_text().strip() == "pactl", "unexpected audio capture child"
++                children[pid] = sampler.counters((path / "stat").read_text())
++            except FileNotFoundError:
++                pass
++        result = sampler.sample(proc.pid, seconds, 1)
++        result["persistent_children"] = []
++        for pid, first in children.items():
++            path = Path("/proc") / pid
++            try:
++                final = sampler.counters((path / "stat").read_text())
++                if final["start_ticks"] == first["start_ticks"]:
++                    result["persistent_children"].append({
++                        "cpu_percent": 100 * (final["cpu_ticks"] - first["cpu_ticks"]) / result["clock_ticks"] / result["duration_s"],
++                        "memory": sampler.memory(path)})
++            except FileNotFoundError:
++                pass
++    finally:
++        proc.terminate()
++        _, errors = proc.communicate(timeout=5)
++    assert proc.returncode == 0, errors.decode()
++    result["stderr"] = errors.decode()
++    return result
++
++
++parser = argparse.ArgumentParser(description=__doc__)
++parser.add_argument("--before", type=Path, required=True)
++parser.add_argument("--after", type=Path, default=HERE.parent / "services/cava_stream.py")
++parser.add_argument("--seconds", type=sampler.positive, default=15)
++parser.add_argument("--output", type=Path, required=True)
++args = parser.parse_args()
++results = {"before": measure(args.before, args.seconds), "after": measure(args.after, args.seconds)}
++args.output.write_text(json.dumps(results, indent=2) + "\n")
++for label, result in results.items():
++    total = result["cpu_percent"] + result["child_cpu_percent"] + sum(c["cpu_percent"] for c in result["persistent_children"])
++    print(label, "total discovery CPU %", round(total, 3), "parent memory", result["memory_after"],
++          "persistent children", result["persistent_children"])
+--- /dev/null
++++ b/bar/tests/qml-performance.py
+@@ -0,0 +1,119 @@
++"""Measure production QML bindings with isolated media/CAVA; never control playback."""
++import argparse
++import json
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import tempfile
++import time
++
++parser = argparse.ArgumentParser()
++parser.add_argument("--source", type=Path, default=Path(__file__).resolve().parents[1])
++parser.add_argument("--baseline", action="store_true")
++parser.add_argument("--output", type=Path)
++args = parser.parse_args()
++fixture = Path(__file__).resolve().parents[1] / "qml-performance-regression.qml"
++with tempfile.TemporaryDirectory(prefix="isla-qml-perf-") as directory:
++    root = Path(directory)
++    bar = root / "bar"
++    shutil.copytree(args.source, bar)
++    shutil.copyfile(fixture, bar / fixture.name)
++    overlay = bar / "windows/IslandOverlay.qml"
++    overlay.write_text(overlay.read_text().replace("    id: overlay", "    id: overlay\n    readonly property alias perfPolicy: inputPolicy"))
++    players = bar / "Singletons/Players.qml"
++    text = players.read_text()
++    text = text.replace("    function isProxy(p) {", '''    property QtObject fixture: QtObject {
++        property bool isPlaying: true
++        property bool canControl: true
++        property bool canSeek: true
++        property bool positionSupported: true
++        property bool lengthSupported: true
++        property bool canGoNext: false
++        property bool canGoPrevious: false
++        property bool canTogglePlaying: true
++        property bool shuffleSupported: false
++        property bool loopSupported: false
++        property real rate: 1
++        property real position: 30
++        property real length: 240
++        property string identity: "Spotify"
++        property string desktopEntry: "spotify"
++        property string dbusName: "org.mpris.MediaPlayer2.fixture"
++        property string trackTitle: "Fixed metadata"
++        property string trackArtist: "Fixture"
++        property string trackAlbum: "Performance"
++        property string trackArtUrl: String(Qt.resolvedUrl("../tests/fixtures/artwork-coral.svg"))
++    }
++    function isProxy(p) {''')
++    text = text.replace("readonly property var list: {", "readonly property var list: {\n        return [root.fixture]")
++    text = text.replace("running: root.live && root.active.positionSupported", "running: false")
++    players.write_text(text)
++    (bar / "Singletons/Cava.qml").write_text('''pragma Singleton
++import QtQuick
++import Quickshell
++Singleton {
++    property bool available: false
++    property bool hasFrame: true
++    property var values: Array(24).fill(0.4)
++    property var consumers: ({})
++    function setConsumer(id, active) {
++        const next = Object.assign({}, consumers)
++        if (active) next[id] = true
++        else delete next[id]
++        consumers = next
++    }
++}
++''')
++    (bar / "Singletons/MediaPalette.qml").write_text('''pragma Singleton
++import QtQuick
++import Quickshell
++Singleton { property color accent: Theme.accent }
++''')
++    shutil.copyfile(fixture.parent / "tests/PerfCounters.js", bar / "tests/PerfCounters.js")
++    spectrum = bar / "Singletons/Spectrum.js"
++    spectrum.write_text('.import "../tests/PerfCounters.js" as Perf\n' + spectrum.read_text().replace(
++        "function band(values, index, count) {", "function band(values, index, count) {\n    Perf.bands++"))
++    (root / "config.json").write_text("{}")
++    env = dict(os.environ, ISLA_CONFIG=str(root / "config.json"),
++               XDG_STATE_HOME=str(root / "state"), ISLA_PERF_BASELINE="1" if args.baseline else "0",
++               QT_QPA_PLATFORM=os.environ.get("QT_QPA_PLATFORM", "wayland"))
++    if args.output:
++        args.output.mkdir(parents=True, exist_ok=True)
++        env["ISLA_TEST_OUTPUT"] = str(args.output.resolve())
++    timing = {}
++    started = time.monotonic()
++    with (root / "output.log").open("w+") as log:
++        process = subprocess.Popen(["quickshell", "-p", str(bar / fixture.name)], env=env,
++                                   stdout=log, stderr=log)
++        try:
++            while process.poll() is None:
++                elapsed = time.monotonic() - started
++                if elapsed > 45:
++                    raise TimeoutError("QML performance fixture exceeded 45 seconds")
++                output = (root / "output.log").read_text()
++                if "Configuration Loaded" in output and "loadedMs" not in timing:
++                    timing["loadedMs"] = round(elapsed * 1000)
++                if "QML_READY" in output and "readyMs" not in timing:
++                    timing["readyMs"] = round(elapsed * 1000)
++                    memory = Path(f"/proc/{process.pid}/smaps_rollup").read_text()
++                    for line in memory.splitlines():
++                        if line.startswith(("Rss:", "Pss:")):
++                            key, value, _ = line.split()
++                            timing[key.rstrip(":") + "KiB"] = int(value)
++                time.sleep(0.025)
++        finally:
++            if process.poll() is None:
++                process.kill()
++            process.wait()
++        log.seek(0)
++        output = log.read()
++    print(output)
++    print("exit", process.returncode)
++    assert process.returncode == 0 and "FAIL" not in output and "PASS: QML performance" in output
++    measurements = [json.loads(line.split("QML_PERF ", 1)[1]) for line in output.splitlines() if "QML_PERF " in line]
++    assert len(measurements) == 1
++    measurements[0].update(timing)
++    print("fixture timing/memory", json.dumps(timing))
++    if args.output:
++        (args.output / "measurements.json").write_text(json.dumps(measurements[0], indent=2) + "\n")
+--- /dev/null
++++ b/bar/qml-performance-regression.qml
+@@ -0,0 +1,142 @@
++// Run through tests/qml-performance.py for isolated services and counters.
++import QtQuick
++import Quickshell
++import "components"
++import "surfaces"
++import "windows"
++import "Singletons"
++import "tests/PerfCounters.js" as Perf
++
++ShellRoot {
++    id: root
++    settings.watchFiles: false
++    readonly property bool baseline: Quickshell.env("ISLA_PERF_BASELINE") === "1"
++    property int playbackChanges: 0
++    property string titleProbe: Perf.title(media.playback.title)
++    property bool done: false
++    Window {
++        id: scene
++        visible: true
++        width: 760; height: 540
++        color: Theme.background
++        Rectangle { anchors.fill: parent; color: Theme.background }
++        MediaSurface { id: media; open: true; morphCloseness: 1 }
++        IslandMediaVisualizer {
++            id: wave
++            x: 15; y: 15
++            hasMedia: true; isPlaying: true; hasFrame: true
++            values: Array(24).fill(0.4)
++        }
++    }
++    Connections { target: media; function onPlaybackChanged() { root.playbackChanges++ } }
++    Timer {
++        interval: 16; running: true; repeat: true
++        property int tick: 0
++        onTriggered: wave.values = Array(24).fill((++tick % 50) / 50)
++    }
++    SurfaceRouter { id: router; focusedMonitorName: Quickshell.screens[0].name; reduceMotion: Flags.reduceMotion }
++    IslandOverlay { id: overlay; modelData: Quickshell.screens[0]; router: router }
++    Timer {
++        id: checks
++        interval: 100; repeat: true; running: Config.loaded
++        property int step: 0
++        property int ticks: 0
++        property var result: ({})
++        property var pill: null
++        property var companion: null
++        property var policy: null
++        property var light: null
++        property var monitors: null
++        property int changes: 0
++        property int reads: 0
++        property int bands: 0
++        property real position: 0
++        property real phase: 0
++        function check(ok, message) { if (!ok) { console.error("FAIL: " + message); Qt.exit(1) } }
++        function glow(item) {
++            if (item.driftPhase !== undefined) return item
++            for (const child of item.children || []) { const found = glow(child); if (found) return found }
++            return null
++        }
++        onTriggered: {
++            if (++ticks > 300) { check(false, "fixture timed out at step " + step); return }
++            if (step === 0) {
++                Recording.observe = false
++                DesktopStatus.monitorServices = false
++                Config.update({appearance: {barLayout: "split", reduceMotion: false}})
++                pill = overlay.contentItem.children.find(child => child.objectName === "islandOverlayContent")
++                pill = pill.children.find(child => child.objectName === "islandPill")
++                companion = overlay.contentItem.children.find(child => child.objectName === "islandOverlayContent")
++                companion = companion.children.find(child => child.objectName === "islandMediaCompanion")
++                policy = overlay.perfPolicy
++                check(!!pill && !!companion && !!policy, "overlay objects available")
++                pill.notificationsEnabled = false
++                step = 1
++            } else if (step === 1) {
++                if (companion.phase !== "companion" || !companion.settled) return
++                light = glow(pill)
++                check(light !== null, "pill glow exists")
++                console.log("QML_READY")
++                changes = root.playbackChanges; reads = Perf.metadata; bands = Perf.bands
++                position = media.playback.displayPosition
++                ticks = 0; step = 2
++            } else if (step === 2 && ticks >= 10) {
++                result = { playbackChanges: root.playbackChanges - changes,
++                    metadataReads: Perf.metadata - reads, visibleBandCalls: Perf.bands - bands }
++                check(media.playback.displayPosition > position + 0.7, "clock advances")
++                check(root.titleProbe === "Fixed metadata", "metadata intact")
++                wave.visible = false
++                ticks = 0; step = 3
++            } else if (step === 3 && ticks >= 2) {
++                bands = Perf.bands; ticks = 0; step = 4
++            } else if (step === 4 && ticks >= 10) {
++                result.hiddenBandCalls = Perf.bands - bands
++                monitors = policy.monitors
++                policy.monitors = [{name: overlay.modelData.name, activeWorkspace: {lastIpcObject: {hasfullscreen: true}}}]
++                ticks = 0; step = 5
++            } else if (step === 5) {
++                if (pill.opacity >= 0.001 || ticks < 5) return
++                phase = light.driftPhase; ticks = 0; step = 6
++            } else if (step === 6 && ticks >= 3) {
++                result.fullscreenGlowAdvanced = light.driftPhase !== phase
++                result.fullscreenCavaActive = !!Cava.consumers[companion.cavaConsumerId]
++                if (!root.baseline) {
++                    check(result.playbackChanges === 0, "playback identity stable")
++                    check(result.metadataReads === 0, "static metadata is not reevaluated")
++                    check(result.hiddenBandCalls === 0, "hidden spectrum does no work")
++                    check(!result.fullscreenGlowAdvanced, "fullscreen glow pauses")
++                    check(!result.fullscreenCavaActive, "fullscreen consumer releases")
++                }
++                policy.monitors = monitors
++                ticks = 0; step = 7
++            } else if (step === 7) {
++                if (!pill.visible || pill.opacity < 0.999 || !companion.visible) return
++                check(!!Cava.consumers[companion.cavaConsumerId], "consumer resumes")
++                phase = light.driftPhase; wave.visible = true; bands = Perf.bands
++                ticks = 0; step = 8
++            } else if (step === 8 && ticks >= 2) {
++                check(light.driftPhase !== phase, "glow resumes")
++                check(Perf.bands > bands, "spectrum resumes")
++                Config.update({appearance: {reduceMotion: true}})
++                phase = light.driftPhase; ticks = 0; step = 9
++            } else if (step === 9 && ticks >= 2) {
++                check(light.driftPhase === phase, "reduced glow remains still")
++                Players.fixture.isPlaying = false
++                Players.fixture.position = 75
++                Players.fixture.trackTitle = "Updated metadata"
++                ticks = 0; step = 10
++            } else if (step === 10 && ticks >= 2) {
++                check(root.titleProbe === "Updated metadata", "metadata changes propagate")
++                check(media.playback.displayPosition === 75, "external seek propagates")
++                check(media.playback.displayTime === "1:15", "formatted position intact")
++                check(media.playback.remainingTime === "2:45", "formatted remaining intact")
++                if (Quickshell.env("ISLA_TEST_OUTPUT"))
++                    scene.contentItem.grabToImage(image => image.saveToFile(Quickshell.env("ISLA_TEST_OUTPUT") + "/media.png"))
++                console.log("QML_PERF " + JSON.stringify(result))
++                console.log("PASS: QML performance measurement, clock, metadata, fullscreen release/resume, reduced")
++                stop(); root.done = true
++            }
++        }
++    }
++    Timer { interval: 100; running: root.done; onTriggered: Qt.quit() }
++}
+--- /dev/null
++++ b/bar/tests/PerfCounters.js
+@@ -0,0 +1,5 @@
++.pragma library
++
++var bands = 0
++var metadata = 0
++function title(value) { metadata++; return value }
+--- /dev/null
++++ b/bar/tests/wallpaper-scan-benchmark.py
+@@ -0,0 +1,131 @@
++"""Measure WallpaperScanner.startScan without touching the user's cache."""
++
++import argparse
++import json
++import os
++from pathlib import Path
++import statistics
++import subprocess
++import tempfile
++
++from PIL import Image
++
++
++ROOT = Path(__file__).resolve().parents[2]
++FIXTURE = ROOT / "bar/tests/wallpaper-scan-benchmark.qml"
++REAL_WALLPAPERS = Path.home() / "Wallpapers"
++EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif", ".bmp"}
++
++
++def scanner_hash(path):
++    value = 5381
++    for byte in str(path).encode():
++        value = ((value << 5) - value + byte) & 0xFFFFFFFF
++    return f"{value:x}"
++
++
++def warm_cache(source_dir, cache_dir):
++    cache_dir.mkdir(parents=True, exist_ok=True)
++    image = cache_dir / "benchmark-thumb.jpg"
++    Image.new("RGB", (320, 180), "#334455").save(image, quality=78)
++    hashes = set()
++    for source in sorted(path for path in source_dir.iterdir()
++                         if path.is_file() and path.suffix.lower() in EXTENSIONS):
++        key = scanner_hash(source)
++        assert key not in hashes, f"scanner hash collision: {source}"
++        hashes.add(key)
++        target = cache_dir / f"{key}.jpg"
++        target.hardlink_to(image)
++        source_stat, target_stat = source.stat(), target.stat()
++        metadata = {"source": str(source), "sourceSize": source_stat.st_size,
++                    "sourceModified": source_stat.st_mtime_ns // 1_000_000,
++                    "cacheSize": target_stat.st_size,
++                    "cacheModified": target_stat.st_mtime_ns // 1_000_000,
++                    "width": 320, "height": 180, "quality": 78}
++        target.with_name(target.name + ".meta.json").write_text(
++            json.dumps(metadata, separators=(",", ":")))
++    image.unlink()
++
++
++def run_qml(source_dir, cache_dir, iterations, plugin):
++    expected = sum(path.is_file() and path.suffix.lower() in EXTENSIONS
++                   for path in source_dir.iterdir())
++    env = dict(os.environ, QT_QPA_PLATFORM="offscreen", QML_IMPORT_PATH=str(plugin),
++               ISLA_SCAN_DIR=str(source_dir), ISLA_SCAN_CACHE=str(cache_dir),
++               ISLA_SCAN_ITERATIONS=str(iterations), ISLA_SCAN_EXPECTED=str(expected))
++    result = subprocess.run(["quickshell", "-p", str(FIXTURE)], env=env,
++                            capture_output=True, text=True, timeout=30)
++    output = result.stdout + result.stderr
++    marker = "WALLPAPER_SCAN_RESULT "
++    records = [line.split(marker, 1)[1] for line in output.splitlines() if marker in line]
++    assert result.returncode == 0 and len(records) == 1, output
++    measurement = json.loads(records[0])
++    assert measurement["items"] == expected, output
++    assert measurement["callbacks"] == iterations, output
++    measurement["scanDoneMs"] = summarize(measurement.pop("scanDoneSamplesMs"))
++    call_samples = measurement.pop("startScanCallSamplesMs")
++    measurement["startScanCallMs"] = summarize(call_samples)
++    measurement["sumStartScanCallMs"] = sum(call_samples)
++    return measurement
++
++
++def summarize(values):
++    return {"median_ms": statistics.median(values), "max_ms": max(values)}
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--output", type=Path, default=Path("/tmp/isla-wallpaper-scan-benchmark.json"))
++    parser.add_argument("--build", type=Path, help="reuse a built Wpscan module instead of building in a temp directory")
++    args = parser.parse_args()
++
++    with tempfile.TemporaryDirectory(prefix="isla-wallpaper-scan-") as directory:
++        temp = Path(directory)
++        plugin = args.build
++        if plugin is None:
++            plugin = temp / "build"
++            subprocess.run(["cmake", "-S", str(ROOT / "wpscan"), "-B", str(plugin),
++                            "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release"], check=True,
++                           capture_output=True, text=True)
++            subprocess.run(["cmake", "--build", str(plugin), "--parallel", "2"], check=True,
++                           capture_output=True, text=True)
++
++        small_png = temp / "fixture.png"
++        Image.new("RGB", (2, 2), "#123456").save(small_png)
++        datasets = [("wallpapers-real", REAL_WALLPAPERS, 35, 24)]
++        for count, iterations in ((35, 24), (1000, 10), (10000, 3)):
++            source_dir = temp / f"fixture-{count}"
++            source_dir.mkdir()
++            for index in range(count):
++                (source_dir / f"wallpaper-{index:05d}.png").hardlink_to(small_png)
++            datasets.append((f"fixture-{count}", source_dir, count, iterations))
++
++        measurements = []
++        for name, source_dir, count, iterations in datasets:
++            for cache_state in ("cold", "warm"):
++                cache_dir = temp / f"cache-{name}-{cache_state}"
++                cache_dir.mkdir()
++                if cache_state == "warm":
++                    warm_cache(source_dir, cache_dir)
++                sample = run_qml(source_dir, cache_dir, iterations, plugin)
++                measurements.append({"dataset": name, "cache": cache_state,
++                                     "files": count, "iterations": iterations,
++                                     **sample})
++
++        result = {"scanner": str(ROOT / "wpscan/WallpaperScanner.cpp"),
++                  "plugin_build": str(plugin), "real_wallpapers": str(REAL_WALLPAPERS),
++                  "measurements": measurements}
++        args.output.parent.mkdir(parents=True, exist_ok=True)
++        args.output.write_text(json.dumps(result, indent=2) + "\n")
++        for item in measurements:
++            print(f"{item['dataset']:18} {item['cache']:4} files={item['files']:5} "
++                  f"scan med/max={item['scanDoneMs']['median_ms']:.1f}/"
++                  f"{item['scanDoneMs']['max_ms']:.1f} ms "
++                  f"call max={item['startScanCallMs']['max_ms']:.1f} ms "
++                  f"max single-scan heartbeat-gap="
++                  f"{item['maxHeartbeatGapMs']:.1f} ms")
++        print(f"JSON: {args.output}")
++
++
++if __name__ == "__main__":
++    main()
+--- /dev/null
++++ b/bar/tests/wallpaper-scan-benchmark.qml
+@@ -0,0 +1,88 @@
++import QtQuick
++import Quickshell
++import Wpscan
++
++ShellRoot {
++    id: test
++    readonly property string imageDir: Quickshell.env("ISLA_SCAN_DIR")
++    readonly property string cacheDir: Quickshell.env("ISLA_SCAN_CACHE")
++    readonly property int iterations: Number(Quickshell.env("ISLA_SCAN_ITERATIONS"))
++    readonly property int expected: Number(Quickshell.env("ISLA_SCAN_EXPECTED"))
++    property double scanStartedAt: 0
++    property double batchStartedAt: 0
++    property double lastHeartbeatAt: 0
++    property double maxHeartbeatGapMs: 0
++    property double batchMs: 0
++    property int callbacks: 0
++    property int itemCount: 0
++    property var scanDoneSamplesMs: []
++    property var startScanCallSamplesMs: []
++
++    WallpaperScanner {
++        id: scanner
++        onScanDone: items => {
++            test.callbacks++
++            test.itemCount = items.length
++            test.scanDoneSamplesMs.push(Date.now() - test.scanStartedAt)
++            test.completeScan()
++        }
++    }
++
++    function fail(message) {
++        console.error("FAIL: " + message)
++        Qt.exit(1)
++    }
++    function runOne() {
++        test.scanStartedAt = Date.now()
++        scanner.startScan(test.imageDir, test.cacheDir, 320, 180, 78)
++        test.startScanCallSamplesMs.push(Date.now() - test.scanStartedAt)
++    }
++    function completeScan() {
++        if (test.callbacks > test.iterations || test.itemCount !== test.expected)
++            return test.fail("scan count/callback mismatch: " + test.callbacks + "/" + test.iterations
++                + " callbacks, " + test.itemCount + "/" + test.expected + " items")
++        if (test.callbacks === test.iterations) {
++            test.batchMs = Date.now() - test.batchStartedAt
++            report.start()
++        } else nextScan.restart()
++    }
++
++    Timer {
++        interval: 1
++        repeat: true
++        running: true
++        onTriggered: {
++            const now = Date.now()
++            if (test.lastHeartbeatAt > 0)
++                test.maxHeartbeatGapMs = Math.max(test.maxHeartbeatGapMs, now - test.lastHeartbeatAt)
++            test.lastHeartbeatAt = now
++        }
++    }
++    Timer {
++        interval: 100
++        running: true
++        onTriggered: {
++            test.batchStartedAt = Date.now()
++            test.lastHeartbeatAt = test.batchStartedAt
++            test.runOne()
++        }
++    }
++    Timer { id: nextScan; interval: 1; onTriggered: test.runOne() }
++    Timer {
++        id: report
++        interval: 100
++        onTriggered: {
++            console.log("WALLPAPER_SCAN_RESULT " + JSON.stringify({
++                items: test.itemCount,
++                callbacks: test.callbacks,
++                iterations: test.iterations,
++                batchMs: test.batchMs,
++                scanDoneSamplesMs: test.scanDoneSamplesMs,
++                startScanCallSamplesMs: test.startScanCallSamplesMs,
++                maxHeartbeatGapMs: test.maxHeartbeatGapMs
++            }))
++            Qt.quit()
++        }
++    }
++    Timer { interval: 30000; running: true; onTriggered: test.fail("benchmark timed out") }
++}
+--- /dev/null
++++ b/bar/tests/wallpaper-scanner-async.cpp
+@@ -0,0 +1,136 @@
++#include "WallpaperScanner.h"
++#include <QCoreApplication>
++#include <QDir>
++#include <QEventLoop>
++#include <QFile>
++#include <QJsonObject>
++#include <QPointer>
++#include <QSemaphore>
++#include <QTemporaryDir>
++#include <QThreadPool>
++#include <QTimer>
++#include <QtConcurrent>
++#include <QElapsedTimer>
++#include <QThread>
++#include <fcntl.h>
++#include <sys/stat.h>
++#include <unistd.h>
++
++static void check(bool condition) {
++    if (!condition) qFatal("async scanner regression failed");
++}
++
++static void waitForScan(WallpaperScanner &scanner) {
++    QEventLoop loop;
++    QObject::connect(&scanner, &WallpaperScanner::scanFinished, &loop, &QEventLoop::quit);
++    QTimer::singleShot(5000, &loop, [] { qFatal("async scanner timeout"); });
++    loop.exec();
++    check(!scanner.isScanning());
++}
++
++int main(int argc, char **argv) {
++    QCoreApplication app(argc, argv);
++    QTemporaryDir fixture;
++    check(fixture.isValid());
++    for (const auto &name : {"A", "B", "C"}) {
++        check(QDir().mkpath(fixture.filePath(name)));
++        QFile image(fixture.filePath(QString(name) + "/" + name + ".png"));
++        check(image.open(QIODevice::WriteOnly));
++        image.write("fixture");
++    }
++    const auto cache = fixture.filePath("cache");
++    auto *pool = QThreadPool::globalInstance();
++    pool->setMaxThreadCount(1);
++    QSemaphore started, release;
++    auto blocker = QtConcurrent::run([&] { started.release(); release.acquire(); });
++    started.acquire();
++    WallpaperScanner scanner;
++    int done = 0, finished = 0;
++    QString thumbnail;
++    auto connection = QObject::connect(&scanner, &WallpaperScanner::scanDone, &scanner,
++        [&](const QJsonArray &items) {
++            check(!scanner.isScanning());
++            check(items.size() == 1 && items[0].toObject()["name"] == "C.png");
++            thumbnail = items[0].toObject()["thumb"].toString();
++            ++done;
++        });
++    QObject::connect(&scanner, &WallpaperScanner::scanFinished, &scanner, [&] { ++finished; });
++    scanner.startScan(fixture.filePath("A"), cache);
++    scanner.startScan(fixture.filePath("B"), fixture.filePath("unused-cache"));
++    scanner.startScan(fixture.filePath("C"), cache);
++    check(scanner.isScanning() && done == 0);
++    check(scanner.findChildren<QObject *>().size() == 1);
++    release.release();
++    waitForScan(scanner);
++    check(done == 1 && finished == 1);
++    check(!QDir(fixture.filePath("unused-cache")).exists());
++    QObject::disconnect(connection);
++
++    done = finished = 0;
++    connection = QObject::connect(&scanner, &WallpaperScanner::scanDone, &scanner,
++        [&](const QJsonArray &items) {
++            check(!scanner.isScanning());
++            check(items[0].toObject()["name"] == (done == 0 ? "A.png" : "B.png"));
++            if (++done == 1) {
++                scanner.startScan(fixture.filePath("B"), cache);
++                check(scanner.isScanning());
++            }
++        });
++    scanner.startScan(fixture.filePath("A"), cache);
++    waitForScan(scanner);
++    check(done == 2 && finished == 1);
++    QObject::disconnect(connection);
++
++    // Deleting a scanner must neither wait for its queued job nor retain it.
++    blocker = QtConcurrent::run([&] { started.release(); release.acquire(); });
++    started.acquire();
++    QPointer<WallpaperScanner> destroyed = new WallpaperScanner;
++    destroyed->startScan(fixture.filePath("A"), cache);
++    delete destroyed.data();
++    check(destroyed.isNull());
++    release.release();
++    pool->waitForDone();
++    QCoreApplication::processEvents();
++
++    // Hold metadata reading open to delete the QObject while its worker runs.
++    QFile thumb(thumbnail);
++    check(thumb.open(QIODevice::WriteOnly));
++    thumb.write("fixture");
++    thumb.close();
++    const auto metadata = QFile::encodeName(thumbnail + ".meta.json");
++    check(::mkfifo(metadata.constData(), 0600) == 0);
++    destroyed = new WallpaperScanner;
++    destroyed->startScan(fixture.filePath("C"), cache);
++    QElapsedTimer deadline;
++    deadline.start();
++    int writer = -1;
++    while (writer < 0 && deadline.elapsed() < 5000) {
++        writer = ::open(metadata.constData(), O_WRONLY | O_NONBLOCK);
++        if (writer < 0) QThread::msleep(1);
++    }
++    check(writer >= 0);
++    delete destroyed.data();
++    check(destroyed.isNull());
++    ::close(writer);
++    pool->waitForDone();
++    check(QFile::remove(QString::fromLocal8Bit(metadata)));
++
++    // A consumer may also destroy the scanner while receiving scanDone.
++    destroyed = new WallpaperScanner;
++    bool deletedInCallback = false;
++    QObject::connect(destroyed, &WallpaperScanner::scanDone, &app, [&] {
++        delete destroyed.data();
++        deletedInCallback = true;
++    });
++    QEventLoop deletionLoop;
++    QTimer poll;
++    QObject::connect(&poll, &QTimer::timeout, &deletionLoop, [&] {
++        if (deletedInCallback) deletionLoop.quit();
++    });
++    QTimer::singleShot(5000, &deletionLoop, [] { qFatal("destruction timeout"); });
++    poll.start(1);
++    destroyed->startScan(fixture.filePath("C"), cache);
++    deletionLoop.exec();
++    check(destroyed.isNull());
++    qInfo("PASS: async coalescing, stale results, reentry, state and destruction");
++}
+--- /dev/null
++++ b/bar/tests/wallpaper-scanner-async.py
+@@ -0,0 +1,37 @@
++"""Build the production scanner and exercise async lifecycle without user data."""
++
++import argparse
++from pathlib import Path
++import subprocess
++import tempfile
++
++ROOT = Path(__file__).resolve().parents[2]
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--build", type=Path, help="retain the build for integration")
++    args = parser.parse_args()
++    with tempfile.TemporaryDirectory(prefix="isla-wpscan-async-") as temporary:
++        source = Path(temporary)
++        build = args.build.resolve() if args.build else source / "build"
++        (source / "CMakeLists.txt").write_text(f'''cmake_minimum_required(VERSION 3.22)
++project(ScannerRegression LANGUAGES CXX)
++set(CMAKE_AUTOMOC ON)
++set(CMAKE_CXX_STANDARD 17)
++find_package(Qt6 REQUIRED COMPONENTS Core Gui Concurrent Qml)
++add_subdirectory("{ROOT / 'wpscan'}" wpscan)
++add_executable(scanner-async "{ROOT / 'bar/tests/wallpaper-scanner-async.cpp'}")
++target_include_directories(scanner-async PRIVATE "{ROOT / 'wpscan'}")
++target_link_libraries(scanner-async PRIVATE wpscanplugin Qt6::Core Qt6::Concurrent Qt6::Qml)
++''')
++        subprocess.run(["cmake", "-S", str(source), "-B", str(build), "-G", "Ninja",
++                        "-DCMAKE_BUILD_TYPE=Release"], check=True, capture_output=True)
++        subprocess.run(["cmake", "--build", str(build), "--parallel", "2"],
++                       check=True, capture_output=True)
++        subprocess.run([str(build / "scanner-async")], check=True, timeout=15)
++        print(f"Plugin build: {build}")
++
++
++if __name__ == "__main__":
++    main()
+--- /dev/null
++++ b/bar/desktop-status-audio-rebind-regression.qml
+@@ -0,0 +1,121 @@
++import QtQuick
++import Quickshell
++import "Singletons"
++
++ShellRoot {
++    id: test
++    property var events: []
++
++    QtObject {
++        id: sinkA
++        property QtObject audio: QtObject {
++            property real volume: 0.42
++            property bool muted: false
++            signal volumesChanged()
++        }
++        signal propertiesChanged()
++    }
++    QtObject {
++        id: sinkB
++        property QtObject audio: QtObject {
++            property real volume: 0.65
++            property bool muted: false
++            signal volumesChanged()
++        }
++        signal propertiesChanged()
++    }
++    QtObject {
++        id: sourceA
++        property QtObject audio: QtObject {
++            property real volume: 0.31
++            property bool muted: false
++            signal volumesChanged()
++        }
++        signal propertiesChanged()
++    }
++    QtObject {
++        id: sourceB
++        property QtObject audio: QtObject {
++            property real volume: 0.73
++            property bool muted: false
++            signal volumesChanged()
++        }
++        signal propertiesChanged()
++    }
++
++    Connections {
++        target: DesktopStatus
++        function onVolumeOSD(progress, muted) { test.events.push(["volume", progress, muted]) }
++        function onMicOSD(progress, muted) { test.events.push(["mic", progress, muted]) }
++    }
++
++    function fail(message) {
++        console.error("FAIL: " + message)
++        Qt.exit(1)
++    }
++    function checkRebound() {
++        sinkA.audio.volume = 0.9
++        sinkA.audio.volume = 0.91
++        sinkA.audio.volumesChanged()
++        sourceA.audio.volume = 0.9
++        sourceA.audio.volume = 0.91
++        sourceA.audio.volumesChanged()
++        if (events.length !== 2) return fail("old audio objects remained connected after hotplug: " + JSON.stringify(events))
++
++        sinkB.audio.volume = 0.66
++        sinkB.audio.volumesChanged()
++        sinkB.audio.muted = true
++        sourceB.audio.volume = 0.74
++        sourceB.audio.volumesChanged()
++        if (events.length !== 5 || JSON.stringify(events[2]) !== JSON.stringify(["volume", 0.66, false])
++                || JSON.stringify(events[3]) !== JSON.stringify(["volume", 0, true])
++                || JSON.stringify(events[4]) !== JSON.stringify(["mic", 0.74, false]))
++            return fail("new audio objects did not drive OSD: " + JSON.stringify(events))
++
++        DesktopStatus._pwSink = null
++        DesktopStatus._pwSource = null
++        sinkB.audio.volume = 0.67
++        sinkB.audio.volumesChanged()
++        sourceB.audio.volume = 0.75
++        sourceB.audio.volumesChanged()
++        if (events.length !== 5) return fail("disconnected audio objects still emitted OSD")
++
++        DesktopStatus.monitorServices = false
++        DesktopStatus._pwSink = sinkA
++        DesktopStatus._pwSource = sourceA
++        DesktopStatus.monitorServices = true
++        sinkA.audio.volume = 0.92
++        sinkA.audio.volumesChanged()
++        sourceA.audio.volume = 0.92
++        sourceA.audio.volumesChanged()
++        if (events.length !== 7 || events[5][0] !== "volume" || events[6][0] !== "mic")
++            return fail("monitorServices failed to re-enable audio observers: " + JSON.stringify(events))
++
++        DesktopStatus.monitorServices = false
++        DesktopStatus._pwSink = null
++        DesktopStatus._pwSource = null
++        console.log("PASS: Pipewire default nodes and audio interfaces rebind on hotplug; disabled observers stay quiet")
++        Qt.quit()
++    }
++
++    Component.onCompleted: {
++        DesktopStatus.monitorServices = false
++        DesktopStatus._pwSink = sinkA
++        DesktopStatus._pwSource = sourceA
++        sinkA.audio.volume = 0.43
++        sourceA.audio.volume = 0.32
++        if (events.length !== 0) return fail("monitorServices=false delivered audio OSD")
++
++        DesktopStatus.monitorServices = true
++        sinkA.audio.volume = 0.44
++        sinkA.audio.volumesChanged()
++        sourceA.audio.volume = 0.33
++        sourceA.audio.volumesChanged()
++        if (events.length !== 2 || events[0][0] !== "volume" || events[1][0] !== "mic")
++            return fail("initial audio observers did not deliver OSD: " + JSON.stringify(events))
++
++        DesktopStatus._pwSink = sinkB
++        DesktopStatus._pwSource = sourceB
++        Qt.callLater(test.checkRebound)
++    }
++}
+--- /dev/null
++++ b/bar/services/nmcli_monitor.py
+@@ -0,0 +1,10 @@
++#!/usr/bin/env python3
++"""Exec the read-only monitor with Quickshell's process lifetime."""
++import os
++import sys
++
++from cava_stream import die_with_parent
++
++if __name__ == "__main__":
++    die_with_parent(int(sys.argv[1]))
++    os.execvp("nmcli", ["nmcli", "monitor"])
+--- /dev/null
++++ b/bar/tests/nmcli-lifetime.py
+@@ -0,0 +1,131 @@
++#!/usr/bin/env python3
++"""Check the real Nmcli monitor with a silent, blocking fake; never use desktop PIDs."""
++import os
++from pathlib import Path
++import signal
++import subprocess
++import sys
++import tempfile
++import time
++
++ROOT = Path(__file__).resolve().parents[1]
++FAKE = '''#!/usr/bin/env python3
++import os, signal, sys
++from pathlib import Path
++state = Path(os.environ['NMCLI_TEST_STATE'])
++if sys.argv[1:] == ['monitor']:
++    signal.signal(signal.SIGUSR1, lambda *_: print('network changed', flush=True))
++    with (state / 'monitors').open('a') as stream:
++        stream.write(str(os.getpid()) + '\\n')
++    while True:
++        signal.pause()
++elif sys.argv[1:2] == ['-g']:
++    with (state / 'reads').open('a') as stream:
++        stream.write('read\\n')
++elif sys.argv[1:] == ['radio', 'wifi']:
++    print('enabled')
++'''
++QML = '''import QtQuick
++import Quickshell
++import Quickshell.Io
++import "Singletons"
++ShellRoot {
++    property bool enabled: Nmcli.wifiEnabled
++    IpcHandler {
++        target: "fixture"
++        function quit(): void { Qt.quit() }
++        function reload(): void { Quickshell.reload(false) }
++    }
++}
++'''
++
++
++def alive(pid):
++    try:
++        return Path(f'/proc/{pid}/stat').read_text().split(') ')[1][0] != 'Z'
++    except FileNotFoundError:
++        return False
++
++
++def wait_for(predicate, message, timeout=5):
++    deadline = time.monotonic() + timeout
++    while not predicate():
++        assert time.monotonic() < deadline, message
++        time.sleep(.02)
++
++
++def lines(path):
++    return path.read_text().splitlines() if path.exists() else []
++
++
++failures = []
++for mode in ('quit', 'SIGTERM', 'reload'):
++    with tempfile.TemporaryDirectory(prefix='isla-nmcli-lifetime-') as directory:
++        work = Path(directory)
++        (work / 'Singletons').mkdir()
++        (work / 'Singletons/Nmcli.qml').write_text((ROOT / 'Singletons/Nmcli.qml').read_text())
++        (work / 'Singletons/qmldir').write_text('singleton Nmcli Nmcli.qml\n')
++        (work / 'services').symlink_to(ROOT / 'services', target_is_directory=True)
++        (work / 'shell.qml').write_text(QML)
++        (work / 'nmcli').write_text(FAKE)
++        (work / 'nmcli').chmod(0o755)
++        env = dict(os.environ, QT_QPA_PLATFORM='offscreen', XDG_RUNTIME_DIR=directory,
++                   NMCLI_TEST_STATE=directory, PATH=directory + os.pathsep + os.environ['PATH'])
++        with (work / 'output.log').open('w+') as log:
++            process = subprocess.Popen(['quickshell', '-p', directory], env=env,
++                                       stdout=log, stderr=subprocess.STDOUT)
++            def call(method):
++                result = subprocess.run(['quickshell', '-p', directory, 'ipc', 'call', 'fixture', method],
++                                        env=env, capture_output=True, text=True, timeout=5)
++                assert result.returncode == 0, result.stdout + result.stderr
++            try:
++                wait_for(lambda: len(lines(work / 'monitors')) == 1, 'monitor not started')
++                first = int(lines(work / 'monitors')[0])
++                assert Path(f'/proc/{first}/stat').read_text().split(') ')[1].split()[1] == str(process.pid), 'monitor must exec directly under Quickshell'
++                wait_for(lambda: len(lines(work / 'reads')) >= 1, 'initial read missing')
++                # Event refresh and restart must survive lifecycle hardening.
++                before = len(lines(work / 'reads'))
++                os.kill(first, signal.SIGUSR1)
++                wait_for(lambda: len(lines(work / 'reads')) > before, 'monitor event lost')
++                os.kill(first, signal.SIGTERM)
++                wait_for(lambda: len(lines(work / 'monitors')) == 2, 'monitor did not restart')
++                if mode == 'reload':
++                    call('reload')
++                    wait_for(lambda: len(lines(work / 'monitors')) >= 3, 'reload monitor missing')
++                    time.sleep(.3)
++                    current = [int(pid) for pid in lines(work / 'monitors') if alive(int(pid))]
++                    assert len(current) == 1, f'reload left monitors {current}'
++                    process.terminate()
++                elif mode == 'quit':
++                    call('quit')
++                else:
++                    process.terminate()
++                process.wait(timeout=5)
++                time.sleep(.15)
++                survivors = [int(pid) for pid in lines(work / 'monitors') if alive(int(pid))]
++                assert not survivors, f'{mode} left orphan monitors {survivors}'
++                print(f'PASS: {mode}; event refresh, crash restart, no surviving monitor')
++            except Exception as error:
++                failures.append(f'{mode}: {error}')
++                log.flush()
++                log.seek(0)
++                print(log.read())
++            finally:
++                if process.poll() is None:
++                    process.terminate()
++                    process.wait(timeout=5)
++                for pid in map(int, lines(work / 'monitors')):
++                    if alive(pid):
++                        os.kill(pid, signal.SIGKILL)
++assert not failures, '\n'.join(failures)
++
++# A parent that died before prctl was armed must not allow exec of the monitor.
++with tempfile.TemporaryDirectory(prefix='isla-nmcli-parent-race-') as directory:
++    work = Path(directory)
++    (work / 'nmcli').write_text(FAKE)
++    (work / 'nmcli').chmod(0o755)
++    result = subprocess.run([sys.executable, str(ROOT / 'services/nmcli_monitor.py'), '0'],
++                            env=dict(os.environ, NMCLI_TEST_STATE=directory,
++                                     PATH=directory + os.pathsep + os.environ['PATH']), timeout=5)
++    assert result.returncode == 1 and not (work / 'monitors').exists(), 'dead parent permitted exec'
++    print('PASS: parent identity mismatch aborts before exec')

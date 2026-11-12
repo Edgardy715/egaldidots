@@ -1,0 +1,1 @@
+ DEBUG qml: PASS: layout exit/settle gates, reversals, reduced motion and launcher/auth header withdrawal

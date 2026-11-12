@@ -1,0 +1,5 @@
+  INFO: Launching config: "/tmp/isla-settings-final-qa-_4m0_2cx/bar/settings-motion-regression.qml"
+  INFO: Shell ID: "f93e7ae061c088cd96a816540912e614" Path ID "f93e7ae061c088cd96a816540912e614"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/67mk6lbnt/log.qslog"
+  INFO: Configuration Loaded
+ DEBUG qml: PASS: Edots page exit, retarget continuity, last destination, reduced motion and hidden stop

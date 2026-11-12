@@ -1,0 +1,14 @@
+[32m  INFO[0m: Launching config: "/home/zdito/.config/quickshell/bar/iris-delight-regression.qml"
+[32m  INFO[0m: Shell ID: "341383234e435097ff1ab2ea649e3060" Path ID "341383234e435097ff1ab2ea649e3060"
+[32m  INFO[0m: Saving logs to "/run/user/1000/quickshell/by-id/iof3z28hnt/log.qslog"
+[32m  INFO[0m: Configuration Loaded
+[33m  WARN[97m qt.qpa.wayland.textinput[0m: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f2d1f4fcc40 but 0x0 is focused
+[34m DEBUG[97m qml[0m: DELIGHT_CAPTURE visitor-firefly
+[34m DEBUG[97m qml[0m: DELIGHT_CAPTURE visitor-moth
+[34m DEBUG[97m qml[0m: DELIGHT_CAPTURE visitor-raindrop
+[34m DEBUG[97m qml[0m: DELIGHT_CAPTURE visitor-bubble
+[34m DEBUG[97m qml[0m: DELIGHT_CAPTURE visitor-snowflake
+[34m DEBUG[97m qml[0m: DELIGHT_CAPTURE tint-dark
+[34m DEBUG[97m qml[0m: DELIGHT_CAPTURE tint-light
+[34m DEBUG[97m qml[0m: DELIGHT_CAPTURE settled
+[34m DEBUG[97m qml[0m: PASS: Iris delight (visitors, clock choice, gaze, interruptions, sightings, dust, eye tint and pupil)

@@ -1,0 +1,299 @@
+{
+  "before": {
+    "pid": 76933,
+    "clock_ticks": 100,
+    "memory_before": {
+      "Rss_kib": 18788,
+      "Pss_kib": 10982,
+      "Private_Dirty_kib": 10072
+    },
+    "samples": [
+      {
+        "elapsed_s": 1.0002036040000348,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 9.997964374461153,
+        "rss_kib": 18596,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 2.000410856000144,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 10.997720700388202,
+        "rss_kib": 18724,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 3.0006833180000285,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 9.99727612215436,
+        "rss_kib": 18724,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 4.000931748999847,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 9.997516307028148,
+        "rss_kib": 18724,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 5.001157608000085,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 9.997741920005305,
+        "rss_kib": 18724,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 6.001332656000159,
+        "cpu_percent": 0.9998249826363658,
+        "child_cpu_percent": 10.998074809000023,
+        "rss_kib": 18724,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 6.200189239999872,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 0.0,
+        "rss_kib": 18724,
+        "threads": 1
+      }
+    ],
+    "duration_s": 6.200189239999872,
+    "cpu_percent": 0.16128539973402822,
+    "child_cpu_percent": 9.99969478350975,
+    "memory_after": {
+      "Rss_kib": 18788,
+      "Pss_kib": 10982,
+      "Private_Dirty_kib": 10072
+    },
+    "window_s": 6.5,
+    "snapshot_commands": 21,
+    "subscribe_processes": 0,
+    "commands": [
+      [
+        "-f",
+        "json",
+        "list",
+        "sink-inputs"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "clients"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sinks"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sink-inputs"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "clients"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sinks"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sink-inputs"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "clients"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sinks"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sink-inputs"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "clients"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sinks"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sink-inputs"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "clients"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sinks"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sink-inputs"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "clients"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sinks"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sink-inputs"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "clients"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sinks"
+      ]
+    ],
+    "stderr": "",
+    "status": 0
+  },
+  "after": {
+    "pid": 77133,
+    "clock_ticks": 100,
+    "memory_before": {
+      "Rss_kib": 18960,
+      "Pss_kib": 11010,
+      "Private_Dirty_kib": 10176
+    },
+    "samples": [
+      {
+        "elapsed_s": 1.0001702380000097,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 0.0,
+        "rss_kib": 18824,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 2.0003935980003007,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 0.0,
+        "rss_kib": 18824,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 3.0006520179999825,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 0.0,
+        "rss_kib": 18824,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 4.0008802880001895,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 0.0,
+        "rss_kib": 18824,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 5.001090862000183,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 0.0,
+        "rss_kib": 18824,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 6.001314314999945,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 0.0,
+        "rss_kib": 18824,
+        "threads": 1
+      },
+      {
+        "elapsed_s": 6.200174683000114,
+        "cpu_percent": 0.0,
+        "child_cpu_percent": 0.0,
+        "rss_kib": 18824,
+        "threads": 1
+      }
+    ],
+    "duration_s": 6.200174683000114,
+    "cpu_percent": 0.0,
+    "child_cpu_percent": 0.0,
+    "memory_after": {
+      "Rss_kib": 18960,
+      "Pss_kib": 11252,
+      "Private_Dirty_kib": 10176
+    },
+    "window_s": 6.5,
+    "snapshot_commands": 3,
+    "subscribe_processes": 1,
+    "commands": [
+      [
+        "subscribe"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sink-inputs"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "clients"
+      ],
+      [
+        "-f",
+        "json",
+        "list",
+        "sinks"
+      ]
+    ],
+    "stderr": "",
+    "status": 0
+  }
+}

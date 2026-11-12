@@ -1,0 +1,5 @@
+{
+  "removed_old_instance_monitor": 1873,
+  "active_shell": 12806,
+  "cause_under_test": "monitor survived previous shell SIGTERM"
+}

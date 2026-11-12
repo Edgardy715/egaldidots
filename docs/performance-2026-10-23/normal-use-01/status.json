@@ -1,0 +1,13 @@
+{
+  "state": "completed",
+  "pid": 545318,
+  "collector_pid": 552155,
+  "start_ticks": 1916844,
+  "started_utc": "2026-10-23T04:38:50.132964+00:00",
+  "requested_seconds": 7200.0,
+  "interval_seconds": 30.0,
+  "samples": 241,
+  "elapsed_seconds": 7200.461031838,
+  "possible_reload": true,
+  "ended_utc": "2026-10-23T06:38:50.593991+00:00"
+}

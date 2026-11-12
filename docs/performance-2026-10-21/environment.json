@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-21",
+  "timezone": "America/Santo_Domingo",
+  "quickshell": "Quickshell 0.3.2 (revision , distributed by Arch Linux)",
+  "qt": "6.12.0",
+  "kernel": "7.2.9-2-cachyos",
+  "nvidia": "615.78.08",
+  "clock_ticks": 100,
+  "cpu_basis": "100 percent means one core",
+  "pre_reboot_baseline_pid": 2203,
+  "post_reboot_activation_pid": 12806,
+  "baseline_files_sha256": "docs/performance-2026-10-21/baseline-hashes.json"
+}

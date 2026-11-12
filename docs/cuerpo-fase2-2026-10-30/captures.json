@@ -1,0 +1,353 @@
+[
+  {
+    "scene": "01-cuello-salida",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "out",
+      "stored": false,
+      "label": false,
+      "drop": [
+        956.6619873046875,
+        114.51883697509766,
+        12.381566047668457,
+        1
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 3659,
+      "pill": [
+        960,
+        90,
+        106.20528411865234,
+        20.261625289916992
+      ]
+    }
+  },
+  {
+    "scene": "02-lagrima",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "out",
+      "stored": false,
+      "label": false,
+      "drop": [
+        946.568603515625,
+        188.65760803222656,
+        13.04782485961914,
+        1
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 3748,
+      "pill": [
+        960,
+        90,
+        109.49490356445312,
+        18.576887130737305
+      ]
+    }
+  },
+  {
+    "scene": "03-regreso",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "return",
+      "stored": false,
+      "label": false,
+      "drop": [
+        949.717529296875,
+        165.5279998779297,
+        12.996613502502441,
+        1
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 3813,
+      "pill": [
+        960,
+        90,
+        108.77753448486328,
+        18.47250747680664
+      ]
+    }
+  },
+  {
+    "scene": "04-persecucion",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "out",
+      "stored": false,
+      "label": false,
+      "drop": [
+        1150.551025390625,
+        177.5227813720703,
+        13.084878921508789,
+        1
+      ],
+      "res": 1,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 4416,
+      "pill": [
+        960,
+        90,
+        111.39981079101562,
+        19.193408966064453
+      ]
+    }
+  },
+  {
+    "scene": "05-tragar",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "return",
+      "stored": true,
+      "label": false,
+      "drop": [
+        1088.98583984375,
+        149.2498016357422,
+        15.500541687011719,
+        1
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 4680,
+      "pill": [
+        960,
+        90,
+        110.18444061279297,
+        19.07328224182129
+      ]
+    }
+  },
+  {
+    "scene": "06-vuelta-con-archivo",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "home",
+      "stored": true,
+      "label": true,
+      "drop": [
+        953.7861938476562,
+        87.14567565917969,
+        10.812517166137695,
+        0
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 4860,
+      "pill": [
+        960,
+        90,
+        132.25282287597656,
+        18.577054977416992
+      ]
+    }
+  },
+  {
+    "scene": "07-fusion-guardado",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "home",
+      "stored": true,
+      "label": true,
+      "drop": [
+        960.0001831054688,
+        90.00009155273438,
+        11,
+        0
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": false,
+      "timer": true,
+      "count": 5233,
+      "pill": [
+        960,
+        90,
+        132,
+        19.33839225769043
+      ]
+    }
+  },
+  {
+    "scene": "08-entrega-viaje",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "deliver",
+      "stored": true,
+      "label": false,
+      "drop": [
+        812.5552978515625,
+        286.5928955078125,
+        15.54177474975586,
+        1
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 5392,
+      "pill": [
+        960,
+        90,
+        110.03374481201172,
+        18.92516326904297
+      ]
+    }
+  },
+  {
+    "scene": "09-archivo-devuelto",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "out",
+      "stored": false,
+      "label": false,
+      "drop": [
+        809.9244995117188,
+        290.1006164550781,
+        12.999984741210938,
+        1
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 5897,
+      "pill": [
+        960,
+        90,
+        109.69931030273438,
+        18.880290985107422
+      ]
+    }
+  },
+  {
+    "scene": "interrupcion-1",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "out",
+      "stored": false,
+      "label": false,
+      "drop": [
+        944.0243530273438,
+        153.73779296875,
+        12.996484756469727,
+        1
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 6614,
+      "pill": [
+        960,
+        90,
+        109.21470642089844,
+        18.6645450592041
+      ]
+    }
+  },
+  {
+    "scene": "interrupcion-2",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "out",
+      "stored": false,
+      "label": false,
+      "drop": [
+        952.7103881835938,
+        153.50013732910156,
+        12.996541023254395,
+        1
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 7329,
+      "pill": [
+        960,
+        90,
+        110.66577911376953,
+        19.327978134155273
+      ]
+    }
+  },
+  {
+    "scene": "interrupcion-3",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "out",
+      "stored": false,
+      "label": false,
+      "drop": [
+        957.640625,
+        154.96487426757812,
+        12.996428489685059,
+        1
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": true,
+      "timer": false,
+      "count": 8047,
+      "pill": [
+        960,
+        90,
+        110.510986328125,
+        19.2686767578125
+      ]
+    }
+  },
+  {
+    "scene": "reposo-final",
+    "status": {
+      "shader": 0,
+      "log": "",
+      "dropMode": "home",
+      "stored": false,
+      "label": false,
+      "drop": [
+        960,
+        90,
+        11,
+        0
+      ],
+      "res": 0,
+      "mood": "curiosa",
+      "frames": false,
+      "timer": true,
+      "count": 8673,
+      "pill": [
+        960,
+        90,
+        111.40184783935547,
+        19.637182235717773
+      ]
+    }
+  }
+]

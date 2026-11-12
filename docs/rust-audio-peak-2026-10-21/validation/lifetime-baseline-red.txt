@@ -1,0 +1,10 @@
+PASS: stdin-EOF leaves no live child
+PASS: TERM leaves no live child
+Traceback (most recent call last):
+  File "/home/zdito/.config/quickshell/bar/tests/audio-lifetime.py", line 75, in <module>
+    wait_for(lambda: not any(tree(pid) for pid in children))
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/zdito/.config/quickshell/bar/tests/audio-lifetime.py", line 43, in wait_for
+    assert time.monotonic() < deadline, "audio child failed to start/stop"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: audio child failed to start/stop

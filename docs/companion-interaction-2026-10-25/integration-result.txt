@@ -1,0 +1,4 @@
+absorption:  DEBUG qml: PASS: continuous capture at 30/60/144/240 Hz, compact/playing/hover/card, coverage and return
+companion-continuity:  DEBUG qml: PASS: companion refresh independence, 80ms stall, velocity at target, capture reopen, geometric neck pinch and live reduced motion
+bar-layout-transition:  DEBUG qml: PASS: layout exit/settle gates, reversals, reduced motion and launcher/auth header withdrawal
+pill-composition:  DEBUG qml: PASS: injected header/calendar input, workspace width, interrupted morph, exposure, reduced motion and notification breath

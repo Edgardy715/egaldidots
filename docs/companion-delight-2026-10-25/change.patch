@@ -1,0 +1,197 @@
+--- before/bar/components/IslandCompanion.qml
++++ after/bar/components/IslandCompanion.qml
+@@ -37,6 +37,10 @@
+     property double sleptAt: 0
+     readonly property bool followsPointer: !context || !!context.options.followPointer
+     readonly property bool interactive: !reduced && !suspended && visible && !asleep
++    readonly property real materialX: followsPointer ? Math.max(-1, Math.min(1, localLook)) * touch * 1.1 * s : 0
++    readonly property real materialY: touch * 0.8 * s
++    readonly property real materialScaleX: 1 - touch * 0.08
++    readonly property real materialScaleY: 1 + touch * 0.08
+     readonly property real beat: context ? context.pupilBeat : 0
+     readonly property bool concentrating: context ? context.concentrating : false
+     property real highlightX: gazeX * 0.32
+@@ -77,7 +81,7 @@
+         touch = Qt.binding(() => root.touchTarget)
+         touchBehavior.enabled = Qt.binding(() => root.interactive)
+         blink.stop(); lid = 1
+-        celebration.stop(); swayMotion.stop(); patMotion.stop(); wakeMotion.stop(); specialMotion.stop(); dozeMotion.stop()
++        celebration.stop(); swayMotion.stop(); patMotion.stop(); wakeMotion.stop(); specialMotion.stop(); dozeMotion.stop(); heldSneeze.stop()
+         winkLid = 1; lowerLid = 0; roll = 0; breath = 1; hop = 0; tilt = 0; squash = 1
+         gesture = ""
+     }
+@@ -86,6 +90,7 @@
+         const now = Date.now()
+         clickCount = now - lastClick < 1100 ? clickCount + 1 : 1
+         lastClick = now
++        if (clickCount === 4) { play("holdSneeze"); return }
+         if (clickCount >= 3) { play("squint"); return }
+         approach.stop()
+         play(choice || (clickCount === 2 ? "roll" : now < affectionUntil ? "wink" : "curious"))
+@@ -95,7 +100,8 @@
+         stopMoment()
+         gesture = kind
+         if (kind === "squint") { cheerful = true; cheerHold.restart() }
+-        if (kind === "doze") dozeMotion.restart()
++        if (kind === "holdSneeze") { cheerHold.stop(); cheerful = false; heldSneeze.restart() }
++        else if (kind === "doze") dozeMotion.restart()
+         else specialMotion.restart()
+     }
+     function approachPointer(inside) {
+@@ -103,6 +109,7 @@
+         approach.stop(); linger.stop()
+         if (!interactive) return
+         if (inside) {
++            if (gesture === "holdSneeze") stopMoment()
+             lingering = false
+             if (Date.now() < affectionUntil) { cheerful = true; cheerHold.restart() }
+             greet(); approach.restart()
+@@ -222,6 +229,30 @@
+         PauseAnimation { duration: 180 }
+         ScriptAction { script: root.play("yawn") }
+     }
++    // A false start, a held sneeze, then a quiet, self-satisfied wink.
++    SequentialAnimation {
++        id: heldSneeze
++        ParallelAnimation {
++            NumberAnimation { target: root; property: "lowerLid"; to: 0.45; duration: 360; easing.type: Easing.InOutSine }
++            NumberAnimation { target: root; property: "breath"; to: 1.06; duration: 360; easing.type: Easing.InOutSine }
++            NumberAnimation { target: root; property: "tilt"; to: -6; duration: 360; easing.type: Easing.InOutSine }
++        }
++        PauseAnimation { duration: 220 }
++        ParallelAnimation {
++            NumberAnimation { target: root; property: "lowerLid"; to: 0.7; duration: 160; easing.type: Easing.OutCubic }
++            NumberAnimation { target: root; property: "squash"; to: 0.92; duration: 160; easing.type: Easing.OutCubic }
++            NumberAnimation { target: root; property: "tilt"; to: 3; duration: 160; easing.type: Easing.OutCubic }
++        }
++        PauseAnimation { duration: 180 }
++        ParallelAnimation {
++            NumberAnimation { target: root; properties: "breath,squash"; to: 1; duration: 400; easing.type: Easing.InOutSine }
++            NumberAnimation { target: root; properties: "lowerLid,tilt"; to: 0; duration: 400; easing.type: Easing.InOutSine }
++            NumberAnimation { target: root; property: "winkLid"; to: 0.08; duration: 220; easing.type: Easing.InOutSine }
++        }
++        PauseAnimation { duration: 180 }
++        NumberAnimation { target: root; property: "winkLid"; to: 1; duration: 240; easing.type: Easing.OutCubic }
++        ScriptAction { script: root.gesture = "" }
++    }
+     // One exclusive finite moment: anticipation, expression, then release.
+     SequentialAnimation {
+         id: specialMotion
+@@ -286,9 +317,10 @@
+         id: face
+         anchors.fill: parent
+         transform: [
++            Scale { origin.x: face.width / 2; origin.y: face.height / 2; xScale: root.materialScaleX; yScale: root.materialScaleY },
+             Scale { origin.x: face.width / 2; origin.y: face.height * 0.8; xScale: 1 / Math.sqrt(root.squash); yScale: root.squash * root.breath },
+             Rotation { origin.x: face.width / 2; origin.y: face.height; angle: root.tilt + root.touchDirection * root.touch * 5 },
+-            Translate { y: root.hop + root.restDrop }
++            Translate { x: root.materialX; y: root.hop + root.restDrop + root.materialY }
+         ]
+         Repeater {
+             model: 2
+--- before/bar/components/IslandActivityChip.qml
++++ after/bar/components/IslandActivityChip.qml
+@@ -27,13 +27,18 @@
+     Behavior on width { enabled: !Flags.reduceMotion; SmoothedAnimation { duration: Motion.morph; velocity: -1 } }
+     TextMetrics { id: labelMetrics; text: root.label; font: labelText.font }
+     Rectangle {
++        id: plate
+         objectName: "companionHoverPlate"
+         visible: root.companionEnabled
+         x: 0; y: (root.height - height) / 2
+         width: 30 * root.s; height: 26 * root.s
+-        radius: 10 * root.s
++        radius: (10 + companion.touch * 3) * root.s
+         scale: hit.motion.visualScale
+-        color: Qt.alpha(Theme.foreground, 0.045 * hit.motion.presence + 0.065 * hit.motion.pressure)
++        transform: [
++            Scale { origin.x: plate.width / 2; origin.y: plate.height / 2; xScale: companion.materialScaleX; yScale: companion.materialScaleY },
++            Translate { x: companion.materialX; y: companion.materialY }
++        ]
++        color: Qt.alpha(Theme.foreground, 0.045 * hit.motion.presence + 0.065 * hit.motion.pressure + 0.055 * companion.touch)
+         border.width: hit.activeFocus ? Theme.borderHairline : 0
+         border.color: Qt.alpha(Theme.accent, 0.65)
+     }
+--- before/bar/components/CompanionBehavior.qml
++++ after/bar/components/CompanionBehavior.qml
+@@ -42,7 +42,7 @@
+         if (!running || blocked || options.mischief === "never" || now - lastMischief < traits.mischiefInterval) return false
+         if (chance >= (options.mischief === "normal" ? 0.28 : 0.08)) return false
+         lastMischief = now
+-        gestureRequested(chance < 0.025 ? "sneeze" : chance < 0.05 ? "roll" : "wink")
++        gestureRequested(chance < 0.025 ? "holdSneeze" : chance < 0.05 ? "roll" : "wink")
+         return true
+     }
+     function tryYawn(now, chance) {
+--- before/bar/personality-regression.qml
++++ after/bar/personality-regression.qml
+@@ -48,7 +48,7 @@
+             // Every moment is finite and returns the body to rest.
+             function companionMoments() {
+                 const newStill = () => face.gesture === "" && face.winkLid === 1 && face.lowerLid === 0 && face.roll === 0 && face.breath === 1
+-                for (const kind of ["wink", "curious", "roll", "sneeze", "yawn", "squint", "doze"]) {
++                for (const kind of ["wink", "curious", "roll", "sneeze", "yawn", "squint", "doze", "holdSneeze"]) {
+                     face.play(kind)
+                     check(face.gesture === kind, kind + " starts")
+                     eventually(newStill, 3000, kind + " returns to rest")
+@@ -136,6 +136,8 @@
+                 face.interact(); check(face.gesture === "curious", "first click is curious")
+                 face.interact(); check(face.gesture === "roll", "second click plays")
+                 face.interact(); check(face.gesture === "squint", "third click asks for a pause")
++                face.interact(); check(face.gesture === "holdSneeze", "fourth click discovers a small story")
++                check(!face.cheerful, "story clears the third click's cheerful expression")
+                 face.lastClick = Date.now() - 1200
+                 face.interact(); check(face.gesture === "curious", "click sequence resets after a pause")
+                 face.settle()
+@@ -176,7 +178,7 @@
+                 check(face.gesture === "" && face.touch === 0 && face.squash === 1, "reduced refuses new interactions")
+                 face.reduced = false; face.settle()
+                 behavior.reduced = false
+-                behavior.options = {followPointer: false, reactToCode: false, reactToMusic: false, mischief: "never"}
++                behavior.options = {followPointer: false, reactToCode: false, reactToMusic: false, reactAtNight: false, mischief: "never"}
+                 face.context = behavior
+                 face.approachPointer(true); face.stroke(120, 1, 0.8); face.approachPointer(false)
+                 check(face.touchDirection === 0 && !face.lingering, "followPointer off disables touch lean and lingering")
+--- before/bar/companion-preview.qml
++++ after/bar/companion-preview.qml
+@@ -103,7 +103,7 @@
+             Card { caption: "guiño · confirmación"; pose: "wink" }
+             Card { caption: "curiosidad · clic"; pose: "curious" }
+             Card { caption: "mirada traviesa · clic"; pose: "roll" }
+-            Card { caption: "estornudo · travesura rara"; pose: "sneeze" }
++            Card { caption: "contener estornudo · cuarto clic"; pose: "holdSneeze" }
+             Card { caption: "bostezo · noche / ausencia"; pose: "doze" }
+             Card { caption: "contento · clics repetidos"; pose: "squint" }
+             Card { id: wake; caption: "estirarse · volver"; asleep: true; Timer { interval: 800; running: true; onTriggered: wake.asleep = false } }
+--- before/bar/fluid/MOTION_LANGUAGE.md
++++ after/bar/fluid/MOTION_LANGUAGE.md
+@@ -390,6 +390,13 @@
+ «ya, ya»; la secuencia se reinicia tras 1,1 s sin clics. Después de una caricia
+ recuerda afecto durante 30 s y saluda con más calidez, sin persistencia ni puntos.
+ Hover prolongado (750 ms) despierta curiosidad; al salir conserva la mirada 850 ms.
++La superficie acompaña el roce con compresión horizontal/estiramiento vertical
++del 8 %, luz local y desplazamiento de hasta 1,1 unidades; comparte la presión
++continua de los ojos y su liberación, conservando layout y target de interacción.
++Un cuarto clic descubre una historia de 1,74 s: contiene un estornudo y guiña.
++Cancela la sonrisa del tercer clic para conservar la anticipación visible.
++También reutiliza la oportunidad existente de travesura; acercarse o tocarlo
++interrumpe la escena. Sin temporizador ni loop de actividad adicional.
+ Seguimiento desactivado elimina también inclinación por roce y mirada de salida.
+ La cara no abre surfaces. Enfoque y Grabación: Super+U → Ajustes rápidos →
+ Actividades. REC y el texto informativo quedan fuera de su zona de interacción.
+--- before/bar/TESTING.md
++++ after/bar/TESTING.md
+@@ -234,6 +234,13 @@
+ 260 ms pointer sampling, context options, bounded night/mischief cadence, blockers,
+ and no delayed joy transition from new events under reduced motion. Run on Wayland
+ with a temporary `ISLA_CONFIG`; `ISLA_TEST_OUTPUT` stores mock-only captures.
++`companion-delight-regression.qml` checks touch deformation at scales 1/1.5/3,
++fixed layout and unclipped plate bounds, the four-click held-sneeze story,
++its visible anticipation after the previous smile, interruptions in three phases,
++pointer approach, reduced/hidden/suspended/blocked/sleep cancellation and tracking
++opt-out. Run with a temporary `ISLA_CONFIG`. `ISLA_TEST_OUTPUT=1` emits capture
++markers; `docs/companion-delight-2026-10-25/capture.py` captures Wayland on the
++documented desktop layout. These captures do not certify physical mouse input.
+ `focus-session-regression.qml` checks deadlines, suspend, pause/resume milliseconds,
+ single completion, choosing the next duration, custom minutes and keyboard input.
+ `notification-attention-regression.qml` and `notification-priority-regression.qml`

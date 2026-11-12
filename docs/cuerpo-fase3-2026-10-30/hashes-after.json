@@ -1,0 +1,11 @@
+{
+  "bar/Pill.qml": "869077729d757a3f5dc73544457daeabb6fdd4de125e01461613279aaa1186f3",
+  "bar/Singletons/Settings.js": "821d12772721bfc18aad31a8921ad7ba16343860f3faa58a475578c87dde28e0",
+  "bar/body/PillBody.qml": "92c2d2e13d4040a51fc3b8d8b395875009cd0617df89e461dd18196178459cde",
+  "bar/body/BodyEngine.qml": "c5fa0b5bf9c22544cf16e72fd9ce1a031e91b13db5e9a60e666de2e48a8b5f78",
+  "bar/body/BodyShader.qml": "051abcc8bcab2a329b9fe19ff6d833a082971f2e7571a3cb697faf3ffc557b12",
+  "bar/body/shaders/body.frag": "6fecf7b6b267a7d803e87fc365f5734f27a1c1b74a20a317f19a372dcc3dfd78",
+  "bar/body/shaders/body.frag.qsb": "a550884cdc1dc27aba9164c9fb1738dce0f2ad091684dcf39ecf819ca2297db7",
+  "bar/body-pill-regression.qml": "4d60f25242f701d8a37d00df501f6f61fd3c47c470f361c9d5377dd5c5933146",
+  "bar/windows/IslandOverlay.qml": "82209b927fb8b07be18852e540f49598594411e72925ca1195e4f5f0aabacb54"
+}

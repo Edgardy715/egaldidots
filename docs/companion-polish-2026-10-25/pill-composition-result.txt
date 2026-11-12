@@ -1,0 +1,1 @@
+ DEBUG qml: PASS: injected header/calendar input, workspace width, interrupted morph, exposure, reduced motion and notification breath

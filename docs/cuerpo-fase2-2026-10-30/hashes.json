@@ -1,0 +1,9 @@
+{
+  "bar/body/BodyEngine.qml": "6bb5ece0e60cb144c7faa5cd9f5ebc4a94f9e845b73d66750cc58b6a0480682b",
+  "bar/body/BodyDropBrain.js": "a0b4c7f6c067bc7f69cb157223026b12e9b5af23acb884767b362abbab955777",
+  "bar/body/README.md": "77fe685cd33be0bea96cd59969e57829004667c53a4bc8eff214bb1723a00445",
+  "bar/body-demo.qml": "9cc8659cc26de148badec4890c93fd5d4c3789af200c183191541bbf6d64a940",
+  "bar/body-drop-regression.qml": "4a7f82544b0d36358d7e6a5ca9ef7b3a1b606e4fd411575e5b3dea772043f1be",
+  "bar/tests/body-drop.cjs": "0886cb08e7d60c6b315c1a718b69ad03c7fd7e25923192d9cfc9fc3278339fc9",
+  "bar/TESTING.md": "d8c93cc0f4388720a15036c8c540a848ec1f32c41f0764de48677ae00ef4d7da"
+}

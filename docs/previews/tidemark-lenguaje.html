@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tidemark · lenguaje de trazo de Isla</title>
+<style>
+:root{--bg:#0d0f14;--pill:#171a22;--line:#262b38;--fg:#e8ecf4;--dim:#6b7488;--accent:#7cc4ff;--ok:#32d975;--bad:#ff4d61}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif;padding:24px 16px 64px}
+main{max-width:980px;margin:auto}h1{font-size:22px;margin:0 0 4px}p.sub{color:var(--dim);margin:0 0 18px}
+.bar{display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--pill);border:1px solid var(--line);border-radius:999px;padding:10px 18px;margin-bottom:22px}
+.bar label{display:flex;gap:6px;align-items:center;color:var(--dim)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}
+.card{background:var(--pill);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card h2{font-size:13px;margin:0;color:var(--dim);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.card p{margin:0;color:var(--dim);font-size:12.5px}
+.stage{display:flex;gap:26px;justify-content:center;align-items:center;padding:12px 0;min-height:140px}
+.stage figure{margin:0;text-align:center;color:var(--dim);font-size:11px}
+svg{width:96px;height:96px;overflow:visible}
+svg .t{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+svg .dim{stroke:var(--fg);opacity:.14}
+svg .head{fill:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{background:#232838;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font:inherit;cursor:pointer}
+button:hover{border-color:var(--accent)}button:focus-visible{outline:2px solid var(--accent)}
+input[type=range]{accent-color:var(--accent);flex:1;min-width:120px}
+.glow{filter:drop-shadow(0 0 3px currentColor)}
+</style></head><body><main>
+<h1>Tidemark</h1>
+<p class="sub">Un trazo que se dibuja como una marca de marea: lo que mide, deja línea; lo que cambia, se redibuja. Esto es una maqueta en SVG del comportamiento (equivale a <code>ShapePath.trim</code> en Qt), no el código final.</p>
+
+<div class="bar">
+ <label><input type="checkbox" id="bead" checked> Cabeza (bead) al dibujar</label>
+ <label><input type="checkbox" id="reduce"> Reduce motion</label>
+ <label>Acento <input type="color" id="accent" value="#7cc4ff"></label>
+ <label>Velocidad <input type="range" id="speed" min="0.4" max="2.5" step="0.1" value="1"></label>
+</div>
+
+<div class="grid">
+
+<section class="card"><h2>1 · Dibujar / des-dibujar</h2>
+<p>Comparación directa: ancho uniforme vs. Tidemark (cabeza que lidera). Pulsa varias veces: interrumpir parte de donde está.</p>
+<div class="stage">
+ <figure><svg viewBox="0 0 24 24"><path id="u1" class="t" d="M4 12.5l5 5L20 6.5" pathLength="1"/></svg>uniforme</figure>
+ <figure><svg viewBox="0 0 24 24"><path id="u2" class="t" d="M4 12.5l5 5L20 6.5" pathLength="1"/><circle id="u2h" class="head" r="2.1" opacity="0"/></svg>Tidemark</figure>
+</div>
+<div class="row"><button id="b1on">Dibujar</button><button id="b1off">Borrar</button></div></section>
+
+<section class="card"><h2>2 · Volumen v2: ondas de marea</h2>
+<p>Las ondas nacen <b>desde su centro</b> y se alejan del altavoz como ondas en agua (radio + apertura con muelle). El cono se comprime un instante al empujar cada onda. Mute: las ondas exterior e interior se recogen; la central <b>se endereza y gira</b> hasta tachar el altavoz, que se apaga un poco. Un objeto, dos estados. Debajo, el nivel y su <b>marca de marea</b>: el pico se queda un momento y baja despacio.</p>
+<div class="stage"><svg viewBox="0 0 24 24">
+ <path id="spk" class="t" d="M11 5 6 9H3v6h3l5 4Z"/>
+ <path id="w1" class="t"/><path id="w2" class="t"/><path id="w3" class="t"/>
+</svg></div>
+<svg viewBox="0 0 100 8" style="width:100%;height:16px;overflow:visible"><path class="t dim" d="M2 4H98"/><path id="lvl" class="t" d="M2 4H98" pathLength="1" style="stroke-dasharray:1 1"/><path id="tide" class="t" d="M0 1.2V6.8" style="stroke-width:1.2"/></svg>
+<div class="row"><input type="range" id="vol" min="0" max="1" step="0.01" value="0.5"><button id="mute">Mute</button></div></section>
+
+<section class="card"><h2>3 · Play ↔ pausa v2: la gota se parte</h2>
+<p>El triángulo son dos mitades unidas. Al pausar se separan como dos gotas: un cuello las une, se estira y se rompe (igual que las gotas de la pill), y cada mitad se asienta como barra. Al reanudar se funden de nuevo. Muelle interrumpible.</p>
+<div class="stage"><svg viewBox="0 0 24 24">
+ <path id="pq1" class="t"/><path id="pq2" class="t"/><path id="pneck" class="t" style="stroke-linecap:round"/>
+</svg></div>
+<div class="row"><button id="pp">Alternar</button><button id="pp2">Alternar rápido ×3</button></div></section>
+
+<section class="card"><h2>4 · Candado v2: levantar y girar</h2>
+<p>Desbloquear: el arco sube con muelle y, cuando ya está fuera (lo decide la geometría, no un tiempo), gira sobre su pata izquierda. La cerradura se vuelve punto. Bloquear: vuelve, baja y el cuerpo da un pequeño «clac».</p>
+<div class="stage"><svg viewBox="0 0 24 24">
+ <g id="lbody"><path class="t" d="M5 11h14v10H5Z"/><path id="lkk" class="t"/></g>
+ <path id="lk" class="t"/>
+</svg></div>
+<div class="row"><button id="lock">Bloquear / desbloquear</button><button id="lock2">Interrumpir a mitad</button></div></section>
+
+<section class="card"><h2>5 · Anillo de tiempo y resultado</h2>
+<p>Trazo = medida. En 0 respira. Al terminar, el anillo cierra desde donde estaba, se tiñe de señal, brilla una vez y se calma.</p>
+<div class="stage"><svg viewBox="0 0 24 24" id="ringsvg">
+ <circle class="t dim" cx="12" cy="12" r="9"/>
+ <path id="ring" class="t" d="M12 3a9 9 0 1 1 0 18a9 9 0 1 1 0-18" pathLength="1"/>
+ <path id="rck" class="t" d="M8 12.5l3 3 5-6" pathLength="1" style="stroke:var(--ok)"/>
+ <circle id="rh" class="head" r="2" opacity="0"/>
+</svg></div>
+<div class="row"><button id="rs">Iniciar 8 s</button><button id="rr">Reiniciar</button></div></section>
+
+<section class="card"><h2>6 · Qué NO se anima</h2>
+<p>Rueda de volumen, hover repetido, avance de la canción, iconos fijos (lupa, cerrar). Aquí el nivel de la tarjeta 2 sigue el slider sin trazo ni cabeza: solo la línea se mide. Con "Reduce motion" activo, todo salta al estado final.</p></section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const S={get reduce(){return $('reduce').checked},get speed(){return +$('speed').value},get bead(){return $('bead').checked}};
+$('accent').oninput=e=>document.documentElement.style.setProperty('--accent',e.target.value);
+const ease=t=>1-Math.pow(1-t,3);
+// Trazo con memoria: cada cambio arranca desde el valor actual (interrumpible).
+class Stroke{
+  constructor(el,{head,onv}={}){this.el=el;this.v=1;this.head=head;this.onv=onv;this.raf=0;this.set(0)}
+  set(v){this.v=v;this.el.style.strokeDasharray='1 1';this.el.style.strokeDashoffset=1-v;this.el.style.opacity=v<=0.001?0:1;this.onv&&this.onv(v);this.pos()}
+  pos(show){if(!this.head)return;const h=this.head;if(!(S.bead&&show&&this.v>0.01&&this.v<0.995)){h.setAttribute('opacity',0);return}
+    const L=this.el.getTotalLength(),p=this.el.getPointAtLength(L*this.v);h.setAttribute('cx',p.x);h.setAttribute('cy',p.y);h.setAttribute('opacity',1)}
+  to(t,ms,delay=0){cancelAnimationFrame(this.raf);if(S.reduce){this.set(t);return Promise.resolve()}
+    const a=this.v,d=ms/S.speed,t0=performance.now()+delay/S.speed;
+    return new Promise(r=>{const f=n=>{const k=Math.min(1,Math.max(0,(n-t0)/d));this.v=a+(t-a)*ease(k);this.set(this.v);this.pos(k<1);if(k<1)this.raf=requestAnimationFrame(f);else{this.pos(false);r()}};this.raf=requestAnimationFrame(f)})}
+}
+// 1
+const u1=new Stroke($('u1')),u2=new Stroke($('u2'),{head:$('u2h')});
+$('b1on').onclick=()=>{u1.to(1,520);u2.to(1,520)};$('b1off').onclick=()=>{u1.to(0,260);u2.to(0,260)};
+u1.set(1);u2.set(1);
+// Muelle (omega rad/s, zeta) como Motion.surfaceSpring: conserva posición y velocidad al cambiar de destino.
+const springs=new Set();let last=0;
+class Spring{constructor(x,omega,zeta){this.x=x;this.v=0;this.t=x;this.w=omega;this.z=zeta}
+  to(t,kick=0){this.t=t;this.v+=kick;if(S.reduce){this.x=t;this.v=0}springs.add(this);loop()}}
+let looping=false,hooks=[];
+function loop(){if(looping)return;looping=true;last=performance.now();requestAnimationFrame(step)}
+function step(n){const dt=Math.min(0.032,(n-last)/1000)*S.speed;last=n;
+  for(const s of springs){const a=-2*s.z*s.w*s.v-s.w*s.w*(s.x-s.t);s.v+=a*dt;s.x+=s.v*dt;
+    if(Math.abs(s.x-s.t)<1e-3&&Math.abs(s.v)<1e-2){s.x=s.t;s.v=0;springs.delete(s)}}
+  hooks.forEach(h=>h());if(springs.size)requestAnimationFrame(step);else looping=false}
+const arc=(cx,cy,r,half)=>{const a=half*Math.PI/180,x=cx+r*Math.cos(a),y=r*Math.sin(a);return half<0.5?'':`M${cx+r*Math.cos(a)} ${cy-y}A${r} ${r} 0 0 1 ${x} ${cy+y}`};
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+// 2 · ondas de marea
+const waves=[0,1,2].map(()=>new Spring(0,17,0.62)),cone=new Spring(0,30,0.45),muteS=new Spring(0,20,0.75),lvlS=new Spring(0.5,26,1),tideS=new Spring(0.5,4,1);
+let muted=false,peak=0.5,peakTimer=0;
+hooks.push(()=>{const R=[4,7,10];
+  const m=clamp(muteS.x,0,1.06);
+  waves.forEach((s,i)=>{const a=Math.max(0,s.x),el=$('w'+(i+1));
+    // Mute: la onda central no desaparece; se endereza y gira hasta ser la barra que tacha el altavoz.
+    if(i===1&&(m>0.004||muteS.t===1)){const N=16;let d='';
+      for(let j=0;j<N;j++){const u=j/(N-1),th=(-52+104*u)*Math.PI/180,ax=9.5+7*Math.cos(th),ay=12+7*Math.sin(th),lx=20-16*u,ly=4+16*u;
+        d+=(j?'L':'M')+(ax+(lx-ax)*m).toFixed(2)+' '+(ay+(ly-ay)*m).toFixed(2)}
+      el.setAttribute('d',d);el.style.opacity=1;el.style.stroke=`color-mix(in srgb, var(--accent) ${Math.round(100-55*clamp(m))}%, var(--fg))`;return}
+    el.style.stroke='';el.setAttribute('d',a<0.06?'':arc(9.5,12,R[i]*(0.45+0.55*a),52*Math.min(1.05,a)));el.style.opacity=clamp(a*2.2)});
+  $('spk').style.transform=`translateX(${-0.9*cone.x}px) scaleX(${1-0.08*cone.x})`;$('spk').style.transformOrigin='11px 12px';$('spk').style.opacity=1-0.45*clamp(m);
+  $('lvl').style.strokeDashoffset=1-clamp(lvlS.x);const tx=2+96*clamp(tideS.x);$('tide').setAttribute('d',`M${tx} 1.2V6.8`);$('tide').style.opacity=tideS.x-lvlS.x>0.015?0.75:0});
+function vol(){const v=muted?0:+$('vol').value;lvlS.to(v);
+  // Al quitar mute la barra vuelve a ser la onda central; luego sigue al volumen.
+  if(!muted&&muteS.t===1){waves[1].x=1;waves[1].v=0;waves[1].t=1}
+  [0.01,0.34,0.67].forEach((th,i)=>{const on=v>=th,was=waves[i].t>0.5;
+    if(on&&!was){setTimeout(()=>{waves[i].to(1);cone.to(0,9)},S.reduce?0:i*45/S.speed)}else if(!on&&was)waves[i].to(0)});
+  muteS.to(muted?1:0);
+  if(v>=peak){peak=v;tideS.to(v)}clearTimeout(peakTimer);peakTimer=setTimeout(()=>{peak=lvlS.t;tideS.to(peak)},700/S.speed)}
+$('vol').oninput=vol;$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'Quitar mute':'Mute';vol()};
+waves[0].x=waves[1].x=1;waves[0].t=waves[1].t=1;vol();loop();
+// 3 · la gota se parte
+const PLAY=[[[6,3],[13,7.5],[13,16.5],[6,21]],[[13,7.5],[20,12],[20,12],[13,16.5]]];
+const PAUSE=[[[6,4],[10,4],[10,20],[6,20]],[[14,4],[18,4],[18,20],[14,20]]];
+const ppS=new Spring(0,19,0.68);let playing=false;
+const quad=q=>`M${q.map(p=>p.join(' ')).join('L')}Z`;
+hooks.push(()=>{const t=ppS.x,Q=[0,1].map(i=>PLAY[i].map((p,j)=>[p[0]+(PAUSE[i][j][0]-p[0])*t,p[1]+(PAUSE[i][j][1]-p[1])*t]));
+  const [A,B]=Q,P=p=>p[0]+' '+p[1],L=(p,q,u)=>[p[0]+(q[0]-p[0])*u,p[1]+(q[1]-p[1])*u];
+  // Cada mitad sin su borde interior: juntas dibujan el triángulo sin costura.
+  $('pq1').setAttribute('d',`M${P(A[1])}L${P(A[0])}L${P(A[3])}L${P(A[2])}`);
+  $('pq2').setAttribute('d',`M${P(B[0])}L${P(B[1])}L${P(B[2])}L${P(B[3])}`);
+  // Cuello: los bordes interiores crecen desde las puntas; entre ellos dos curvas
+  // se curvan hacia el centro hasta pinzarse (microgota) cuando el hueco llega a 3 px.
+  const gap=B[0][0]-A[1][0],f=clamp(gap/3),cy=(A[1][1]+A[2][1])/2;
+  if(f>=1){$('pneck').setAttribute('d',`M${P(A[1])}L${P(A[2])}M${P(B[0])}L${P(B[3])}`)}else{
+    const a1=L(A[1],A[2],f/2),a2=L(A[2],A[1],f/2),b0=L(B[0],B[3],f/2),b3=L(B[3],B[0],f/2),mx=(a1[0]+b0[0])/2;
+    const ct=(a1[1]+b0[1])/2+(cy-(a1[1]+b0[1])/2)*f,cb=(a2[1]+b3[1])/2+(cy-(a2[1]+b3[1])/2)*f;
+    $('pneck').setAttribute('d',`M${P(A[1])}L${P(a1)}Q${mx} ${ct} ${P(b0)}L${P(B[0])}M${P(A[2])}L${P(a2)}Q${mx} ${cb} ${P(b3)}L${P(B[3])}`)}});
+function pp(){playing=!playing;ppS.to(playing?1:0)}
+$('pp').onclick=pp;$('pp2').onclick=()=>{pp();setTimeout(pp,140);setTimeout(pp,280)};
+// 4 · candado: subir y, ya fuera, girar sobre la pata izquierda
+const lift=new Spring(0,18,0.6),swing=new Spring(0,15,0.7),seat=new Spring(0,34,0.4),hole=new Spring(1,22,0.8);
+let open=false;
+hooks.push(()=>{
+  if(open&&lift.x>0.8&&swing.t!==1)swing.to(1);
+  if(!open&&swing.x<0.15&&lift.t!==0){lift.to(0);}
+  if(!open&&lift.t===0&&lift.x<0.05&&lift.v<0&&!seat.done){seat.done=true;seat.to(0,-14)}
+  const y=-3.2*lift.x,sx=1-0.75*clamp(swing.x,0,1.08);
+  $('lk').setAttribute('d',`M8 11V7a${4*sx} 4 0 0 1 ${8*sx} 0v${4-0.9*lift.x}`);$('lk').style.transform=`translateY(${y}px)`;
+  $('lbody').style.transform=`translateY(${-0.6*seat.x}px)`;
+  const h=Math.max(0,hole.x)*2;$('lkk').setAttribute('d',`M12 ${15.5-h/2}V${15.5+h/2+0.01}`)});
+function lockToggle(){open=!open;seat.done=false;
+  if(open){lift.to(1);hole.to(0)}else{swing.to(0);hole.to(1)}}
+$('lock').onclick=lockToggle;$('lock2').onclick=()=>{lockToggle();setTimeout(lockToggle,180/S.speed)};
+loop();
+// 5
+const ring=new Stroke($('ring'),{head:$('rh')}),rck=new Stroke($('rck'));
+let timer=0,prog=0,done=false;
+function breathe(n){if(timer||done)return;const b=S.reduce?0.12:0.1+0.06*Math.sin(n/1100*Math.PI*2*0.9/ (1/S.speed));ring.set(b);requestAnimationFrame(breathe)}
+requestAnimationFrame(breathe);
+function colour(c,g){$('ring').style.stroke=c;$('rh').style.fill=c;$('ringsvg').style.color=c;$('ringsvg').classList.toggle('glow',g)}
+$('rs').onclick=()=>{if(timer)return;done=false;colour('var(--accent)',false);rck.set(0);const t0=performance.now(),D=8000/S.speed;
+ timer=setInterval(()=>{prog=Math.min(1,(performance.now()-t0)/D);ring.set(prog);ring.pos(true);
+  if(prog>=1){clearInterval(timer);timer=0;done=true;ring.pos(false);colour('var(--ok)',true);rck.to(1,380).then(()=>setTimeout(()=>colour('var(--ok)',false),700/S.speed))}},30)};
+$('rr').onclick=()=>{clearInterval(timer);timer=0;done=false;rck.set(0);colour('var(--accent)',false);requestAnimationFrame(breathe)};
+</script></main></body></html>

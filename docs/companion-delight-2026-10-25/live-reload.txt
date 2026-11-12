@@ -1,0 +1,35 @@
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded
+  INFO: Reloading configuration...
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Auth] Polkit agent registered: true
+ DEBUG qml: [Session] singleton instanciado
+ DEBUG qml: [KeepAwake] wrapper instanciado (systemd-inhibit)
+  INFO: Configuration Loaded

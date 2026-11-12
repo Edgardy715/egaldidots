@@ -35,11 +35,9 @@ Optional modules are composed by `TopBarModules.qml` and `OptionalModule.qml`.
 The main pill is required; disabled modules release input and unload after their
 exit transition. Both split and compact layouts use the same settings and data.
 
-El único pet es IslandCompanion (`bar/components/IslandCompanion.qml`), la cara de la
-isla: un item dentro del hueco del compañero del reloj, activado por
-`appearance.personality`. No hay capa ni overlay propios, ni percha, ni viaje entre
-surfaces. El sistema de mascotas pixel art (Eshell Pets: Mimo y Pip) se eliminó el
-2026-10-24; las ideas aprovechables están en `docs/companion-legacy-ideas-2026-10-24.md`.
+No hay mascota ni compañero propio: Iris y el sistema de mascotas (Eshell Pets) se retiraron
+(2026-10-24 y 2026-11-09). La cara de la isla es el cuerpo Amalgam (`bar/body/`); las ideas
+aprovechables están en `docs/companion-legacy-ideas-2026-10-24.md`.
 
 ## Configuration
 
@@ -208,3 +206,25 @@ Git rechaza árbol sucio, commits locales o falta de upstream. No hace stash,
 reset ni instala automáticamente. Tras acabar se vuelve a comprobar manualmente;
 Isla puede necesitar reinicio. Apps externas a pacman/AUR/Flatpak y actualizadores
 propios no están cubiertos. IPC: `updates.check`, `updates.open`, `updates.state`.
+
+## Explorador de archivos
+
+Ventana flotante propia (`FloatingWindow`), sin pill. Se abre con `qs -c bar ipc call files open|toggle|close`
+o con `bar/scripts/isla-files [ruta]` (acepta `file://`; filtra rutas inexistentes).
+
+| Pieza | Papel |
+| --- | --- |
+| `components/files/FilesIpc.qml` | Manejador IPC `files`; rutas absolutas existentes (relativa o inexistente = false); un archivo abre su carpeta |
+| `components/files/FilesHost.qml` | Ciclo de vida: crea la ventana al abrir y la destruye al cerrar; una sola ventana |
+| `windows/FilesWindow.qml` | `FloatingWindow` transparente; tamaño y centrado vía windowrule de Hyprland |
+| `components/files/FilesView.qml` | Composición: barra de ruta, lugares, vista, QuickLook, menú, diálogo de conflictos; enlaza `Config.files` |
+| `FilesViewBase`, `FileList`, `FileGrid`, `FileDelegate` | Vistas de lista y cuadrícula; datos por propiedades |
+| `FilesModel.qml` | Listado nativo; `pathLost` si la carpeta desaparece. No importa Config ni Flags |
+| `SelectionModel.qml` | Selección por ruta, no por índice |
+| `Singletons/FileOps.qml` | Cola FIFO de operaciones sobre `services/files_helper.py` (NDJSON por línea: progreso, conflictos, `undo`). Conflictos y miniaturas van fuera de la cola con tope; `cancel()` sólo aborta el trabajo actual; deshacer es no-op si está ocupada |
+| `services/files_helper.py` | Helper Python (stdlib): copiar, mover (merge = sin deshacer), papelera FreeDesktop, restaurar, renombrar, miniaturas ffmpegthumbnailer |
+| `assets/azog-files.desktop` | Entrada `inode/directory`; no instalada automáticamente |
+
+Regla: las hojas visuales reciben `thumbResolver(path, size, cb)` por propiedad y nunca importan `FileOps` ni `Config`;
+la composición (`FilesView`) las conecta. Ajustes en `files` de `Settings.js` (vista, orden, ocultos), con Config.update/discard/save.
+

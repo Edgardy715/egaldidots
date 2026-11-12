@@ -1,0 +1,777 @@
+{
+  "complete": true,
+  "runs": [
+    {
+      "backend": "before",
+      "round": 0,
+      "metrics": [
+        {
+          "page": 1,
+          "cycle": 0,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 0,
+          "max_ms": 23
+        },
+        {
+          "page": 3,
+          "cycle": 0,
+          "max_ms": 24
+        },
+        {
+          "page": 4,
+          "cycle": 0,
+          "max_ms": 12
+        },
+        {
+          "page": 5,
+          "cycle": 0,
+          "max_ms": 29
+        },
+        {
+          "page": 0,
+          "cycle": 0,
+          "max_ms": 60
+        },
+        {
+          "page": 1,
+          "cycle": 1,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 1,
+          "max_ms": 34
+        },
+        {
+          "page": 3,
+          "cycle": 1,
+          "max_ms": 34
+        },
+        {
+          "page": 4,
+          "cycle": 1,
+          "max_ms": 13
+        },
+        {
+          "page": 5,
+          "cycle": 1,
+          "max_ms": 22
+        },
+        {
+          "page": 0,
+          "cycle": 1,
+          "max_ms": 61
+        }
+      ],
+      "config_calls": [
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        }
+      ],
+      "qt_update_core_ms": [
+        0.54,
+        0.56,
+        0.52,
+        0.53,
+        0.52,
+        0.54,
+        0.53,
+        0.53,
+        0.53,
+        0.56
+      ]
+    },
+    {
+      "backend": "after",
+      "round": 0,
+      "metrics": [
+        {
+          "page": 1,
+          "cycle": 0,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 0,
+          "max_ms": 13
+        },
+        {
+          "page": 3,
+          "cycle": 0,
+          "max_ms": 14
+        },
+        {
+          "page": 4,
+          "cycle": 0,
+          "max_ms": 11
+        },
+        {
+          "page": 5,
+          "cycle": 0,
+          "max_ms": 18
+        },
+        {
+          "page": 0,
+          "cycle": 0,
+          "max_ms": 31
+        },
+        {
+          "page": 1,
+          "cycle": 1,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 1,
+          "max_ms": 18
+        },
+        {
+          "page": 3,
+          "cycle": 1,
+          "max_ms": 20
+        },
+        {
+          "page": 4,
+          "cycle": 1,
+          "max_ms": 11
+        },
+        {
+          "page": 5,
+          "cycle": 1,
+          "max_ms": 20
+        },
+        {
+          "page": 0,
+          "cycle": 1,
+          "max_ms": 36
+        }
+      ],
+      "config_calls": [
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        }
+      ],
+      "qt_update_core_ms": [
+        0.53,
+        0.52,
+        0.48,
+        0.47,
+        0.48,
+        0.48,
+        0.5,
+        0.48,
+        0.49,
+        0.48
+      ]
+    },
+    {
+      "backend": "after",
+      "round": 1,
+      "metrics": [
+        {
+          "page": 1,
+          "cycle": 0,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 0,
+          "max_ms": 14
+        },
+        {
+          "page": 3,
+          "cycle": 0,
+          "max_ms": 15
+        },
+        {
+          "page": 4,
+          "cycle": 0,
+          "max_ms": 11
+        },
+        {
+          "page": 5,
+          "cycle": 0,
+          "max_ms": 14
+        },
+        {
+          "page": 0,
+          "cycle": 0,
+          "max_ms": 19
+        },
+        {
+          "page": 1,
+          "cycle": 1,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 1,
+          "max_ms": 17
+        },
+        {
+          "page": 3,
+          "cycle": 1,
+          "max_ms": 21
+        },
+        {
+          "page": 4,
+          "cycle": 1,
+          "max_ms": 11
+        },
+        {
+          "page": 5,
+          "cycle": 1,
+          "max_ms": 19
+        },
+        {
+          "page": 0,
+          "cycle": 1,
+          "max_ms": 32
+        }
+      ],
+      "config_calls": [
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        }
+      ],
+      "qt_update_core_ms": [
+        0.74,
+        0.77,
+        0.7,
+        0.47,
+        0.49,
+        0.47,
+        0.51,
+        0.48,
+        0.48,
+        0.48
+      ]
+    },
+    {
+      "backend": "before",
+      "round": 1,
+      "metrics": [
+        {
+          "page": 1,
+          "cycle": 0,
+          "max_ms": 13
+        },
+        {
+          "page": 2,
+          "cycle": 0,
+          "max_ms": 21
+        },
+        {
+          "page": 3,
+          "cycle": 0,
+          "max_ms": 23
+        },
+        {
+          "page": 4,
+          "cycle": 0,
+          "max_ms": 12
+        },
+        {
+          "page": 5,
+          "cycle": 0,
+          "max_ms": 17
+        },
+        {
+          "page": 0,
+          "cycle": 0,
+          "max_ms": 38
+        },
+        {
+          "page": 1,
+          "cycle": 1,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 1,
+          "max_ms": 32
+        },
+        {
+          "page": 3,
+          "cycle": 1,
+          "max_ms": 39
+        },
+        {
+          "page": 4,
+          "cycle": 1,
+          "max_ms": 12
+        },
+        {
+          "page": 5,
+          "cycle": 1,
+          "max_ms": 22
+        },
+        {
+          "page": 0,
+          "cycle": 1,
+          "max_ms": 60
+        }
+      ],
+      "config_calls": [
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        }
+      ],
+      "qt_update_core_ms": [
+        0.79,
+        0.82,
+        0.77,
+        0.79,
+        0.77,
+        0.81,
+        0.78,
+        0.79,
+        0.77,
+        0.76
+      ]
+    },
+    {
+      "backend": "before",
+      "round": 2,
+      "metrics": [
+        {
+          "page": 1,
+          "cycle": 0,
+          "max_ms": 12
+        },
+        {
+          "page": 2,
+          "cycle": 0,
+          "max_ms": 34
+        },
+        {
+          "page": 3,
+          "cycle": 0,
+          "max_ms": 39
+        },
+        {
+          "page": 4,
+          "cycle": 0,
+          "max_ms": 14
+        },
+        {
+          "page": 5,
+          "cycle": 0,
+          "max_ms": 28
+        },
+        {
+          "page": 0,
+          "cycle": 0,
+          "max_ms": 59
+        },
+        {
+          "page": 1,
+          "cycle": 1,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 1,
+          "max_ms": 32
+        },
+        {
+          "page": 3,
+          "cycle": 1,
+          "max_ms": 33
+        },
+        {
+          "page": 4,
+          "cycle": 1,
+          "max_ms": 13
+        },
+        {
+          "page": 5,
+          "cycle": 1,
+          "max_ms": 22
+        },
+        {
+          "page": 0,
+          "cycle": 1,
+          "max_ms": 61
+        }
+      ],
+      "config_calls": [
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        }
+      ],
+      "qt_update_core_ms": [
+        0.83,
+        0.81,
+        0.77,
+        0.79,
+        0.76,
+        0.81,
+        0.77,
+        0.79,
+        0.76,
+        0.82
+      ]
+    },
+    {
+      "backend": "after",
+      "round": 2,
+      "metrics": [
+        {
+          "page": 1,
+          "cycle": 0,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 0,
+          "max_ms": 19
+        },
+        {
+          "page": 3,
+          "cycle": 0,
+          "max_ms": 23
+        },
+        {
+          "page": 4,
+          "cycle": 0,
+          "max_ms": 14
+        },
+        {
+          "page": 5,
+          "cycle": 0,
+          "max_ms": 15
+        },
+        {
+          "page": 0,
+          "cycle": 0,
+          "max_ms": 35
+        },
+        {
+          "page": 1,
+          "cycle": 1,
+          "max_ms": 11
+        },
+        {
+          "page": 2,
+          "cycle": 1,
+          "max_ms": 13
+        },
+        {
+          "page": 3,
+          "cycle": 1,
+          "max_ms": 15
+        },
+        {
+          "page": 4,
+          "cycle": 1,
+          "max_ms": 12
+        },
+        {
+          "page": 5,
+          "cycle": 1,
+          "max_ms": 18
+        },
+        {
+          "page": 0,
+          "cycle": 1,
+          "max_ms": 21
+        }
+      ],
+      "config_calls": [
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        },
+        {
+          "snapshots": 0,
+          "validations": 0
+        }
+      ],
+      "qt_update_core_ms": [
+        0.75,
+        0.78,
+        0.74,
+        0.75,
+        0.76,
+        0.76,
+        0.77,
+        0.75,
+        0.75,
+        0.74
+      ]
+    }
+  ],
+  "excluded_rounds": [
+    0
+  ],
+  "exclusion_reason": "Round0 before overlapped early warmup with baseline-red fixture; exclude whole pair conservatively"
+}

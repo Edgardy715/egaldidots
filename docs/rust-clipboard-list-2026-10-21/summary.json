@@ -1,0 +1,110 @@
+{
+  "0": {
+    "python": {
+      "wall_ms": 61.16941400023279,
+      "cpu_ms": 59.8665,
+      "qml_ms": 39.0,
+      "qml_range": [
+        36,
+        43
+      ],
+      "observed_pss_kib": 9471.0,
+      "observed_rss_hwm_kib": 19712.0,
+      "pss_samples": [
+        49,
+        50,
+        51,
+        55
+      ]
+    },
+    "rust": {
+      "wall_ms": 0.9415995000381372,
+      "cpu_ms": 0.7569999999999999,
+      "qml_ms": 3.0,
+      "qml_range": [
+        2,
+        4
+      ],
+      "observed_pss_kib": 148.0,
+      "observed_rss_hwm_kib": 1048.0,
+      "pss_samples": [
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  "100": {
+    "python": {
+      "wall_ms": 41.23724000010043,
+      "cpu_ms": 40.230999999999995,
+      "qml_ms": 55.5,
+      "qml_range": [
+        40,
+        74
+      ],
+      "observed_pss_kib": 9621.0,
+      "observed_rss_hwm_kib": 19884.0,
+      "pss_samples": [
+        54,
+        54,
+        53,
+        52
+      ]
+    },
+    "rust": {
+      "wall_ms": 1.2636494998332637,
+      "cpu_ms": 0.9515,
+      "qml_ms": 6.0,
+      "qml_range": [
+        6,
+        7
+      ],
+      "observed_pss_kib": 156.0,
+      "observed_rss_hwm_kib": 920.0,
+      "pss_samples": [
+        1,
+        1,
+        2,
+        1
+      ]
+    }
+  },
+  "1000": {
+    "python": {
+      "wall_ms": 95.01001699982226,
+      "cpu_ms": 90.0505,
+      "qml_ms": 65.5,
+      "qml_range": [
+        62,
+        73
+      ],
+      "observed_pss_kib": 11216.0,
+      "observed_rss_hwm_kib": 21652.0,
+      "pss_samples": [
+        98,
+        78,
+        78,
+        74
+      ]
+    },
+    "rust": {
+      "wall_ms": 10.937482499684847,
+      "cpu_ms": 7.560499999999999,
+      "qml_ms": 14.0,
+      "qml_range": [
+        13,
+        15
+      ],
+      "observed_pss_kib": 2654.0,
+      "observed_rss_hwm_kib": 4696.0,
+      "pss_samples": [
+        7,
+        7,
+        7,
+        7
+      ]
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "bar/components/IslandCompanion.qml": "16ef469bcb395c8b004432b9b3f5b64bc2e3e057caf9fe0b3441351b45673757",
+  "bar/components/CompanionBehavior.qml": "3ec04713d2ceba5550e24f6380e2ba23c2634e2877f666ba11197f85c8727cd9",
+  "bar/personality-regression.qml": "e8fbd9f0e84cd5875f20577a8d22b88e26a51fd927710409adca987aecfa66e2",
+  "bar/companion-delight-regression.qml": "a2272689e78bb4596adfa86100821944d2ba285a5a6e2baf5a61d512f65ed04c",
+  "bar/companion-preview.qml": "203e670c12112e8005e215d4815950b0861aae94a69dc4f3b9355e12bda1ad3e",
+  "bar/TESTING.md": "d9f9a2a3fb235cc4ba1fd3cc0d392e7d9837eb24bb3e04824f4dc2999b6ccdcb",
+  "bar/fluid/MOTION_LANGUAGE.md": "1c213649b664a6b831bb5e540d53e770cdf0fb32f24c92440755db8e013b5c14"
+}

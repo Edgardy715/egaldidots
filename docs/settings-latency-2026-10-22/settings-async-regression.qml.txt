@@ -1,0 +1,7 @@
+  INFO: Launching config: "/tmp/isla-settings-final-qa-_4m0_2cx/bar/settings-async-regression.qml"
+  INFO: Shell ID: "abb91e7bd3934e88037b50983f372859" Path ID "abb91e7bd3934e88037b50983f372859"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/18ml6lbnt/log.qslog"
+  INFO: Configuration Loaded
+  WARN: QQuickShaderEffectSource::textureProvider: can only be queried on the rendering thread of an exposed window
+  WARN: QQuickShaderEffectSource::textureProvider: can only be queried on the rendering thread of an exposed window
+ DEBUG qml: PASS: asynchronous settings cold open, loading cancellation/reopen, retained editor and reduced motion

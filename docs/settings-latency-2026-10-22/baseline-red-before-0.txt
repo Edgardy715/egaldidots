@@ -1,0 +1,15 @@
+  INFO: Launching config: "/tmp/isla-settings-navigation-t26336_b/before/bar/settings-navigation-regression.qml"
+  INFO: Shell ID: "8089c957fc8e3c136000beef835c83e3" Path ID "8089c957fc8e3c136000beef835c83e3"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/czg70lbnt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f9286e8b160 but 0x0 is focused
+ DEBUG qml: CONFIG_TIMING [0.53,0.56,0.53,0.53,0.51,0.55,0.51,0.52,0.53,0.55]
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f9286e8b160 but 0x0 is focused
+ DEBUG qml: METRIC: page=1 cycle=0 maxms=11
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=2 cycle=0 maxms=24
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ ERROR qml: LAZY_EDITOR_FAIL only applicable slider: mediaTransitions
+ ERROR qml: FAIL: settings navigation: Error: QtQuickTest::fail

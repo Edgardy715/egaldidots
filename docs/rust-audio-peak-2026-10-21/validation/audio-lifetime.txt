@@ -1,0 +1,5 @@
+PASS: stdin-EOF leaves no live child
+PASS: TERM leaves no live child
+PASS: KILL leaves no live child
+PASS: query-KILL leaves no live child
+PASS: server-EOF leaves no live child

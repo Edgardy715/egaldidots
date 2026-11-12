@@ -1,0 +1,20 @@
+{
+  "rust/clipboard-list/Cargo.toml": "3c21075a53df238c0c130544609495eb55618d2a53fa301fa5debe8d2914488a",
+  "rust/clipboard-list/Cargo.lock": "41a0f90b6089fec2072ea5299b2ae26cf7ef58599e7b8f62e43d1f313baa2489",
+  "rust/clipboard-list/src/main.rs": "ee87c589e52be935062c7b6878812454e5126d2d8ef4e59320e72d9240a20ff8",
+  "bar/services/clipboard-list.sh": "a540e15398d80286c5f6e45704307a3a49b3ad0d2188cb70ea1e0cc09d5bf9bc",
+  "scripts/build-clipboard-list.sh": "5388cc4cb499017393788b5760b90d2ff9959d4cd5cdd3fd61f52192280cc4e6",
+  "bar/components/ClipboardController.qml": "3bbc0edbf594c3be78b1bb53fb4eaaae2ecb42590c2ea127cb9a1bdab23e7b60",
+  "bar/services/clipboard_library.py": "3ea38dc22b1f402c8980badca0adfd5f37cbb56174bd08a38ac9f314f36ff464",
+  "bar/tests/clipboard-list.py": "b313b05f57caac75cdc56b92611c3c9bd2f12f89b67cf8527909f6e140bacca2",
+  "bar/tests/clipboard-list-backend.py": "e94963f9cc9f0effc357da733f0f644b13915666ec01c8a82e10b737fc61a9bf",
+  "bar/tests/clipboard-list-performance.py": "ed0880a6e16cdfdfdd6d79460e6e984782a2c56b9f3e6c364af8782364161c40",
+  "bar/tests/clipboard-library.py": "31821212653c9945a8bef6faff270013f69e1877c8a553713e45389652c402bb",
+  "bar/tests/clipboard-library-regression.sh": "85bc3abeaf06ed45755063415b03e837161af5d8fa8ef0d498da095b771119ff",
+  "bar/clipboard-library-regression.qml": "4213905be37e83b338f703d2bbd7ab62c22d7344a585c29bc7546cda50e9bc0c",
+  "bar/components/ClipboardPreviewAdapter.qml": "0f2ebb30e8934b207ea747c173a1db9600a7afbce9ca16b3e7b73b2adca186f8",
+  "install.sh": "0c48dbb4fe5673ea518312caa1fda80aad253f0f8cb751bbb18a29d22ad17143",
+  "README.md": "9a5e2e06371db48cbf448e1ad34fcd886d7eac2712f5c955852ebd081f02b5f0",
+  "bar/TESTING.md": "deb64cf2d441dc168e56e14f4ba580808d66012912601f71e99246452775fbfb",
+  "docs/SHELL_ARCHITECTURE.md": "7b70547fb8a71c15ddb2977a60965abbb14060b993ff416610372de6a43c625b"
+}

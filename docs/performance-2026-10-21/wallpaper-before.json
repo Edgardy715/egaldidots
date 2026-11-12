@@ -1,0 +1,159 @@
+{
+  "scanner": "/home/zdito/.config/quickshell/wpscan/WallpaperScanner.cpp",
+  "plugin_build": "/tmp/isla-wallpaper-scan-jnwj8p0a/build",
+  "real_wallpapers": "/home/zdito/Wallpapers",
+  "measurements": [
+    {
+      "dataset": "wallpapers-real",
+      "cache": "cold",
+      "files": 35,
+      "iterations": 24,
+      "items": 35,
+      "callbacks": 24,
+      "batchMs": 38,
+      "maxHeartbeatGapMs": 2,
+      "scanDoneMs": {
+        "median_ms": 0.0,
+        "max_ms": 1
+      },
+      "startScanCallMs": {
+        "median_ms": 0.0,
+        "max_ms": 1
+      },
+      "sumStartScanCallMs": 11
+    },
+    {
+      "dataset": "wallpapers-real",
+      "cache": "warm",
+      "files": 35,
+      "iterations": 24,
+      "items": 35,
+      "callbacks": 24,
+      "batchMs": 98,
+      "maxHeartbeatGapMs": 5,
+      "scanDoneMs": {
+        "median_ms": 3.0,
+        "max_ms": 5
+      },
+      "startScanCallMs": {
+        "median_ms": 3.0,
+        "max_ms": 5
+      },
+      "sumStartScanCallMs": 73
+    },
+    {
+      "dataset": "fixture-35",
+      "cache": "cold",
+      "files": 35,
+      "iterations": 24,
+      "items": 35,
+      "callbacks": 24,
+      "batchMs": 38,
+      "maxHeartbeatGapMs": 2,
+      "scanDoneMs": {
+        "median_ms": 0.5,
+        "max_ms": 1
+      },
+      "startScanCallMs": {
+        "median_ms": 0.5,
+        "max_ms": 1
+      },
+      "sumStartScanCallMs": 12
+    },
+    {
+      "dataset": "fixture-35",
+      "cache": "warm",
+      "files": 35,
+      "iterations": 24,
+      "items": 35,
+      "callbacks": 24,
+      "batchMs": 98,
+      "maxHeartbeatGapMs": 4,
+      "scanDoneMs": {
+        "median_ms": 3.0,
+        "max_ms": 4
+      },
+      "startScanCallMs": {
+        "median_ms": 3.0,
+        "max_ms": 4
+      },
+      "sumStartScanCallMs": 70
+    },
+    {
+      "dataset": "fixture-1000",
+      "cache": "cold",
+      "files": 1000,
+      "iterations": 10,
+      "items": 1000,
+      "callbacks": 10,
+      "batchMs": 158,
+      "maxHeartbeatGapMs": 16,
+      "scanDoneMs": {
+        "median_ms": 14.0,
+        "max_ms": 15
+      },
+      "startScanCallMs": {
+        "median_ms": 14.0,
+        "max_ms": 16
+      },
+      "sumStartScanCallMs": 145
+    },
+    {
+      "dataset": "fixture-1000",
+      "cache": "warm",
+      "files": 1000,
+      "iterations": 10,
+      "items": 1000,
+      "callbacks": 10,
+      "batchMs": 841,
+      "maxHeartbeatGapMs": 85,
+      "scanDoneMs": {
+        "median_ms": 82.0,
+        "max_ms": 84
+      },
+      "startScanCallMs": {
+        "median_ms": 82.5,
+        "max_ms": 85
+      },
+      "sumStartScanCallMs": 827
+    },
+    {
+      "dataset": "fixture-10000",
+      "cache": "cold",
+      "files": 10000,
+      "iterations": 3,
+      "items": 10000,
+      "callbacks": 3,
+      "batchMs": 482,
+      "maxHeartbeatGapMs": 162,
+      "scanDoneMs": {
+        "median_ms": 155,
+        "max_ms": 160
+      },
+      "startScanCallMs": {
+        "median_ms": 157,
+        "max_ms": 162
+      },
+      "sumStartScanCallMs": 476
+    },
+    {
+      "dataset": "fixture-10000",
+      "cache": "warm",
+      "files": 10000,
+      "iterations": 3,
+      "items": 10000,
+      "callbacks": 3,
+      "batchMs": 2536,
+      "maxHeartbeatGapMs": 855,
+      "scanDoneMs": {
+        "median_ms": 844,
+        "max_ms": 849
+      },
+      "startScanCallMs": {
+        "median_ms": 846,
+        "max_ms": 851
+      },
+      "sumStartScanCallMs": 2530
+    }
+  ]
+}

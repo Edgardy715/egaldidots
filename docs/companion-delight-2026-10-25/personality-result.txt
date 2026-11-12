@@ -1,0 +1,10 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/personality-regression.qml"
+  INFO: Shell ID: "393a985b93229b71ebba02fe467da72b" Path ID "393a985b93229b71ebba02fe467da72b"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/tq12au8gnt/log.qslog"
+  INFO: Configuration Loaded
+  WARN quickshell.hyprland.ipc: Got openwindow for workspace "1" which was not previously tracked.
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f15f8c2f0c0 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f15f8c2f0c0 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f15f8c2f0c0 but 0x0 is focused
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f15f8c2f0c0 but 0x0 is focused
+ DEBUG qml: PASS: companion moments, pat, reception, charging, shared surface feedback, eyes, reduced motion, visibility and opt-out

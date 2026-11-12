@@ -1,0 +1,13 @@
+{
+  "bar/body/BodySprings.js": "c5d8a1d84b5713b8bea28726b363ca368a8fdcff0fd38f7fcfa950a0984e08b3",
+  "bar/body/BodyLight.js": "64205f54589b9e380ee10d7c3242baf1bd630257f522c51dad09e4c00c35f826",
+  "bar/body/BodyBrain.js": "2be003fff3bd948d7c1e7315be81ab839070a01d4576b2d9b1ea0e401ea39383",
+  "bar/body/BodyShader.qml": "ac5b1575974c2c8c68d39e7a9553bf94a9871a7b33facd0b0334145e4c604ae4",
+  "bar/body/BodyEngine.qml": "b0bea066ede65f6bd68b74e9ca1c110472faf4173391cd65cb9a4c53f5b18954",
+  "bar/body/README.md": "e79ca4546d8d94c01e60cbec9b34babae7cceb695409b30e305d448d5cde2fe8",
+  "bar/body/shaders/body.frag": "8100c9bf2199935dfcfac38cd7893dc89e8f3244ce28c3c73f9dd611d5f4ed5e",
+  "bar/body/shaders/body.frag.qsb": "d75fcbe1b0550417f86a14a3435e2de6fe20bc3d715d8bb4d40d344462df7fea",
+  "bar/body-demo.qml": "3fab9c9c52693d240bb8b948b3b4ed9a3a408cf54e6a5df1f68934f70b49d9c4",
+  "bar/body-regression.qml": "aff8c133a08574570db3bbe5c5968d2523e8a6c2536e2ea8cbdb6c17963726a3",
+  "bar/tests/body-brain.cjs": "4a1bc2aeb1b48f801741bfb4cdbb023827a1321c761fd0b0440f03dd6ab6cbfe"
+}

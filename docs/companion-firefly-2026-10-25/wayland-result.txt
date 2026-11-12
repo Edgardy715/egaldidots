@@ -1,0 +1,14 @@
+  INFO: Launching config: "/home/zdito/.config/quickshell/bar/companion-delight-regression.qml"
+  INFO: Shell ID: "89cfac638def945a6adc6468f185e3b8" Path ID "89cfac638def945a6adc6468f185e3b8"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/d5d2jb9gnt/log.qslog"
+  INFO: Configuration Loaded
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fdf30baec80 but 0x0 is focused
+ DEBUG qml: DELIGHT_CAPTURE rest
+ DEBUG qml: DELIGHT_CAPTURE touch-left
+ DEBUG qml: DELIGHT_CAPTURE touch-right
+ DEBUG qml: DELIGHT_CAPTURE anticipation
+ DEBUG qml: DELIGHT_CAPTURE relief
+ DEBUG qml: DELIGHT_CAPTURE firefly-left
+ DEBUG qml: DELIGHT_CAPTURE firefly-right
+ DEBUG qml: DELIGHT_CAPTURE settled
+ DEBUG qml: PASS: companion material, story phases, firefly gaze and cadence, interruptions, scales, opt-out, reduced and hidden

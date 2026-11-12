@@ -1,0 +1,1 @@
+ DEBUG qml: PASS: scaled reading material, opaque preference, header exposure/bounds and empty/search/calculator/closing states

@@ -1,0 +1,9 @@
+{
+  "old_pid": 1589,
+  "pid": 12806,
+  "stop_replace_load_ms": 826,
+  "config_unchanged": true,
+  "module": "/home/zdito/.local/share/isla/qml/Wpscan",
+  "module_sha256": "b46c9c692a3b701018eecb26829acb2ac93a7c16f560a4a7e24550ea42f9114c",
+  "rollback": "/home/zdito/.local/state/isla-performance/2026-10-21/Wpscan-before"
+}

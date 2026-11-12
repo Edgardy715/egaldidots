@@ -1,0 +1,9 @@
+{
+  "bar/services/cava_stream.py": "d686cc7eaab8591b6fdce883f919351bcb27901b86af7bc274ff69b0578d6f00",
+  "bar/services/audio_discovery.py": "8d1ca95e6c3324d6446d37a3443e1a799cd4588e72edd7fa12da6ee716d0f7fe",
+  "bar/Singletons/Cava.qml": "a6a81f3466cc809c40192f4b3a2a44ac49856d38a43fa540e59c39688b239733",
+  "bar/tests/cava-stream.py": "0be426862a3cd29cfc813ab2da501320695b595dc0afb556d765abc63ddd8c5d",
+  "bar/tests/cava-discovery-performance.py": "d46bac9b0224a5f745b62c5eec20b4297d018dfee4f6922b63d36b146aa08bb7",
+  "bar/tests/sample-process.py": "0ed7e8d335bc7cc70d3d1dde0ca13266d27a3cb00058185fef23c5d496a0d789",
+  "install.sh": "f858c8158bb2217a6e7f17fbd571b7e0374723f29e334fbbca1350127a1f789c"
+}

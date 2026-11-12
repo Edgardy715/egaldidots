@@ -1,0 +1,8 @@
+Nuevas entradas respecto al inicio:
+?? bar/body-demo.qml
+?? bar/body-regression.qml
+?? bar/body/
+?? bar/tests/body-brain.cjs
+?? docs/cuerpo-fase1-2026-10-30/
+Entradas desaparecidas:
+

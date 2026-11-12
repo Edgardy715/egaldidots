@@ -1,0 +1,1 @@
+ DEBUG qml: PASS: media birth, rebirth, cover exclusion; playing: false

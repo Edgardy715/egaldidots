@@ -1,0 +1,1 @@
+ DEBUG qml: PASS: clock downward rollover, queued interruption, stable width, unchanged minutes, reduced motion and hidden updates

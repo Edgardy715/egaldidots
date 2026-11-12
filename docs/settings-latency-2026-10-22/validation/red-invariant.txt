@@ -1,0 +1,1 @@
+PASS: baseline reproduces hidden-editor invariant failure

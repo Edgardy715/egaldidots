@@ -1,0 +1,25 @@
+[32m  INFO[0m: Launching config: "/home/zdito/.config/quickshell/bar/iris-continuity-regression.qml"
+[32m  INFO[0m: Shell ID: "16d023aff21fa5e3b2d7a3f43b60c9b5" Path ID "16d023aff21fa5e3b2d7a3f43b60c9b5"
+[32m  INFO[0m: Saving logs to "/run/user/1000/quickshell/by-id/kfp2767hnt/log.qslog"
+[32m  INFO[0m: Configuration Loaded
+[33m  WARN[97m quickshell.hyprland.ipc[0m: Got openwindow for workspace "2" which was not previously tracked.
+[33m  WARN[97m qt.qpa.wayland.textinput[0m: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7f3bdd1e69e0 but 0x0 is focused
+[34m DEBUG[97m qml[0m: PASS: attention mechanism (precedence, saturation, opt-outs, springs)
+[34m DEBUG[97m qml[0m: MAXSTEP open travel/frame 0.200
+[34m DEBUG[97m qml[0m: MAXSTEP retarget travel/frame 0.194
+[34m DEBUG[97m qml[0m: PASS: perch (rest, travel, retarget, close, launcher, reduced, hidden)
+[34m DEBUG[97m qml[0m: PASS: pill attention vector and approval wiring
+[33m  WARN[97m scene[0m: QML QQuickImage* at @components/WallpaperView.qml[350:17]: Cannot open: file:///nonexistent/w0.png?v=0
+[34m DEBUG[97m qml[0m: PASS: producers (launcher caret, synced lyrics, wallpaper hover)
+[34m DEBUG[97m qml[0m: CONTINUITY_CAPTURE perch-rest
+[34m DEBUG[97m qml[0m: CAPTURE_TRAVEL 0.611
+[34m DEBUG[97m qml[0m: CONTINUITY_CAPTURE perch-travel-a
+[34m DEBUG[97m qml[0m: CAPTURE_TRAVEL 0.582
+[34m DEBUG[97m qml[0m: CONTINUITY_CAPTURE perch-travel-b
+[34m DEBUG[97m qml[0m: CONTINUITY_CAPTURE perch-mixer
+[34m DEBUG[97m qml[0m: CAPTURE_TRAVEL 0.183
+[34m DEBUG[97m qml[0m: CONTINUITY_CAPTURE perch-closing
+[34m DEBUG[97m qml[0m: CONTINUITY_CAPTURE perch-closed
+[34m DEBUG[97m qml[0m: CONTINUITY_CAPTURE launcher-empty
+[34m DEBUG[97m qml[0m: CONTINUITY_CAPTURE launcher-caret-right
+[34m DEBUG[97m qml[0m: CONTINUITY_CAPTURE launcher-caret-left

@@ -1,0 +1,10 @@
+   Compiling isla-audio-peak v0.1.0 (/home/zdito/.config/quickshell/rust/audio-peak)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running unittests src/lib.rs (/home/zdito/.cache/isla/audio-peak-build/debug/deps/isla_audio_peak-3ae15274f44f5d24)
+
+running 2 tests
+test tests::ffi_accepts_owned_arrays_and_rejects_obvious_invalid_buffers ... ok
+test tests::finite_peak_ignores_invalid_samples ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

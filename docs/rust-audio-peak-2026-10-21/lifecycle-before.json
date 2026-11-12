@@ -1,0 +1,18 @@
+[
+  {
+    "pid": 148946,
+    "owned_by_test": "XDG_DATA_HOME=/tmp/isla-peak-qml-87zdcrw4/fallback",
+    "cmd": [
+      "pactl",
+      "subscribe"
+    ]
+  },
+  {
+    "pid": 149491,
+    "owned_by_test": "XDG_DATA_HOME=/tmp/isla-peak-qml-85fv945a/fallback",
+    "cmd": [
+      "pactl",
+      "subscribe"
+    ]
+  }
+]

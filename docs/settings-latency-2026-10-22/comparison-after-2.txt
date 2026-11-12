@@ -1,0 +1,36 @@
+  INFO: Launching config: "/tmp/isla-settings-navigation-2qs1wk_e/after/bar/settings-navigation-regression.qml"
+  INFO: Shell ID: "bb0195abdc550a1546559fd89d7dde80" Path ID "bb0195abdc550a1546559fd89d7dde80"
+  INFO: Saving logs to "/run/user/1000/quickshell/by-id/segezkbnt/log.qslog"
+  INFO: Configuration Loaded
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN scene: QML QQuickImage* at @components/UserAvatar.qml[29:9]: Cannot open: file:///home/zdito/.face
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fcb355b7d60 but 0x0 is focused
+ DEBUG qml: CONFIG_TIMING [0.75,0.78,0.74,0.75,0.76,0.76,0.77,0.75,0.75,0.74]
+  WARN qt.qpa.wayland.textinput: virtual void QtWaylandClient::QWaylandTextInputv3::disableSurface(wl_surface*) Trying to disable 0x7fcb355b7d60 but 0x0 is focused
+ DEBUG qml: METRIC: page=1 cycle=0 maxms=11
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=2 cycle=0 maxms=19
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=3 cycle=0 maxms=23
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=4 cycle=0 maxms=14
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=5 cycle=0 maxms=15
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=0 cycle=0 maxms=35
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: settings navigation cold frames=644 p95ms=11 maxms=35
+ DEBUG qml: METRIC: page=1 cycle=1 maxms=11
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=2 cycle=1 maxms=13
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=3 cycle=1 maxms=15
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=4 cycle=1 maxms=12
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=5 cycle=1 maxms=18
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: page=0 cycle=1 maxms=21
+ DEBUG qml: CONFIG_CALLS {"snapshots":0,"validations":0}
+ DEBUG qml: METRIC: settings navigation warm frames=616 p95ms=11 maxms=21
+ DEBUG qml: PASS: settings navigation cold/warm and retained drafts

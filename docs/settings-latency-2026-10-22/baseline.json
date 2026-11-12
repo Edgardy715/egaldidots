@@ -1,0 +1,9 @@
+{
+  "bar/settings/SettingsPage.qml": "908a3634246860e1b9c9fd97747403804623adba3165c99263e506254ebc22aa",
+  "bar/settings/SettingRow.qml": "57274b30c456ec0c3d71b835755d592662c41f6849fae3bb026e86c613515a9b",
+  "bar/settings/EdotsWindow.qml": "1687e36e61a2bdca6117b4a58cc9728fe5b573bfe140d804f54bae735c996d11",
+  "bar/settings/EdotsPageMotion.qml": "25c51a154098e641ca36f641c15c8156d9b982f4c1d638b1ce106ba647211f8d",
+  "bar/components/StaggerItem.qml": "7bd33c39baf0d8e924bf40ad7c8a6dec3a2763f55892c7da8670892c55c3e83a",
+  "bar/Singletons/Config.qml": "9c87bae29cfeda150f88ecd337a5db9a4e67f5e656f9e9fee8f98db780f4689b",
+  "bar/Singletons/Settings.js": "b431f7559f8d7fcc22dde461feb58de49eead3bb498fd49f288cfcd54a645d39"
+}

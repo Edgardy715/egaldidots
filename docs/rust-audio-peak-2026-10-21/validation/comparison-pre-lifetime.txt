@@ -1,0 +1,13 @@
+baseline idle CPU% 0.0 PSS KiB 11720 attack ms None
+native idle CPU% 0.0 PSS KiB 11909 attack ms None
+native idle CPU% 0.0 PSS KiB 11528 attack ms None
+baseline idle CPU% 0.0 PSS KiB 11412 attack ms None
+baseline active CPU% 3.743 PSS KiB 13206 attack ms 66.39070399978664
+native active CPU% 1.083 PSS KiB 13321.0 attack ms 64.07168700025068
+native active CPU% 1.413 PSS KiB 13304 attack ms 58.39888499940571
+baseline active CPU% 3.495 PSS KiB 13222 attack ms 64.15593000019726
+baseline active CPU% 3.163 PSS KiB 13184 attack ms 63.50145299984433
+native active CPU% 1.166 PSS KiB 13016.5 attack ms 66.7447389996596
+native active CPU% 1.414 PSS KiB 13077 attack ms 67.00250399990182
+baseline active CPU% 3.659 PSS KiB 13207.0 attack ms 59.66809599976841
+PASS: native maps, private meters, attack/release, EOF/TERM cleanup and defaults preserved

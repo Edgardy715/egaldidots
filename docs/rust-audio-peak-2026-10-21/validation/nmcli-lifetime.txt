@@ -1,0 +1,4 @@
+PASS: quit; event refresh, crash restart, no surviving monitor
+PASS: SIGTERM; event refresh, crash restart, no surviving monitor
+PASS: reload; event refresh, crash restart, no surviving monitor
+PASS: parent identity mismatch aborts before exec
