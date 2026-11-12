@@ -20,6 +20,10 @@ Item {
         const v = cfg(key)
         return /^#[0-9a-fA-F]{6}$/.test(v) ? v : fallback
     }
+    function ranged(key, lo, hi) {
+        const v = parseFloat(cfg(key))
+        return isFinite(v) ? Math.max(lo, Math.min(hi, v)) : 1
+    }
     function asset(key) { return /^[A-Za-z0-9._-]+$/.test(cfg(key)) ? Qt.resolvedUrl(cfg(key)) : "" }
 
     FontLoader { id: textFont; source: root.asset("font") }
@@ -34,6 +38,9 @@ Item {
         Theme.cardBot = hex("cardBot", Theme.cardBot)
         Theme.outline = hex("outline", Theme.outline)
         Flags.time12h = config.boolValue("clock12h")
+        Flags.reduceMotion = config.boolValue("reduceMotion")
+        Flags.motionScale = ranged("motionScale", 0.25, 2)
+        Flags.fontScale = ranged("fontScale", 0.75, 1.75)
         if (secured) entranceTimer.start()
         forceActiveFocus()
     }

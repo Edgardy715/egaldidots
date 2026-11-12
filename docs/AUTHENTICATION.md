@@ -32,7 +32,8 @@ theme that ports the lockscreen: the island grows into the rest pill, the
 capsule with liquid beads, the rejection slosh, the lock glyph and the power
 menu. It has no media, weather or battery. The installer bundles the
 lockscreen's own components, shader and Material Symbols font into the theme,
-so rerun it after changing those. Install it as your normal user; the script
+so rerun it after changing those or your reduce-motion, motion scale, text
+size or 12-hour clock settings, which it copies from Isla's config. Install it as your normal user; the script
 asks for sudo only to copy files:
 
 ```sh

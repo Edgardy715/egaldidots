@@ -54,8 +54,11 @@ class SddmTheme(unittest.TestCase):
         (self.cache / "matugen" / "palette.json").write_text(
             json.dumps({"wallpaper": str(self.wall), "colors": colors}))
 
-    def run_install(self, *args):
-        env = dict(os.environ, XDG_CACHE_HOME=str(self.cache), LANG="es_MX.UTF-8")
+    def run_install(self, *args, env_extra=None):
+        # Never read the real Isla config: point it at a missing file by default.
+        env = dict(os.environ, XDG_CACHE_HOME=str(self.cache), LANG="es_MX.UTF-8",
+                   ISLA_CONFIG=str(Path(self.tmp.name) / "none.json"))
+        env.update(env_extra or {})
         return subprocess.run(["bash", str(INSTALL), "--root", str(self.root), *args],
                               env=env, capture_output=True, text=True, check=True)
 
@@ -102,6 +105,17 @@ class SddmTheme(unittest.TestCase):
         # QML warnings carry "file.qml:LINE"; a load failure says "Fallback".
         bad = [l for l in text.splitlines() if re.search(r"\.(qml|js):\d+", l) or "Fallback" in l]
         self.assertEqual(bad, [], text)
+
+    def test_isla_preferences_reach_the_greeter(self):
+        import json
+        cfg = Path(self.tmp.name) / "shell.json"
+        cfg.write_text(json.dumps({"appearance": {
+            "reduceMotion": True, "time12h": False, "motionScale": 9, "fontScale": "1.2\nCurrent=evil"}}))
+        self.run_install(env_extra={"ISLA_CONFIG": str(cfg)})
+        conf = (self.theme / "theme.conf").read_text()
+        for line in ("reduceMotion=true", "clock12h=false", "motionScale=2", "fontScale=1"):
+            self.assertIn(line + "\n", conf)
+        self.assertNotIn("evil", conf)
 
     def test_reinstall_keeps_original_previous_theme(self):
         self.run_install()

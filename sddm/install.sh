@@ -144,7 +144,27 @@ else
 fi
 locale="${LANG%%.*}"
 [[ $locale =~ ^[a-z]{2}(_[A-Z]{2})?$ ]] || locale=es_ES
-printf 'locale=%s\nclock12h=false\n' "$locale" >> "$stage/isla/theme.conf"
+printf 'locale=%s\n' "$locale" >> "$stage/isla/theme.conf"
+# Isla's own motion, text-size and clock preferences, validated like Settings.js.
+python3 - "${ISLA_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/isla/shell.json}" <<'EOF' >> "$stage/isla/theme.conf"
+import json, sys
+try:
+    a = json.load(open(sys.argv[1])).get("appearance", {})
+except Exception:
+    a = {}
+if not isinstance(a, dict):
+    a = {}
+def flag(k, d):
+    v = a.get(k)
+    return v if isinstance(v, bool) else d
+def num(k, d, lo, hi):
+    v = a.get(k)
+    return min(hi, max(lo, v)) if isinstance(v, (int, float)) and not isinstance(v, bool) else d
+print("reduceMotion=" + str(flag("reduceMotion", False)).lower())
+print("clock12h=" + str(flag("time12h", True)).lower())
+print("motionScale=%g" % num("motionScale", 1, 0.25, 2))
+print("fontScale=%g" % num("fontScale", 1, 0.75, 1.75))
+EOF
 
 previous="$(current_theme)"
 [[ $previous == isla ]] && previous="$(cat "$theme_dir/previous-theme" 2>/dev/null || true)"
