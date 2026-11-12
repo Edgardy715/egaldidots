@@ -115,7 +115,10 @@ ShellRoot {
                 phase = light.driftPhase; wave.visible = true; bands = Perf.bands
                 ticks = 0; step = 8
             } else if (step === 8 && ticks >= 2) {
-                check(light.driftPhase !== phase, "glow resumes")
+                // GlowClock ticks at ~12 Hz (83 ms): give it several periods before judging.
+                // A resting/status pill holds its glow on purpose (PillMaterial.drifting): only a drifting glow must resume.
+                if (light.drifting && light.driftPhase === phase && ticks < 30) return
+                check(!light.drifting || light.driftPhase !== phase, "glow resumes")
                 check(Perf.bands > bands, "spectrum resumes")
                 Config.update({appearance: {reduceMotion: true}})
                 phase = light.driftPhase; ticks = 0; step = 9

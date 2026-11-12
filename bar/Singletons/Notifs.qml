@@ -23,6 +23,18 @@ Singleton {
      * null cuando no hay nada activo (pill en reposo).
      */
     property var activePopup: null
+    property var activityTrackers: ({})
+    function activityNotification(notif) {
+        if (!Activities.notification(notif)) return false
+        if (!activityTrackers[notif.id])
+            activityTrackers[notif.id] = activityTracker.createObject(root, {notification: notif, finish: root.activityClosed})
+        return true
+    }
+
+    function activityClosed(id) {
+        Activities.dispatch({op: "end", id: "notification:" + id, state: "done"})
+        delete activityTrackers[id]
+    }
 
     /**
      * Avanza la cola: la pill llama esto al terminar su ciclo morph de la notif
@@ -37,7 +49,18 @@ Singleton {
             if (completed.ephemeral) Qt.callLater(function() { completed.close() })
         }
         if (root.activePopup && root.activePopup !== completed && root.activePopup.popup) return
-        root.activePopup = root.popups.find(n => n.isCritical) || root.popups[0] || null
+        root.activePopup = root._nextPopup()
+    }
+
+    /** Siguiente toast por orden de llegada (list guarda la más nueva primero); una crítica se adelanta. */
+    function _nextPopup() {
+        const queue = root.popups
+        let next = null
+        for (let i = queue.length - 1; i >= 0; --i) {
+            if (queue[i].isCritical) return queue[i]
+            if (!next) next = queue[i]
+        }
+        return next
     }
 
     /**
@@ -48,9 +71,9 @@ Singleton {
     function _maybePromote() {
         const critical = root.popups.find(n => n.isCritical)
         if (critical && root.activePopup && !root.activePopup.isCritical) {
-            root.activePopup = critical
+            root.activePopup = root._nextPopup()
         } else if ((!root.activePopup || !root.activePopup.popup || root.activePopup.closed) && root.popups.length > 0) {
-            root.activePopup = critical || root.popups[0]
+            root.activePopup = root._nextPopup()
         } else if (root.activePopup && root.popups.length === 0) {
             // la activa ya expiró/cerró y no hay más → null
             root.activePopup = null
@@ -79,6 +102,45 @@ Singleton {
     function _remove(item) {
         root.list = root.list.filter(function(n) { return n !== item })
         root._bump()
+    }
+
+    /** Pausa anidable del toast: conserva el tiempo restante del timer actual. */
+    function pauseExpiration(notif) {
+        if (!notif || !notif.expireTimer || notif.expireInterval <= 0 || notif.isCritical) return
+        if (notif._expirationPauseDepth === undefined) {
+            notif._expirationPauseDepth = 0
+            notif._expirationRemaining = 0
+        }
+        if (notif._expirationPauseDepth++ > 0) return
+        const timer = notif.expireTimer
+        notif._expirationRemaining = timer.running
+                ? Math.max(0, notif._expirationInterval - (Date.now() - notif._expirationStartedAt)) : 0
+        notif._expirationPaused = true
+        timer.stop()
+    }
+
+    function resumeExpiration(notif) {
+        if (!notif || !notif._expirationPauseDepth) return
+        if (--notif._expirationPauseDepth > 0) return
+        const remaining = notif._expirationRemaining
+        notif._expirationPaused = false
+        if (notif.popup && !notif.closed && remaining >= 0) {
+            notif.expireTimer.interval = Math.max(1, remaining)
+            notif.expireTimer.restart()
+        }
+    }
+
+    /** Lleva la notificación al principio del orden visible del centro. */
+    function promote(notif) {
+        if (!notif || notif.closed) return
+        const index = root.list.indexOf(notif)
+        if (index < 0) return
+        if (index > 0) root.list = [notif].concat(root.list.filter(function(n) { return n !== notif }))
+        root._bump()
+    }
+
+    function dismissGesture(notif) {
+        if (notif && !notif.closed) notif.close()
     }
 
     // ---- path de estado (XDG) ----
@@ -151,6 +213,7 @@ Singleton {
         persistenceSupported: true
         onNotification: function(notif) {
             notif.tracked = true
+            if (root.activityNotification(notif)) return
             var d = notifComp.createObject(root, {
                 popup: root.shouldShowPopup(),
                 notification: notif,
@@ -171,6 +234,25 @@ Singleton {
             if (d.ephemeral && !d.popup) { d.close(); return }
             root.list = [d].concat(root.list)
             root._bump()   // promote a activePopup si no hay una activa
+        }
+    }
+
+    Component {
+        id: activityTracker
+        QtObject {
+            id: tracker
+            required property var notification
+            required property var finish
+            property Connections changes: Connections {
+                target: tracker.notification
+                function onHintsChanged() { Activities.notification(tracker.notification) }
+                function onSummaryChanged() { Activities.notification(tracker.notification) }
+                function onBodyChanged() { Activities.notification(tracker.notification) }
+                function onClosed(reason) {
+                    tracker.finish(tracker.notification.id)
+                    tracker.destroy()
+                }
+            }
         }
     }
 
@@ -256,6 +338,26 @@ Singleton {
 
     Component {
         id: notifComp
-        NotifData {}
+        NotifData {
+            id: notifData
+            property int _expirationPauseDepth: 0
+            property int _expirationRemaining: 0
+            property bool _expirationPaused: false
+            property double _expirationStartedAt: Date.now()
+            property int _expirationInterval: expireInterval
+            readonly property Connections expirationTimerState: Connections {
+                target: notifData.expireTimer
+                function onRunningChanged() {
+                    if (notifData.expireTimer.running && !notifData._expirationPaused) {
+                        notifData._expirationStartedAt = Date.now()
+                        notifData._expirationInterval = notifData.expireTimer.interval
+                        notifData._expirationRemaining = notifData._expirationInterval
+                    } else if (!notifData.expireTimer.running && !notifData._expirationPaused) {
+                        notifData.expireTimer.interval = notifData.expireInterval
+                    }
+                }
+                function onTriggered() { notifData.expireTimer.interval = notifData.expireInterval }
+            }
+        }
     }
 }

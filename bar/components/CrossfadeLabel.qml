@@ -11,6 +11,13 @@ Item {
     property bool initialized: false
     property bool animated: true
     property real swapTravel: 0
+    // Lets a group of labels follow one another instead of changing all at once.
+    property int delay: 0
+    // Hand off instead of overlapping: the old value leaves before the new one arrives.
+    property bool sequential: false
+    // Sequential: the old value accelerates away, the new one settles in.
+    readonly property real outgoing: sequential ? Math.pow(Math.min(1, reveal / 0.45), 2) : reveal
+    readonly property real incoming: sequential ? 1 - Math.pow(1 - Math.max(0, (reveal - 0.3) / 0.7), 3) : reveal
     property int reservedLines: 0
     property alias font: incoming.font
     property alias color: incoming.color
@@ -64,8 +71,8 @@ Item {
         wrapMode: incoming.wrapMode
         maximumLineCount: incoming.maximumLineCount
         lineHeight: incoming.lineHeight
-        transform: Translate { y: -root.swapTravel * root.reveal }
-        opacity: 1 - root.reveal
+        transform: Translate { y: -root.swapTravel * root.outgoing }
+        opacity: 1 - root.outgoing
         visible: opacity > 0
         Accessible.ignored: true
     }
@@ -74,14 +81,17 @@ Item {
         objectName: "crossfadeText"
         anchors.fill: parent
         text: root.displayed
-        transform: Translate { y: root.swapTravel * (1 - root.reveal) }
-        opacity: root.reveal
+        transform: Translate { y: root.swapTravel * (1 - root.incoming) }
+        opacity: root.incoming
     }
-    NumberAnimation {
+    SequentialAnimation {
         id: swap
-        target: root; property: "reveal"; from: 0; to: 1
-        duration: Motion.standardSmall
-        easing.type: Motion.easeStandard
+        PauseAnimation { duration: root.delay }
+        NumberAnimation {
+            target: root; property: "reveal"; from: 0; to: 1
+            duration: root.sequential ? Motion.standard + 90 : Motion.standardSmall
+            easing.type: root.sequential ? Easing.Linear : Motion.easeStandard
+        }
         onFinished: { root.previous = ""; root.sync() }
     }
 }

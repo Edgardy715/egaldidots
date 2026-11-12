@@ -135,7 +135,10 @@ Item {
         // Publica las mutaciones JS una sola vez por cuadro.
         lamps=lamps.slice()
         result=r
-        needsFrames=!reduceMotion && (r.needsFrames || d.needsFrames || !Springs.settled(lamps,.001,.01))
+        // Lamps settle at visible precision: 0.004 is below one 8-bit level in every term they
+        // feed (rim light, night dimming). Tighter, a minute's light catch-up kept the engine
+        // drawing unchanged frames for a second after each wake.
+        needsFrames=!reduceMotion && (r.needsFrames || d.needsFrames || !Springs.settled(lamps,.004,.02))
         advanceCount++
     }
     function advance(dt) { step(dt); lastClock=Date.now() }

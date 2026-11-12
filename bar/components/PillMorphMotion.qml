@@ -32,6 +32,36 @@ Item {
     property real velW: 0
     property real velH: 0
     property bool integrating: false
+    property bool grabbed: false
+    property bool gestureSpring: false
+    property real grabW: 0
+    property real grabH: 0
+    property real grabRadius: 0
+    property real grabProgress: 0
+    property bool handoffPending: false
+    property bool pullRevealing: false
+    onIntegratingChanged: if (!integrating && !grabbed) { pullRevealing = false; gestureSpring = false }
+    function grab() {
+        if (grabbed) return
+        const w = width, h = height, r = radius
+        springW = w; springH = h
+        grabW = w; grabH = h; grabRadius = r
+        grabProgress = surfaceGrowth
+        grabbed = true
+        integrating = false
+        handoffPending = false
+    }
+    function release(vw, vh, gesture) {
+        springW = grabW; springH = grabH
+        velW = reduceMotion ? 0 : vw
+        velH = reduceMotion ? 0 : vh
+        pullRevealing = gesture !== false
+        handoffPending = gesture !== false && !reduceMotion
+        grabbed = false
+        integrating = !reduceMotion && (springW !== clampedW || springH !== clampedH || velW !== 0 || velH !== 0)
+        if (reduceMotion) { springW = clampedW; springH = clampedH }
+        if (!integrating) { handoffPending = false; pullRevealing = false; gestureSpring = false }
+    }
     // Dirección latcheada del último retarget (signo del recorrido); closeness la usa
     // para no penalizar el rebase.
     property int dirW: 1
@@ -49,29 +79,29 @@ Item {
     property real latchedW: clampedW
     property real latchedH: clampedH
     // La altura decide si manda el muelle: el aviso de workspace sólo cambia el ancho.
-    readonly property bool springOn: !reduceMotion && !notifAnimating
+    readonly property bool springOn: !reduceMotion && (!notifAnimating || gestureSpring)
         && (surfaceOpen || integrating || targetH > coreH + 1 || springH > coreH + 1)
     readonly property real timeScale: Math.max(0.05, Flags.motionScale)
 
-    width: springOn ? springW : clampedW
-    height: springOn ? springH : clampedH
-    property real radius: targetRadius
+    width: grabbed ? grabW : springOn ? springW : clampedW
+    height: grabbed ? grabH : springOn ? springH : clampedH
+    property real radius: grabbed ? grabRadius : targetRadius
     Behavior on width {
-        enabled: !root.reduceMotion && !root.springOn
+        enabled: !root.grabbed && !root.reduceMotion && !root.springOn
             && (!root.workspaceAnimating || root.surfaceOpen || root.notifAnimating)
         SmoothedAnimation { duration: root.duration; velocity: -1 }
     }
     Behavior on height {
-        enabled: !root.reduceMotion && !root.springOn
+        enabled: !root.grabbed && !root.reduceMotion && !root.springOn
         SmoothedAnimation { duration: root.duration; velocity: -1 }
     }
     Behavior on radius {
-        enabled: !root.reduceMotion
+        enabled: !root.grabbed && !root.reduceMotion
         SmoothedAnimation { duration: root.duration; velocity: -1 }
     }
     // Fuera del muelle el muelle sigue al valor real para tomar el relevo sin salto.
-    onWidthChanged: if (!springOn) { springW = width; velW = 0 }
-    onHeightChanged: if (!springOn) { springH = height; velH = 0 }
+    onWidthChanged: if (!springOn && !grabbed && (reduceMotion || notifAnimating || !surfaceOpen && clampedH <= coreH + 1)) { springW = width; velW = 0 }
+    onHeightChanged: if (!springOn && !grabbed && (reduceMotion || notifAnimating || !surfaceOpen && clampedH <= coreH + 1)) { springH = height; velH = 0 }
 
     function atRest(w, h) { return Math.abs(w - restW) < 1 && Math.abs(h - coreH) < 1 }
     function kindFor() {
@@ -98,7 +128,7 @@ Item {
             kindDirtyH = true
             changed = true
         }
-        if (changed && springOn && !integrating) integrating = true
+        if (changed && springOn && !grabbed && !integrating) integrating = true
     }
     function accel(x, v, target, p, dir, span) {
         var e = x - target
@@ -112,7 +142,15 @@ Item {
     // Recupera cuadros tardíos con subpasos estables. Dos segundos de tiempo del
     // muelle bastan para asentar los perfiles actuales y acotan una suspensión larga.
     function step(dt) {
-        if (!isFinite(dt) || dt <= 0) return
+        if (grabbed || !isFinite(dt) || dt <= 0) return
+        // The first published frame continues the measured trajectory. Subsequent
+        // frames use the unchanged surface spring and its normal integration.
+        if (handoffPending) {
+            handoffPending = false
+            springW += velW * Math.min(dt, 2)
+            springH += velH * Math.min(dt, 2)
+            return
+        }
         dt = Math.min(dt / timeScale, 2)
         if (kindDirtyW) { kindW = kindFor(); paramsW = spring[kindW].w; kindDirtyW = false }
         if (kindDirtyH) { kindH = kindFor(); paramsH = spring[kindH].h; kindDirtyH = false }
@@ -136,12 +174,12 @@ Item {
     // Las pruebas avanzan el muelle a mano con step(dt) para ser deterministas.
     property bool manualStep: false
     FrameAnimation {
-        running: root.integrating && root.springOn && !root.manualStep
+        running: root.integrating && !root.grabbed && root.springOn && !root.manualStep
         onTriggered: root.step(frameTime)
     }
     onClampedWChanged: retarget()
     onClampedHChanged: retarget()
-    onSpringOnChanged: if (springOn) {
+    onSpringOnChanged: if (springOn && !grabbed) {
         retarget()
         if (springW !== clampedW || springH !== clampedH) integrating = true
     }
@@ -201,9 +239,9 @@ Item {
     // el campo de búsqueda ~200 ms. Cerrar, cambiar de surface o una
     // notificación vuelven a la exposición por crecimiento.
     property bool contentHeld: false
-    readonly property real contentProgress: contentHeld ? 1 : growthProgress
+    readonly property real contentProgress: grabbed ? grabProgress : pullRevealing ? surfaceGrowth : contentHeld ? 1 : growthProgress
     function holdContentIfRevealed() {
-        if (surfaceOpen && !notifAnimating && growthProgress >= 0.999) contentHeld = true
+        if (!grabbed && surfaceOpen && !notifAnimating && growthProgress >= 0.999) contentHeld = true
     }
     onGrowthProgressChanged: holdContentIfRevealed()
     onSurfaceOpenChanged: if (!surfaceOpen) contentHeld = false

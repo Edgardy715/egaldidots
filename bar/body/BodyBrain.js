@@ -62,7 +62,10 @@ function update(s,dt,t,opts) {
         else { tl=f*11*k; tox=dx*f*6*k; toy=dy*f*3*k; th+=f*1.5*k; gt=f*.1 }
     }
     else if (mood==='timida') { tox=-dx*f*14*k; toy=-Math.max(dy,0)*f*4*k; tw-=(4+f*18)*k; th-=(1+f*2)*k }
-    else if (sleep) { th=14.5*k; tw-=6*k; toy=3*k; dm=1 }
+    // Dormida se encoge en su sitio: hundirse la sacaba del centro común de la barra.
+    // th entero: con s=1, centro común (y=27) y sin respiración, los bordes caen en filas enteras.
+    // Con s fraccionaria o respiración vuelven a caer entre píxeles; no se corrige aquí.
+    else if (sleep) { th=16*k; tw-=6*k; dm=1 }
     else if (mood==='contenta') {
         tl=f*6*k; gt=.3
         if (t>s.jiggleAt && !reduce) { s.jiggleAt=t+1.35; s.hh.v+=60*k; s.hw.v-=170*k; s.glow.v+=2.4 }

@@ -175,3 +175,17 @@ muelles, reposo y fallback. Su rama RHI comprueba cambio de píxeles por portada
 fallo real de shader; la continuidad de cuello se mantiene en water-drop.
 En este entorno RHI no crea contexto: píxeles y coste GPU **no verificados**.
 Informe: `docs/agua-w4-2026-10-31/REPORT.md`. QA Wayland pendiente de Claude.
+
+## Material vivo · el agua responde al contenido
+
+Reglas puras en `WaterReactive.js`; `PillBody` las alimenta y `body.frag` las dibuja (uniformes al
+final del bloque: `tintFrom/tintTo/tintCross/tintPresence`, `rippleT/rippleAmp/rippleOrigin`, `bassGain`).
+- Tinte: color de `MediaPalette.extracted`, mezcla <= 12 % con guarda (contraste del texto >= min(actual, 7)
+  sobre cardTop/cardBot). Cambio de pista: `SpringValue tintCross` (token `level`), sin temporizador.
+  Pausa: `tintPresence` vuelve a 0 en 1,2 s.
+- Onda: `PillBody.adjust(kind, value, muted)` desde los OSD de volumen/brillo; amplitud = min(1, 10·|delta|),
+  450 ms, un solo anillo (reinicia desde la amplitud visible).
+- Graves: `Cava.bass` (banda 0..6) -> envolvente 40/220 ms integrada en `advanceDecor` -> `bassGain` (1..1.08)
+  sólo sobre el brillo especular. Ajuste `appearance.waterReactsToMusic`.
+- Todo cuelga de `waterActive`: waterBody apagado, shader en error, software o reduceMotion = sin onda,
+  graves ni tinte animado. Los cuadros sólo se piden mientras hay datos (`bassMoving`), muelle o anillo.

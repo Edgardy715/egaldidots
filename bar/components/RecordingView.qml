@@ -40,13 +40,13 @@ FocusScope {
         const remainder = String(seconds % 60).padStart(2, "0")
         return seconds >= 3600 ? String(Math.floor(seconds / 3600)).padStart(2, "0") + ":" + minutes + ":" + remainder : minutes + ":" + remainder
     }
-    readonly property string statusText: phase === "recording" ? qsTr("Grabando pantalla")
-        : phase === "paused" ? qsTr("Grabación en pausa")
-        : counting ? qsTr("Prepárate") : phase === "starting" ? qsTr("Elige qué compartir…")
-        : phase === "stopping" ? qsTr("Guardando grabación…") : phase === "error" ? qsTr("No se pudo completar la acción")
-        : needsConnection ? qsTr("Grabador no disponible") : outputAvailable ? qsTr("Grabación finalizada") : qsTr("Listo para grabar")
-    readonly property string primaryText: active ? qsTr("Detener grabación") : counting ? qsTr("Cancelar cuenta atrás")
-        : phase === "starting" ? qsTr("Iniciando…") : phase === "stopping" ? qsTr("Finalizando…") : qsTr("Iniciar grabación")
+    readonly property string statusText: phase === "recording" ? I18n.tr("Grabando pantalla")
+        : phase === "paused" ? I18n.tr("Grabación en pausa")
+        : counting ? I18n.tr("Prepárate") : phase === "starting" ? I18n.tr("Elige qué compartir…")
+        : phase === "stopping" ? I18n.tr("Guardando grabación…") : phase === "error" ? I18n.tr("No se pudo completar la acción")
+        : needsConnection ? I18n.tr("Grabador no disponible") : outputAvailable ? I18n.tr("Grabación finalizada") : I18n.tr("Listo para grabar")
+    readonly property string primaryText: active ? I18n.tr("Detener grabación") : counting ? I18n.tr("Cancelar cuenta atrás")
+        : phase === "starting" ? I18n.tr("Iniciando…") : phase === "stopping" ? I18n.tr("Finalizando…") : I18n.tr("Iniciar grabación")
     implicitHeight: content.implicitHeight
 
     onMotionAllowedChanged: if (!motionAllowed) { shapeRadiusMotion.complete(); symbolSizeMotion.complete(); symbolRadiusMotion.complete() }
@@ -152,7 +152,7 @@ FocusScope {
                     font.pixelSize: Theme.fontSizeCover * root.s
                     font.weight: Font.Medium
                     font.features: ({ "tnum": 1 })
-                    Accessible.name: root.counting ? qsTr("La grabación comienza en %1").arg(root.countdown) : qsTr("Duración de grabación: %1").arg(root.timeText)
+                    Accessible.name: root.counting ? I18n.tr("La grabación comienza en %1").arg(root.countdown) : I18n.tr("Duración de grabación: %1").arg(root.timeText)
                 }
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
@@ -184,7 +184,7 @@ FocusScope {
                 spacing: 0
                 AudioControl {
                     objectName: "recordingSystemAudio"
-                    label: qsTr("Audio del sistema")
+                    label: I18n.tr("Audio del sistema")
                     iconName: root.systemAudio ? "volume_up" : "volume_off"
                     selected: root.systemAudio
                     onClicked: root.systemAudioToggled()
@@ -197,7 +197,7 @@ FocusScope {
                 }
                 AudioControl {
                     objectName: "recordingMicrophone"
-                    label: qsTr("Micrófono")
+                    label: I18n.tr("Micrófono")
                     iconName: root.microphoneAudio ? "mic" : "mic_off"
                     selected: root.microphoneAudio
                     onClicked: root.microphoneAudioToggled()
@@ -266,7 +266,7 @@ FocusScope {
                 Behavior on Layout.preferredWidth { enabled: root.motionAllowed; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                 Behavior on Layout.leftMargin { enabled: root.motionAllowed; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                 enabled: root.open && !root.busy && root.pauseSupported
-                text: !root.pauseSupported ? qsTr("Pausa no disponible") : root.phase === "paused" ? qsTr("Continuar") : qsTr("Pausar")
+                text: !root.pauseSupported ? I18n.tr("Pausa no disponible") : root.phase === "paused" ? I18n.tr("Continuar") : I18n.tr("Pausar")
                 Accessible.name: text
                 onClicked: if (root.phase === "paused") root.resumeRequested(); else root.pauseRequested()
                 contentItem: MaterialIcon {
@@ -287,19 +287,19 @@ FocusScope {
             objectName: "recordingRefresh"
             visible: root.needsConnection || root.phase === "error"
             enabled: root.open
-            text: qsTr("Reintentar")
+            text: I18n.tr("Reintentar")
             onClicked: root.refreshRequested()
         }
         Text {
             objectName: "recordingHelp"
             Layout.fillWidth: true
             Layout.minimumHeight: 32 * root.s
-            text: root.error ? root.error : root.phase === "error" ? qsTr("No se ha confirmado el guardado. Puedes volver a intentarlo.")
-                : root.needsConnection ? qsTr("Instala gpu-screen-recorder para grabar con aceleración por hardware.")
-                : root.busy ? qsTr("Esperando al grabador o al selector de pantalla…")
-                : root.counting ? qsTr("Puedes cancelar antes de que comience.")
-                : root.active ? qsTr("El audio se mantiene como lo configuraste al iniciar.")
-                : root.outputAvailable ? qsTr("Guardada en Vídeos/Recordings.") : qsTr("Elige pantalla o ventana al empezar.")
+            text: root.error ? root.error : root.phase === "error" ? I18n.tr("No se ha confirmado el guardado. Puedes volver a intentarlo.")
+                : root.needsConnection ? I18n.tr("Instala gpu-screen-recorder para grabar con aceleración por hardware.")
+                : root.busy ? I18n.tr("Esperando al grabador o al selector de pantalla…")
+                : root.counting ? I18n.tr("Puedes cancelar antes de que comience.")
+                : root.active ? I18n.tr("El audio se mantiene como lo configuraste al iniciar.")
+                : root.outputAvailable ? I18n.tr("Guardada en Vídeos/Recordings.") : I18n.tr("Elige pantalla o ventana al empezar.")
             textFormat: Text.PlainText
             color: (root.error && !root.setupRequired) || root.phase === "error" ? Theme.error : Theme.iconSecondary
             horizontalAlignment: Text.AlignHCenter
@@ -312,7 +312,7 @@ FocusScope {
             objectName: "recordingOutput"
             visible: root.outputAvailable
             enabled: root.open && root.outputAvailable
-            text: qsTr("Abrir grabación")
+            text: I18n.tr("Abrir grabación")
             Accessible.description: root.outputPath
             onClicked: root.openOutputRequested()
         }

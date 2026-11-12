@@ -40,7 +40,7 @@ Item {
     property bool showMonitors: false
     property bool amplified: false
     readonly property real maximum: amplified ? 1.5 : 1
-    readonly property var tabLabels: [qsTr("Salida"), qsTr("Entrada"), qsTr("Aplicaciones"), qsTr("Hardware")]
+    readonly property var tabLabels: [I18n.tr("Salida"), I18n.tr("Entrada"), I18n.tr("Aplicaciones"), I18n.tr("Hardware")]
     readonly property var tabSymbols: ["volume_up", "mic", "apps", "tune"]
     readonly property string kind: pages.displayedPage === 0 ? "output" : pages.displayedPage === 1 ? "input" : captureApps ? "recording" : "playback"
     readonly property var rows: pages.displayedPage === 0 ? [...outputs].sort((a,b) => Number(b.name === defaultOutput) - Number(a.name === defaultOutput) || outputs.indexOf(a) - outputs.indexOf(b)) : pages.displayedPage === 1 ? inputs.filter(row => showMonitors || !row.monitor).sort((a,b) => Number(b.name === defaultInput) - Number(a.name === defaultInput) || inputs.indexOf(a) - inputs.indexOf(b))
@@ -63,7 +63,6 @@ Item {
     Component.onCompleted: Qt.callLater(updateMeters)
     signal requested(string action, var args)
     signal refreshRequested()
-    signal requestClose()
 
     EdotsPageMotion {
         id: pages
@@ -78,34 +77,17 @@ Item {
     ColumnLayout {
         anchors.fill: parent
         spacing: 16 * root.s
-        RowLayout {
+        SurfaceHeader {
             Layout.fillWidth: true
-            ColumnLayout {
-                Layout.fillWidth: true; Layout.minimumWidth: 0
-                spacing: 4 * root.s
-                Text {
-                    text: qsTr("Sonido")
-                    color: Theme.foreground; font.family: Theme.font
-                    font.pixelSize: Theme.fontSizeHero * root.s; font.weight: Font.DemiBold
+            title: I18n.tr("Sonido")
+            s: root.s
+            trailing: Component {
+                AudioButton {
+                    objectName: "audioRefresh"
+                    s: root.s; symbol: "refresh"
+                    ToolTip.text: I18n.tr("Actualizar dispositivos"); ToolTip.visible: hovered
+                    onClicked: root.refreshRequested()
                 }
-                AnimatedLabel {
-                    Layout.fillWidth: true
-                    value: !root.ready ? qsTr("Conectando con el audio…") : (root.outputs.length === 1 ? qsTr("1 salida") : qsTr("%1 salidas").arg(root.outputs.length)) + " · " + (root.inputs.filter(row => !row.monitor).length === 1 ? qsTr("1 entrada") : qsTr("%1 entradas").arg(root.inputs.filter(row => !row.monitor).length))
-                    color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s
-                    elide: Text.ElideRight
-                }
-            }
-            AudioButton {
-                objectName: "audioRefresh"
-                s: root.s; symbol: "refresh"
-                ToolTip.text: qsTr("Actualizar dispositivos"); ToolTip.visible: hovered
-                onClicked: root.refreshRequested()
-            }
-            AudioButton {
-                objectName: "audioClose"
-                s: root.s; symbol: "close"
-                ToolTip.text: qsTr("Cerrar sonido"); ToolTip.visible: hovered
-                onClicked: root.requestClose()
             }
         }
         Item {
@@ -176,7 +158,7 @@ Item {
                 font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; color: Theme.error
                 Accessible.role: Accessible.AlertMessage
             }
-            AudioButton { s: root.s; text: qsTr("Reintentar"); onClicked: root.refreshRequested() }
+            AudioButton { s: root.s; text: I18n.tr("Reintentar"); onClicked: root.refreshRequested() }
         }
         Item {
             Layout.fillWidth: true; Layout.fillHeight: true
@@ -192,28 +174,28 @@ Item {
                     Text {
                         Layout.fillWidth: true
                         visible: pages.displayedPage !== 2
-                        text: pages.displayedPage === 0 ? qsTr("Dónde quieres escuchar") : pages.displayedPage === 1 ? qsTr("Qué quieres capturar") : pages.displayedPage === 2 ? qsTr("Cada aplicación, a tu manera") : qsTr("Perfiles y conexiones")
+                        text: pages.displayedPage === 0 ? I18n.tr("Dónde quieres escuchar") : pages.displayedPage === 1 ? I18n.tr("Qué quieres capturar") : pages.displayedPage === 2 ? I18n.tr("Cada aplicación, a tu manera") : I18n.tr("Perfiles y conexiones")
                         font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * root.s; font.weight: Font.Medium; color: Theme.foreground
                         elide: Text.ElideRight
                     }
                     AudioButton {
                         objectName: "audioMonitors"
                         visible: pages.displayedPage === 1
-                        s: root.s; text: qsTr("Monitores"); symbol: "speaker"; selected: root.showMonitors
+                        s: root.s; text: I18n.tr("Monitores"); symbol: "speaker"; selected: root.showMonitors
                         onClicked: root.showMonitors = !root.showMonitors
                     }
                     AudioButton {
                         objectName: "audioPlayback"
                         Layout.fillWidth: true
                         visible: pages.displayedPage === 2
-                        s: root.s; text: qsTr("Reproducción · %1").arg(root.playback.length); selected: !root.captureApps
+                        s: root.s; text: I18n.tr("Reproducción · %1").arg(root.playback.length); selected: !root.captureApps
                         onClicked: root.captureApps = false
                     }
                     AudioButton {
                         objectName: "audioRecording"
                         Layout.fillWidth: true
                         visible: pages.displayedPage === 2
-                        s: root.s; text: qsTr("Grabación · %1").arg(root.recording.length); selected: root.captureApps
+                        s: root.s; text: I18n.tr("Grabación · %1").arg(root.recording.length); selected: root.captureApps
                         onClicked: root.captureApps = true
                     }
                 }
@@ -222,7 +204,7 @@ Item {
                     objectName: "audioSearch"
                     Layout.fillWidth: true
                     visible: pages.displayedPage === 2
-                    placeholderText: qsTr("Buscar aplicaciones")
+                    placeholderText: I18n.tr("Buscar aplicaciones")
                     onTextChanged: Qt.callLater(() => list.positionViewAtBeginning())
                 }
                 Item {
@@ -297,13 +279,13 @@ Item {
                         }
                         Text {
                             Layout.fillWidth: true
-                            text: !root.ready ? qsTr("Esperando al servidor de audio") : pages.displayedPage === 2 ? search.text ? qsTr("No hay aplicaciones que coincidan") : root.captureApps ? qsTr("Ninguna aplicación está grabando") : qsTr("Ninguna aplicación está reproduciendo") : qsTr("No hay dispositivos disponibles")
+                            text: !root.ready ? I18n.tr("Esperando al servidor de audio") : pages.displayedPage === 2 ? search.text ? I18n.tr("No hay aplicaciones que coincidan") : root.captureApps ? I18n.tr("Ninguna aplicación está grabando") : I18n.tr("Ninguna aplicación está reproduciendo") : I18n.tr("No hay dispositivos disponibles")
                             horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * root.s; color: Theme.foreground
                         }
                         Text {
                             Layout.fillWidth: true
-                            text: pages.displayedPage === 2 ? qsTr("Los controles aparecen cuando una aplicación abre un stream de audio.") : qsTr("Conecta un dispositivo o revisa su perfil en Hardware.")
+                            text: pages.displayedPage === 2 ? I18n.tr("Los controles aparecen cuando una aplicación abre un stream de audio.") : I18n.tr("Conecta un dispositivo o revisa su perfil en Hardware.")
                             horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; color: Theme.iconSecondary
                         }
@@ -316,17 +298,16 @@ Item {
             spacing: 12 * root.s
             AudioButton {
                 objectName: "audioAmplification"
-                s: root.s; text: qsTr("Hasta 150 %"); symbol: "volume_up"; selected: root.amplified
+                s: root.s; text: I18n.tr("Hasta 150 %"); symbol: "volume_up"; selected: root.amplified
                 visible: root.page !== 3
                 onClicked: root.amplified = !root.amplified
             }
             Text {
                 Layout.fillWidth: true
-                text: root.busy ? qsTr("Aplicando cambios…") : root.page === 3 ? qsTr("El perfil define las entradas y salidas disponibles.") : root.amplified ? qsTr("Por encima del 100 % puede haber distorsión.") : qsTr("Los cambios se aplican al instante.")
+                text: root.busy ? I18n.tr("Aplicando cambios…") : root.page === 3 ? I18n.tr("El perfil define las entradas y salidas disponibles.") : root.amplified ? I18n.tr("Por encima del 100 % puede haber distorsión.") : ""
                 elide: Text.ElideRight
                 font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
             }
-            Text { text: "Esc"; font.family: Theme.fontMono; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary }
         }
     }
 }

@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Effects
 import Quickshell.Widgets
 import "../"
 import "../Singletons"
@@ -120,41 +119,15 @@ Item {
     Component.onDestruction: if (md) unlockRequested(md, card)
 
 
-    // ---- sombra separada del contenido (fix blur en texto) ----
-    Rectangle {
-        id: bodyShadow
-        anchors.fill: parent
-        radius: Motion.rTile
-        color: "transparent"
-        border.width: Theme.borderHairline
-        border.color: Theme.border
-        layer.enabled: true
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowColor: Qt.rgba(0, 0, 0, Theme.shadowOpacity)
-            shadowBlur: 0.7
-            shadowVerticalOffset: 3 * card.s
-        }
-    }
-
     // ---- cuerpo de vidrio ----
     Rectangle {
         id: body
         anchors.fill: parent
         radius: Motion.rTile
-        border.width: Theme.borderHairline
-        border.color: critical ? Qt.alpha(Theme.accent, Theme.alphaCritical) : Theme.border
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Qt.alpha(Theme.cardTop, Flags.glassAlpha) }
-            GradientStop { position: 1.0; color: Qt.alpha(Theme.cardBot, Flags.glassAlpha) }
-        }
-
-        Rectangle {
-            anchors.top: parent.top; anchors.topMargin: 1 * s
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width * 0.82; height: 1.2 * s; radius: height / 2
-            color: Theme.sheen
-        }
+        // Tarjeta tonal (DIRECCION.md): sin borde ni sombra propios; sólo la urgente lleva aro de acento.
+        color: Theme.tonalFill
+        border.width: critical ? Theme.borderHairline : 0
+        border.color: Qt.alpha(Theme.accent, Theme.alphaCritical)
 
         InnerGlow {
             anchors.fill: parent
@@ -189,7 +162,7 @@ Item {
     // swipe and to the controls inside.
     MotionArea {
         id: ma
-        accessibleName: card.compact ? qsTr("Cerrar notificación") : ""
+        accessibleName: card.compact ? I18n.tr("Cerrar notificación") : ""
         acceptedButtons: card.compact ? Qt.LeftButton : Qt.NoButton
         hoverWash: false
         anchors.fill: parent
@@ -291,7 +264,7 @@ Item {
                     Rectangle {
                         visible: card.critical && !card.compact
                         Layout.preferredWidth: urgTxt.implicitWidth + 10 * s
-                        Layout.preferredHeight: 16 * s
+                        Layout.preferredHeight: Math.max(16 * s, urgTxt.implicitHeight + 4 * s)
                         Layout.alignment: Qt.AlignVCenter
                         radius: height / 2
                         color: Qt.alpha(Theme.accentStrong, Theme.alphaChip)
@@ -301,7 +274,7 @@ Item {
                             transform: Translate { y: -Motion.labelTravel * ma.motion.presence }
                             id: urgTxt
                             anchors.centerIn: parent
-                            text: "URGENTE"
+                            text: I18n.tr("URGENTE")
                             color: Theme.accentStrong
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeCaption * card.s
                             font.weight: Font.Bold
@@ -335,7 +308,7 @@ Item {
                             anchors.margins: -4 * card.s
                             enabled: !card.compact && !card.leaving
                             feedbackEnabled: false
-                            accessibleName: qsTr("Descartar notificación")
+                            accessibleName: I18n.tr("Descartar notificación")
                             onClicked: card.requestClose(1)
                         }
                     }
@@ -385,13 +358,13 @@ Item {
                     transform: Translate { y: -Motion.labelTravel * ma.motion.presence }
                     Layout.fillWidth: true
                     visible: !card.compact && card.bodyTruncated
-                    text: card.expanded ? qsTr("mostrar menos") : "···"
+                    text: card.expanded ? I18n.tr("mostrar menos") : "···"
                     color: Qt.alpha(Theme.accent, Theme.alphaIconSec)
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeLabel * card.s
                     font.weight: Font.Medium
                     MotionArea {
-                        accessibleName: card.expanded ? qsTr("Mostrar menos") : qsTr("Expandir notificación")
+                        accessibleName: card.expanded ? I18n.tr("Mostrar menos") : I18n.tr("Expandir notificación")
                         anchors.fill: parent
                         anchors.margins: -4 * s
                         cursorShape: Qt.PointingHandCursor
@@ -421,7 +394,7 @@ Item {
                     MotionArea {
                         id: act
                         objectName: "notificationAction"
-        accessibleName: modelData.text || qsTr("Acción de notificación")
+        accessibleName: modelData.text || I18n.tr("Acción de notificación")
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor

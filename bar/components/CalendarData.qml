@@ -1,12 +1,13 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../Singletons"
 
 // Clock and weather observation; no presentation or date-selection state.
 Item {
     id: root
     property bool observe: true
-    property date today: new Date()
+    property date today: Regional.now()
     property string weatherTemp: ""
     property string weatherDesc: ""
     property string weatherIcon: "cloud"
@@ -30,14 +31,14 @@ Item {
     }
 
     function weatherLabel(code: int): string {
-        if (code === 113) return qsTr("Despejado")
-        if (code === 116) return qsTr("Parcialmente nublado")
-        if ([119, 122].includes(code)) return qsTr("Nublado")
-        if ([143, 248, 260].includes(code)) return qsTr("Niebla")
-        if (mapWeather(code, false) === "thunderstorm") return qsTr("Tormenta")
-        if (mapWeather(code, false) === "ac_unit") return qsTr("Nieve")
-        if (mapWeather(code, false) === "rainy") return qsTr("Lluvia")
-        return qsTr("Sin descripción")
+        if (code === 113) return I18n.tr("Despejado")
+        if (code === 116) return I18n.tr("Parcialmente nublado")
+        if ([119, 122].includes(code)) return I18n.tr("Nublado")
+        if ([143, 248, 260].includes(code)) return I18n.tr("Niebla")
+        if (mapWeather(code, false) === "thunderstorm") return I18n.tr("Tormenta")
+        if (mapWeather(code, false) === "ac_unit") return I18n.tr("Nieve")
+        if (mapWeather(code, false) === "rainy") return I18n.tr("Lluvia")
+        return I18n.tr("Sin descripción")
     }
 
     function measurement(value, suffix, minimum, maximum) {
@@ -89,12 +90,12 @@ Item {
             const area = d.nearest_area && d.nearest_area[0]
             root.weatherLocation = String(area?.areaName?.[0]?.value || "").slice(0, 80)
             root.forecast = days
-            root.weatherUpdated = Qt.formatDateTime(new Date(), "HH:mm")
+            root.weatherUpdated = Qt.formatDateTime(Regional.now(), "HH:mm")
             root.weatherError = ""
             if (!fromCache) weatherCache.setText(JSON.stringify({raw: output, updated: root.weatherUpdated}))
             return true
         } catch (e) {
-            if (!fromCache) root.weatherError = qsTr("No se pudo actualizar el clima")
+            if (!fromCache) root.weatherError = I18n.tr("No se pudo actualizar el clima")
             return false
         }
     }
@@ -105,7 +106,7 @@ Item {
         getWeather.running = true
     }
     Component.onCompleted: if (observe) refresh()
-    Timer { interval: 1000; repeat: true; running: root.observe; onTriggered: root.today = new Date() }
+    Timer { interval: 1000; repeat: true; running: root.observe; onTriggered: root.today = Regional.now() }
     Timer { interval: 15 * 60 * 1000; repeat: true; running: root.observe; onTriggered: root.refresh() }
     Process {
         id: getWeather

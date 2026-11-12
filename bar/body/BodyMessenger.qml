@@ -190,7 +190,7 @@ Item {
         enabled: root.acceptsClick
         activeFocusOnTab: enabled
         Accessible.role: Accessible.Button
-        Accessible.name: qsTr("Abrir %1").arg(root.fileName)
+        Accessible.name: I18n.tr("Abrir %1").arg(root.fileName)
         Accessible.onPressAction: root.activate()
         Keys.onReturnPressed: root.activate()
         Keys.onEnterPressed: root.activate()

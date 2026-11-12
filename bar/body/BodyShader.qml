@@ -49,6 +49,15 @@ ShaderEffect {
         asynchronous: true
         fillMode: Image.PreserveAspectCrop
     }
+    // Material vivo: tint (rgb + guarded share), adjustment ripple and bass brightness.
+    property vector4d tintFrom: Qt.vector4d(0, 0, 0, 0)
+    property vector4d tintTo: Qt.vector4d(0, 0, 0, 0)
+    property real tintCross: 1
+    property real tintPresence: 0
+    property real rippleT: 1
+    property real rippleAmp: 0
+    property vector2d rippleOrigin: Qt.vector2d(0, 0)
+    property real bassGain: 1
     property bool cacheWhenStill: false
     property point cacheOrigin: Qt.point(0, 0)
     readonly property int quietFrames: 6
@@ -63,6 +72,7 @@ ShaderEffect {
         colBg, colBase, colTop, fillAlpha, pillRadius, water, reading, edgeExposure,
         companionBox0, companionShape0, companionBox1, companionShape1, companionBox2, companionShape2, companionBox3, companionShape3, companionBox4, companionShape4,
         decorAccent, decorAwake, decorGlow, reception, sweep, decorMoving, artBox, artFirstUrl, artSecondUrl, artBlend, artSlot, artReady, artAspectFirst, artAspectSecond, artFirst.status, artSecond.status,
+        tintFrom, tintTo, tintCross, tintPresence, rippleT, rippleAmp, rippleOrigin, bassGain,
         shadowExposure, wallpaperSource, fragmentShader, status, cacheOrigin] : null
     onRenderInputsChanged: { unchangedFrames = 0; inputsDirty = true }
     FrameAnimation {

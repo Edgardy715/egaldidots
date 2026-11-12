@@ -27,8 +27,8 @@ Rectangle {
     ColumnLayout {
         anchors.fill: parent; anchors.margins: 22; spacing: 14
         RowLayout {
-            Text { text: qsTr("Prueba el movimiento"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 16; font.weight: Font.DemiBold; Layout.fillWidth: true }
-            Text { visible: root.width > 560; text: qsTr("ESCENA DE PRUEBA"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: 10 }
+            Text { text: I18n.tr("Prueba el movimiento"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 16; font.weight: Font.DemiBold; Layout.fillWidth: true }
+            Text { visible: root.width > 560; text: I18n.tr("ESCENA DE PRUEBA"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: 10 }
         }
         Item {
             Layout.fillWidth: true; Layout.fillHeight: true
@@ -67,7 +67,7 @@ Rectangle {
                 Column {
                     anchors.centerIn: parent; spacing: 8
                     opacity: root.scene !== 0 ? morph.contentProgress * root.sceneExposure : 0
-                    Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.displayedScene === 1 ? qsTr("Un espacio para tu música") : qsTr("Todo está a tu alcance"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 12 }
+                    Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.displayedScene === 1 ? I18n.tr("Un espacio para tu música") : I18n.tr("Todo está a tu alcance"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 12 }
                     Row { anchors.horizontalCenter: parent.horizontalCenter; spacing: 20
                         EdotsIcon { animateChanges: false; iconName: root.displayedScene === 1 ? "skip_previous" : "calendar_month"; font.pixelSize: 22; color: Theme.accent }
                         EdotsIcon { animateChanges: false; iconName: root.displayedScene === 1 ? "play_arrow" : "notifications"; font.pixelSize: 22; color: Theme.accent }
@@ -79,7 +79,7 @@ Rectangle {
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             Repeater {
-                model: [qsTr("Reposo"), qsTr("Música"), qsTr("Panel")]
+                model: [I18n.tr("Reposo"), I18n.tr("Música"), I18n.tr("Panel")]
                 EdotsButton { required property int index; required property string modelData; text: modelData; accent: root.scene === index; onClicked: root.scene = index }
             }
         }

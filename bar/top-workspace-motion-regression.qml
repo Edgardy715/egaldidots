@@ -24,7 +24,7 @@ ShellRoot {
     Timer {
         interval: 60; running: true
         onTriggered: {
-            check(rail.navWidth - 44 * rail.s >= 20 * rail.s
+            check(rail.navWidth - 38 * rail.s >= 20 * rail.s
                   && lens.height > 38 && lens.x >= 0 && lens.x + lens.width <= rail.width,
                   "independent button gap and active orb must fit the rail")
             startX = lens.x

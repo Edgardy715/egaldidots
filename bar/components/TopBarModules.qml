@@ -10,6 +10,7 @@ Item {
     property real topGap: compact ? (height - 48 * s) / 2 : 8 * s
     property real availableWidth: 360
     property bool presented: true
+    property real depth: 1
     property real centerWidth: 0
     readonly property real contentWidth: centerWidth + leftWidth + rightWidth + 36 * s
         + (leftWidth > 0 ? 18 * s : 0) + (rightWidth > 0 ? 18 * s : 0)
@@ -68,13 +69,15 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: (root.compact ? 18 : 26) * root.s
         anchors.top: parent.top
-        anchors.topMargin: root.topGap
+        // The rail item is 48 tall around a 38 pill: lift it so every module shares the island's centre.
+        anchors.topMargin: root.topGap - (root.compact ? 0 : 5 * root.s)
         s: root.s
+        depth: root.depth
         requested: Config.modules.workspaceRail
         presented: root.presented && root.contentFits && (!root.workspaceItem || root.workspaceItem.fits)
         animateChanges: Config.modules.animateChanges
         sourceComponent: TopWorkspaceRail {
-            presented: workspaceLoader.interactive && workspaceLoader.exposure > 0.95 && root.opacity > 0.95
+            presented: workspaceLoader.interactive && workspaceLoader.exposure > 0.95
             s: root.s
             integrated: root.compact
             style: Config.appearance.workspaceStyle
@@ -85,7 +88,7 @@ Item {
             occupied: workspaceData.occupied
             availableWidth: Math.max(0, root.availableWidth - (mediaLoader.active ? root.mediaWidth + 12 * root.s : 0))
             onWorkspaceRequested: id => workspaceData.activate(id)
-            onRequestWorkspaces: root.requestSurface("workspaces")
+            onRequestWorkspaces: root.requestSurface("overview")
         }
     }
     OptionalModule {
@@ -96,6 +99,7 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: root.topGap + (root.compact ? 5 * root.s : 0)
         s: root.s
+        depth: root.depth
         presented: root.presented && root.contentFits
         animateChanges: Config.modules.animateChanges
         sourceComponent: TopUserStatus {
@@ -113,6 +117,7 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: root.topGap + (root.compact ? 5 * root.s : 0)
         s: root.s
+        depth: root.depth
         requested: Config.modules.systemStatus && (Config.modules.apps || Config.modules.audio
             || Config.modules.network || Config.modules.battery)
         presented: root.presented && root.contentFits && (!root.statusItem || root.statusItem.fits)
@@ -128,7 +133,12 @@ Item {
             showNetwork: Config.modules.network
             showBattery: Config.modules.battery
             animateChanges: Config.modules.animateChanges
+            micActive: DeviceMoments.privacyEnabled && DeviceMoments.micActive
+            camActive: DeviceMoments.privacyEnabled && DeviceMoments.camActive
+            micApp: DeviceMoments.micApp
+            camApp: DeviceMoments.camApp
             onRequestSurface: name => root.requestSurface(name)
+            onRequestPrivacy: DeviceMoments.activatePrivacy()
         }
     }
     OptionalModule {
@@ -137,6 +147,7 @@ Item {
         y: root.topGap + 5 * root.s
         width: root.mediaWidth
         s: root.s
+        depth: root.depth
         requested: root.compact && root.hasMedia
         presented: root.presented && root.contentFits && root.mediaWidth <= root.availableWidth
         animateChanges: Config.modules.animateChanges

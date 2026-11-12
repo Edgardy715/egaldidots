@@ -19,21 +19,21 @@ ColumnLayout {
         return status.supported !== false && !!status.error
     })
     readonly property string headline: installing ? UpdateText.phase(controller.progress)
-        : checking ? qsTr("Consultando actualizaciones…")
-        : incomplete ? qsTr("La consulta necesita atención")
-        : controller.count === 1 ? qsTr("1 actualización disponible")
-        : controller.count > 0 ? qsTr("%1 actualizaciones disponibles").arg(controller.count)
-        : controller.result.checkedAt ? qsTr("Tu equipo está al día") : qsTr("Comprueba si hay novedades")
+        : checking ? I18n.tr("Consultando actualizaciones…")
+        : incomplete ? I18n.tr("La consulta necesita atención")
+        : controller.count === 1 ? I18n.tr("1 actualización disponible")
+        : controller.count > 0 ? I18n.tr("%1 actualizaciones disponibles").arg(controller.count)
+        : controller.result.checkedAt ? I18n.tr("Tu equipo está al día") : I18n.tr("Comprueba si hay novedades")
     readonly property int count: controller.count
     property real nowMs: Date.now()
     Timer { interval: 30000; repeat: true; running: root.visible; onTriggered: root.nowMs = Date.now() }
     function relativeTime(iso) {
         const minutes = Math.max(0, Math.floor((nowMs - new Date(iso).getTime()) / 60000))
-        if (minutes < 1) return qsTr("ahora mismo")
-        if (minutes < 60) return qsTr("hace %1 min").arg(minutes)
+        if (minutes < 1) return I18n.tr("ahora mismo")
+        if (minutes < 60) return I18n.tr("hace %1 min").arg(minutes)
         const hours = Math.floor(minutes / 60)
-        if (hours < 24) return qsTr("hace %1 h").arg(hours)
-        return qsTr("hace %1 d").arg(Math.floor(hours / 24))
+        if (hours < 24) return I18n.tr("hace %1 h").arg(hours)
+        return I18n.tr("hace %1 d").arg(Math.floor(hours / 24))
     }
     readonly property string searchTerms: I18n.tr("actualizaciones actualizar sistema CachyOS Arch Linux paquetes AUR Flatpak aplicaciones shell Azog software")
 
@@ -74,9 +74,18 @@ ColumnLayout {
                         Behavior on opacity { enabled: root.motionAllowed; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                         Behavior on scale { enabled: root.motionAllowed; NumberAnimation { duration: Motion.emphasized; easing.type: Easing.BezierSpline; easing.bezierCurve: Motion.emphasizedDecelCurve } }
                         Text {
+                            id: countBadge
                             anchors.centerIn: parent
-                            visible: root.count > 0
-                            text: root.count > 99 ? "99+" : root.count
+                            // Keep the last positive count while the badge fades out.
+                            property int shownCount: 0
+                            readonly property bool present: root.count > 0
+                            Binding on shownCount { when: root.count > 0; value: root.count }
+                            opacity: present ? 1 : 0
+                            visible: opacity > 0.01
+                            scale: Flags.reduceMotion ? 1 : (present ? 1 : 0.6)
+                            Behavior on opacity { enabled: root.motionAllowed; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                            Behavior on scale { enabled: root.motionAllowed && !Flags.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: countBadge.present ? Easing.OutBack : Motion.easeStandard } }
+                            text: shownCount > 99 ? "99+" : shownCount
                             color: Theme.accent; font.family: Config.appearance.fontDisplayFamily
                             font.pixelSize: Theme.fontSizeHead; font.weight: Font.DemiBold; font.features: { "tnum": 1 }
                         }
@@ -94,11 +103,11 @@ ColumnLayout {
                     AnimatedLabel {
                         Layout.fillWidth: true; textFormat: Text.PlainText
                         value: root.installing ? (UpdateText.committed(root.controller.progress)
-                                ? qsTr("Aplicando cambios. No apagues el equipo hasta que termine.")
-                                : qsTr("Se instala en segundo plano. Puedes seguir usando el equipo."))
-                            : root.checking ? qsTr("Puedes seguir usando la shell mientras tanto.")
-                            : root.controller.result.checkedAt ? qsTr("Última consulta %1").arg(root.relativeTime(root.controller.result.checkedAt))
-                            : qsTr("Consulta primero para conocer las versiones disponibles.")
+                                ? I18n.tr("Aplicando cambios. No apagues el equipo hasta que termine.")
+                                : I18n.tr("Se instala en segundo plano. Puedes seguir usando el equipo."))
+                            : root.checking ? I18n.tr("Puedes seguir usando la shell mientras tanto.")
+                            : root.controller.result.checkedAt ? I18n.tr("Última consulta %1").arg(root.relativeTime(root.controller.result.checkedAt))
+                            : I18n.tr("Consulta primero para conocer las versiones disponibles.")
                         font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBodyLg
                         color: Theme.iconSecondary; wrapMode: Text.WordWrap
                     }
@@ -106,7 +115,7 @@ ColumnLayout {
                 EdotsButton {
                     objectName: "updatesRefresh"
                     Layout.alignment: Qt.AlignTop
-                    text: root.checking ? qsTr("Comprobando…") : qsTr("Comprobar"); symbol: "refresh"
+                    text: root.checking ? I18n.tr("Comprobando…") : I18n.tr("Comprobar"); symbol: "refresh"
                     accent: !root.controller.busy && root.count === 0
                     enabled: !root.controller.busy
                     onClicked: root.controller.refresh()
@@ -175,7 +184,7 @@ ColumnLayout {
             }
             Text {
                 Layout.fillWidth: true; Layout.topMargin: 6
-                text: qsTr("Comprobación automática")
+                text: I18n.tr("Comprobación automática")
                 color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBodyLg; font.weight: Font.DemiBold
             }
             Repeater {
@@ -193,7 +202,7 @@ ColumnLayout {
             }
             Text {
                 Layout.fillWidth: true
-                text: qsTr("Se comprueba al iniciar y cada seis horas. Los avisos respetan No molestar. Las aplicaciones descargadas manualmente y las extensiones con actualizador propio se gestionan desde cada aplicación.")
+                text: I18n.tr("Se comprueba al iniciar y cada seis horas. Los avisos respetan No molestar. Las aplicaciones descargadas manualmente y las extensiones con actualizador propio se gestionan desde cada aplicación.")
                 color: Theme.iconSecondary; font.family: Config.appearance.fontFamily
                 font.pixelSize: Theme.fontSizeBody; wrapMode: Text.WordWrap
             }

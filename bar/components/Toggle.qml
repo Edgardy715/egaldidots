@@ -16,7 +16,7 @@ import "../"
 Item {
     id: root
 
-    property string accessibleName: qsTr("Interruptor")
+    property string accessibleName: I18n.tr("Interruptor")
     property bool checked: false
 
     signal toggled(bool on)
@@ -74,13 +74,6 @@ Item {
 
         Rectangle {
             id: knob
-            layer.enabled: root.visible && root.enabled && root.checked
-            layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowColor: Qt.alpha(Theme.accent, 0.8)
-                shadowBlur: 0.7
-                blurMax: 12
-            }
             readonly property real diameter: parent.height - 4 * s
             // Posición del centro de masa; con Superficies líquidas el botón se
             // alarga hacia su destino mientras viaja y se recoge al llegar.

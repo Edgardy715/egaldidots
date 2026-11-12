@@ -30,22 +30,22 @@ Rectangle {
         id: content
         anchors.fill: parent; anchors.margins: 18; spacing: 14
         RowLayout {
-            Text { text: qsTr("Composición de la barra"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeTitle; font.weight: Font.DemiBold; Layout.fillWidth: true }
-            Text { text: qsTr("Pulsa para activar u ocultar"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody }
+            Text { text: I18n.tr("Composición de la barra"); color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeTitle; font.weight: Font.DemiBold; Layout.fillWidth: true }
+            Text { text: I18n.tr("Pulsa para activar u ocultar"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody }
         }
         RowLayout {
             Layout.fillWidth: true; spacing: 8
-            Text { text: qsTr("Diseño"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody; Layout.rightMargin: 8 }
-            EdotsButton { objectName: "layout-split"; text: qsTr("Separada"); checkable: true; checked: root.config.appearance.barLayout === "split"; accent: checked; enabled: root.config.loaded && !root.config.saving; Accessible.name: qsTr("Barra separada"); onClicked: { root.selectLayout("split"); checked = Qt.binding(() => root.config.appearance.barLayout === "split") } }
-            EdotsButton { objectName: "layout-compact"; text: qsTr("Compacta"); checkable: true; checked: root.config.appearance.barLayout === "compact"; accent: checked; enabled: root.config.loaded && !root.config.saving; Accessible.name: qsTr("Bead compacto"); onClicked: { root.selectLayout("compact"); checked = Qt.binding(() => root.config.appearance.barLayout === "compact") } }
+            Text { text: I18n.tr("Diseño"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody; Layout.rightMargin: 8 }
+            EdotsButton { objectName: "layout-split"; text: I18n.tr("Separada"); checkable: true; checked: root.config.appearance.barLayout === "split"; accent: checked; enabled: root.config.loaded && !root.config.saving; Accessible.name: I18n.tr("Barra separada"); onClicked: { root.selectLayout("split"); checked = Qt.binding(() => root.config.appearance.barLayout === "split") } }
+            EdotsButton { objectName: "layout-compact"; text: I18n.tr("Compacta"); checkable: true; checked: root.config.appearance.barLayout === "compact"; accent: checked; enabled: root.config.loaded && !root.config.saving; Accessible.name: I18n.tr("Bead compacto"); onClicked: { root.selectLayout("compact"); checked = Qt.binding(() => root.config.appearance.barLayout === "compact") } }
             Item { Layout.fillWidth: true }
         }
         RowLayout {
             Layout.fillWidth: true; spacing: 12
             ColumnLayout {
                 Layout.fillWidth: true; Layout.preferredWidth: (root.width - 60) / 3; Layout.maximumWidth: Infinity; spacing: 9
-                Text { text: qsTr("Izquierda"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody }
-                ModuleButton { keyName: "workspaceRail"; text: qsTr("Espacios"); symbol: "dashboard" }
+                Text { text: I18n.tr("Izquierda"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody }
+                ModuleButton { keyName: "workspaceRail"; text: I18n.tr("Espacios"); symbol: "dashboard" }
             }
             ColumnLayout {
                 Layout.fillWidth: true; Layout.preferredWidth: (root.width - 60) / 3; Layout.maximumWidth: Infinity; spacing: 9
@@ -56,7 +56,7 @@ Rectangle {
                         EdotsIcon { iconName: "lock"; font.pixelSize: 14; color: Theme.accent }
                         Text { text: "Bead"; color: Theme.foreground; font.family: Config.appearance.fontFamily; font.pixelSize: 13 }
                     }
-                    Accessible.role: Accessible.StaticText; Accessible.name: qsTr("Bead principal, siempre visible")
+                    Accessible.role: Accessible.StaticText; Accessible.name: I18n.tr("Bead principal, siempre visible")
                 }
             }
             ColumnLayout {
@@ -65,8 +65,8 @@ Rectangle {
                 RowLayout {
                     Layout.alignment: Qt.AlignRight
                     spacing: 6
-                    ModuleButton { keyName: "systemStatus"; text: qsTr("Estado"); symbol: "tune" }
-                    ModuleButton { keyName: "userAvatar"; text: qsTr("Avatar"); symbol: "person" }
+                    ModuleButton { keyName: "systemStatus"; text: I18n.tr("Estado"); symbol: "tune" }
+                    ModuleButton { keyName: "userAvatar"; text: I18n.tr("Avatar"); symbol: "person" }
                 }
             }
         }
@@ -74,10 +74,10 @@ Rectangle {
             Layout.fillWidth: true; spacing: 6
             Text { text: root.config.modules.systemStatus ? I18n.tr("En Estado") : I18n.tr("En Estado · oculto"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Config.appearance.fontFamily; font.pixelSize: Theme.fontSizeBody; Layout.rightMargin: 8 }
             Repeater {
-                model: [{key:"apps",label:qsTr("Apps"),icon:"apps"}, {key:"audio",label:qsTr("Audio"),icon:"volume_up"}, {key:"network",label:qsTr("Red"),icon:"wifi"}, {key:"battery",label:qsTr("Batería"),icon:"battery_full"}]
+                model: [{key:"apps",label:I18n.tr("Apps"),icon:"apps"}, {key:"audio",label:I18n.tr("Audio"),icon:"volume_up"}, {key:"network",label:I18n.tr("Red"),icon:"wifi"}, {key:"battery",label:I18n.tr("Batería"),icon:"battery_full"}]
                 ModuleButton {
                     required property var modelData
-                    keyName: modelData.key; text: modelData.label; symbol: modelData.icon
+                    keyName: modelData.key; text: I18n.tr(modelData.label); symbol: modelData.icon
                     Layout.fillWidth: true
                 }
             }

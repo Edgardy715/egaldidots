@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import "../"
 import "../Singletons"
 import "../Singletons/Spectrum.js" as Spectrum
@@ -28,18 +27,8 @@ Item {
 
     Row {
         id: spectrumBars
-        objectName: "smallCavaGlow"
-        readonly property real energy: root.visible && root.isPlaying && root.hasFrame && !Flags.reduceMotion
-            ? Spectrum.band(root.values, 0, 1) : 0
-        layer.enabled: root.visible && energy > 0.001
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowColor: Qt.alpha(root.musicAccent, 0.8 * spectrumBars.energy)
-            shadowBlur: 0.85
-            blurMax: 8
-            shadowVerticalOffset: 0
-            shadowHorizontalOffset: 0
-        }
+        objectName: "smallCavaBars"
+        // Agua: las barras no emiten halo; el color de la portada basta.
         scale: hit.motion.visualScale
         anchors.horizontalCenter: parent.horizontalCenter
         height: root.height
@@ -72,7 +61,7 @@ Item {
 
     MotionArea {
         id: hit
-        accessibleName: qsTr("Abrir controles multimedia")
+        accessibleName: I18n.tr("Abrir controles multimedia")
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
         onClicked: root.requestMedia()

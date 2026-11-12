@@ -9,7 +9,7 @@ ShellRoot {
     }
     IpcHandler {
         target: "edotsTest"
-        function page(index: int): void { window.page = Math.max(0, Math.min(6, index)) }
+        function page(index: int): void { window.page = Math.max(0, Math.min(7, index)) }
         function tab(name: string): void { window.systemTab = name }
         function size(w: int, h: int): void { preview.implicitWidth = w; preview.implicitHeight = h }
         function scene(index: int): void { window.previewScene = index }

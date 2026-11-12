@@ -74,7 +74,7 @@ Item {
         Text {
             width: parent.width
             objectName: "clipboardEntryLabel"
-            text: root.entry.isImage ? qsTr("Imagen copiada") : root.entry.preview.replace(/\s+/g, " ")
+            text: root.entry.isImage ? I18n.tr("Imagen copiada") : root.entry.preview.replace(/\s+/g, " ").replace(/[\u202A-\u202E\u2066-\u2069]/g, "")
             textFormat: Text.PlainText
             elide: Text.ElideRight
             maximumLineCount: 2
@@ -86,7 +86,7 @@ Item {
         }
         AnimatedLabel {
             width: parent.width
-            value: root.entry.saved ? (root.collectionName.length ? qsTr("En %1").arg(root.collectionName) : qsTr("Guardado")) : root.entry.isImage ? qsTr("Imagen") : root.isLink ? qsTr("Enlace") : qsTr("Texto")
+            value: root.entry.saved ? (root.collectionName.length ? I18n.tr("En %1").arg(root.collectionName) : I18n.tr("Guardado")) : root.entry.isImage ? I18n.tr("Imagen") : root.isLink ? I18n.tr("Enlace") : I18n.tr("Texto")
             color: root.entry.saved ? Theme.accent : Theme.iconSecondary
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeSmall * root.s
@@ -101,7 +101,7 @@ Item {
         anchors.right: actions.left
         enabled: !root.busy
         hoverWash: false
-        accessibleName: qsTr("Copiar %1").arg(root.entry.isImage ? qsTr("imagen") : root.entry.preview)
+        accessibleName: I18n.tr("Copiar %1").arg(root.entry.isImage ? I18n.tr("imagen") : root.entry.preview.replace(/[\u202A-\u202E\u2066-\u2069]/g, ""))
         onClicked: root.copyRequested(root.entry)
     }
     Row {
@@ -117,7 +117,7 @@ Item {
             objectName: "clipboardRowPreview"
             s: root.s
             iconName: "visibility"
-            helpText: qsTr("Ver contenido completo")
+            helpText: I18n.tr("Ver contenido completo")
             enabled: !root.busy
             onClicked: root.previewRequested(root.entry)
         }
@@ -125,7 +125,7 @@ Item {
             id: saveChip
             objectName: "clipboardRowSave"
             s: root.s
-            text: root.entry.saved ? qsTr("Organizar") : qsTr("Guardar")
+            text: root.entry.saved ? I18n.tr("Organizar") : I18n.tr("Guardar")
             iconName: root.entry.saved ? "check" : "add"
             morphIcon: true
             selected: !!root.entry.saved

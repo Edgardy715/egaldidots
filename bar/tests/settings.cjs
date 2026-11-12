@@ -115,10 +115,11 @@ for (const [sectionName, sectionFields] of Object.entries(settings.fields)) {
 }
 const catalog = settings.catalog(context);
 assert.equal(catalog.version, settings.version);
-assert.ok(catalog.sectionOrder.some(section => section.id === 'companion' && section.label === 'Cuerpo'
+assert.ok(catalog.sectionOrder.some(section => section.id === 'companion' && section.label === 'Amalgam'
     && section.description.includes('vidrio líquido')));
 assert.equal(catalog.availabilityIsLive, false);
-assert.deepEqual(Array.from(catalog.sectionOrder, item => item.id), Object.keys(settings.fields));
+assert.deepEqual(Array.from(catalog.sectionOrder, item => item.id).sort(), Object.keys(settings.fields).sort());
+assert.equal(catalog.sectionOrder[0].id, 'activities', 'display order leads with activities');
 assert.equal(catalog.requiredModules.length, 1);
 assert.equal(catalog.requiredModules[0].id, 'pill');
 assert.equal(catalog.requiredModules[0].configurable, false);
@@ -126,13 +127,13 @@ assert.deepEqual(Array.from(catalog.optionalModules, item => item.setting), [
     'modules.workspaceRail', 'modules.systemStatus', 'modules.apps',
     'modules.audio', 'modules.network', 'modules.userAvatar', 'modules.battery'
 ]);
-assert.equal(catalog.surfaces.length, 17);
+assert.equal(catalog.surfaces.length, 16);
 assert.deepEqual(Array.from(catalog.surfaces, item => item.id).sort(),
     fs.readdirSync(__dirname + '/../surfaces').filter(file => file.endsWith('Surface.qml'))
         .map(file => file.slice(0, -11).toLowerCase()).sort(), 'catalog covers every routed surface');
 assert.deepEqual(Array.from(catalog.surfaces, item => item.id), [
-    'appearance', 'auth', 'calendar', 'clipboard', 'connectivity', 'focus', 'launcher',
-    'media', 'mixer', 'notifs', 'overview', 'recording', 'session', 'settings', 'utils', 'wallpaper', 'workspaces'
+    'auth', 'calendar', 'clipboard', 'connectivity', 'focus', 'launcher',
+    'media', 'mixer', 'notifs', 'overview', 'recording', 'session', 'settings', 'shortcuts', 'utils', 'wallpaper'
 ]);
 assert.ok(catalog.surfaces.every(surface => surface.availability === 'routed'
     && Array.isArray(surface.dependsOn) && Array.isArray(surface.optionalDependsOn)));
@@ -157,8 +158,7 @@ for (const surface of catalog.surfaces) {
 }
 assert.ok(catalog.capabilities.some(capability => capability.id === 'upower.laptopBattery'
     && capability.availability === 'runtime-conditional'));
-assert.equal(catalog.sections.appearance.pillBlur.availability, 'inactive');
-assert.equal(catalog.sections.appearance.showGlyphs.availability, 'inactive');
+assert.equal(catalog.sections.companion.mischief.availability, 'inactive');
 assert.equal(catalog.sections.appearance.clockSeconds.availability, 'partial');
 assert.ok(catalog.optionalModules.find(item => item.id === 'battery').dependsOn.includes('upower.laptopBattery'));
 assert.equal(validate({}).effective.paths.userAvatar, '/home/test/.face');

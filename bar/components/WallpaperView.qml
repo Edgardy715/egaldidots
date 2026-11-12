@@ -16,14 +16,6 @@ Item {
     property string applyError: ""
     property string feedback: ""
     property color previewAccent: "white"
-    // Attention for Iris: the thumbnail under the pointer, centre in view coordinates.
-    property Item hoveredThumb: null
-    readonly property bool focusActive: active && hoveredThumb !== null
-    readonly property point focusPoint: {
-        if (!focusActive) return Qt.point(0, 0)
-        void pathView.contentX; void pathView.x; void pathView.y
-        return hoveredThumb.mapToItem(root, hoveredThumb.width / 2, hoveredThumb.height / 2)
-    }
     property bool mediaHas: false
     property string mediaArtUrl: ""
     property bool mediaHasProgress: false
@@ -37,9 +29,15 @@ Item {
     property url readyPreview: ""
     property url previewSource: ""
     readonly property url desiredPreview: sel ? "file://" + sel.path.split("/").map(encodeURIComponent).join("/") + "?v=" + (sel.cacheRevision || 0) : ""
+    // The full-size preview decodes and uploads after the surface has materialised; until then the
+    // hero shows the cached thumbnail, so the opening spring never shares frames with that upload.
+    property bool previewHeld: false
+    Timer { id: previewHold; interval: 420; onTriggered: { root.previewHeld = false; root.updatePreview() } }
     function updatePreview() {
-        if (active && !heroReveal.running && previewSource !== desiredPreview) previewSource = desiredPreview
+        if (active && !previewHeld && !heroReveal.running && previewSource !== desiredPreview) previewSource = desiredPreview
     }
+    // Aplicar sólo si la vista previa mostrada es la de la selección y decodifica (QA-12).
+    readonly property bool previewDecodable: previewSource === desiredPreview && heroImage.status !== Image.Error
     onDesiredPreviewChanged: Qt.callLater(root.updatePreview)
     readonly property int count: wallpaperModel ? wallpaperModel.count : 0
     readonly property bool active: open && !closing
@@ -86,14 +84,14 @@ Item {
         var idx = num === 0 ? 9 : num - 1
         if (idx >= 0 && idx < wallpaperModel.count) selectIndex(idx)
     }
-    function commitSelection() { if (active && count > 0 && !applying && (!selApplied || feedback === "error")) commitRequested(pathView.currentIndex) }
+    function commitSelection() { if (active && root.previewDecodable && count > 0 && !applying && (!selApplied || feedback === "error")) commitRequested(pathView.currentIndex) }
     function applyPath(path) { applyPathRequested(path) }
     function applied() { if (active) closeTimer.restart() }
     onActiveChanged: {
         closeTimer.stop()
         wheelTravel = 0
-        if (active) { navigating = false; footerEntered = false; updatePreview() }
-        else { navigateTimer.stop(); navigating = false; heroReveal.complete() }
+        if (active) { navigating = false; footerEntered = false; previewHeld = !Flags.reduceMotion; if (previewHeld) previewHold.restart(); else updatePreview() }
+        else { navigateTimer.stop(); previewHold.stop(); previewHeld = false; navigating = false; heroReveal.complete() }
     }
     Connections {
         target: Flags
@@ -122,47 +120,13 @@ Item {
         z: 10
         opacity: root.footerEntered ? 1 : 0
 
-        Rectangle {
+        SurfaceHeader {
             x: 23 * s
-            y: 19 * s
-            width: 34 * s
-            height: width
-            radius: Theme.radiusLg * s
-            color: Qt.alpha(root.previewAccent, 0.18)
-            border.color: Qt.alpha(root.previewAccent, 0.4)
-
-            MaterialIcon {
-                anchors.centerIn: parent
-                iconName: "wallpaper"
-                color: root.previewAccent
-                font.pixelSize: 20 * s
-            }
-
-        }
-
-        Column {
-            x: 68 * s
-            y: 16 * s
+            y: 14 * s
             width: Math.max(0, (headerMedia.visible ? headerMedia.x : refreshButton.x - 62 * root.s) - x - 16 * root.s)
-            spacing: 3 * s
-
-            Text {
-                width: parent.width
-                elide: Text.ElideRight
-                text: qsTr("Fondos de pantalla")
-                color: Theme.foreground
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeHead * s
-                font.weight: Font.DemiBold
-            }
-
-            Text {
-                text: qsTr("%1 fondos disponibles").arg(root.count)
-                color: Qt.alpha(Theme.foreground, Theme.alphaIconSec)
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSizeSmall * s
-            }
-
+            title: "Cinnabar"
+            subtitle: I18n.tr("%1 fondos disponibles").arg(root.count)
+            s: root.s
         }
 
         Rectangle {
@@ -178,7 +142,7 @@ Item {
 
             MotionArea {
                 id: closeMouse
-                accessibleName: qsTr("Cerrar")
+                accessibleName: I18n.tr("Cerrar")
 
                 anchors.fill: parent
                 hoverEnabled: true
@@ -218,7 +182,7 @@ Item {
 
             MotionArea {
                 id: refreshMouse
-                accessibleName: qsTr("Actualizar fondos")
+                accessibleName: I18n.tr("Actualizar fondos")
 
                 anchors.fill: parent
                 enabled: root.active && !root.applying
@@ -280,7 +244,7 @@ Item {
                 textWidth: Math.max(0, Math.min(200 * root.s, root.width - 650 * root.s))
                 spacing: textWidth > 0 ? 10 * root.s : 0
                 metadataSpacing: 2 * root.s
-                titlePixelSize: 12.5 * root.s
+                titlePixelSize: 13 * root.s
                 artistPixelSize: 11 * root.s
                 artUrl: root.mediaArtUrl
                 hasProgress: root.mediaHasProgress
@@ -291,16 +255,29 @@ Item {
             }
         }
 
-        Text {
+        // Contador: al recorrer fondos sólo ruedan los dígitos del índice.
+        Row {
             anchors.right: refreshButton.left
             anchors.rightMargin: 16 * s
             anchors.verticalCenter: refreshButton.verticalCenter
-            text: root.count > 0 ? (pathView.currentIndex + 1) + " / " + root.count : "—"
-            color: Theme.iconSecondary
-            font.family: Theme.font
-            font.features: Theme.fontNumeric
-            font.pixelSize: 12 * s
-            font.weight: Font.Medium
+            RollingNumber {
+                visible: root.count > 0
+                value: pathView.currentIndex + 1
+                widthSample: String(Math.max(1, root.count)).replace(/./g, "0")
+                color: Theme.iconSecondary
+                font.family: Theme.font
+                font.features: Theme.fontNumeric
+                font.pixelSize: 12 * s
+                font.weight: Font.Medium
+            }
+            Text {
+                text: root.count > 0 ? " / " + root.count : "—"
+                color: Theme.iconSecondary
+                font.family: Theme.font
+                font.features: Theme.fontNumeric
+                font.pixelSize: 12 * s
+                font.weight: Font.Medium
+            }
         }
 
         Behavior on opacity {
@@ -419,7 +396,7 @@ Item {
                     Text {
                         id: currentLabel
                         anchors.centerIn: parent
-                        text: qsTr("Fondo actual")
+                        text: I18n.tr("Fondo actual")
                         color: Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: 11 * root.s
@@ -458,7 +435,7 @@ Item {
                 MotionArea {
                     id: railMouse
                     anchors.fill: parent
-                    accessibleName: index === 0 ? qsTr("Fondo anterior") : qsTr("Fondo siguiente")
+                    accessibleName: index === 0 ? I18n.tr("Fondo anterior") : I18n.tr("Fondo siguiente")
                     enabled: root.active && !root.applying && root.count > 1
                     onClicked: root.cycle(index === 0 ? -1 : 1)
                 }
@@ -570,16 +547,12 @@ Item {
                 }
                 MotionArea {
                     id: thumbMouse
-                    accessibleName: qsTr("Seleccionar fondo %1: %2").arg(thumbnail.index + 1).arg(root.displayName(thumbnail.path.split("/").pop()))
+                    accessibleName: I18n.tr("Seleccionar fondo %1: %2").arg(thumbnail.index + 1).arg(root.displayName(thumbnail.path.split("/").pop()))
                     focusOnTab: false
                     anchors.fill: parent
                     hoverEnabled: true
                     enabled: root.active && !root.applying
                     cursorShape: Qt.PointingHandCursor
-                    onContainsMouseChanged: {
-                        if (containsMouse) root.hoveredThumb = thumbnail
-                        else if (root.hoveredThumb === thumbnail) root.hoveredThumb = null
-                    }
                     onClicked: root.selectIndex(thumbnail.index)
                     onDoubleClicked: if (!thumbnail.applied || root.feedback === "error") root.applyPath(thumbnail.path)
                 }
@@ -637,7 +610,7 @@ Item {
 
             Text {
                 width: parent.width
-                text: root.feedback === "applying" ? "Cambiando fondo y colores…" : root.feedback === "done" ? "Fondo y colores actualizados" : root.feedback === "error" ? root.applyError : root.selApplied ? "Ya es tu fondo  ·  ← → para explorar otros" : "← → navegar  ·  Intro o doble clic para aplicar"
+                text: root.feedback === "applying" ? "Cambiando fondo y colores…" : root.feedback === "done" ? "Fondo y colores actualizados" : root.feedback === "error" ? root.applyError : ""
                 color: root.feedback === "error" ? Theme.error : root.feedback === "done" ? root.previewAccent : Qt.alpha(Theme.foreground, Theme.alphaIconSec)
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeSmall * s
@@ -668,10 +641,10 @@ Item {
 
                 MotionArea {
                     id: applyMouse
-                    accessibleName: qsTr("Aplicar fondo")
+                    accessibleName: I18n.tr("Aplicar fondo")
 
                     anchors.fill: parent
-                    enabled: root.active && !root.applying && root.feedback !== "done" && (!root.selApplied || root.feedback === "error")
+                    enabled: root.active && root.previewDecodable && !root.applying && root.feedback !== "done" && (!root.selApplied || root.feedback === "error")
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: root.commitSelection()
@@ -792,7 +765,7 @@ Item {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: !root.scanning
-            text: qsTr("Añade imágenes a tu carpeta de fondos.")
+            text: I18n.tr("Añade imágenes a tu carpeta de fondos.")
             color: Theme.iconSecondary
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeSmall * s

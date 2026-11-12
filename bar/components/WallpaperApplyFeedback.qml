@@ -20,7 +20,7 @@ Item {
     visible: opacity > 0.001
     scale: Flags.reduceMotion ? 1 : 0.9 + 0.1 * opacity
     Accessible.role: Accessible.AlertMessage
-    Accessible.name: failed ? errorText : success ? qsTr("Fondo de pantalla aplicado") : qsTr("Aplicando fondo de pantalla")
+    Accessible.name: failed ? errorText : success ? I18n.tr("Fondo de pantalla aplicado") : I18n.tr("Aplicando fondo de pantalla")
     onPhaseChanged: {
         if (phase.length > 0) displayedPhase = phase
     }
@@ -39,7 +39,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width - 24 * root.s
         horizontalAlignment: Text.AlignHCenter
-        text: root.success ? qsTr("Fondo listo") : root.failed ? qsTr("No se completó") : root.displayedPhase === "preparing" ? qsTr("Preparando…") : qsTr("Aplicando…")
+        text: root.success ? I18n.tr("Fondo listo") : root.failed ? I18n.tr("No se completó") : root.displayedPhase === "preparing" ? I18n.tr("Preparando…") : I18n.tr("Aplicando…")
         color: Theme.foreground
         font.family: Theme.font
         font.pixelSize: Theme.fontSizeBodyLg * root.s

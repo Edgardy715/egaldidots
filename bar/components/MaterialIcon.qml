@@ -51,7 +51,9 @@ Item {
     property color color: Theme.foreground
     // Only state changes on a mounted icon: hundreds of icons must not tween at load.
     Behavior on color { enabled: root.ready && root.visible; ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-    property real neonIntensity: interaction ? 0.65 * interaction.presence + 0.25 * interaction.pressure : 0
+    // Sin brillo por defecto: cada icono con brillo era una textura fuera de pantalla más
+    // un desenfoque, y competía con el acento. Hover y pulsación ya se leen por escala.
+    property real neonIntensity: 0
     layer.enabled: visible && enabled && neonIntensity > 0.01
     layer.effect: MultiEffect {
         shadowEnabled: true

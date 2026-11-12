@@ -16,9 +16,9 @@ ShellRoot {
         onAuthCloseRequested: test.authCancels++
     }
     Component.onCompleted: {
-        router.toggleSurface("", "calendar")
-        check(router.openMon === "DP-1" && router.openSurface === "calendar", "focused monitor")
-        router.toggleSurface("DP-1", "calendar")
+        router.toggleSurface("", "mixer")
+        check(router.openMon === "DP-1" && router.openSurface === "mixer", "focused monitor")
+        router.toggleSurface("DP-1", "mixer")
         check(router.openSurface === "", "same surface closes")
         router.toggleSurface("DP-2", "wallpaper")
         check(router.mediaDockPendingMon === "DP-2" && router.openSurface === "", "wait for dock")
@@ -61,14 +61,14 @@ ShellRoot {
         onTriggered: {
             test.check(router.openSurface === "launcher", "old timer cannot close reopened launcher")
             router.close()
-            router.toggleSurface("DP-2", "calendar")
+            router.toggleSurface("DP-2", "mixer")
             replaced.start()
         }
     }
     Timer {
         id: replaced; interval: 170
         onTriggered: {
-            test.check(router.openSurface === "calendar" && router.openMon === "DP-2", "retarget cancels timers")
+            test.check(router.openSurface === "mixer" && router.openMon === "DP-2", "retarget cancels timers")
             router.toggleSurface("DP-1", "launcher")
             router.finishMediaDock("DP-1")
             router.reduceMotion = true
@@ -86,8 +86,8 @@ ShellRoot {
         onTriggered: {
             test.check(router.openSurface === "" && router.openMon === "" && router.launcherClosePhase === 0, "complete two-phase close")
             router.focusedMonitorName = ""
-            router.toggleSurface("", "calendar")
-            test.check(router.openSurface === "" && router.pendingFocusSurface === "calendar", "startup request waits for monitor")
+            router.toggleSurface("", "mixer")
+            test.check(router.openSurface === "" && router.pendingFocusSurface === "mixer", "startup request waits for monitor")
             router.toggleSurface("", "launcher")
             router.focusedMonitorName = "DP-1"
             test.check(router.mediaDockPendingMon === "DP-1" && router.mediaDockPendingSurface === "launcher", "latest startup request resumes docking")
@@ -98,12 +98,12 @@ ShellRoot {
             test.check(router.openSurface === "" && router.launcherClosePhase === 0,
                        "enabling reduced motion resolves an in-flight close")
             router.focusedMonitorName = ""
-            router.toggleSurface("", "calendar")
-            router.toggleSurface("", "calendar")
+            router.toggleSurface("", "mixer")
+            router.toggleSurface("", "mixer")
             router.focusedMonitorName = "DP-1"
             test.check(router.openSurface === "" && router.pendingFocusSurface === "", "repeated startup toggle cancels")
             router.focusedMonitorName = ""
-            router.toggleSurface("", "calendar")
+            router.toggleSurface("", "mixer")
             router.close()
             router.focusedMonitorName = "DP-1"
             test.check(router.openSurface === "", "hide cancels startup request")
@@ -119,9 +119,9 @@ ShellRoot {
             router.present("DP-1", "auth")
             router.dismissMonitor("DP-1")
             test.check(authCancels === 2 && router.openSurface === "", "fullscreen cancels auth once")
-            router.present("DP-2", "calendar")
+            router.present("DP-2", "mixer")
             router.dismissMonitor("DP-1")
-            test.check(router.openSurface === "calendar", "fullscreen stays monitor-local")
+            test.check(router.openSurface === "mixer", "fullscreen stays monitor-local")
             console.log("PASS: routing, dock cancellation, auth priority, two-phase close, interruption and reduced motion")
             Qt.quit()
         }

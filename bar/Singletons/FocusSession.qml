@@ -27,7 +27,7 @@ Singleton {
 
     function start(minutes): bool {
         if (typeof minutes !== "number" || !Number.isFinite(minutes) || Math.floor(minutes) !== minutes || minutes < 1 || minutes > 180) {
-            root.rejected(qsTr("Elige una duración entre 1 y 180 minutos."))
+            root.rejected(I18n.tr("Elige una duración entre 1 y 180 minutos."))
             return false
         }
         state.durationMs = minutes * 60000

@@ -48,7 +48,7 @@ Item {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         feedbackEnabled: false
-        accessibleName: qsTr("Abrir música: %1 · %2").arg(root.title).arg(root.artist)
+        accessibleName: I18n.tr("Abrir música: %1 · %2").arg(root.title).arg(root.artist)
         onClicked: root.requestMedia()
     }
     Rectangle {

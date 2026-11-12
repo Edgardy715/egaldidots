@@ -45,8 +45,8 @@ Item {
         const values = root.channels.map((channel, i) => Math.min(1.5, root.channelsLinked || i === index ? value : channel.volume))
         root.send("setChannelVolumes", {volumes: values})
     }
-    function commitRename() {
-        const description = renameField.text.trim()
+    function commitRename(text) {
+        const description = String(text || "").trim()
         if (!description.length) return
         if (description !== root.title) send("renameDevice", {description:description})
         renaming = false
@@ -61,7 +61,7 @@ Item {
         if (next.length) send("setFormats", {formats:next})
     }
     function channelName(name) {
-        const labels = {"front-left":qsTr("Frontal izquierdo"), "front-right":qsTr("Frontal derecho"), "front-center":qsTr("Central"), "rear-left":qsTr("Trasero izquierdo"), "rear-right":qsTr("Trasero derecho"), "side-left":qsTr("Lateral izquierdo"), "side-right":qsTr("Lateral derecho"), "lfe":qsTr("Subgrave"), "mono":qsTr("Mono")}
+        const labels = {"front-left":I18n.tr("Frontal izquierdo"), "front-right":I18n.tr("Frontal derecho"), "front-center":I18n.tr("Central"), "rear-left":I18n.tr("Trasero izquierdo"), "rear-right":I18n.tr("Trasero derecho"), "side-left":I18n.tr("Lateral izquierdo"), "side-right":I18n.tr("Lateral derecho"), "lfe":I18n.tr("Subgrave"), "mono":I18n.tr("Mono")}
         return labels[name] || name
     }
     Rectangle {
@@ -113,8 +113,8 @@ Item {
                 }
                 Text {
                     Layout.fillWidth: true
-                    text: root.stream ? (root.endpoint.mediaName || (root.endpoint.corked ? qsTr("En pausa") : root.input ? qsTr("Grabación activa") : qsTr("Sesión de audio activa")))
-                        : root.endpoint.monitor ? qsTr("Monitor de una salida") : root.isDefault ? qsTr("Dispositivo predeterminado") : qsTr("Disponible")
+                    text: root.stream ? (root.endpoint.mediaName || (root.endpoint.corked ? I18n.tr("En pausa") : root.input ? I18n.tr("Grabación activa") : I18n.tr("Sesión de audio activa")))
+                        : root.endpoint.monitor ? I18n.tr("Monitor de una salida") : root.isDefault ? I18n.tr("Dispositivo predeterminado") : I18n.tr("Disponible")
                     elide: Text.ElideRight
                     color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s
                 }
@@ -124,15 +124,9 @@ Item {
                 visible: !root.stream && root.endpoint.canRename !== false
                 s: root.s; symbol: "edit"; selected: root.renaming
                 enabled: root.endpoint.canRename !== false
-                ToolTip.text: enabled ? qsTr("Cambiar nombre de %1").arg(root.title) : qsTr("El servidor de audio no admite renombrar dispositivos")
+                ToolTip.text: enabled ? I18n.tr("Cambiar nombre de %1").arg(root.title) : I18n.tr("El servidor de audio no admite renombrar dispositivos")
                 ToolTip.visible: hovered
-                onClicked: {
-                    root.renaming = !root.renaming
-                    if (root.renaming) {
-                        renameField.text = root.title
-                        Qt.callLater(() => { renameField.forceActiveFocus(); renameField.selectAll() })
-                    }
-                }
+                onClicked: root.renaming = !root.renaming
             }
             AudioButton {
                 objectName: "default-" + root.kind + "-" + root.endpoint.id
@@ -140,7 +134,7 @@ Item {
                 s: root.s
                 symbol: root.isDefault ? "check" : "add"
                 selected: root.isDefault
-                ToolTip.text: root.isDefault ? qsTr("Dispositivo predeterminado") : qsTr("Usar como predeterminado")
+                ToolTip.text: root.isDefault ? I18n.tr("Dispositivo predeterminado") : I18n.tr("Usar como predeterminado")
                 ToolTip.visible: hovered
                 onClicked: root.send("setDefault")
             }
@@ -148,7 +142,7 @@ Item {
                 objectName: "stop-" + root.kind + "-" + root.endpoint.id
                 visible: root.stream
                 s: root.s; symbol: "stop"
-                ToolTip.text: root.input ? qsTr("Detener esta grabación") : qsTr("Detener esta reproducción")
+                ToolTip.text: root.input ? I18n.tr("Detener esta grabación") : I18n.tr("Detener esta reproducción")
                 ToolTip.visible: hovered
                 onClicked: root.send("killStream")
             }
@@ -157,37 +151,53 @@ Item {
                 s: root.s
                 symbol: root.input ? (root.endpoint.mute ? "mic_off" : "mic") : (root.endpoint.mute ? "volume_off" : "volume_up")
                 selected: !!root.endpoint.mute
-                ToolTip.text: root.endpoint.mute ? qsTr("Activar %1").arg(root.title) : qsTr("Silenciar %1").arg(root.title)
+                ToolTip.text: root.endpoint.mute ? I18n.tr("Activar %1").arg(root.title) : I18n.tr("Silenciar %1").arg(root.title)
                 ToolTip.visible: hovered
                 onClicked: root.send("setMute", {mute: !root.endpoint.mute})
             }
         }
+        // Rename and details are built on demand: a mixer row opens with only what it shows,
+        // and they stay alive until their fold finishes closing.
         Item {
+            id: renameFold
             Layout.fillWidth: true
-            Layout.preferredHeight: root.renaming ? renameRow.implicitHeight : 0
+            Layout.preferredHeight: root.renaming && renameLoader.item ? renameLoader.item.implicitHeight : 0
             clip: true; enabled: root.renaming
             opacity: root.renaming ? 1 : 0
             Behavior on Layout.preferredHeight { enabled: root.visible && !Flags.reduceMotion; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
             Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast } }
-            RowLayout {
-                id: renameRow
+            Loader {
+                id: renameLoader
                 width: parent.width
-                spacing: 8 * root.s
-                EdotsTextField {
-                    id: renameField
-                    objectName: "renameField-" + root.kind + "-" + root.endpoint.id
-                    Layout.fillWidth: true
-                    maximumLength: 256
-                    placeholderText: qsTr("Nombre del dispositivo")
-                    Accessible.name: placeholderText
-                    onAccepted: root.commitRename()
+                active: root.renaming || renameFold.Layout.preferredHeight > 0.5
+                sourceComponent: RowLayout {
+                    id: renameRow
+                    spacing: 8 * root.s
+                    function prime() {
+                        renameField.text = root.title
+                        Qt.callLater(() => { renameField.forceActiveFocus(); renameField.selectAll() })
+                    }
+                    Component.onCompleted: if (root.renaming) prime()
+                    Connections {
+                        target: root
+                        function onRenamingChanged() { if (root.renaming) renameRow.prime() }
+                    }
+                    EdotsTextField {
+                        id: renameField
+                        objectName: "renameField-" + root.kind + "-" + root.endpoint.id
+                        Layout.fillWidth: true
+                        maximumLength: 256
+                        placeholderText: I18n.tr("Nombre del dispositivo")
+                        Accessible.name: placeholderText
+                        onAccepted: root.commitRename(text)
+                    }
+                    AudioButton {
+                        s: root.s; symbol: "check"; text: I18n.tr("Guardar")
+                        enabled: renameField.text.trim().length > 0
+                        onClicked: root.commitRename(renameField.text)
+                    }
+                    AudioButton { s: root.s; symbol: "close"; ToolTip.text: I18n.tr("Cancelar nombre"); ToolTip.visible: hovered; onClicked: root.renaming = false }
                 }
-                AudioButton {
-                    s: root.s; symbol: "check"; text: qsTr("Guardar")
-                    enabled: renameField.text.trim().length > 0
-                    onClicked: root.commitRename()
-                }
-                AudioButton { s: root.s; symbol: "close"; ToolTip.text: qsTr("Cancelar nombre"); ToolTip.visible: hovered; onClicked: root.renaming = false }
             }
         }
         RowLayout {
@@ -200,15 +210,23 @@ Item {
                 s: root.s; volume: root.volume; maximum: Math.max(root.maximum, Math.min(1.5, root.volume))
                 muted: !!root.endpoint.mute
                 enabled: root.endpoint.hasVolume !== false
-                label: qsTr("Volumen de %1").arg(root.title)
+                label: I18n.tr("Volumen de %1").arg(root.title)
                 onEdited: value => root.setMaster(value)
             }
-            Text {
+            Item {
                 Layout.preferredWidth: 54 * root.s
-                horizontalAlignment: Text.AlignRight
-                text: Math.round(root.displayVolume * 100) + "%"
-                color: root.displayVolume > 1 ? Theme.error : root.endpoint.mute ? Theme.iconSecondary : Theme.foreground
-                font.family: Theme.font; font.features: Theme.fontNumeric; font.weight: Font.Medium; font.pixelSize: Theme.fontSizeBodyLg * root.s
+                Layout.preferredHeight: masterPercent.implicitHeight
+                RollingNumber {
+                    id: masterPercent
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    value: Math.round(root.displayVolume * 100)
+                    suffix: "%"
+                    immediate: master.pressed || master.pending
+                    color: root.displayVolume > 1 ? Theme.error : root.endpoint.mute ? Theme.iconSecondary : Theme.foreground
+                    Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
+                    font.family: Theme.font; font.features: Theme.fontNumeric; font.weight: Font.Medium; font.pixelSize: Theme.fontSizeBodyLg * root.s
+                }
             }
         }
         Rectangle {
@@ -223,7 +241,7 @@ Item {
                 // Literal on purpose: ~one meter-sample interval of linear smoothing; it follows live levels and must not scale with Motion.mult.
                 Behavior on width { enabled: root.visible && !Flags.reduceMotion; NumberAnimation { duration: 32; easing.type: Easing.Linear } }
             }
-            Accessible.name: qsTr("Nivel de señal de %1").arg(root.title)
+            Accessible.name: I18n.tr("Nivel de señal de %1").arg(root.title)
         }
         RowLayout {
             Layout.fillWidth: true
@@ -233,7 +251,7 @@ Item {
                 Layout.fillWidth: true
                 visible: root.stream || (root.endpoint.ports || []).length > 0
                 s: root.s; popupBounds: root.popupBounds
-                label: root.stream ? qsTr("Dispositivo de %1").arg(root.title) : qsTr("Puerto de %1").arg(root.title)
+                label: root.stream ? I18n.tr("Dispositivo de %1").arg(root.title) : I18n.tr("Puerto de %1").arg(root.title)
                 options: root.stream ? root.destinations.map(device => ({name:device.id, description:device.description})) : root.endpoint.ports || []
                 selectedValue: root.stream ? String(root.endpoint.device) : root.endpoint.activePort || ""
                 onMenuOpened: menu => root.menuOpened(menu)
@@ -244,111 +262,122 @@ Item {
                 visible: root.channels.length > 1 || !!root.endpoint.canSetFormats || !!root.card
                 s: root.s; symbol: "tune"
                 selected: root.expanded
-                text: root.endpoint.canSetFormats || root.card ? qsTr("Detalles") : qsTr("Canales")
-                Accessible.name: qsTr("Ajustar canales de %1").arg(root.title)
+                text: root.endpoint.canSetFormats || root.card ? I18n.tr("Detalles") : I18n.tr("Canales")
+                Accessible.name: I18n.tr("Ajustar canales de %1").arg(root.title)
                 onClicked: root.expanded = !root.expanded
             }
             Item { Layout.fillWidth: true; visible: !root.stream && !(root.endpoint.ports || []).length }
         }
         Item {
+            id: detailsFold
             Layout.fillWidth: true
-            Layout.preferredHeight: root.expanded ? details.implicitHeight : 0
+            Layout.preferredHeight: root.expanded && detailsLoader.item ? detailsLoader.item.implicitHeight : 0
             clip: true
             opacity: root.expanded ? 1 : 0
             enabled: root.expanded
             Behavior on Layout.preferredHeight { enabled: !Flags.reduceMotion && root.visible; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
             Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast } }
-            ColumnLayout {
-                id: details
+            Loader {
+                id: detailsLoader
                 width: parent.width
-                spacing: 6 * root.s
-                RowLayout {
-                    Layout.fillWidth: true
+                active: root.expanded || detailsFold.Layout.preferredHeight > 0.5
+                sourceComponent: ColumnLayout {
+                    spacing: 6 * root.s
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Text {
+                            Layout.fillWidth: true
+                            text: I18n.tr("Volumen por canal")
+                            color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s
+                        }
+                        AudioButton {
+                            objectName: "link-" + root.kind + "-" + root.endpoint.id
+                            s: root.s; text: I18n.tr("Vincular"); symbol: "link"; selected: root.channelsLinked
+                            visible: root.channels.length > 1
+                            Accessible.name: I18n.tr("Vincular canales de %1").arg(root.title)
+                            onClicked: root.channelsLinked = !root.channelsLinked
+                        }
+                        AudioButton {
+                            s: root.s; text: I18n.tr("Equilibrar")
+                            Accessible.name: I18n.tr("Igualar los canales de %1").arg(root.title)
+                            onClicked: root.send("setChannelVolumes", {volumes: root.channels.map(channel => Math.min(1.5, root.volume))})
+                        }
+                    }
+                    Repeater {
+                        model: root.channels
+                        delegate: RowLayout {
+                            id: channel
+                            required property var modelData
+                            required property int index
+                            Layout.fillWidth: true
+                            Text {
+                                Layout.preferredWidth: 120 * root.s
+                                text: root.channelName(channel.modelData.name)
+                                elide: Text.ElideRight
+                                font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
+                            }
+                            AudioFader {
+                                id: channelFader
+                                Layout.fillWidth: true
+                                s: root.s; maximum: Math.max(root.maximum, Math.min(1.5, channel.modelData.volume))
+                                volume: channel.modelData.volume
+                                label: root.channelName(channel.modelData.name)
+                                onEdited: value => root.changeChannel(channel.index, value)
+                            }
+                            Item {
+                                Layout.preferredWidth: 48 * root.s
+                                Layout.preferredHeight: channelPercent.implicitHeight
+                                RollingNumber {
+                                    id: channelPercent
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    value: Math.round(channelFader.displayVolume * 100)
+                                    suffix: "%"
+                                    immediate: channelFader.pressed || channelFader.pending
+                                    font.family: Theme.font; font.features: Theme.fontNumeric; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
+                                }
+                            }
+                        }
+                    }
                     Text {
                         Layout.fillWidth: true
-                        text: qsTr("Volumen por canal")
-                        color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s
+                        visible: !!root.endpoint.canSetFormats
+                        text: I18n.tr("Formatos digitales · activa sólo los compatibles con tu receptor")
+                        wrapMode: Text.WordWrap
+                        font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
                     }
-                    AudioButton {
-                        objectName: "link-" + root.kind + "-" + root.endpoint.id
-                        s: root.s; text: qsTr("Vincular"); symbol: "link"; selected: root.channelsLinked
-                        visible: root.channels.length > 1
-                        Accessible.name: qsTr("Vincular canales de %1").arg(root.title)
-                        onClicked: root.channelsLinked = !root.channelsLinked
-                    }
-                    AudioButton {
-                        s: root.s; text: qsTr("Equilibrar")
-                        Accessible.name: qsTr("Igualar los canales de %1").arg(root.title)
-                        onClicked: root.send("setChannelVolumes", {volumes: root.channels.map(channel => Math.min(1.5, root.volume))})
-                    }
-                }
-                Repeater {
-                    model: root.channels
-                    delegate: RowLayout {
-                        id: channel
-                        required property var modelData
-                        required property int index
+                    Flow {
                         Layout.fillWidth: true
-                        Text {
-                            Layout.preferredWidth: 120 * root.s
-                            text: root.channelName(channel.modelData.name)
-                            elide: Text.ElideRight
-                            font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
-                        }
-                        AudioFader {
-                            id: channelFader
-                            Layout.fillWidth: true
-                            s: root.s; maximum: Math.max(root.maximum, Math.min(1.5, channel.modelData.volume))
-                            volume: channel.modelData.volume
-                            label: root.channelName(channel.modelData.name)
-                            onEdited: value => root.changeChannel(channel.index, value)
-                        }
-                        Text {
-                            Layout.preferredWidth: 48 * root.s
-                            text: Math.round(channelFader.displayVolume * 100) + "%"
-                            horizontalAlignment: Text.AlignRight
-                            font.family: Theme.font; font.features: Theme.fontNumeric; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
+                        Layout.preferredHeight: visible ? implicitHeight : 0
+                        visible: !!root.endpoint.canSetFormats
+                        spacing: 6 * root.s
+                        Repeater {
+                            model: root.formatOptions
+                            delegate: AudioButton {
+                                required property var modelData
+                                objectName: "format-" + modelData.name
+                                s: root.s; text: modelData.label
+                                selected: (root.endpoint.formats || []).includes(modelData.name)
+                                enabled: !selected || (root.endpoint.formats || []).length > 1
+                                Accessible.name: I18n.tr("Formato digital %1").arg(modelData.label)
+                                onClicked: root.toggleFormat(modelData.name)
+                            }
                         }
                     }
-                }
-                Text {
-                    Layout.fillWidth: true
-                    visible: !!root.endpoint.canSetFormats
-                    text: qsTr("Formatos digitales · activa sólo los compatibles con tu receptor")
-                    wrapMode: Text.WordWrap
-                    font.family: Theme.font; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
-                }
-                Flow {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: visible ? implicitHeight : 0
-                    visible: !!root.endpoint.canSetFormats
-                    spacing: 6 * root.s
-                    Repeater {
-                        model: root.formatOptions
-                        delegate: AudioButton {
-                            required property var modelData
-                            objectName: "format-" + modelData.name
-                            s: root.s; text: modelData.label
-                            selected: (root.endpoint.formats || []).includes(modelData.name)
-                            enabled: !selected || (root.endpoint.formats || []).length > 1
-                            Accessible.name: qsTr("Formato digital %1").arg(modelData.label)
-                            onClicked: root.toggleFormat(modelData.name)
-                        }
+                    AudioButton {
+                        objectName: "disable-" + root.kind + "-" + root.endpoint.id
+                        visible: !root.stream && !!root.card
+                        enabled: !!root.card && (root.input ? !!root.card.canToggleInput : !!root.card.canToggleOutput)
+                        s: root.s; symbol: "power_settings_new"
+                        text: root.input ? I18n.tr("Deshabilitar entrada") : I18n.tr("Deshabilitar salida")
+                        ToolTip.text: I18n.tr("Podrás volver a activarla en Hardware")
+                        ToolTip.visible: hovered
+                        onClicked: root.requested("setDeviceEnabled", {id:root.card.id, direction:root.input ? "input" : "output", enabled:false})
                     }
-                }
-                AudioButton {
-                    objectName: "disable-" + root.kind + "-" + root.endpoint.id
-                    visible: !root.stream && !!root.card
-                    enabled: !!root.card && (root.input ? !!root.card.canToggleInput : !!root.card.canToggleOutput)
-                    s: root.s; symbol: "power_settings_new"
-                    text: root.input ? qsTr("Deshabilitar entrada") : qsTr("Deshabilitar salida")
-                    ToolTip.text: qsTr("Podrás volver a activarla en Hardware")
-                    ToolTip.visible: hovered
-                    onClicked: root.requested("setDeviceEnabled", {id:root.card.id, direction:root.input ? "input" : "output", enabled:false})
-                }
-                Text {
-                    text: root.displayVolume > 0 ? (60 * Math.log(root.displayVolume) / Math.LN10).toFixed(1) + " dB" : "−∞ dB"
-                    font.family: Theme.font; font.features: Theme.fontNumeric; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
+                    Text {
+                        text: root.displayVolume > 0 ? (60 * Math.log(root.displayVolume) / Math.LN10).toFixed(1) + " dB" : "−∞ dB"
+                        font.family: Theme.font; font.features: Theme.fontNumeric; font.pixelSize: Theme.fontSizeSmall * root.s; color: Theme.iconSecondary
+                    }
                 }
             }
         }

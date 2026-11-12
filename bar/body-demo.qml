@@ -105,7 +105,7 @@ ShellRoot {
                 Text {
                     x:engine.cx-width/2; y:engine.cy-height/2
                     visible:engine.dropLabel
-                    text:qsTr("▧  captura.png")
+                    text:I18n.tr("▧  captura.png")
                     color:Theme.foreground;font.pixelSize:12*window.u
                 }
                 Rectangle {
@@ -118,7 +118,7 @@ ShellRoot {
                     Behavior on opacity { NumberAnimation { duration:engine.reduceMotion?0:340 } }
                     Behavior on scale { NumberAnimation { duration:engine.reduceMotion?0:340 } }
                     color:Theme.background;border.color:Theme.accentSoft
-                    Text { anchors.centerIn:parent;text:qsTr("▧  captura.png");color:Theme.foreground;font.pixelSize:13*window.u }
+                    Text { anchors.centerIn:parent;text:I18n.tr("▧  captura.png");color:Theme.foreground;font.pixelSize:13*window.u }
                     DragHandler {
                         id:chipDrag
                         xAxis.minimum:24*window.u;xAxis.maximum:stage.width-chip.width-24*window.u
@@ -129,21 +129,21 @@ ShellRoot {
                 Row {
                     x:20*window.u;y:305*window.u;spacing:8*window.u
                     Button {
-                        text:engine.dropMode==="home"?qsTr("Soltar la gota · G"):qsTr("Llamar / cambiar rumbo · G")
+                        text:engine.dropMode==="home"?I18n.tr("Soltar la gota · G"):I18n.tr("Llamar / cambiar rumbo · G")
                         onClicked:{stage.forceActiveFocus();engine.dropCommand(engine.dropMode==="home" || engine.dropMode==="return"?"release":"callBack")}
                     }
-                    Button { text:qsTr("Devolver archivo · D");enabled:engine.dropHasItem && engine.dropMode==="home"
+                    Button { text:I18n.tr("Devolver archivo · D");enabled:engine.dropHasItem && engine.dropMode==="home"
                         onClicked:{stage.forceActiveFocus();engine.dropCommand("deliver")} }
                 }
                 Text {
                     x:20*window.u; y:260*window.u
                     color:Theme.foreground
                     font.pixelSize:12*window.u
-                    text: qsTr("%1 · %2:%3 · %4\n1–5 ánimo · ← → hora · N ahora · M música · B respiración · R reducir · G gota · D devolver · Esc cerrar")
-                        .arg(engine.currentMood==="timida"?qsTr("tímida"):engine.currentMood)
+                    text: I18n.tr("%1 · %2:%3 · %4\n1–5 ánimo · ← → hora · N ahora · M música · B respiración · R reducir · G gota · D devolver · Esc cerrar")
+                        .arg(engine.currentMood==="timida"?I18n.tr("tímida"):engine.currentMood)
                         .arg(String(Math.floor(engine.hour)).padStart(2,"0"))
                         .arg(String(Math.floor(engine.hour%1*60)).padStart(2,"0"))
-                        .arg(({home:qsTr("En casa"),out:qsTr("Explorando"),return:qsTr("Regresando"),deliver:qsTr("Entregando")})[engine.dropMode])
+                        .arg(({home:I18n.tr("En casa"),out:I18n.tr("Explorando"),return:I18n.tr("Regresando"),deliver:I18n.tr("Entregando")})[engine.dropMode])
                 }
             }
         }

@@ -20,7 +20,7 @@ FocusScope {
     onContentReadyChanged: { if (contentReady) activate(); else settingsPage.closePicker() }
     property alias previewScene: studio.scene
     property alias searchQuery: search.text
-    readonly property int resultCount: settingsPage.entries.length + (hyprlandSearchMatch ? 1 : 0) + (updatesSearchMatch ? 1 : 0)
+    readonly property int resultCount: settingsPage.entries.length + (hyprlandSearchMatch ? 1 : 0) + (updatesSearchMatch ? 1 : 0) + (shortcutsSearchMatch ? 1 : 0)
     readonly property string validationError: settingsPage.validationError
     property bool showPreview: false
     property int page: 0
@@ -28,13 +28,19 @@ FocusScope {
     property var updatesController: SystemUpdates
     property var pluginsController: HyprlandPlugins
     property var bindsController: HyprlandBinds
-    // Sistema (página 5) agrupa ajustes generales, Hyprland y Actualizaciones en pestañas.
+    // Atajos tiene página propia; Sistema, la última, agrupa ajustes generales, Hyprland y Actualizaciones en pestañas.
+    readonly property int shortcutsPage: 6
+    readonly property int systemPage: 7
     property string systemTab: "general"
-    function showSystem(tab) { root.page = 5; root.systemTab = tab; search.text = "" }
-    readonly property bool updatesActive: !searchShown && pageMotion.displayedPage === 5 && systemTab === "updates"
+    function showSystem(tab) { root.page = systemPage; root.systemTab = tab; search.text = "" }
+    function showShortcuts() { root.page = shortcutsPage; search.text = "" }
+    readonly property bool updatesActive: !searchShown && pageMotion.displayedPage === systemPage && systemTab === "updates"
     function showUpdates() { showSystem("updates"); SystemUpdates.portalRequested = false }
     Connections { target: SystemUpdates; function onOpenRequested() { root.showUpdates() } }
-    Component.onCompleted: { if (SystemUpdates.portalRequested) root.showUpdates() }
+    Component.onCompleted: {
+        if (SystemUpdates.portalRequested) root.showUpdates()
+        else if (bindsController && bindsController.focusId) showShortcuts()
+    }
     readonly property bool searchShown: pageMotion.displayedSearching
     property string heldQuery: ""
     onSearchQueryChanged: if (searchQuery.length > 0) heldQuery = searchQuery
@@ -47,7 +53,20 @@ FocusScope {
         pendingErrorFocus = false
         Qt.callLater(() => settingsPage.focusFirstError())
     }
-    readonly property bool hyprlandActive: !searchShown && pageMotion.displayedPage === 5 && systemTab === "hyprland"
+    readonly property bool hyprlandActive: !searchShown && pageMotion.displayedPage === systemPage && systemTab === "hyprland"
+    readonly property bool shortcutsActive: !searchShown && pageMotion.displayedPage === shortcutsPage
+    onShortcutsActiveChanged: if (shortcutsActive && bindsController && !bindsController.busy) bindsController.load()
+    readonly property bool shortcutsSearchMatch: {
+        const terms = settingsPage.normalize(search.text).trim().split(/\s+/).filter(Boolean)
+        const haystack = settingsPage.normalize(I18n.tr("atajos teclas teclado combinación combinaciones keybinds shortcuts"))
+        return terms.length > 0 && terms.every(term => haystack.includes(term))
+    }
+    // Explorer → manager hand-off: open on the bind the explorer was showing.
+    Connections {
+        target: root.bindsController
+        ignoreUnknownSignals: true
+        function onFocusIdChanged() { if (root.bindsController.focusId) root.showShortcuts() }
+    }
     readonly property bool hyprlandSearchMatch: {
         const terms = settingsPage.normalize(search.text).trim().split(/\s+/).filter(Boolean)
         const haystack = settingsPage.normalize(hyprlandPage.searchTerms)
@@ -71,7 +90,7 @@ FocusScope {
     property string saveConfirmation: ""
     property bool savePending: false
     property string feedback: ""
-    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "paths", "activities", "companion"]
+    readonly property var sections: ["appearance", "modules", "appearance", "appearance", "paths", "companion", "", "activities"]
     // "#Etiqueta" abre un grupo dentro de la página (ver SettingsPage.entries).
     readonly property var pageFields: [
         ["#Barra", "appearance.workspaceStyle",
@@ -87,14 +106,15 @@ FocusScope {
          "#Formato", "appearance.time12h"],
         ["#Perfil", "profile.displayName", "paths.userAvatar",
          "#Archivos", "paths.paletteFile", "paths.wallpaperDir", "paths.wallpaperCacheDir", "paths.wallpaperApplyScript"],
+        ["#Amalgam", "appearance.personality", "appearance.waterBody", "appearance.waterReactsToMusic", "appearance.bodyBreath", "appearance.bodyMessenger", "appearance.notificationDrop",
+         "#Reacciones"].concat(Object.keys(Config.schema.sections.companion).map(key => "companion." + key)),
+        [],
         ["#Rendimiento", "appearance.ambientFps", "appearance.clockSeconds",
          "#Actividades", "activities.enabled", "activities.longCommandSeconds", "activities.fromNotifications",
-         "#Dispositivos", "devices.enabled", "devices.bluetooth", "devices.power", "devices.storage", "devices.privacyDots"],
-        ["#Amalgam", "appearance.personality", "appearance.waterBody", "appearance.waterReactsToMusic", "appearance.bodyBreath", "appearance.bodyMessenger", "appearance.notificationDrop",
-         "#Reacciones"].concat(Object.keys(Config.schema.sections.companion).map(key => "companion." + key))
+         "#Dispositivos", "devices.enabled", "devices.bluetooth", "devices.power", "devices.storage", "devices.privacyDots"]
     ]
-    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "person", "settings", "sentiment_satisfied"]
-    readonly property var titles: [I18n.tr("Apariencia"), I18n.tr("Composición"), I18n.tr("Movimiento"), I18n.tr("Texto"), I18n.tr("Perfil y archivos"), I18n.tr("Sistema"), I18n.tr("Amalgam")]
+    readonly property var symbols: ["palette", "dashboard", "animation", "text_fields", "person", "sentiment_satisfied", "keyboard", "settings"]
+    readonly property var titles: [I18n.tr("Apariencia"), I18n.tr("Composición"), I18n.tr("Movimiento"), I18n.tr("Texto"), I18n.tr("Perfil y archivos"), I18n.tr("Amalgam"), I18n.tr("Atajos"), I18n.tr("Sistema")]
     onPageChanged: if (contentReady && visible && enabled) body.forceActiveFocus()
     EdotsPageMotion {
         id: pageMotion
@@ -304,6 +324,12 @@ FocusScope {
             onClicked: { root.showSystem("hyprland"); body.forceActiveFocus() }
         }
         EdotsButton {
+            objectName: "shortcutsSearchResult"
+            visible: root.shortcutsSearchMatch
+            text: I18n.tr("Atajos · Combinaciones de teclado"); symbol: "keyboard"
+            onClicked: { root.showShortcuts(); body.forceActiveFocus() }
+        }
+        EdotsButton {
             objectName: "updatesSearchResult"
             visible: root.updatesSearchMatch
             text: I18n.tr("Actualizaciones · Sistema, aplicaciones y Azog"); symbol: "system_update"
@@ -311,7 +337,7 @@ FocusScope {
         }
         IslaSegmented {
             objectName: "systemTabs"
-            visible: !root.searchShown && pageMotion.displayedPage === 5
+            visible: !root.searchShown && pageMotion.displayedPage === root.systemPage
             inline: true
             options: ["general", "hyprland", "updates"]
             optionLabels: [I18n.tr("General"), I18n.tr("Hyprland"), I18n.tr("Actualizaciones")]
@@ -353,17 +379,17 @@ FocusScope {
         RowLayout {
             Layout.fillWidth: true; Layout.fillHeight: true; spacing: 24
         SettingsPage {
-            id: settingsPage; visible: !root.hyprlandActive && !root.updatesActive && (root.searchShown || pageMotion.displayedPage !== 1 || !root.richComposition)
+            id: settingsPage; visible: !root.hyprlandActive && !root.updatesActive && !root.shortcutsActive && (root.searchShown || pageMotion.displayedPage !== 1 || !root.richComposition)
             // Update the form atomically: empty keys otherwise briefly build a whole section.
             fieldSelection: {
                 const page = pageMotion.displayedPage
-                return { active: root.searchShown || ((page !== 5 || root.systemTab === "general") && (page !== 1 || !root.richComposition)),
+                return { active: root.searchShown || (page !== root.shortcutsPage && (page !== root.systemPage || root.systemTab === "general") && (page !== 1 || !root.richComposition)),
                          section: root.sections[page], keys: root.pageFields[page], title: root.titles[page] }
             }
             Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumWidth: 260
             popupBounds: root
-            offerUnavailable: pageMotion.displayedPage === 5 && root.systemTab === "general"
-            showFishIntegration: pageMotion.displayedPage === 5 && root.systemTab === "general" && !root.searchShown
+            offerUnavailable: pageMotion.displayedPage === root.systemPage && root.systemTab === "general"
+            showFishIntegration: pageMotion.displayedPage === root.systemPage && root.systemTab === "general" && !root.searchShown
             emptyAllowed: root.resultCount === 0
             config: Config; query: root.searchShown ? (search.text || root.heldQuery) : ""
             onEdited: root.feedback = ""
@@ -389,6 +415,11 @@ FocusScope {
                 Layout.fillWidth: true; Layout.fillHeight: true
                 controller: root.hyprlandController
                 plugins: root.pluginsController
+            }
+            KeybindsPage {
+                id: keybindsPage
+                visible: root.shortcutsActive
+                Layout.fillWidth: true; Layout.fillHeight: true
                 binds: root.bindsController
             }
             ColumnLayout {

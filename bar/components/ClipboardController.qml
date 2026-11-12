@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../Singletons"
 
 Item {
     id: root
@@ -240,7 +241,7 @@ Item {
         if (code === 0) showEntries(output)
         else {
             loading = false
-            errorMessage = qsTr("No se pudo cargar el historial.")
+            errorMessage = I18n.tr("No se pudo cargar el historial.")
         }
         if (listReloadPending) {
             listReloadPending = false
@@ -363,7 +364,7 @@ Item {
             var result = null
             try { result = JSON.parse(output || "") } catch (e) { }
             if (!result || !result.ok) {
-                root.errorMessage = result && result.error === "collection_exists" ? qsTr("Ya existe una colección con ese nombre.") : qsTr("No se pudo actualizar la biblioteca.")
+                root.errorMessage = result && result.error === "collection_exists" ? I18n.tr("Ya existe una colección con ese nombre.") : I18n.tr("No se pudo actualizar la biblioteca.")
                 if (action === "list" && root.libraryRefresh) {
                     const refresh = root.libraryRefresh
                     root.libraryRefresh = null
@@ -423,7 +424,7 @@ Item {
         onExited: code => {
             root.copying = false
             if (code === 0) root.closeRequested()
-            else root.errorMessage = qsTr("No se pudo copiar la entrada.")
+            else root.errorMessage = I18n.tr("No se pudo copiar la entrada.")
         }
     }
     function clearHistory() {
@@ -442,7 +443,7 @@ Item {
                 root.concealRequested()
             } else {
                 root.clearing = false
-                root.errorMessage = qsTr("No se pudo limpiar el historial.")
+                root.errorMessage = I18n.tr("No se pudo limpiar el historial.")
             }
         }
     }

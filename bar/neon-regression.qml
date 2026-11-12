@@ -17,7 +17,6 @@ ShellRoot {
                 Text { text: "Isla · luz y respuesta"; color: Theme.foreground; font.pixelSize: 24 }
                 Row { spacing: 26
                     Slider { width: 170; value: 0.65; knob: true }
-                    IconTile { iconName: "coffee"; active: true }
                 }
                 Row {
                     spacing: 26
@@ -40,7 +39,7 @@ ShellRoot {
                 }
                 Row {
                     spacing: 28
-                    GlassCard { width: 340; height: 140; glow: 0.65
+                    GlassCard { width: 340; height: 140
                         Column { x: 20; y: 20; spacing: 16
                             Text { text: "Controles activos"; color: Theme.foreground; font.pixelSize: 18 }
                             Row { spacing: 28

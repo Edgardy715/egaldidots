@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import "../../Singletons"
+import "../RubberBand.js" as RubberBand
 
 Slider {
     id: root
@@ -22,6 +23,31 @@ Slider {
     onVisibleChanged: if (!visible) { pending = false; confirmation.stop() }
     onEnabledChanged: if (!enabled) { pending = false; confirmation.stop() }
     Timer { id: confirmation; interval: 1600; onTriggered: root.pending = false }
+    // Banda elástica (como Slider): pasado un extremo el track se estira hacia el
+    // puntero con resistencia y vuelve con el muelle de controles al soltar.
+    readonly property real maxOverdrag: 10 * s
+    property real overdrag: 0
+    property bool overdragLive: false
+    Behavior on overdrag {
+        enabled: !root.overdragLive && !Flags.reduceMotion
+        SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping; mass: 0.5; epsilon: 0.05 }
+    }
+    readonly property real squeeze: Math.min(1, Math.abs(overdrag) / maxOverdrag)
+    function rubber(px) {
+        return RubberBand.rubberBand(px, maxOverdrag, 0.55)
+    }
+    PointHandler {
+        id: pointer
+        target: null
+        acceptedButtons: Qt.LeftButton
+        onPointChanged: {
+            if (!root.pressed || Flags.reduceMotion) return
+            const x = point.position.x, lo = root.leftPadding, hi = root.leftPadding + root.availableWidth
+            root.overdragLive = true
+            root.overdrag = x < lo ? root.rubber(x - lo) : x > hi ? root.rubber(x - hi) : 0
+        }
+    }
+    onPressedChanged: if (!pressed) { overdragLive = false; overdrag = 0 }
     signal edited(real volume)
     from: 0; to: maximum; stepSize: 0.01
     implicitHeight: 32 * s
@@ -38,8 +64,8 @@ Slider {
         edited(pendingValue)
     }
     background: Rectangle {
-        x: root.leftPadding; y: (root.height - height) / 2
-        width: root.availableWidth; height: 6 * root.s
+        x: root.leftPadding + Math.min(0, root.overdrag); y: (root.height - height) / 2
+        width: root.availableWidth + Math.abs(root.overdrag); height: 6 * root.s * (1 - 0.2 * root.squeeze)
         radius: height / 2
         color: Qt.alpha(Theme.foreground, Theme.alphaSubtle)
         Rectangle {
@@ -49,13 +75,13 @@ Slider {
         }
         Rectangle {
             visible: root.maximum > 1
-            x: parent.width / root.maximum; y: -3 * root.s
+            x: root.availableWidth / root.maximum - Math.min(0, root.overdrag); y: -3 * root.s
             width: root.s; height: parent.height + 6 * root.s
             color: Theme.foreground
         }
     }
     handle: Rectangle {
-        x: root.leftPadding + root.shownPosition * root.availableWidth - width / 2
+        x: root.leftPadding + root.shownPosition * root.availableWidth - width / 2 + root.overdrag
         y: (root.height - height) / 2
         width: 14 * root.s; height: width; radius: width / 2
         color: root.muted ? Theme.iconSecondary : Theme.foreground

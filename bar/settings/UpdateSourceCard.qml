@@ -35,16 +35,16 @@ Rectangle {
     readonly property bool pending: !failed && !unsupported && status.count > 0
     readonly property real fraction: UpdateText.fraction(progress)
     readonly property bool committed: installing && UpdateText.committed(progress)
-    readonly property string stateText: installing ? (cancelling ? qsTr("Cancelando…") : qsTr("Actualizando"))
-        : installFailed ? qsTr("Sin completar")
-        : unsupported ? qsTr("No instalado")
+    readonly property string stateText: installing ? (cancelling ? I18n.tr("Cancelando…") : I18n.tr("Actualizando"))
+        : installFailed ? I18n.tr("Sin completar")
+        : unsupported ? I18n.tr("No instalado")
         : failed ? UpdateText.checkPill(status.error)
-        : checking && !checked ? qsTr("Comprobando…")
-        : !checked ? qsTr("Sin comprobar")
+        : checking && !checked ? I18n.tr("Comprobando…")
+        : !checked ? I18n.tr("Sin comprobar")
         : held && !(status.count > 0) ? UpdateText.blockedPill(status)
-        : status.count === 1 ? qsTr("1 pendiente") : status.count > 0 ? qsTr("%1 pendientes").arg(status.count) : qsTr("Al día")
+        : status.count === 1 ? I18n.tr("1 pendiente") : status.count > 0 ? I18n.tr("%1 pendientes").arg(status.count) : I18n.tr("Al día")
     // One sentence under the title row: live phase, last result or why the source is paused.
-    readonly property string message: installing ? UpdateText.phase(progress) + (committed ? " · " + qsTr("No apagues el equipo.") : "")
+    readonly property string message: installing ? UpdateText.phase(progress) + (committed ? " · " + I18n.tr("No apagues el equipo.") : "")
         : outcome ? UpdateText.outcome(outcome, sourceKey)
         : failed ? UpdateText.checkError(status.error)
         : held ? UpdateText.blocked(status)
@@ -96,8 +96,20 @@ Rectangle {
                     Behavior on opacity { enabled: card.motionAllowed; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                 }
             }
+            Item {
+                Layout.fillWidth: true; Layout.alignment: Qt.AlignVCenter
+                implicitHeight: titleColumn.implicitHeight
+                // Wash/press feedback behind the text; the gesture still toggles the package list.
+                MotionArea {
+                    anchors { fill: parent; margins: -4 }
+                    z: -1
+                    enabled: card.packages.length > 0
+                    feedbackRadius: 8
+                    onClicked: card.expanded = !card.expanded
+                }
             ColumnLayout {
-                Layout.fillWidth: true; spacing: 2
+                id: titleColumn
+                anchors.fill: parent; spacing: 2
                 Text {
                     Layout.fillWidth: true; text: card.title; elide: Text.ElideRight
                     color: Theme.foreground; font.family: Config.appearance.fontFamily
@@ -109,7 +121,7 @@ Rectangle {
                     color: Theme.iconSecondary; font.family: Config.appearance.fontFamily
                     font.pixelSize: Theme.fontSizeBody - 1
                 }
-                TapHandler { enabled: card.packages.length > 0; onTapped: card.expanded = !card.expanded }
+            }
             }
             Rectangle {
                 id: pill
@@ -129,23 +141,39 @@ Rectangle {
                     font.features: { "tnum": 1 }
                 }
             }
-            EdotsButton {
-                objectName: "updatesInstall-" + card.sourceKey
-                visible: !card.installing
-                text: card.installFailed ? qsTr("Reintentar") : qsTr("Actualizar")
-                accent: card.installable
-                enabled: !card.busy && card.installable
-                Accessible.name: qsTr("%1 %2").arg(text).arg(card.title)
-                onClicked: card.installRequested()
-            }
-            // Cancel exists only while nothing has been applied; afterwards the step must finish.
-            EdotsButton {
-                objectName: "updatesCancel-" + card.sourceKey
-                visible: card.installing
-                text: card.cancelling ? qsTr("Cancelando…") : qsTr("Cancelar")
-                enabled: !card.cancelling && !!card.progress.cancellable
-                Accessible.name: qsTr("Cancelar la actualización de %1").arg(card.title)
-                onClicked: card.cancelRequested()
+            // One slot, two stacked actions: install and cancel cross-fade instead of swapping.
+            Item {
+                id: actionSlot
+                Layout.alignment: Qt.AlignVCenter
+                implicitWidth: card.installing ? cancelButton.implicitWidth : installButton.implicitWidth
+                implicitHeight: Math.max(installButton.implicitHeight, cancelButton.implicitHeight)
+                Behavior on implicitWidth { enabled: card.motionAllowed && card.visible; NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                EdotsButton {
+                    id: installButton
+                    objectName: "updatesInstall-" + card.sourceKey
+                    anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
+                    opacity: card.installing ? 0 : 1
+                    visible: opacity > 0.01
+                    Behavior on opacity { NumberAnimation { duration: Motion.iconSwap; easing.type: Motion.easeStandard } }
+                    text: card.installFailed ? I18n.tr("Reintentar") : I18n.tr("Actualizar")
+                    accent: card.installable
+                    enabled: !card.busy && card.installable && !card.installing
+                    Accessible.name: I18n.tr("%1 %2").arg(text).arg(card.title)
+                    onClicked: card.installRequested()
+                }
+                // Cancel exists only while nothing has been applied; afterwards the step must finish.
+                EdotsButton {
+                    id: cancelButton
+                    objectName: "updatesCancel-" + card.sourceKey
+                    anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
+                    opacity: card.installing ? 1 : 0
+                    visible: opacity > 0.01
+                    Behavior on opacity { NumberAnimation { duration: Motion.iconSwap; easing.type: Motion.easeStandard } }
+                    text: card.cancelling ? I18n.tr("Cancelando…") : I18n.tr("Cancelar")
+                    enabled: card.installing && !card.cancelling && !!card.progress.cancellable
+                    Accessible.name: I18n.tr("Cancelar la actualización de %1").arg(card.title)
+                    onClicked: card.cancelRequested()
+                }
             }
         }
         AnimatedLabel {
@@ -158,8 +186,10 @@ Rectangle {
         }
         EdotsButton {
             objectName: "updatesPackages-" + card.sourceKey
-            visible: card.packages.length > 0
-            text: card.expanded ? qsTr("Ocultar paquetes") : qsTr("Ver paquetes")
+            opacity: card.packages.length > 0 ? 1 : 0
+            visible: opacity > 0.01
+            Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+            text: card.expanded ? I18n.tr("Ocultar paquetes") : I18n.tr("Ver paquetes")
             symbol: card.expanded ? "expand_less" : "expand_more"
             Accessible.name: text + " · " + card.title
             onClicked: card.expanded = !card.expanded

@@ -68,14 +68,16 @@ Rectangle {
         }
         Text {
             anchors.verticalCenter: parent.verticalCenter
-            text: overlay.kind === "volume" ? qsTr("Volumen") : (overlay.kind === "mic" ? qsTr("Micrófono") : qsTr("Brillo"))
+            text: overlay.kind === "volume" ? I18n.tr("Volumen") : (overlay.kind === "mic" ? I18n.tr("Micrófono") : I18n.tr("Brillo"))
             color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeSmall * s
         }
-        Text {
+        RollingNumber {
             anchors.verticalCenter: parent.verticalCenter
-            text: Math.round(Math.max(0, Math.min(1, dial.level)) * 100) + "%"
+            value: Math.round(Math.max(0, Math.min(1, dial.level)) * 100)
+            suffix: "%"
+            alignment: Qt.AlignLeft
             color: Theme.accent
             font.family: Theme.font
             font.features: Theme.fontNumeric

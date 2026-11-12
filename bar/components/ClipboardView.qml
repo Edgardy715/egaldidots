@@ -118,10 +118,10 @@ FocusScope {
         if (success && (action === "save" || action === "move" || action === "remove")) {
             details.resultStatus = "success"
             const destination = details.destinations.find(c => c.id === details.chosenCollectionId)
-            details.resultText = action === "remove" ? qsTr("Entrada retirada de Guardados") : qsTr("Guardado en %1").arg(destination ? destination.name : qsTr("Sin colección"))
+            details.resultText = action === "remove" ? I18n.tr("Entrada retirada de Guardados") : I18n.tr("Guardado en %1").arg(destination ? destination.name : I18n.tr("Sin colección"))
         } else if (!success) {
             details.resultStatus = "error"
-            details.resultText = qsTr("No se pudo guardar. Puedes reintentarlo.")
+            details.resultText = I18n.tr("No se pudo guardar. Puedes reintentarlo.")
         }
     }
     onShowingDetailsChanged: {
@@ -233,27 +233,16 @@ FocusScope {
             width: parent.width
             height: Math.max(52, 34 * Flags.fontScale + 8) * root.s
             spacing: 12 * root.s
-            Column {
+            SurfaceHeader {
                 Layout.fillWidth: true
-                spacing: 3 * root.s
-                Text {
-                    text: qsTr("Portapapeles")
-                    color: Theme.foreground
-                    font.family: Theme.font
-                    font.pixelSize: 22 * Flags.fontScale * root.s
-                    font.weight: Font.DemiBold
-                }
-                AnimatedLabel {
-                    value: root.showingDetails ? (root.organizingOnly ? qsTr("Conserva lo que importa") : qsTr("Contenido completo")) : root.section === "history" ? qsTr("Listo para volver a copiar") : qsTr("Tu biblioteca, siempre a mano")
-                    color: Theme.iconSecondary
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSizeBody * root.s
-                }
+                Layout.alignment: Qt.AlignVCenter
+                title: I18n.tr("Portapapeles")
+                s: root.s
             }
             ClipboardChip {
-                text: qsTr("Colección")
+                text: I18n.tr("Colección")
                 iconName: "add"
-                helpText: qsTr("Crear una colección")
+                helpText: I18n.tr("Crear una colección")
                 s: root.s
                 enabled: !root.libraryBusy && !root.editingCollection && !root.showingDetails
                 onClicked: root.editCollection("")
@@ -261,7 +250,7 @@ FocusScope {
             ClipboardChip {
                 objectName: "clipboardClearButton"
                 iconName: root.clearing ? "hourglass_empty" : "delete_sweep"
-                helpText: qsTr("Limpiar historial; conservar guardados")
+                helpText: I18n.tr("Limpiar historial; conservar guardados")
                 s: root.s
                 enabled: !root.loading && !root.copying && !root.clearing && !root.libraryBusy && root.entries.length > 0 && !root.showingDetails
                 onClicked: root.clearHistory()
@@ -297,11 +286,11 @@ FocusScope {
                 anchors.leftMargin: 42 * root.s
                 anchors.rightMargin: 50 * root.s
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
-                placeholderText: qsTr("Buscar en portapapeles…")
+                placeholderText: I18n.tr("Buscar en portapapeles…")
                 motionActive: root.active && root.visible
                 floating: false
                 chrome: false
-                Accessible.name: qsTr("Buscar en portapapeles")
+                Accessible.name: I18n.tr("Buscar en portapapeles")
                 onTextChanged: {
                     root.query = text
                 }
@@ -325,7 +314,7 @@ FocusScope {
                 anchors.rightMargin: 5 * root.s
                 anchors.verticalCenter: parent.verticalCenter
                 iconName: "close"
-                helpText: qsTr("Borrar búsqueda")
+                helpText: I18n.tr("Borrar búsqueda")
                 s: root.s
                 visible: opacity > 0
                 opacity: root.query.length ? 1 : 0
@@ -365,7 +354,7 @@ FocusScope {
                     id: sectionButtons
                     spacing: 6 * root.s
                     Repeater {
-                        model: [{id: "history", name: qsTr("Recientes"), icon: "history"}, {id: "saved", name: qsTr("Guardados"), icon: "bookmark"}].concat(root.collections)
+                        model: [{id: "history", name: I18n.tr("Recientes"), icon: "history"}, {id: "saved", name: I18n.tr("Guardados"), icon: "bookmark"}].concat(root.collections)
                         delegate: ClipboardChip {
                             required property var modelData
                             s: root.s
@@ -380,7 +369,7 @@ FocusScope {
             }
             ClipboardChip {
                 iconName: "chevron_left"
-                helpText: qsTr("Colecciones anteriores")
+                helpText: I18n.tr("Colecciones anteriores")
                 s: root.s
                 visible: sectionsScroll.contentWidth > sectionsScroll.width
                 enabled: sectionsScroll.contentX > 1
@@ -389,7 +378,7 @@ FocusScope {
             ClipboardChip {
                 iconName: "chevron_right"
                 objectName: "clipboardCollectionsNext"
-                helpText: qsTr("Más colecciones")
+                helpText: I18n.tr("Más colecciones")
                 s: root.s
                 visible: sectionsScroll.contentWidth > sectionsScroll.width
                 enabled: sectionsScroll.contentX < sectionsScroll.contentWidth - sectionsScroll.width - 1
@@ -397,7 +386,7 @@ FocusScope {
             }
             ClipboardChip {
                 s: root.s
-                text: qsTr("Editar")
+                text: I18n.tr("Editar")
                 visible: root.section !== "history" && root.section !== "saved"
                 enabled: !root.libraryBusy
                 onClicked: root.editCollection(root.section)
@@ -418,7 +407,7 @@ FocusScope {
             opacity: root.loading ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast } }
             Accessible.role: Accessible.StaticText
-            Accessible.name: qsTr("Cargando entradas del portapapeles")
+            Accessible.name: I18n.tr("Cargando entradas del portapapeles")
             Column {
                 width: parent.width
                 spacing: 8 * root.s
@@ -535,7 +524,7 @@ FocusScope {
                 }
                 Text {
                     width: parent.width
-                    text: root.query.length ? qsTr("Sin coincidencias") : root.section === "history" ? qsTr("Todo empieza con una copia") : qsTr("Un lugar para lo que quieres conservar")
+                    text: root.query.length ? I18n.tr("Sin coincidencias") : root.section === "history" ? I18n.tr("Todo empieza con una copia") : I18n.tr("Un lugar para lo que quieres conservar")
                     color: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeTitle * root.s
@@ -545,7 +534,7 @@ FocusScope {
                 }
                 Text {
                     width: parent.width
-                    text: root.query.length ? qsTr("Prueba con otro texto o vuelve a ver todas las entradas.") : root.section === "history" ? qsTr("Copia texto, un enlace o una imagen y aparecerá aquí.") : qsTr("Usa Guardar en una entrada reciente y elige su colección.")
+                    text: root.query.length ? I18n.tr("Prueba con otro texto o vuelve a ver todas las entradas.") : root.section === "history" ? I18n.tr("Copia texto, un enlace o una imagen y aparecerá aquí.") : I18n.tr("Usa Guardar en una entrada reciente y elige su colección.")
                     color: Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeBody * root.s
@@ -554,7 +543,7 @@ FocusScope {
                 }
                 ClipboardChip {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: root.query.length ? qsTr("Borrar búsqueda") : root.section === "history" ? qsTr("Actualizar") : qsTr("Ver recientes")
+                    text: root.query.length ? I18n.tr("Borrar búsqueda") : root.section === "history" ? I18n.tr("Actualizar") : I18n.tr("Ver recientes")
                     iconName: root.query.length ? "close" : root.section === "history" ? "refresh" : "history"
                     s: root.s
                     onClicked: {
@@ -618,7 +607,7 @@ FocusScope {
                 anchors.margins: 16 * root.s
                 spacing: 16 * root.s
                 Text {
-                    text: root.editingCollectionId.length ? qsTr("Editar colección") : qsTr("Nueva colección")
+                    text: root.editingCollectionId.length ? I18n.tr("Editar colección") : I18n.tr("Nueva colección")
                     color: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: 20 * Flags.fontScale * root.s
@@ -630,7 +619,7 @@ FocusScope {
                     width: parent.width
                     height: 44 * root.s
                     floating: false
-                    placeholderText: qsTr("Nombre de la colección")
+                    placeholderText: I18n.tr("Nombre de la colección")
                     Accessible.name: placeholderText
                     maximumLength: 64
                     Keys.onReturnPressed: root.finishCollectionEdit()
@@ -638,17 +627,17 @@ FocusScope {
                 }
                 Row {
                     spacing: 8 * root.s
-                    ClipboardChip { s: root.s; text: qsTr("Guardar"); prominent: true; enabled: collectionName.text.trim().length > 0 && !root.libraryBusy; onClicked: root.finishCollectionEdit() }
-                    ClipboardChip { s: root.s; text: qsTr("Cancelar"); onClicked: { root.editingCollection = false; restoreFocus() } }
+                    ClipboardChip { s: root.s; text: I18n.tr("Guardar"); prominent: true; enabled: collectionName.text.trim().length > 0 && !root.libraryBusy; onClicked: root.finishCollectionEdit() }
+                    ClipboardChip { s: root.s; text: I18n.tr("Cancelar"); onClicked: { root.editingCollection = false; restoreFocus() } }
                     ClipboardChip {
-                        s: root.s; text: qsTr("Eliminar colección"); visible: root.editingCollectionId.length > 0
+                        s: root.s; text: I18n.tr("Eliminar colección"); visible: root.editingCollectionId.length > 0
                         enabled: !root.libraryBusy
                         onClicked: { root.deleteCollectionRequested(root.editingCollectionId); root.editingCollection = false; restoreFocus() }
                     }
                 }
                 AnimatedLabel {
                     width: parent.width
-                    value: root.errorMessage && collectionName.text.trim() === root.submittedName ? root.errorMessage : root.editingCollectionId.length ? qsTr("Al eliminar una colección, su contenido permanece en Guardados.") : qsTr("Elige un nombre para reunir texto, enlaces e imágenes.")
+                    value: root.errorMessage && collectionName.text.trim() === root.submittedName ? root.errorMessage : root.editingCollectionId.length ? I18n.tr("Al eliminar una colección, su contenido permanece en Guardados.") : I18n.tr("Elige un nombre para reunir texto, enlaces e imágenes.")
                     wrapMode: Text.WordWrap
                     color: Theme.iconSecondary
                     font.family: Theme.font
@@ -700,14 +689,14 @@ FocusScope {
                 spacing: Theme.spacingMd * root.s
 
                 AnimatedLabel {
-                    value: root.filteredEntries.length === 1 ? qsTr("1 elemento") : qsTr("%1 elementos").arg(root.filteredEntries.length)
+                    value: root.filteredEntries.length === 1 ? I18n.tr("1 elemento") : I18n.tr("%1 elementos").arg(root.filteredEntries.length)
                     color: Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeSmall * root.s
                 }
                 Item { Layout.fillWidth: true }
                 Text {
-                    text: root.showingDetails ? qsTr("Esc · volver") : qsTr("Clic o Enter · copiar")
+                    text: root.showingDetails ? I18n.tr("Esc · volver") : ""
                     color: Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeSmall * root.s

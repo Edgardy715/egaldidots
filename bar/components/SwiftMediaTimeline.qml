@@ -30,13 +30,15 @@ Item {
     readonly property real expandedThickness: 6 * s
     property real thickness: (input.containsMouse || input.pressed || input.activeFocus)
         ? expandedThickness : restThickness
-    // Quicksilver: el progreso es un hilo de mercurio teñido dentro de un canal
-    // hundido; la cabeza es una gota que crece al apuntar. Mientras suena, un
-    // reflejo recorre el hilo (fase = wavelength / 1,6 s), sin onda Material.
+    // Barra plana: pista translúcida, progreso sólido de acento y una bolita
+    // cabeza que crece al apuntar. Mientras suena, un brillo tenue recorre el
+    // progreso (fase = wavelength / 1,6 s), sin onda.
     readonly property bool handleShown: input.containsMouse || input.pressed || input.activeFocus
     readonly property real beadSize: (handleShown ? 14 : 9) * s
     readonly property color ink: Qt.hsla(musicAccent.hslHue < 0 ? 0 : musicAccent.hslHue,
         Math.max(0.5, musicAccent.hslSaturation), Theme.dark ? 0.62 : 0.5, 1)
+    readonly property color inkAlt: Qt.hsla(((musicAccent.hslHue < 0 ? 0 : musicAccent.hslHue) + 0.09) % 1,
+        Math.max(0.55, musicAccent.hslSaturation), Theme.dark ? 0.7 : 0.55, 1)
     readonly property bool motionAllowed: enabled && active && visible && opacity > 0 && Flags.mediaTransitions && !Flags.reduceMotion
     readonly property bool moving: motionAllowed && playing && !dragging
     property real waveAmount: 0
@@ -100,9 +102,7 @@ Item {
         x: root.trackInset
         anchors.verticalCenter: parent.verticalCenter
         width: root.trackWidth
-        height: root.thickness + 4 * root.s
-        tint: root.musicAccent
-        tintAmount: 0.85
+        height: root.thickness
     }
     Item {
         id: playedClip
@@ -117,7 +117,8 @@ Item {
             height: parent.height
             radius: height / 2
             gradient: Gradient {
-                GradientStop { position: 0; color: Qt.lighter(root.ink, 1.25) }
+                orientation: Gradient.Horizontal
+                GradientStop { position: 0; color: root.inkAlt }
                 GradientStop { position: 1; color: root.ink }
             }
         }
@@ -127,12 +128,15 @@ Item {
             Rectangle {
                 required property int index
                 x: (index - 1) * root.wavelength + root.phaseOffset
-                y: 1 * root.s
-                width: root.wavelength * 0.35
-                height: Math.max(1, playedClip.height * 0.4)
-                radius: height / 2
-                color: "#ffffff"
-                opacity: 0.45 * root.waveAmount
+                width: root.wavelength * 0.5
+                height: playedClip.height
+                gradient: Gradient {
+                    orientation: Gradient.Horizontal
+                    GradientStop { position: 0; color: Qt.alpha("#ffffff", 0) }
+                    GradientStop { position: 0.5; color: Qt.alpha("#ffffff", 0.28) }
+                    GradientStop { position: 1; color: Qt.alpha("#ffffff", 0) }
+                }
+                opacity: root.waveAmount
                 visible: opacity > 0.01
             }
         }
@@ -144,12 +148,9 @@ Item {
         width: root.beadSize
         height: root.beadSize
         tint: root.musicAccent
-        tintAmount: input.pressed ? 0.6 : 0.3
-        glint: root.handleShown ? 1 : 0.8
         opacity: root.enabled ? 1 : 0
         Behavior on width { enabled: !Flags.reduceMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
         Behavior on height { enabled: !Flags.reduceMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
-        Behavior on tintAmount { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
     }
     MouseArea {
         id: input

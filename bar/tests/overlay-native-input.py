@@ -39,7 +39,7 @@ with tempfile.TemporaryDirectory(prefix="isla-native-input-") as directory:
             raise AssertionError("native keyboard route did not reach " + repr(name))
         try:
             wait_surface("")
-            for name in ["calendar", "mixer", "connectivity", "workspaces", "notifs", "utils", "appearance",
+            for name in ["calendar", "mixer", "connectivity", "notifs", "utils", "focus",
                          "launcher", "media", "wallpaper", "clipboard", "overview", "session", "settings"]:
                 assert call("open", name).returncode == 0
                 wait_surface(name)
@@ -51,7 +51,7 @@ with tempfile.TemporaryDirectory(prefix="isla-native-input-") as directory:
             log.seek(0)
             output = log.read()
             assert not any(word in output for word in ["FAIL", "TypeError", "ReferenceError", "Binding loop"]), output
-            print("PASS: all 14 non-auth modal surfaces receive Wayland Escape and release keyboard on close")
+            print("PASS: all 13 non-auth modal surfaces receive Wayland Escape and release keyboard on close")
         except Exception:
             log.flush()
             log.seek(0)

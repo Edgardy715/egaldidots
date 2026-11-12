@@ -15,6 +15,5 @@ PillSurface {
         anchors.fill: parent
         s: root.s
         active: root.active
-        onRequestClose: root.requestClose()
     }
 }

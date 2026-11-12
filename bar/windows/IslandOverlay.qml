@@ -27,7 +27,7 @@ PanelWindow {
             && (!overlay.mediaOpen || !pill.surfaceOpen && pill.morphCloseness > 0.999)
         settleReady: pill.morphCloseness > 0.999
     }
-    readonly property var mediaSurfaceItem: compact ? pill.surfaceItem : fluidCompanion.surfaceItem
+    readonly property var mediaSurfaceItem: compact || pulledMedia ? pill.surfaceItem : fluidCompanion.surfaceItem
     readonly property real lateralAvailable: Math.max(0, compact ? Math.min(500 * s, (width - pill.restCenterWidth - 72 * s) / 2)
         : (width - Math.max(pill.width, pill.targetW)) / 2 - 48 * s)
     readonly property real recordingLeftBoundary: !compact && sideModules.workspaceModule.active
@@ -37,6 +37,34 @@ PanelWindow {
     readonly property string surface: router.openMon === modelData.name ? router.openSurface : ""
     readonly property bool surfaceOpen: surface.length > 0
     readonly property bool overviewOpen: surface === "overview"
+    property bool pulledMedia: false
+    property bool recordingFromDrop: false
+    property bool notificationFromDrop: false
+    // Tarjeta de dispositivo (Bluetooth/USB): reutiliza el brote centrado de las
+    // notificaciones, sólo en el monitor enfocado y cediendo ante una notificación.
+    readonly property bool deviceCardShown: monitorIsFocused && !!DeviceMoments.card
+        && (DeviceMoments.cardOpen || DeviceMoments.returning) && !pill.notifDropOpen && !notificationFromDrop
+    readonly property bool deviceCardOpen: deviceCardShown && DeviceMoments.cardOpen
+    property bool notificationDropOpening: false
+    readonly property var pullSettings: Config._effective.gestures
+    readonly property bool pullMediaVisible: router.mediaAvailable && Players.has
+        && (mediaOpen || (compact ? sideModules.mediaModule.interactive : fluidCompanion.visible && fluidCompanion.open))
+    readonly property string pullTarget: pill.pullGesture.resolveTarget(pullSettings.pullTarget, pullMediaVisible, Activities.hasLive)
+    function togglePull(target) {
+        const visibleMedia = pullMediaVisible
+        if (target === "auto") target = pullTarget
+        if (target === "focus" && Activities.hasLive) Activities.requestList = true
+        const wantsMedia = target === "media" || target === "auto" && visibleMedia
+        if (wantsMedia) pulledMedia = true
+        const accepted = router.pull(modelData.name, target, target === "focus" ? surface !== "focus" : undefined, visibleMedia)
+        if (!accepted && surface !== "media") pulledMedia = false
+        return accepted
+    }
+    onSurfaceChanged: {
+        if (surface !== "media") pulledMedia = false
+        if (surface !== "recording" && surface !== "focus") recordingFromDrop = false
+        if (surface !== "notifs") notificationFromDrop = false
+    }
     readonly property bool mediaOpen: surface === "media"
     readonly property bool settingsOpen: surface === "settings"
     readonly property bool settingsReturning: !settingsOpen && settingsCompanion.active && surface !== "auth"
@@ -61,9 +89,56 @@ PanelWindow {
         onTriggered: overlay.mediaPanelReturning = false
     }
     readonly property bool launcherOpen: surface === "launcher"
+    // Monitor de Hyprland de este overlay y su área de trabajo (descontando zonas reservadas).
+    readonly property var hyprMonitor: {
+        const list = Hyprland.monitors.values
+        for (let i = 0; i < list.length; ++i) if (modelData && list[i].name === modelData.name) return list[i]
+        return null
+    }
+    readonly property rect workArea: {
+        const r = hyprMonitor && hyprMonitor.lastIpcObject && hyprMonitor.lastIpcObject.reserved
+            ? hyprMonitor.lastIpcObject.reserved : [0, 0, 0, 0]
+        return Qt.rect(r[0], r[1], Math.max(1, width - r[0] - r[2]), Math.max(1, height - r[1] - r[3]))
+    }
     readonly property bool mediaDocking: router.mediaDockPendingMon === modelData.name
     readonly property bool launcherClosing: launcherOpen && router.launcherClosePhase !== 0
     readonly property bool launcherReturning: launcherOpen && router.launcherClosePhase === 2
+    // El launcher es la propia pill: se recoge en gota, cae a su sitio y se abre;
+    // al cerrar se recoge, sube y vuelve a ser la pill (LauncherDropMotion).
+    readonly property bool launcherCardOpen: launcherOpen && !launcherClosing
+    // Mientras viaja o asienta, la gota de media sigue absorbida en la pill.
+    readonly property bool launcherFlightBusy: launcherDrop.active || launcherSettling
+    // Tras volver arriba la pill aún se ensancha a su reposo: la gota de media
+    // espera a que termine para no brotar contra una pill que crece.
+    property bool launcherSettling: false
+    function updateLauncherSettling() {
+        if (launcherDrop.active) launcherSettling = true
+        else if (launcherSettling && !launcherOpen && (pill.morphCloseness > 0.999 || pill.surfaceOpen))
+            launcherSettling = false
+    }
+    onLauncherOpenChanged: updateLauncherSettling()
+    Connections {
+        target: launcherDrop
+        function onActiveChanged() { overlay.updateLauncherSettling() }
+    }
+    Connections {
+        target: pill
+        function onMorphClosenessChanged() { overlay.updateLauncherSettling() }
+        function onSurfaceOpenChanged() { overlay.updateLauncherSettling() }
+    }
+    LauncherDropMotion {
+        id: launcherDrop
+        s: overlay.s
+        open: overlay.launcherCardOpen
+        reduceMotion: Flags.reduceMotion
+        // Mismo sitio que el launcher anclado arriba de antes: centrado en pantalla.
+        landing: Math.max(overlay.topGap * 2, (overlay.height - IslandGeometry.launcherSurface.height * overlay.s) / 2)
+            - overlay.topGap
+        dropSize: pill.dropSize
+        pillW: pill.width
+        pillH: pill.height
+        holdAtTop: !overlay.compact && fluidCompanion.active
+    }
     OverlayInputPolicy {
         id: inputPolicy
         objectName: "islandInputPolicy"
@@ -72,6 +147,9 @@ PanelWindow {
         monitors: Hyprland.monitors.values
         surface: overlay.surface
         launcherClosing: overlay.launcherClosing
+        pointerPull: (pill.pullGesture.candidate || pill.pullGesture.active) && !pill.pullGesture.scrolling
+        wheelHold: pill.pullGesture.scrolling && pill.pullGesture.wasOpen
+            || fluidCompanion.gestureCandidate || recordingCompanion.gestureCandidate || sessionCompanion.gestureCandidate || notificationCompanion.gestureCandidate
         pillX: pill.x; pillY: pill.y
         pillWidth: pill.width; pillHeight: pill.height
         pillTargetW: pill.targetW; pillTargetH: pill.targetH
@@ -165,6 +243,11 @@ PanelWindow {
         onWidthChanged: changed()
         onHeightChanged: changed()
         Region {
+            x: notificationCompanion.visualX; y: notificationCompanion.yPos
+            width: notificationCompanion.active ? notificationCompanion.wPos : 0
+            height: notificationCompanion.active ? notificationCompanion.hPos : 0
+        }
+        Region {
             x: messenger.hitItem.x; y: messenger.hitItem.y
             width: messenger.acceptsClick ? messenger.hitItem.width : 0
             height: messenger.acceptsClick ? messenger.hitItem.height : 0
@@ -200,14 +283,17 @@ PanelWindow {
     // backdrop glass del overview: dim sutil cuando está abierto. No es
     // la "pantalla oscura" del approach con ventana aparte — apenas atenúa
     // para que la pill-morph (con el overview dentro) domine visualmente.
+    // The dim stays below the compositor's blur threshold (layer rule ignore_alpha 0.15):
+    // crossing it switched a full-screen blur on or off in a single frame. A whole-screen
+    // change also starts and ends gently; a decelerating curve put a quarter of it in frame one.
     Rectangle {
         anchors.fill: parent
-        color: Qt.rgba(0, 0, 0, Theme.shadowOpacity > 0 ? 0.5 : 0.42)
+        color: Qt.rgba(0, 0, 0, Theme.shadowOpacity > 0 ? 0.4 : 0.36)
         opacity: overlay.overviewOpen ? 0.34 : 0
         visible: opacity > 0.005
         z: 0
         Behavior on opacity {
-            Anim { type: Anim.DefaultEffects }
+            NumberAnimation { duration: Motion.standardLarge; easing.type: Easing.InOutSine }
         }
     }
 
@@ -294,6 +380,11 @@ PanelWindow {
             z: overlay.compact ? 3 : 1
             compact: overlay.compact
             topGap: overlay.compact ? (height - 48 * overlay.s) / 2 : overlay.topGap
+            // Depth: while a surface owns attention the side modules recede a step (opacity only,
+            // no travel, so reduceMotion keeps it); each module composites as one layer meanwhile.
+            property real lateralDepth: !overlay.compact && pill.surfaceOpen && !pill.launcherReturning ? 0.82 : 1
+            Behavior on lateralDepth { NumberAnimation { duration: Motion.standard; easing.type: Motion.easeStandard } }
+            depth: lateralDepth
             opacity: !overlay.compact ? 1 : pill.opacity * ((!pill.surfaceOpen || pill.launcherReturning)
                 && !pill.notifMorphing ? pill.morphRestReturn
                     * Math.max(0, Math.min(1, (pill.width - pill.restW + 40 * overlay.s) / (40 * overlay.s))) : 0)
@@ -411,52 +502,40 @@ PanelWindow {
             objectName: "islandPill"
             z: overlay.surface === "auth" ? 5 : 2
             anchors.top: parent.top
-            // El launcher es "spotlight-style" → se centra verticalmente en
-            // la pantalla (no top, como el resto de surfaces). Las notifs/
-            // calendar/mixer/etc se quedan top-centre como siempre; el launcher
-            // baja al centro con la misma curva morph del pill (cociente
-            // topMargin = (screen.height - pill.height) / 2). El Behavior
-            // existente anima la transición.
+            // El launcher viaja con la pill: launcherDrop.offset la baja como gota
+            // hasta el centro de la pantalla y la vuelve a subir al cerrar.
             // El wallpaper da un respiro extra bajo el borde superior para
             // NO parecer un dock pegado a la pantalla (actúa flotante).
-            anchors.topMargin: overlay.launcherOpen
-                ? overlay.launcherReturning
-                    ? overlay.topGap
-                    : Math.max(overlay.topGap * 2,
-                               (overlay.height - IslandGeometry.launcherSurface.height * overlay.s) / 2)
-                : overlay.wallpaperOpen
-                    ? Math.max(overlay.topGap * 2, 18 * overlay.s)
-                    : overlay.topGap
+            anchors.topMargin: (overlay.wallpaperOpen
+                ? Math.max(overlay.topGap * 2, 18 * overlay.s)
+                : overlay.topGap) + launcherDrop.offset
             anchors.horizontalCenter: parent.horizontalCenter
 
             Behavior on anchors.topMargin {
-                enabled: !Flags.reduceMotion
+                enabled: !Flags.reduceMotion && !launcherDrop.active && !overlay.launcherOpen
                 SmoothedAnimation { duration: Motion.morph; velocity: -1 }
             }
             s: overlay.s
             screenName: overlay.modelData.name
+            notificationExternalSettling: notificationCompanion.active && !notificationCompanion.settled
             recordingDetached: recordingCompanion.open || recordingCompanion.active
-            companionBlocked: overlay.launcherOpen || overlay.surface === "auth"
-            companionWorkspaceLook: sideModules.workspaceItem && sideModules.workspaceItem.hoverId > 0
-                ? (sideModules.workspaceItem.hoverId - 0.5) / Math.max(1, sideModules.workspaceItem.count) * 2 - 1 : 0
+            companionBlocked: overlay.launcherOpen || overlay.launcherFlightBusy || overlay.surface === "auth"
             companionCodeFocused: {
                 const top = Hyprland.activeToplevel
                 const app = top && top.lastIpcObject ? String(top.lastIpcObject.class || "").toLowerCase() : ""
                 return /(^|[. -])(kitty|alacritty|foot|wezterm|ghostty|konsole|code|codium|zed|neovide|emacs|terminal)([. -]|$)/.test(app)
             }
-            attentionItem: overlay.mediaSurfaceItem
-            companionMusicVisible: overlay.mediaOpen && !!overlay.mediaSurfaceItem && overlay.mediaSurfaceItem.visible
-            companionSeek: companionMusicVisible && overlay.mediaSurfaceItem.playback ? overlay.mediaSurfaceItem.playback.progress : 0.5
-            companionBeat: companionMusicVisible && Cava.hasFrame && Cava.values.length
-                ? Cava.values[Math.floor(Cava.values.length / 2)] : 0
             layoutChanging: overlay.layoutChanging
             interactionOpen: overlay.surfaceOpen
             restHeight: overlay.compact ? IslandGeometry.compactRestHeight : IslandGeometry.restHeight
             restLeftWidth: overlay.compact ? sideModules.leftWidth : 0
             restRightWidth: overlay.compact ? sideModules.rightWidth : 0
-            surface: (overlay.mediaOpen && (!overlay.compact || overlay.layoutChanging)) || overlay.sessionOpen || overlay.settingsOpen || overlay.settingsReturning ? "" : overlay.surface
+            surface: (overlay.mediaOpen && !overlay.pulledMedia && (!overlay.compact || overlay.layoutChanging)) || overlay.sessionOpen || overlay.settingsOpen || overlay.settingsReturning
+                || overlay.notificationFromDrop && overlay.surface === "notifs"
+                || overlay.recordingFromDrop && (overlay.surface === "recording" || overlay.surface === "focus") ? "" : overlay.surface
             launcherClosing: overlay.launcherClosing
             launcherClosePhase: router.launcherClosePhase
+            dropMode: launcherDrop.dropMode
             forcePinned: router.peekMon === overlay.modelData.name
             fluidCompanion0: fluidCompanion
             fluidCompanion1: sessionCompanion
@@ -477,6 +556,22 @@ PanelWindow {
             visible: opacity > 0.005
             transform: Translate { y: overlay.fullscreenLift }
 
+            pullEnabled: overlay.pullSettings.enabled && !overlay.sessionOpen && !overlay.settingsOpen
+                && !overlay.settingsReturning && !overlay.monFullscreen
+                && !launcherDrop.dropMode && !launcherDrop.moving
+                && (overlay.surfaceOpen || overlay.pullTarget !== "media" || overlay.router.mediaAvailable)
+            pullTarget: overlay.pullTarget
+            onPullPrepare: name => {
+                if (name === "media") overlay.pulledMedia = true
+                if (name === "focus" && Activities.hasLive) Activities.requestList = true
+                // Deferred: pointer/wheel handlers emit this mid-delivery, and
+                // swapping surfaces there frees items Qt is still iterating.
+                Qt.callLater(() => overlay.router.pull(overlay.modelData.name, name, true))
+            }
+            onPullSettled: (name, opened) => {
+                if (name === "media" && opened) overlay.pulledMedia = true
+                Qt.callLater(() => overlay.router.pull(overlay.modelData.name, name, opened))
+            }
             onRequestSurface: (name) => router.toggleSurface(overlay.modelData.name, name)
             onRequestClose: router.close()
 
@@ -484,6 +579,33 @@ PanelWindow {
             // La pill morfea para mostrar la notif activa (reemplaza Toast).
             // Solo el monitor con foco muestra el morph; resto ve pill en reposo.
             notificationsEnabled: overlay.monitorIsFocused
+        }
+
+        // Las apps nacen de la isla: la gota del icono lanzado vuela hasta su ventana.
+        // Sólo dibuja durante el vuelo; no captura entrada ni toca la máscara.
+        LaunchFlight {
+            id: launchFlight
+            objectName: "islandLaunchFlight"
+            anchors.fill: parent
+            z: 3
+            s: overlay.s
+            monitorName: overlay.modelData ? overlay.modelData.name : ""
+            fullscreen: overlay.monFullscreen
+            bodyX: pill.x; bodyY: pill.y
+            bodyW: pill.width; bodyH: pill.height
+            bodyRadius: pill.morphRadius
+            workArea: overlay.workArea
+            workspaceTarget: sideModules.workspaceModule.active
+                ? Qt.rect(sideModules.x + sideModules.workspaceModule.x, sideModules.y + sideModules.workspaceModule.y,
+                          sideModules.workspaceModule.width, sideModules.workspaceModule.height)
+                : Qt.rect(0, 0, 0, 0)
+            visibleWorkspaceId: overlay.hyprMonitor && overlay.hyprMonitor.activeWorkspace ? overlay.hyprMonitor.activeWorkspace.id : -1
+            Connections {
+                target: Apps
+                function onLaunchAnnounced(info) {
+                    if (overlay.launcherOpen) launchFlight.begin(info)
+                }
+            }
         }
 
         FluidRecordingCompanion {
@@ -496,17 +618,31 @@ PanelWindow {
             leftSide: true
             s: overlay.s
             screenName: overlay.modelData.name
+            recordingActive: Recording.engaged
+            focusRemainingSeconds: FocusSession.remainingSeconds
+            activity: Activities.primary
+            activityCount: Activities.count
             recordingPhase: Recording.uncertain ? "unknown" : Recording.phase
             elapsedText: Recording.timeText
             tallBar: overlay.compact
             countdown: Recording.countdown
-            open: Recording.engaged && !overlay.layoutChanging && !overlay.monFullscreen
+            focusActive: !Recording.engaged && FocusSession.active
+            open: (Recording.engaged || FocusSession.active || Activities.count > 0) && !overlay.layoutChanging && !overlay.monFullscreen
                 && overlay.recordingHasRoom && !overlay.sessionOpen && sessionCompanion.phase === "idle"
                 && !overlay.settingsOpen && settingsCompanion.phase === "idle"
             bodyBusy: pill.surfaceOpen || pill.notifMorphing
             opacity: 1 - overlay.fullscreenHide
             transform: Translate { y: overlay.fullscreenLift }
-            onRequestRecording: router.toggleSurface(overlay.modelData.name, "recording")
+            gesturesEnabled: overlay.pullSettings.enabled
+            expanded: overlay.recordingFromDrop && (overlay.surface === "recording" || overlay.surface === "focus")
+            onRequestOpen: name => {
+                if (Activities.count > 0) Activities.requestList = true
+                if (router.openFromDrop(overlay.modelData.name, name)) overlay.recordingFromDrop = true
+            }
+            onRequestRecording: {
+                if (Activities.count > 0) Activities.requestList = true
+                router.toggleSurface(overlay.modelData.name, recordingCompanion.surfaceName)
+            }
         }
 
         FluidCompanion {
@@ -516,6 +652,8 @@ PanelWindow {
             body: pill
             waterBody: pill.bodyPresentation
             leftSide: true
+            gesturesEnabled: overlay.pullSettings.enabled
+            onRequestOpen: name => router.openFromDrop(overlay.modelData.name, name)
             surfaceName: "session"
             surfaceSize: IslandGeometry.sessionSurface
             open: overlay.sessionOpen && !overlay.settingsReturning && recordingCompanion.phase === "idle"
@@ -560,7 +698,7 @@ PanelWindow {
         }
 
         // Informational notifications bud below the pill; it keeps its content.
-        // Not part of the input region: clicks pass through as before.
+        // Its gesture keeps the same focus/mask capture as the pill and side drops.
         FluidCompanion {
             id: notificationCompanion
             objectName: "islandNotificationCompanion"
@@ -571,10 +709,87 @@ PanelWindow {
             centered: true
             below: true
             springRate: 1.5
-            surfaceName: "notification"
-            surfaceSize: Qt.size(380, 72)
-            expandedContent: Component {
+            surfaceName: overlay.deviceCardShown ? "device" : overlay.notificationFromDrop ? "notifs" : "notification"
+            surfaceSize: overlay.deviceCardShown ? Qt.size(380, DeviceMoments.card && DeviceMoments.card.kind === "storage" ? 112 : 84)
+                : overlay.notificationFromDrop ? IslandGeometry.notificationsSurface : Qt.size(380, 72)
+            property QtObject notificationDragMotion: QtObject {
+                property real width: notificationCompanion.wPos
+                property real height: notificationCompanion.hPos
+                property real radius: notificationCompanion.cardRadius
+                property real coreH: notificationCompanion.moduleH
+                property real restW: coreH
+                property bool integrating: !notificationCompanion.settled
+                property real velW: notificationCompanion.vw
+                property real velH: notificationCompanion.vh
+                property bool grabbed: false
+                property bool gestureSpring: false
+                property real grabW: width
+                property real grabH: height
+                property real grabRadius: radius
+                property real grabProgress: 0
+                function grab() {
+                    grabW = width; grabH = height; grabRadius = radius
+                    grabbed = true
+                }
+                onGrabWChanged: if (grabbed) {
+                    notificationCompanion.wPos = grabW
+                    notificationCompanion.xPos = notificationCompanion.bodyX + (notificationCompanion.bodyW - grabW) / 2
+                }
+                onGrabHChanged: if (grabbed) notificationCompanion.hPos = grabH
+                function release(vw, vh, gesture) {
+                    notificationCompanion.vw = vw; notificationCompanion.vh = vh
+                    grabbed = false
+                    notificationCompanion.gestureCandidate = false
+                }
+            }
+            expandedContentDelay: 0.6
+            expandedContent: overlay.deviceCardShown ? deviceContent : overlay.notificationFromDrop ? null : notificationContent
+            Component {
+                id: deviceContent
+                DeviceMomentCard {
+                    readonly property var moment: DeviceMoments.card
+                    readonly property bool isStorage: !!moment && moment.kind === "storage"
+                    s: overlay.s
+                    pillWidth: notificationCompanion.cardW
+                    pillHeight: notificationCompanion.cardH
+                    closeness: 1
+                    kind: isStorage ? "storage" : "bluetooth"
+                    glyph: isStorage ? "usb" : moment ? (DeviceMoments.kindGlyphs[moment.deviceKind] || "bluetooth") : "bluetooth"
+                    title: moment ? moment.name : ""
+                    subtitle: isStorage ? moment.sizeLabel : ""
+                    batteries: moment && !isStorage ? DeviceMoments.batteriesOf(moment.device) : []
+                    ejectState: DeviceMoments.cardState
+                    errorText: DeviceMoments.cardError
+                    onHoverChanged: hovered => DeviceMoments.cardHovered = hovered
+                    onActivated: DeviceMoments.activateCard()
+                    onOpenRequested: DeviceMoments.openMount()
+                    onEjectRequested: DeviceMoments.eject()
+                }
+            }
+            Component {
+                id: notificationContent
                 IslandNotification {
+                    gestureMotion: notificationCompanion.notificationDragMotion
+                    gesturesEnabled: overlay.pullSettings.enabled
+                    onGestureStarted: {
+                        notificationCompanion.gestureCandidate = true
+                        pill.pauseNotification()
+                    }
+                    onGestureFinished: action => {
+                        if (action === "open") {
+                            overlay.notificationDropOpening = true
+                        }
+                        pill.finishNotification(action)
+                    }
+                    onGestureSettled: (name, opened) => {
+                        if (opened) Qt.callLater(() => {
+                            overlay.notificationFromDrop = true
+                            overlay.router.pull(overlay.modelData.name, "notifs", true)
+                            overlay.notificationDropOpening = false
+                            notificationCompanion.bloom()
+                        })
+                    }
+
                     notification: pill.activeNotif
                     s: overlay.s
                     pillWidth: notificationCompanion.cardW
@@ -585,13 +800,38 @@ PanelWindow {
                 }
             }
             retainExpandedContent: true
-            open: pill.notifDropOpen
-            expanded: pill.notifDropOpen
+            open: pill.notifDropOpen || overlay.notificationFromDrop || overlay.notificationDropOpening || overlay.deviceCardOpen
+            expanded: pill.notifDropOpen || overlay.notificationFromDrop || overlay.notificationDropOpening || overlay.deviceCardOpen
             bodyBusy: pill.surfaceOpen
             s: overlay.s
             screenName: overlay.modelData.name
             opacity: 1 - overlay.fullscreenHide
             transform: Translate { y: overlay.fullscreenLift }
+        }
+
+        // Contexto de prioridad para los momentos de dispositivo: sólo el monitor
+        // enfocado lo publica y sólo él los muestra.
+        Binding {
+            target: DeviceMoments
+            property: "context"
+            when: overlay.monitorIsFocused
+            value: ({
+                surfaceOpen: overlay.surfaceOpen,
+                fullscreen: overlay.monFullscreen,
+                gesture: inputPolicy.pointerPull,
+                notification: !!pill.activeNotif || pill.notifDropOpen,
+                dnd: Notifs.dnd
+            })
+        }
+        Connections {
+            target: DeviceMoments
+            enabled: overlay.monitorIsFocused
+            function onNoticeRequested(text, kind) { pill.notice(text, kind) }
+            function onSurfaceRequested(surface) { router.toggleSurface(overlay.modelData.name, surface) }
+        }
+        Connections {
+            target: pill
+            function onNotifDropOpenChanged() { if (pill.notifDropOpen) DeviceMoments.interrupt() }
         }
 
         FluidMediaCompanion {
@@ -604,7 +844,9 @@ PanelWindow {
             anchors.fill: parent
             body: pill
             waterBody: pill.bodyPresentation
-            open: !overlay.layoutChanging && !overlay.compact && (Players.has || overlay.mediaOpen) && !overlay.launcherOpen && !overlay.mediaPanelOpen
+            gesturesEnabled: overlay.pullSettings.enabled
+            onRequestOpen: name => router.openFromDrop(overlay.modelData.name, name)
+            open: !dismissedUntilTrackChange && !overlay.pulledMedia && !overlay.layoutChanging && !overlay.compact && (Players.has || overlay.mediaOpen) && !overlay.launcherOpen && !overlay.launcherFlightBusy && !overlay.mediaPanelOpen
                 && !overlay.mediaPanelReturning && !overlay.mediaDocking
             // Once the drop is concealed inside the body the dock is visually done;
             // its hidden springs settling to idle used to hold the launcher ~0.5 s.
@@ -616,6 +858,12 @@ PanelWindow {
                 || phase === "retornando" && contentExposure <= 0 && router.mediaDockPendingSurface !== "launcher"
             onDockedChanged: if (docked && overlay.mediaDocking)
                 Qt.callLater(() => router.finishMediaDock(overlay.modelData.name))
+            // Safety net: a dock that never conceals must not hold the surface.
+            Timer {
+                interval: 900
+                running: overlay.mediaDocking
+                onTriggered: router.finishMediaDock(overlay.modelData.name)
+            }
             Connections {
                 target: overlay
                 function onMediaDockingChanged() {
@@ -623,7 +871,7 @@ PanelWindow {
                         Qt.callLater(() => router.finishMediaDock(overlay.modelData.name))
                 }
             }
-            expanded: !overlay.layoutChanging && !overlay.compact && overlay.mediaOpen && !overlay.mediaDocking && !overlay.settingsReturning
+            expanded: !overlay.pulledMedia && !overlay.layoutChanging && !overlay.compact && overlay.mediaOpen && !overlay.mediaDocking && !overlay.settingsReturning
             bodyBusy: overlay.surfaceOpen && !overlay.mediaOpen && !overlay.sessionOpen || pill.notifMorphing
             s: overlay.s
             screenName: overlay.modelData.name

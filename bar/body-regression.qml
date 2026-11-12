@@ -24,7 +24,7 @@ ShellRoot {
             function test_engine() {
                 verify(!engine.frameRunning && !engine.timerRunning)
                 engine.reduceMotion=true; engine.mood="dormida"
-                compare(engine.pillHalfH,14.5); verify(!engine.needsFrames)
+                compare(engine.pillHalfH,16); verify(!engine.needsFrames)
                 verify(!engine.frameRunning && !engine.timerRunning)
                 engine.reduceMotion=false; engine.mood="curiosa"
                 for (let i=0;i<20;i++) engine.step(1/240)

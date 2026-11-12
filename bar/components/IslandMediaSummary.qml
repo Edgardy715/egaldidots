@@ -11,7 +11,7 @@ Item {
     property real textWidth: 200
     property real spacing: 10
     property real metadataSpacing: 3
-    property real titlePixelSize: 12.5
+    property real titlePixelSize: 13
     property real artistPixelSize: 11
     property string artUrl: ""
     property string title: ""

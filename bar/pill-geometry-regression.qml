@@ -50,8 +50,11 @@ ShellRoot {
         geometry.resultsCount = 50
         test.equal(geometry.launcherH, 632, "launcher results cap")
         geometry.launcherClosing = true
-        test.equal(geometry.targetH, 64, "launcher closing height")
-        test.equal(geometry.targetRadius, 32, "launcher closing radius")
+        // Closing never shows the old in-place search bar: the card leaves as a
+        // drop and every phase back at the top targets rest.
+        test.equal(geometry.targetW, 156, "launcher closing width")
+        test.equal(geometry.targetH, 38, "launcher closing height")
+        test.equal(geometry.targetRadius, 19, "launcher closing radius")
         geometry.launcherClosePhase = 2
         test.equal(geometry.targetW, 156, "launcher return width")
         test.equal(geometry.targetH, 38, "launcher return height")

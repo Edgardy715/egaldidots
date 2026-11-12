@@ -53,7 +53,7 @@ ShellRoot {
                     const toggle = findChild(view, "mediaToggle")
                     compare(String(toggle.primaryColor), coral, "rotating button shares artwork color")
                     compare(String(toggle.primaryInk), "#000000")
-                    verify(findChild(view, "mediaNeonField").visible, "neon is emitted inside the media surface")
+                    verify(findChild(view, "mediaRipples").count === 3, "artwork ripples sit around the cover")
                     shot("01-coral")
                     scene.art = String(Qt.resolvedUrl("tests/fixtures/artwork-blue.svg"))
                     MediaPalette.source = scene.art

@@ -35,6 +35,11 @@ layout(std140, binding = 0) uniform buf {
     float sweep;
     vec4 artBox;
     float artBlend, artSlot, artReady, artAspectFirst, artAspectSecond;
+    vec4 tintFrom; vec4 tintTo;
+    float tintCross, tintPresence;
+    float rippleT, rippleAmp;
+    vec2 rippleOrigin;
+    float bassGain;
 };
 layout(binding = 1) uniform sampler2D wallpaper;
 layout(binding = 2) uniform sampler2D artworkFirst;
@@ -114,6 +119,9 @@ vec4 decorate(vec4 tint, vec2 p, float y) {
             color = mix(color, art * (1.0 - veil), 0.22 * mask);
         }
     }
+    // Cover tint: rgb + share (<= 0.12, already contrast-guarded in QML); crossed by spring.
+    vec4 tt = mix(tintFrom, tintTo, tintCross);
+    color = mix(color, tt.rgb, min(tt.a, 0.12) * tintPresence);
     // One accent field; specular direction and the sole exterior rim remain below.
     float topWash = (1.0 - smoothstep(0.0, 0.30, y)) * mix(0.028, 0.075, decorAwake);
     color = mix(color, decorAccent.rgb, 0.035 + topWash);
@@ -125,7 +133,7 @@ vec4 decorate(vec4 tint, vec2 p, float y) {
     float travel = fract(sweep);
     float bandX = pill.x + (travel * 3.0 - 1.5) * pill.z * 2.0;
     float band = exp(-pow((p.x - bandX + (p.y - pill.y) * 0.30) / max(24.0 * designScale, pill.z * 0.20), 2.0));
-    color += vec3(0.12) * band * pow(sin(travel * 3.14159265), 2.0);
+    color += vec3(0.07) * band * pow(sin(travel * 3.14159265), 2.0);
     return vec4(color * tint.a, tint.a);
 }
 void main() {
@@ -161,7 +169,7 @@ void main() {
     float yTint = clamp((p.y - pill.y + pill.w) / (0.92 * pill.w), 0.0, 1.0);
     vec3 base = mix(colTop.rgb, colBase.rgb, yTint);
     float rim = water > 0.5 ? edgeExposure : 1.0;
-    float lens = 0.55 * pow(edge, 3.0) * rim;
+    float lens = 0.38 * pow(edge, 3.0) * rim;
     vec3 glass = base * fillAlpha * (1.0 - lens) + refr * lens;
     float glassA = fillAlpha * (1.0 - lens) + lens;
     if (water > 0.5) {
@@ -169,9 +177,17 @@ void main() {
         glassA = tint.a * (1.0 - lens) + lens;
     }
     vec3 lc = mix(vec3(0.82, 0.88, 1.0), vec3(1.0, 0.74, 0.48), warm);
-    glass += lc * pow(max(dot(n, lightDir), 0.0), 2.0) * pow(edge, 5.0) * spec * rim;
-    glass += colB.rgb * max(dot(n, -lightDir), 0.0) * pow(edge, 6.0) * 0.22 * rim;
-    glass += colC.rgb * glow * pow(edge, 2.5) * 0.55 * rim;
+    glass += lc * pow(max(dot(n, lightDir), 0.0), 2.0) * pow(edge, 6.0) * spec * bassGain * 0.42 * rim;
+    // Adjustment ripple: one ring of light travels the specular rim from the icon side.
+    if (water > 0.5 && rippleAmp > 0.0 && rippleT < 1.0) {
+        float k = 1.0 - rippleT;
+        float ringX = mix(rippleOrigin.x, rippleOrigin.y, 1.0 - k * k * k);
+        float ringW = max(18.0 * designScale, 0.08 * abs(rippleOrigin.y - rippleOrigin.x));
+        float u = (p.x - ringX) / ringW;
+        glass += lc * exp(-u * u) * rippleAmp * k * k * pow(edge, 3.0) * 0.55 * rim;
+    }
+    glass += colB.rgb * max(dot(n, -lightDir), 0.0) * pow(edge, 6.0) * 0.14 * rim;
+    glass += colC.rgb * glow * pow(edge, 2.5) * 0.40 * rim;
     // The accent belongs to the exterior SDF rim, including all fused necks.
     if (water > 0.5)
         glass = mix(glass, decorAccent.rgb * glassA,

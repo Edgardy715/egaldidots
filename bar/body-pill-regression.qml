@@ -139,7 +139,6 @@ ShellRoot {
                     compare(body.exposure, 0); compare(material.opacity, 1)
                     Config.update({appearance: {reduceTransparency: false, personality: false}})
                     compare(body.exposure, 0)
-                    verify(!pill.legacyCompanionEnabled)
                     passed = true
                     console.info("PASS: BodyPill geometry, handoff, interruption, surface, Fluid, hidden and accessibility")
                 } catch (error) {

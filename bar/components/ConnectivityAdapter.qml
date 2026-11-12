@@ -19,7 +19,10 @@ Item {
     readonly property string activeSsid: Nmcli.active ? Nmcli.active.ssid : ""
     property bool ssidObserved: false
     property string previousSsid: ""
-    Component.onCompleted: { previousSsid = activeSsid; ssidObserved = true }
+    Component.onCompleted: {
+        previousSsid = activeSsid; ssidObserved = true
+        if (open && DeviceMoments.consumeIntent("connectivity") === "bluetooth") view.mode = "bluetooth"
+    }
     onActiveSsidChanged: {
         if (ssidObserved && open && activeSsid.length && activeSsid !== previousSsid)
             root.feedbackRequested("connected")
@@ -58,9 +61,9 @@ Item {
                 root.feedbackRequested("connected")
                 successHold.restart()
             } else if (result && result.needsPassword) {
-                passwordError = qsTr("Contraseña incorrecta. Inténtalo de nuevo.")
+                passwordError = I18n.tr("Contraseña incorrecta. Inténtalo de nuevo.")
             } else {
-                passwordError = qsTr("No se pudo conectar. Comprueba la red.")
+                passwordError = I18n.tr("No se pudo conectar. Comprueba la red.")
             }
         })
     }
@@ -74,7 +77,7 @@ Item {
         onTriggered: {
             root.passwordConnecting = false
             root.connectingToSsid = ""
-            root.passwordError = qsTr("La conexión tarda más de lo previsto.")
+            root.passwordError = I18n.tr("La conexión tarda más de lo previsto.")
         }
     }
     Timer {
@@ -83,7 +86,11 @@ Item {
         onTriggered: root.cancelPassword()
     }
 
+    // Un momento de dispositivo (tarjeta Bluetooth) abre esta vista en su pestaña.
+    onOpenChanged: if (open && DeviceMoments.consumeIntent("connectivity") === "bluetooth") view.mode = "bluetooth"
+
     ConnectivityView {
+        id: view
         anchors.fill: parent
         s: root.s
         open: root.open

@@ -52,8 +52,7 @@ ShellRoot {
                 shot("single-compact")
                 const hover = findChild(rail, "statusAppHover")
                 mouseMove(hover, 13, 14)
-                wait(500)
-                check(rail.nameShown && rail.width > expanded - 1, "hover reveals name and expands")
+                tryVerify(() => rail.nameShown && rail.width > expanded - 1, 1200, "hover reveals name and expands")
                 shot("single-hover")
                 mouseMove(scene.contentItem, 5, 5)
                 wait(500)
@@ -81,9 +80,9 @@ ShellRoot {
                 expectEqual(list.count, 3)
                 shot("three")
                 rail.windows = []
-                wait(500)
+                // The glass settles on the emphasized collapse (~580 ms on Wayland), not at a fixed 500 ms.
+                tryVerify(() => Math.abs(rail.width - base) < 0.5, 1200, "empty width " + rail.width + " base " + base)
                 expectEqual(list.count, 0)
-                check(Math.abs(rail.width - base) < 0.5, "empty width " + rail.width + " base " + base)
                 shot("closed")
                 Config.update({appearance: {reduceMotion: true}})
                 rail.windows = windows(["kitty", "firefox"])

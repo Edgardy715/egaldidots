@@ -62,7 +62,9 @@ Item {
             color: "transparent"
             border.color: Theme.accent
             border.width: Theme.borderHairline
-            visible: root.activeFocus
+            opacity: root.activeFocus ? 1 : 0
+            visible: opacity > 0.01
+            Behavior on opacity { NumberAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
         }
         scale: response.visualScale
         transformOrigin: Item.Center
@@ -74,7 +76,11 @@ Item {
             iconName: root.iconName
             fill: 1
             transport: true
-            visible: root.iconName.length > 0
+            readonly property bool shown: root.iconName.length > 0
+            opacity: shown ? 1 : 0
+            visible: opacity > 0.01
+            scale: Flags.reduceMotion ? 1 : 0.9 + 0.1 * opacity
+            Behavior on opacity { NumberAnimation { duration: Motion.iconSwap; easing.type: Motion.easeStandard } }
             interaction: response
             hovered: response.engaged
             pressed: response.pressed
@@ -86,7 +92,10 @@ Item {
         Text {
             anchors.centerIn: parent
             text: root.glyph
-            visible: root.iconName.length === 0
+            opacity: root.iconName.length === 0 ? 1 : 0
+            visible: opacity > 0.01
+            scale: Flags.reduceMotion ? 1 : 0.9 + 0.1 * opacity
+            Behavior on opacity { NumberAnimation { duration: Motion.iconSwap; easing.type: Motion.easeStandard } }
             color: root.primary ? Theme.primaryContent : root.active ? Theme.iconOnAccent
                                : (hover.containsMouse ? Theme.foreground : Qt.alpha(Theme.foreground, Theme.alphaIconSec))
             font.family: Theme.fontMono

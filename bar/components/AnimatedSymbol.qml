@@ -55,7 +55,7 @@ Item {
         anchors.centerIn: parent
         scale: Math.min(root.width, root.height) / 24
         Repeater {
-            model: root.parts.length
+            model: root.exposed ? root.parts.length : 0
             delegate: Shape {
                 id: piece
                 readonly property var modelData: root.parts[index] || ({path: "", role: "body"})

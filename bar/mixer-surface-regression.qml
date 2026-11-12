@@ -30,7 +30,6 @@ ShellRoot {
             levels: ({"headset.monitor":0.38,"microphone":0.52,"playback:21":0.25})
             onRequested: (action,args) => test.actions.push({action:action,args:args})
             onRefreshRequested: test.actions.push({action:"refresh"})
-            onRequestClose: test.actions.push({action:"close"})
         }
         Shortcut { sequence: "Escape"; enabled: !view.popupOpen; onActivated: test.actions.push({action:"escape"}) }
         TestCase {
@@ -156,7 +155,7 @@ ShellRoot {
                 scene.width=660; scene.height=720
                 wait(300); capture("09-large-text")
                 check(view.kind==="output","reduced resolves destination")
-                check(find(view,"audioClose").x>=0,"close remains visible")
+                check(find(view,"audioRefresh").x>=0,"refresh remains visible")
                 const many=[]
                 for(let i=0;i<15;i++) many.push(Object.assign({},test.output,{id:String(100+i),name:"device"+i,monitorSource:"device"+i+".monitor"}))
                 view.outputs=many; wait(150)

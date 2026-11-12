@@ -6,7 +6,7 @@ ShellRoot {
     id: test
     settings.watchFiles: false
     function check(ok, message) {
-        if (!ok) { console.error("FAIL:", message); Qt.exit(1) }
+        if (!ok) { console.error("FAIL:", message); Qt.exit(1); throw new Error(message) }
     }
     OverlayInputPolicy {
         id: policy
@@ -43,10 +43,33 @@ ShellRoot {
                 "recording hover never captures fullscreen input or keyboard")
             policy.recordingActive = false
             test.check(policy.outsideBodies(10, 6), "absorbed recording releases its input bounds")
+            policy.mediaActive = false; policy.sessionActive = false
+            policy.pointerPull = true
+            policy.surface = "utils"
+            policy.pillWidth = 420; policy.pillHeight = 480
+            policy.pillTargetW = 400; policy.pillTargetH = 440
+            test.check(!policy.exclusiveFocus && policy.maskMode === "pill",
+                "pointer pull retains rest focus and mask while route opens")
+            test.check(policy.maskX <= policy.pillX && policy.maskY <= policy.pillY
+                && policy.maskX + policy.maskW >= policy.pillX + policy.pillWidth
+                && policy.maskY + policy.maskH >= policy.pillY + policy.pillHeight,
+                "pill region covers actual overstretched geometry")
+            policy.pointerPull = false
+            test.check(policy.exclusiveFocus && policy.maskMode === "full" && policy.escapeShortcutEnabled,
+                "release open immediately enables keyboard and Escape")
+            policy.pointerPull = true
+            policy.surface = ""
+            test.check(policy.exclusiveFocus && policy.maskMode === "full",
+                "closing pointer pull retains its initial modal policy")
+            policy.pointerPull = false
+            test.check(!policy.exclusiveFocus && policy.maskMode === "pill",
+                "release closed restores bounded input and releases keyboard")
+            policy.pillWidth = 120; policy.pillHeight = 38
+            policy.pillTargetW = 140; policy.pillTargetH = 40
             policy.surface = "calendar"
             test.check(policy.maskMode === "full" && policy.kbFocusWanted && policy.exclusiveFocus,
                 "ordinary modal surface grabs keyboard for Escape and navigation")
-            for (const name of ["mixer", "connectivity", "workspaces", "notifs", "utils", "appearance"]) {
+            for (const name of ["mixer", "connectivity", "notifs", "utils", "appearance"]) {
                 policy.surface = name
                 test.check(policy.exclusiveFocus && policy.escapeShortcutEnabled, name + " receives modal keyboard")
             }

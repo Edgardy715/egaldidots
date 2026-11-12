@@ -71,6 +71,12 @@ código, material ni recursos propietarios de Apple.
   para notificaciones (duración semántica existente), el aviso de workspace y el
   reposo. Al retargetear ambos conservan velocidad; ninguno reinicia una curva
   Bézier desde reposo. Referencia: [Qt SmoothedAnimation](https://doc.qt.io/qt-6/qml-qtquick-smoothedanimation.html).
+- Aviso de workspace (2026-11-05): el número es un `ClockReel` (sólo rueda del
+  valor anterior al nuevo, hacia arriba al subir y hacia abajo al bajar; el
+  primero aparece sin rodar). Sin insignia: sólo el número en `Theme.accent`,
+  15·s DemiBold, en un hueco de 24·s. Sale antes de que se cierre el hueco:
+  opacidad y escala 0.8→1 por smoothstep del ancho entre 55 % y 100 %, así el
+  reloj nunca se desliza sobre un dígito.
 - El contenido necesita espacio en ambos ejes para revelarse. Entre surfaces,
   el contenido saliente se retira en `Motion.fast`, se sustituye y reaparece;
   la geometría continúa su recorrido. Una nueva petición sustituye el destino
@@ -225,6 +231,12 @@ línea de fondo. Halo, borde y brillo de la gota se apagan en los 7·s previos a
 contacto (edgeClearance), así el layer del recorte nunca los corta. Sin
 CurveRenderer ni teselado CPU; FluidMetaballBridge queda sólo para FluidIslandDemo.
 La ocultación exige contención en la cápsula completa con tolerancia0.08·s.
+Ruta Agua (PillBody/`body.frag`, sin casco convexo): el radio smin de la unión
+gota-cuerpo se multiplica por `sinkFade` = smoothstep(0.15→0.65, stretch), así
+al hundirse la gota pierde el abultamiento k/4 y la ocultación no cambia píxeles
+(antes: limón de ~8 px, 90 ms quieto y salto al ocultar). La tarjeta de
+notificación (`expandedContentDelay` 0.6) apaga el texto con ~44 % de tamaño, no
+a escala diminuta dentro de la gota.
 
 Regresión: companion-continuity, absorption, centered/session/settings-companion.
 Capturas nativas y límites de medición: informe shell-smooth de2026-10-12.
@@ -377,105 +389,9 @@ acotada al borde inferior, sin aro expansivo ni invasión de todo el panel. Entr
 y salida sinusoidales. El hover de los ojos no muestra tooltip: luz local y
 expresión acompañan la presión del control, con foco visible y target fijo.
 
-### El compañero es la cara de la isla (prototipo, 2026-10-25)
+### El compañero (Iris) — retirado (2026-11-09)
 
-**PROTOTIPO — no es la implementación final.** Un solo personaje vectorial junto
-al reloj, del mismo material de la pill. Sin nicho, viajes ni cambios de ancho.
-Carácter tranquilo, atento y un poco curioso. Ojos ligeramente asimétricos,
-punto interior que sigue la mirada con retardo, párpados independientes y alegría
-teñida con el acento de Theme. Mirada con resorte y deriva interior más lenta.
-
-El roce horizontal o vertical cierra los ojos progresivamente y acompaña la mano;
-la presión se acumula sin depender del refresco y se libera al parar. Tres
-inversiones suaves en 1,4 s dejan alegría (mínimo 1,8 s entre caricias). Por encima
-de 550 unidades/s el roce provoca cosquillas. Clic/teclado: curiosidad, juego y
-«ya, ya»; la secuencia se reinicia tras 1,1 s sin clics. Después de una caricia
-recuerda afecto durante 30 s y saluda con más calidez, sin persistencia ni puntos.
-Hover prolongado (750 ms) despierta curiosidad; al salir conserva la mirada 850 ms.
-La superficie acompaña el roce con compresión horizontal/estiramiento vertical
-del 8 %, luz local y desplazamiento de hasta 1,1 unidades; comparte la presión
-continua de los ojos y su liberación, conservando layout y target de interacción.
-Un cuarto clic descubre una historia de 1,74 s: contiene un estornudo y guiña.
-Cancela la sonrisa del tercer clic para conservar la anticipación visible.
-Quinto clic: una luciérnaga cruza el hueco de la cara durante 2,6 s, seguida por
-los ojos. La mirada y la luz comparten progreso y envolvente de entrada/salida;
-el resorte habitual se desactiva durante el recorrido para evitar retraso por
-retarget continuo. Halo y núcleo usan el acento de Theme y no salen del slot.
-Ambas historias reutilizan la oportunidad existente de travesura; acercarse o
-tocarlo interrumpe la escena. Sin temporizador ni loop de actividad adicional.
-Seguimiento desactivado elimina también inclinación por roce y mirada de salida.
-La cara no abre surfaces. Enfoque y Grabación: Super+U → Ajustes rápidos →
-Actividades. REC y el texto informativo quedan fuera de su zona de interacción.
-
-Cada momento es finito y exclusivo: anticipación, expresión y asentamiento;
-confirmación → guiño; final de sesión/grabación → dos saltos; inicio de música →
-dos vaivenes; sueño → bostezo y cierre; regreso corto → reconocimiento,
-regreso tras al menos 60 s dormido → estiramiento y saludo. A veces de noche
-intenta mantenerse despierto antes de bostezar (2,5 % por oportunidad de 2 min).
-El parpadeo responde a interacción/estado y se interrumpe al comenzar otro gesto.
-Atención importante usa ojos grandes y mirada abajo hacia la notificación central,
-respetando la ocultación normal de la cabecera durante la expansión.
-Sin loop idle ni respiración continua: la respiración acompaña un gesto puntual.
-Reduced, ocultación o desactivación cortan los momentos y dejan el cuerpo quieto.
-
-`CompanionBehavior` recibe contexto desde composición: puntero cada 260 ms como
-máximo, celda del rail, clase de terminal/editor, progreso musical y Cava sólo
-con reproducción y panel visible. No abre consumidores nuevos de Cava. El reloj
-marca noche entre 23 y 6; bostezo nocturno al 10 % cada 2 min como máximo.
-Travesura rara: 8 % por oportunidad de 10 min (normal: 28 %), nunca durante
-launcher, auth, grabación o notificación; un bloqueo también cancela el momento.
-
-Config.companion y Edots → Iris controlan sueño (180 s, rango 60–1800),
-reacciones a código/música/noche, seguimiento y travesuras. appearance.personality
-sigue siendo el interruptor general. IdleMonitor conserva sus inhibidores.
-Iris (nombre de la cara) recuerda, en `isla/iris.json` y sin timers, sólo el histograma
-de horas de la primera actividad del día y un ánimo lento (`IrisMemory`, opción
-`companion.remember`). Saluda una vez por día en una sola pantalla: `welcome` (parpadeo
-lento 220/260 ms InOutSine/OutCubic, sonrisa 2,2 s, squash 1,05 OutBack), `welcomeBack`
-(igual, 3,6 s, tras más de 36 h) o `surprised` (ojos 1,25, tilt −7 OutBack 240 ms, un
-parpadeo 70/150 ms). El ánimo sólo reduce la tirada de travesura (÷ 0,6–1,6).
-Iris reacciona al sistema sólo ante sucesos reales y discretos (`companion.reactToSystem`,
-`CompanionBehavior.react/noteBattery`): notificación crítica → `surprised`, diferida hasta que
-la cara se vea (la notificación la cubre; las demás no hacen nada); batería ≤15 % descargando →
-párpados pesados persistentes (`tired`, droop 0,35), empezar a cargar → `content` (squint con
-sonrisa), llegar a completa → `stretch` (squash 1,18 OutBack, tilt atrás 240 ms, vuelta 380 ms);
-captura activa → brillo del ojo en `Theme.error` sin gestos al azar y, al terminar, `relief`
-(parpadeo lento 220 ms + exhalación 0,94→1); contraseña fallida → `no` (dos vaivenes
-decrecientes de 120 ms InOutSine con párpado `wary` 0,25), éxito → `wink`. Un solo gesto a la
-vez; `stopMoment()`/`settle()` los cancelan; en `reduced` no se mueve nada.
-
-Iris viaja con el usuario (`companion.followFocus`). Las surfaces que ocultan la cabecera
-reciben la cara en la esquina superior derecha (inset 22·s + 15·s, centro vertical del reposo):
-una sola propiedad `perchTravel` 0→1, 400 ms (`Motion.standardLarge`) con `SmoothedAnimation`
-(`velocity: -1`: una inversión a mitad de viaje conserva la velocidad), de la posición viva de la cara de reposo a la esquina, escala 1→1 y opacidad igual al viaje; al
-cerrar o cambiar de superficie se reorienta desde el valor actual. Con movimiento reducido no hay
-viaje (la cara de la cabecera simplemente se desvanece). Launcher y auth conservan la cara en su
-cabecera. La mirada va a lo que importa en la superficie (cursor del launcher, línea actual de la
-letra, fondo bajo el puntero, espacio bajo el puntero o las teclas en overview) por los mismos
-resortes de siempre; lo que importa manda sobre el puntero (`followFocus`; sin foco, el puntero
-sobre la pill guía) y reducido, dormida u opción apagada la devuelven a su comportamiento anterior.
-La letra sincronizada también guía en el layout dividido: `IslandOverlay` inyecta la superficie
-multimedia en `Pill.attentionItem`; límite: la mirada parte de la cabecera y no se reevalúa
-mientras la tarjeta se mueve, y en layout dividido la cara no viaja. El saludo del día espera a
-que la cara termine el gesto de despertar (polvo, bostezo; `CompanionBehavior.noteMoment/busyFaces`),
-sin temporizador fijo. Lanzar una app o aplicar un fondo hace `wink`.
-
-Vista previa ×3: `bar/companion-preview.qml`, con rótulo de prototipo visible.
-Abiertos a valoración: amplitud a tamaño real, punto interior, tiempos/probabilidades
-y reconocimiento de caricia física. Informes: docs/companion-polish-2026-10-25/REPORT.md
-y docs/companion-interaction-2026-10-25/REPORT.md.
-
-Visitas de Iris (`bar/Singletons/Visitors.js`): luciérnaga, polilla (23:00 a 05:59), gota,
-burbuja y copo (diciembre) comparten una escena: una forma cruza el hueco de 30x26 y los ojos la
-siguen con el mismo cruce de mirada de la luciérnaga; progreso 0→1 InOutSine, 1,8 a 3,6 s según
-la visita, opacidad por envolvente. La polilla tiembla ±28° (rotación) y la burbuja estalla en el
-último octavo (escala hasta 1,6 y un parpadeo de 70/150 ms). Ocupan la ranura rara de la
-luciérnaga (1,25 %), repartida por pesos: ninguna probabilidad total sube. Sólo cuentan como
-avistamiento si la escena termina; cualquier interrupción la cancela sin rastro. Tras media hora
-dormida Iris «sacude el polvo» (`dust`): mitad de amplitud y 100 ms por paso frente a `no`,
-parpadeo, 560 ms de pausa y bostezo. Los ojos llevan un 12 % de acento sobre el color de texto
-(`Motion.standard`); en tema claro la pupila baja de 1,9 a 1,6 veces la escala para mantener el
-contraste. Informe: docs/iris-delight-2026-10-25/REPORT.md.
+Iris, su memoria, el perch y las visitas se retiraron de la shell; la cara de la isla es el cuerpo Amalgam. El historial está en `docs/iris-*` y en git.
 
 ### Grabación y actividades (2026-10-21)
 
@@ -613,6 +529,19 @@ El cierre animado del launcher libera teclado desde el primer tramo. Las accione
 de aplicación/workspace se programan fuera del contexto descargable del panel;
 Escape respeta primero búsqueda y popups locales. No añadir una segunda espera
 de morph para ejecutar o enfocar la aplicación.
+
+## Tragado de gotas (2026-11-05)
+- Una gota nunca se frena junto a la pill: llega al borde con velocidad. No se le pone una pausa ni un suavizado final.
+- Las laterales (sesión, canción) se unen como agua, nunca como un disco que se desliza dentro de la pill:
+  1. El extremo de la pill se estira hacia la gota antes del contacto (`captureExtra` 12·s).
+  2. Al tocarse se abre un cuello con velocidad (`neckSpring.kick`); la gota apunta al casquete de la pill, no a su interior.
+  3. Ya cubierta (`draining`), el extremo queda como un bulbo pequeño que se relaja: el borde se retira, la gota encoge al 60 % y el cuello baja a 0.
+  4. Sólo se oculta cuando la unión smin es menor que 0.35·s, así no salta ningún píxel.
+  - El radio de unión lateral se limita a 14·s (`drainBlend`). Con el radio de la pill el extremo se hincha demasiado.
+- Una tarjeta que cae sobre la pill (notificación, ajustes) se estrecha primero (ancho y x más rápidos que alto e y), así llega como gota y no como losa ancha que forma un champiñón al unirse.
+- Una gota ya hundida se oculta aunque aún se contraiga; esperar a la contracción completa deja un bulto visible.
+- Cuerpo alto (notificaciones, mixer…): la gota lateral no «vuelve» a un disco tan alto como el cuerpo (nunca lo cubría y quedaba en `retornando`, bloqueando el cambio de layout). Se traga por la esquina superior del extremo: `returnH` acotado y `returnY` en la línea del casquete.
+- Superficies que cubren la fila superior (launcher, wallpaper, overview, calendario): la gota de media se funde primero en la pill (`mediaDockPendingSurface`) y se vuelve a brotar al cerrar; no la tapa el cuerpo en seco.
 
 ### Quicksilver: controles y reproductor (2026-11-06, sustituye Swiftify/Material)
 

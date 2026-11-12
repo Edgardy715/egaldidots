@@ -51,7 +51,7 @@ Item {
             textFormat: Text.RichText
             color: Theme.foreground
             font.family: Theme.font
-            font.pixelSize: 12.5 * root.s
+            font.pixelSize: Theme.fontSizeBody * root.s
             font.weight: Font.Medium
             font.letterSpacing: 0.05 * root.s
             value: root.richText
@@ -65,7 +65,7 @@ Item {
             textFormat: Text.RichText
             color: Theme.foreground
             font.family: Theme.font
-            font.pixelSize: 12.5 * root.s
+            font.pixelSize: Theme.fontSizeBody * root.s
             font.weight: Font.Medium
             font.letterSpacing: 0.05 * root.s
             value: root.richText

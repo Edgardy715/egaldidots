@@ -37,11 +37,12 @@ Item {
 
     clip: true
 
-    // evita que la rueda llegue al control de volumen de la pill
+    // La rueda sigue hasta la pill: allí pullCanWheel decide si la cabecera
+    // cierra la surface con scroll. Tragarla aquí rompía cerrar por scroll.
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
-        onWheel: (wheel) => {}
+        onWheel: (wheel) => { wheel.accepted = false }
     }
 
     // Mosaico de acción: icono en círculo arriba, título y estado abajo.
@@ -147,7 +148,7 @@ Item {
         // ════════════════════ HEADER ════════════════════
         SurfaceHeader {
             Layout.fillWidth: true
-            title: qsTr("Ajustes rápidos")
+            title: I18n.tr("Ajustes rápidos")
             s: root.s
             trailing: Component {
                 Rectangle {
@@ -171,7 +172,7 @@ Item {
                         }
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("Apariencia")
+                            text: I18n.tr("Apariencia")
                             color: Theme.foreground
                             font.family: Theme.font
                             font.pixelSize: Theme.fontSizeSmall * root.s
@@ -182,7 +183,7 @@ Item {
                         id: appearanceHit
                         objectName: "appearanceAction"
                         anchors.fill: parent
-                        accessibleName: qsTr("Abrir ajustes de apariencia")
+                        accessibleName: I18n.tr("Abrir ajustes de apariencia")
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.requestPage("appearance")
                     }
@@ -207,11 +208,11 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     iconName: Icons.iCoffee
-                    title: qsTr("Mantener activa")
-                    detail: root.keepAwakeEnabled ? qsTr("Activa · %1").arg(root.keepAwakeElapsedTime) : qsTr("Desactivada")
+                    title: I18n.tr("Mantener activa")
+                    detail: root.keepAwakeEnabled ? I18n.tr("Activa · %1").arg(root.keepAwakeElapsedTime) : I18n.tr("Desactivada")
                     active: root.keepAwakeEnabled
                     hit.objectName: "keepAwakeToggle"
-                    hit.accessibleName: qsTr("Mantener despierto")
+                    hit.accessibleName: I18n.tr("Mantener despierto")
                     hit.Accessible.role: Accessible.CheckBox
                     hit.Accessible.checkable: true
                     hit.Accessible.checked: root.keepAwakeEnabled
@@ -222,11 +223,11 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     iconName: "timer"
-                    title: qsTr("Actividades")
-                    detail: qsTr("Enfoque y grabación")
+                    title: I18n.tr("Actividades")
+                    detail: I18n.tr("Enfoque y grabación")
                     navigates: true
                     hit.objectName: "openFocus"
-                    hit.accessibleName: qsTr("Abrir enfoque y grabación")
+                    hit.accessibleName: I18n.tr("Abrir enfoque y grabación")
                     onActivated: root.requestPage("focus")
                 }
             }
@@ -256,15 +257,17 @@ Item {
                         Text {
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignBaseline
-                            text: qsTr("Brillo")
+                            text: I18n.tr("Brillo")
                             color: Theme.foreground
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; font.weight: Font.DemiBold
                         }
                         // La cifra es el dato: grande y tabular, sigue al arrastre.
-                        Text {
+                        // Rueda con teclas o cambios externos; sigue al dedo 1:1 al arrastrar.
+                        RollingNumber {
                             objectName: "brightnessPercent"
                             Layout.alignment: Qt.AlignBaseline
-                            text: Math.round(brightnessSlider.dragging || brightnessSlider.holding ? brightnessSlider.dragValue * 100 : root.brightnessPercent)
+                            value: Math.round(brightnessSlider.dragging || brightnessSlider.holding ? brightnessSlider.dragValue * 100 : root.brightnessPercent)
+                            immediate: brightnessSlider.dragging || brightnessSlider.holding
                             color: Theme.foreground
                             font.family: Theme.fontDisplay; font.features: Theme.fontNumeric
                             font.pixelSize: Theme.fontSizeDisplayLg * root.s; font.weight: Font.DemiBold
@@ -295,7 +298,7 @@ Item {
                         enabled: root.showBrightness
                         activeFocusOnTab: enabled
                         Accessible.role: Accessible.Slider
-                        Accessible.name: qsTr("Brillo")
+                        Accessible.name: I18n.tr("Brillo")
                         Accessible.description: Math.round(root.brightnessPercent) + "%"
                         Accessible.onIncreaseAction: if (enabled && visible) root.brightnessStepRequested(5)
                         Accessible.onDecreaseAction: if (enabled && visible) root.brightnessStepRequested(-5)
@@ -334,7 +337,7 @@ Item {
                         Layout.preferredHeight: implicitHeight * opacity
                         Layout.topMargin: -Theme.spacingLg * root.s * (1 - opacity)
                         visible: opacity > 0.01
-                        text: qsTr("Sin permiso para cambiar el brillo")
+                        text: I18n.tr("Sin permiso para cambiar el brillo")
                         color: Theme.accentStrong
                         font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s
                         clip: true
@@ -368,7 +371,7 @@ Item {
                         Layout.fillWidth: true
                         spacing: Theme.spacingMd * root.s
                         Text {
-                            text: qsTr("Energía")
+                            text: I18n.tr("Energía")
                             color: Theme.foreground
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s; font.weight: Font.DemiBold
                         }
@@ -381,7 +384,7 @@ Item {
                                 if (root.activeProfile === "performance") return "Máximo rendimiento · más consumo"
                                 if (root.activeProfile === "balanced") return "Equilibrio · recomendado"
                                 if (root.activeProfile === "power-saver") return "Máximo ahorro · menos consumo"
-                                return root.profileError.length ? root.profileError : qsTr("Perfil no disponible")
+                                return root.profileError.length ? root.profileError : I18n.tr("Perfil no disponible")
                             }
                             color: root.profileAvailable ? Theme.iconSecondary : Theme.accentStrong
                             font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s
@@ -410,8 +413,8 @@ Item {
                         Rectangle {
                             anchors.fill: parent
                             radius: height / 2
+                            // Dentro de una GlassCard: sólo relleno, sin segundo contorno.
                             color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                            border.width: Theme.liquid ? 0 : Theme.borderHairline; border.color: Qt.alpha(Theme.foreground, Theme.alphaHair)
                         }
 
                         // Gota de selección: se estira hacia la opción nueva y se recoge al llegar.
@@ -467,7 +470,7 @@ Item {
                                         id: profileHit
                                         objectName: "profile-" + profileOption.modelData
                                         anchors.fill: parent; cursorShape: Qt.PointingHandCursor
-                                        accessibleName: qsTr("Perfil de energía: %1").arg(profileLabel.text)
+                                        accessibleName: I18n.tr("Perfil de energía: %1").arg(profileLabel.text)
                                         Accessible.role: Accessible.RadioButton
                                         Accessible.checked: profileOption.current
                                         enabled: !root.profileBusy

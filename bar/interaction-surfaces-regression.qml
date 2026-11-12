@@ -30,7 +30,7 @@ ShellRoot {
         visible: true; width: 1100; height: 760
         Loader { id: host; anchors.fill: parent }
         property int current: 0
-        readonly property var names: ["Auth", "Appearance", "Calendar", "Clipboard", "Connectivity", "Launcher", "Media", "Mixer", "Notifs", "Overview", "Session", "Utils", "Wallpaper", "Workspaces"]
+        readonly property var names: ["Auth", "Calendar", "Clipboard", "Connectivity", "Launcher", "Media", "Mixer", "Notifs", "Overview", "Session", "Utils", "Wallpaper"]
         Timer {
             interval: 130; running: true; repeat: true
             onTriggered: {

@@ -23,6 +23,8 @@ text = text[:start] + '''    QtObject {
 assert 'PolkitAgent {' not in text
 reload_function = re.search(r'function reload\(\): bool \{[^}]+\}',
                             (source.parents[1] / "shell.qml").read_text()).group()
+# shell.qml difiere la recarga con un Timer (QA-10); el fixture no lo tiene.
+reload_function = reload_function.replace("reloadDebounce.restart()", "Quickshell.reload(false)")
 
 with tempfile.TemporaryDirectory(prefix="isla-auth-transport-") as directory:
     root = Path(directory)

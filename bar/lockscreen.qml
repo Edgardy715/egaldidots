@@ -131,15 +131,30 @@ ShellRoot {
         onError: error => root.authenticationFailed("No se pudo verificar la contraseña")
     }
 
-    // Keep the Wayland lock held while the success feedback is visible.
+    // Desktop frames captured by lock.sh right before locking, one per output.
+    readonly property string snapshotDir: Quickshell.env("ISLA_LOCK_SNAPSHOT_DIR") || ""
+    function snapshotFor(screen) {
+        if (root.preview) {
+            const file = Quickshell.env("QS_LOCK_PREVIEW_SNAPSHOT") || ""
+            return file ? "file://" + file : ""
+        }
+        return root.snapshotDir && screen && screen.name ? "file://" + root.snapshotDir + "/" + screen.name + ".ppm" : ""
+    }
+
+    // The lock is held until a surface finishes its return to the desktop;
+    // the timer only bounds that wait if no surface reports back.
+    property bool released: false
+    function release() {
+        if (!root.authenticated || root.released) return
+        root.released = true
+        successTimer.stop()
+        if (!root.preview) sessionLock.locked = false
+        quitTimer.start()
+    }
     Timer {
         id: successTimer
-        interval: Flags.reduceMotion ? 220 : Motion.standard + 2 * Motion.fast + Motion.morph + 80
-        onTriggered: {
-            if (!root.authenticated) return
-            if (!root.preview) sessionLock.locked = false
-            quitTimer.start()
-        }
+        interval: Flags.reduceMotion ? 700 : Motion.standard + Motion.fast + Motion.morph * 2.2 + 600
+        onTriggered: root.release()
     }
 
     Timer {
@@ -165,6 +180,7 @@ ShellRoot {
 
         surface: Component {
             WlSessionLockSurface {
+                id: lockWindow
                 color: Theme.background
 
                 LockSurface {
@@ -182,7 +198,9 @@ ShellRoot {
                     responseVisible: pam.responseVisible
                     promptText: root.promptText
                     errorText: root.errorText
+                    snapshotSource: root.snapshotFor(lockWindow.screen)
                     onEntryActivated: root.errorText = ""
+                    onExitFinished: root.release()
                     onUnlockRequested: secret => root.authenticate(secret)
                     onPowerRequested: action => root.power(action)
                 }
@@ -212,6 +230,7 @@ ShellRoot {
                     palette: root.palette
                     weather: root.weather
                     preview: true
+                    snapshotSource: root.snapshotFor(null)
                     busy: false
                     secured: true
                     responseVisible: false

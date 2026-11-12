@@ -11,7 +11,6 @@ Singleton {
     readonly property size mixerSurface: Qt.size(760, 600 + Math.max(0, Flags.fontScale - 1.2) * 100)
     readonly property size mediaSurface: Qt.size(720, 440 + Math.max(0, Flags.fontScale - 1.2) * 180)
     readonly property size calendarSurface: Qt.size(660, 470)
-    readonly property size workspacesSurface: Qt.size(360, 200)
     readonly property size notificationsSurface: Qt.size(380, 540)
     readonly property size wallpaperSurface: Qt.size(1000, 640)
     readonly property size launcherSurface: Qt.size(680, 620)
@@ -23,13 +22,13 @@ Singleton {
     readonly property size connectivitySurface: Qt.size(460, 520 + Math.max(0, Flags.fontScale - 1.2) * 160)
     readonly property size clipboardSurface: Qt.size(680, 600)
     readonly property size settingsSurface: Qt.size(1000, 700)
+    readonly property size shortcutsSurface: Qt.size(880, 560)
     readonly property size focusSurface: Qt.size(440, 560 + Math.max(0, Flags.fontScale - 1.2) * 240)
 
     readonly property var surfaceSizes: ({
         mixer: mixerSurface,
         media: mediaSurface,
         calendar: calendarSurface,
-        workspaces: workspacesSurface,
         notifs: notificationsSurface,
         wallpaper: wallpaperSurface,
         launcher: launcherSurface,
@@ -41,6 +40,7 @@ Singleton {
         connectivity: connectivitySurface,
         clipboard: clipboardSurface,
         settings: settingsSurface,
+        shortcuts: shortcutsSurface,
         focus: focusSurface,
         recording: focusSurface
     })

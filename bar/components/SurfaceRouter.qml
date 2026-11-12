@@ -12,6 +12,8 @@ QtObject {
         toggleSurface(focusedMonitorName, surface)
     }
     property bool reduceMotion: false
+    // Sin reproductor, Media sólo mostraría un estado vacío: no se abre.
+    property bool mediaAvailable: true
     onReduceMotionChanged: if (reduceMotion && launcherClosePhase !== 0) close()
     property int resultsDuration: 250
     property int morphDuration: 420
@@ -40,8 +42,31 @@ QtObject {
         openSurface = surface
     }
 
+    // Geometry and velocity belong to PillMorphMotion; navigation only sets intent.
+    function pull(mon, surface, opened, visibleMedia) {
+        if (!mon) mon = focusedMonitorName
+        if (opened === undefined) {
+            if (["auto", "utils", "media", "notifs", "calendar"].indexOf(surface) < 0) return false
+            if (surface === "auto") surface = mediaAvailable && visibleMedia ? "media" : "utils"
+            opened = !(openMon === mon && openSurface === surface)
+        }
+        if (!mon || openSurface === "auth" || surface === "media" && !mediaAvailable) return false
+        present(opened ? mon : "", opened ? surface : "")
+        return true
+    }
+
+    function openFromDrop(mon, surface) {
+        // Recording uses the existing recording/activity route.
+        if (["media", "focus", "recording", "session"].indexOf(surface) < 0) return false
+        return pull(mon, surface, true)
+    }
+
     /** Monitor vacío → monitor con foco, para que los keybinds salten el jq. */
     function toggleSurface(mon, surface) {
+        // Espacios vive dentro de Overview; el nombre antiguo sigue sirviendo a keybinds.
+        if (surface === "workspaces") surface = "overview"
+        // Apariencia se integró en Ajustes (su primera página).
+        if (surface === "appearance") surface = "settings"
         if (!mon || mon.length === 0) mon = focusedMonitorName
         if (!mon) {
             pendingFocusSurface = pendingFocusSurface === surface ? "" : surface
@@ -69,7 +94,9 @@ QtObject {
             root.close();
             return;
         }
-        if (surface === "launcher" || surface === "wallpaper" || surface === "overview") {
+        if (surface === "media" && !root.mediaAvailable) return
+        // Superficies que cubren la fila superior: la gota de media se funde primero.
+        if (surface === "launcher" || surface === "wallpaper" || surface === "overview" || surface === "calendar") {
             root.mediaDockPendingSurface = surface
             root.mediaDockPendingMon = mon
             return

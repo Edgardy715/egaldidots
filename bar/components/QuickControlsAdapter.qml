@@ -90,11 +90,11 @@ Item {
             if (valid) root.activeProfile = profile
             if (valid || !root.pendingProfile.length) ProfileProbe.available = valid
             if (root.pendingProfile.length) {
-                root.profileError = root.profileSetFailed ? qsTr("No se pudo aplicar el perfil.")
-                    : !valid || profile !== root.pendingProfile ? qsTr("No se pudo confirmar el perfil.") : ""
+                root.profileError = root.profileSetFailed ? I18n.tr("No se pudo aplicar el perfil.")
+                    : !valid || profile !== root.pendingProfile ? I18n.tr("No se pudo confirmar el perfil.") : ""
                 root.pendingProfile = ""
             } else if (!valid) {
-                root.profileError = qsTr("No se pudo leer el perfil.")
+                root.profileError = I18n.tr("No se pudo leer el perfil.")
                 root.profileReadFailed = true
             } else if (root.profileReadFailed) {
                 root.profileError = ""

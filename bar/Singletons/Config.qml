@@ -24,6 +24,8 @@ Singleton {
     readonly property url userAvatarUrl: "file://" + userAvatar.split("/").map(part => encodeURIComponent(part)).join("/")
     readonly property var appearance: _effective.appearance
     readonly property var companion: _effective.companion
+    readonly property var regional: _effective.regional
+    readonly property var files: _effective.files
     readonly property var updates: _effective.updates
     readonly property string paletteFile: _effective.paths.paletteFile
     readonly property string wallpaperDir: _effective.paths.wallpaperDir
@@ -180,10 +182,21 @@ Singleton {
             catch (exception) { return JSON.stringify({ ok: false, errors: [String(exception)] }) }
         }
         function update(patch: string): string {
-            try { return JSON.stringify(root.update(JSON.parse(patch))) }
+            try {
+                const parsed = JSON.parse(patch)
+                const unknown = Settings.unknownPatchKeys(parsed)
+                if (unknown.length) return JSON.stringify({ ok: false, errors: unknown })
+                return JSON.stringify(root.update(parsed))
+            }
             catch (exception) { return JSON.stringify({ ok: false, errors: [String(exception)] }) }
         }
+        // true only means the save was accepted; it is asynchronous. Poll
+        // saveStatus (or get) for the outcome: error is non-empty on failure.
         function save(): bool { return root.save() }
+        function saveStatus(): string {
+            return JSON.stringify({ saving: root.saving, dirty: root.dirty, error: root.error,
+                ok: !root.saving && !root.dirty && root.error === "" })
+        }
         function discard(): bool { return root.discard() }
         function reload(): bool { return root.reload() }
     }

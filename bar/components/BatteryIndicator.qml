@@ -22,7 +22,8 @@ Item {
     property color boltInk: boltTarget
     Behavior on boltInk { ColorAnimation { duration: Motion.standard; easing.type: Motion.easeStandard } }
 
-    readonly property color fillTint: charging || chargePaused || charge <= 0.4 ? tint : Theme.accent
+    // Neutral at a healthy level: the bar keeps a single accent; colour only for charge states.
+    readonly property color fillTint: tint
 
     width: 27 * s
     height: 14 * s
@@ -35,26 +36,21 @@ Item {
         height: 12 * root.s
         radius: 3.4 * root.s
         color: "transparent"
-        border.width: 1.2 * root.s
+        border.width: Math.max(1, Math.round(1.2 * root.s))
         border.color: root.tint
         Behavior on border.color { ColorAnimation { duration: Motion.standard; easing.type: Motion.easeStandard } }
 
         Rectangle {
             id: chargeFill
-            x: 2 * root.s
+            // Border width plus a constant gap, so the fill never touches the outline at fractional scales.
+            readonly property real inset: shell.border.width + Math.round(0.8 * root.s)
+            x: inset
             anchors.verticalCenter: parent.verticalCenter
-            width: (shell.width - 4 * root.s) * root.charge
-            height: shell.height - 4 * root.s
+            width: (shell.width - 2 * inset) * root.charge
+            height: shell.height - 2 * inset
             radius: Math.min(2 * root.s, width / 2)
             color: root.fillTint
             Behavior on color { ColorAnimation { duration: Motion.standard; easing.type: Motion.easeStandard } }
-            layer.enabled: root.visible && root.enabled && root.charge > 0
-            layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowColor: Qt.alpha(root.fillTint, root.chargePaused ? 0.25 : 0.85)
-                shadowBlur: 0.8
-                blurMax: 12
-            }
             visible: root.charge > 0
             Behavior on width { Anim { type: Anim.DefaultEffects } }
         }

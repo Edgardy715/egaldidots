@@ -1,6 +1,7 @@
 import QtQuick
 import "../Singletons"
 import "../components"
+import "WaterReactive.js" as WR
 
 // Presentation only: PillMorphMotion remains the owner of layout and input.
 Item {
@@ -67,6 +68,81 @@ Item {
         active: root.waterActive
         manualStep: true
     }
+    // ---- Material vivo: the water answers to content (tint, adjustment ripple, bass) ----
+    // Composition feeds plain data; nothing here reads Players, Cava or MediaPalette.
+    property color tintColor: "transparent"
+    property bool tintOn: false
+    property bool bassLive: false
+    property real bassTarget: 0
+    property real bassEnv: 0
+    property real rippleLevel: 0
+    property real rippleProgress: 1
+    property real lastVolume: -1
+    property bool lastMuted: false
+    property real lastBrightness: -1
+    readonly property bool tintValid: tintOn && tintColor.a > 0
+    property color tintFromColor: "transparent"
+    property color tintToColor: "transparent"
+    readonly property real tintFromShare: tintShare(tintFromColor)
+    readonly property real tintToShare: tintShare(tintToColor)
+    readonly property alias tintCross: tintCrossSpring
+    readonly property real tintShown: waterActive ? tintPresence : 0
+    property real tintPresence: tintValid ? 1 : 0
+    Behavior on tintPresence {
+        enabled: root.waterActive && !root.reduceMotion
+        NumberAnimation { duration: WR.tintRelaxMs; easing.type: Easing.OutCubic }
+    }
+    // Guard against the opaque Theme faces under the text; the glass is more translucent.
+    function tintShare(c) {
+        if (c.a <= 0) return 0
+        const face = k => ({ r: k.r, g: k.g, b: k.b })
+        return WR.tintAmount({ r: c.r, g: c.g, b: c.b }, [face(Theme.cardTop), face(Theme.cardBot)], face(Theme.foreground))
+    }
+    onTintColorChanged: if (tintColor.a > 0) {
+        const k = tintCrossSpring.value, a = tintFromColor, b = tintToColor
+        // Continue from the colour on screen; a first tint starts from itself (no dark detour).
+        tintFromColor = b.a <= 0 ? Qt.rgba(tintColor.r, tintColor.g, tintColor.b, 0)
+            : Qt.rgba(a.r + (b.r - a.r) * k, a.g + (b.g - a.g) * k, a.b + (b.b - a.b) * k, 1)
+        tintToColor = tintColor
+        tintCrossSpring.snap(0)
+        tintCrossSpring.retarget()
+    }
+    SpringValue {
+        id: tintCrossSpring
+        objectName: "pillBodyTintCross"
+        target: 1
+        value: 1
+        spring: Motion.strokeSpring.level
+        active: root.waterActive
+    }
+    // OSD volume/brightness: one ring, amplitude from the change; a repeat restarts from
+    // the amplitude still visible instead of stacking another wave.
+    function adjust(kind, value, muted) {
+        if (kind !== "volume" && kind !== "brightness") return
+        const previous = kind === "volume" ? lastVolume : lastBrightness
+        const flipped = kind === "volume" && muted !== lastMuted
+        if (kind === "volume") { lastVolume = value; lastMuted = muted } else lastBrightness = value
+        if (!waterActive) return
+        // First event has no reference: assume one typical key step.
+        const delta = previous < 0 || flipped ? 0.05 : value - previous
+        const level = WR.rippleRestart(rippleAnim.running ? WR.rippleEnvelope(rippleLevel, rippleProgress) : 0, delta)
+        if (level <= 0) return
+        rippleLevel = level
+        rippleAnim.restart()
+    }
+    NumberAnimation {
+        id: rippleAnim
+        objectName: "pillBodyRipple"
+        target: root; property: "rippleProgress"; from: 0; to: 1
+        duration: WR.rippleMs
+        easing.type: Easing.Linear
+        onStopped: if (root.rippleProgress >= 1) root.rippleLevel = 0
+    }
+    onWaterActiveChanged: if (!waterActive) {
+        rippleAnim.stop(); rippleProgress = 1; rippleLevel = 0
+        bassEnv = 0; tintCrossSpring.snap(1)
+    }
+    readonly property bool bassMoving: waterActive && (bassEnv > 0 || bassLive && bassTarget > 0)
     property bool waterBody: false
     property real reading: 0
     property real edgeExposure: 1
@@ -179,8 +255,17 @@ Item {
         reception: Qt.vector4d(root.receptionOrigin.x - x, root.receptionOrigin.y - y,
             Math.max(1, root.receptionOrigin.z), Math.max(0, receptionSpring.value))
         sweep: sweepSpring.value
-        decorMoving: root.waterActive && (receptionSpring.integrating || sweepSpring.integrating)
+        decorMoving: root.waterActive && (receptionSpring.integrating || sweepSpring.integrating) || root.bassMoving
+        tintFrom: Qt.vector4d(root.tintFromColor.r, root.tintFromColor.g, root.tintFromColor.b, root.tintFromShare)
+        tintTo: Qt.vector4d(root.tintToColor.r, root.tintToColor.g, root.tintToColor.b, root.tintToShare)
+        tintCross: tintCrossSpring.value
+        tintPresence: root.tintShown
+        rippleT: root.rippleProgress
+        rippleAmp: root.waterActive ? root.rippleLevel : 0
+        rippleOrigin: Qt.vector2d(pillCx - pillHalfW, pillCx + pillHalfW)
+        bassGain: root.waterActive ? WR.bassGain(root.bassEnv) : 1
         onAdvanceDecor: dt => {
+            if (root.bassMoving) root.bassEnv = WR.bassStep(root.bassEnv, root.bassLive ? root.bassTarget : 0, dt)
             if (receptionSpring.integrating) receptionSpring.step(dt)
             if (sweepSpring.integrating) sweepSpring.step(dt)
         }

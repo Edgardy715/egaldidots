@@ -7,6 +7,8 @@ Item {
     property color glowColor: Theme.accent
     property real focusX: 0.26
     property real focusY: 0.82
+    // Off holds the current phase: the glow rests where it is and resumes from there.
+    property bool drifting: true
     visible: opacity > 0.005
     property real driftPhase: 0
     readonly property real driftX: Flags.reduceMotion ? 0 : Math.sin(driftPhase) * 0.06
@@ -17,7 +19,7 @@ Item {
     // del monitor (240 Hz) mientras la pill reposaba: ~20% de CPU en render.
     AmbientSubscription {
         clock: GlowClock
-        running: root.visible && root.opacity > 0.005 && root.width > 0 && root.height > 0 && !Flags.reduceMotion
+        running: root.drifting && root.visible && root.opacity > 0.005 && root.width > 0 && root.height > 0 && !Flags.reduceMotion
         onTriggered: dt => root.driftPhase = (root.driftPhase
             + dt * 1000 * Math.PI * 2 / (Motion.breathe * 4)) % (Math.PI * 2)
     }

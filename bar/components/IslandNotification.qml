@@ -1,5 +1,6 @@
 import QtQuick
 import "../Singletons"
+import "RubberBand.js" as RubberBand
 
 /** Inline notification shown while the island has morphed to notification size. */
 Item {
@@ -14,6 +15,58 @@ Item {
     property bool holding: false
     property bool iconResolved: false
     property string iconSource: ""
+    property var gestureMotion: null
+    property bool gesturesEnabled: Config._effective.gestures.enabled
+    readonly property alias gesture: drag
+    onNotificationChanged: {
+        if (notification && !drag.candidate && !drag.pendingNotificationAction) drag.resetNotificationContent()
+    }
+    signal gestureStarted()
+    signal gestureFinished(string action)
+    signal gestureSettled(string name, bool opened)
+    PillPullGesture {
+        id: drag
+        motion: root.gestureMotion
+        enabled: root.gesturesEnabled && root.gestureMotion !== null
+        mode: "notification"
+        s: root.s
+        reduceMotion: Flags.reduceMotion
+        plannedW: IslandGeometry.notificationsSurface.width * root.s
+        plannedH: IslandGeometry.notificationsSurface.height * root.s
+        plannedRadius: 24 * root.s
+        rubberBand: (value, limit) => RubberBand.rubberBand(value, limit, 0.55)
+        onNotificationStarted: root.gestureStarted()
+        onNotificationFinished: action => root.gestureFinished(action)
+        onSettled: (name, opened) => root.gestureSettled(name, opened)
+    }
+    property bool dragIntent: false
+    PointHandler {
+        id: dragPoint
+        enabled: drag.enabled
+        acceptedButtons: Qt.LeftButton
+        onActiveChanged: {
+            if (active) { root.dragIntent = false; drag.press(point.scenePosition.x, point.scenePosition.y, Date.now(), false, "") }
+            else if (!dragHandler.active) drag.release(Date.now())
+        }
+        onPointChanged: if (active && drag.candidate) root.dragIntent = drag.wantsMove(point.scenePosition.x, point.scenePosition.y)
+    }
+    DragHandler {
+        id: dragHandler
+        enabled: drag.enabled
+        target: null
+        acceptedButtons: Qt.LeftButton
+        dragThreshold: root.dragIntent ? Math.max(Motion.pullThreshold * root.s, 1) : 32766
+        grabPermissions: PointerHandler.CanTakeOverFromItems | PointerHandler.CanTakeOverFromHandlersOfDifferentType
+            | PointerHandler.ApprovesTakeOverByAnything
+        onActiveChanged: {
+            if (active) drag.move(centroid.scenePosition.x, centroid.scenePosition.y, Date.now())
+            else if (!dragPoint.active) drag.release(Date.now())
+        }
+        onCentroidChanged: if (active) drag.move(centroid.scenePosition.x, centroid.scenePosition.y, Date.now())
+        onCanceled: drag.cancel()
+    }
+    property real contentOffset: 0
+    property bool gestureActive: false
 
     width: pillWidth
     height: pillHeight
@@ -22,10 +75,12 @@ Item {
     clip: true
     // breath ya llega modulado por el nivel de hold (PillMorphMotion); no se
     // anima otra vez un valor que ya está animado.
-    scale: 1.0 + breath * 0.025
+    scale: gestureActive || drag.candidate ? 1 : 1.0 + breath * 0.025
 
     Row {
         anchors.centerIn: parent
+        transform: Translate { x: root.contentOffset + drag.contentOffset }
+        opacity: Math.max(0, 1 - Math.abs(root.contentOffset + drag.contentOffset) / Math.max(1, root.pillWidth * 0.65))
         spacing: Theme.spacingXl * root.s
         visible: root.notification !== null
 
@@ -101,7 +156,7 @@ Item {
                 text: root.notification?.appName ?? ""
                 color: Theme.dim
                 font.family: Theme.font
-                font.pixelSize: 10.5 * root.s
+                font.pixelSize: 11 * root.s
                 font.weight: Font.Medium
                 elide: Text.ElideRight
                 width: root.pillWidth - 100 * root.s

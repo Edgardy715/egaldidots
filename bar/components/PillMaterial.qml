@@ -5,7 +5,9 @@ import Quickshell.Widgets
 import ".."
 import "../Singletons"
 
-/** Material continuo de la isla: sombra, halo, arte multimedia y vidrio. */
+/** Material continuo de la isla: sombra, arte multimedia y vidrio.
+ *  Sin halo exterior: un segundo contorno de acento fuera del vidrio es vidrio sobre
+ *  vidrio (WWDC25) y competía con el borde propio; el pulso interior ya avisa. */
 Item {
     id: root
 
@@ -79,34 +81,6 @@ Item {
         Behavior on opacity { enabled: !root.suppressEdge; Anim { type: Anim.DefaultEffects } }
     }
 
-    Rectangle {
-        id: materialHalo
-        objectName: "pillMaterialHalo"
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.leftMargin: -7 * root.s - root.captureLeftExtra
-        anchors.topMargin: -7 * root.s
-        anchors.bottomMargin: -7 * root.s
-        width: parent.width + root.captureExtra + root.captureLeftExtra + 14 * root.s
-        radius: root.morphRadius + 7 * root.s
-        color: "transparent"
-        border.width: Math.max(1, Theme.borderHairline * root.s)
-        border.color: Qt.alpha(root.materialAccent, 0.32)
-        opacity: root.surface === "auth" ? 0
-            : ((root.materialAwake && root.mode !== "hover" ? 0.16 : 0) + root.materialPulse * 0.34) * (1 - root.readingExposure) * root.edgeExposure
-        scale: 1 + root.materialPulse * 0.028
-        layer.enabled: opacity > 0.01
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowColor: Qt.alpha(root.materialAccent, 0.55)
-            shadowBlur: 1.0
-        }
-        z: 1
-        Behavior on opacity { enabled: !root.suppressEdge; Anim { type: Anim.DefaultEffects } }
-        Behavior on scale { Anim { type: Anim.FastEffects } }
-    }
-
     ClippingRectangle {
         id: mediaBgLayer
         anchors.fill: parent
@@ -153,6 +127,8 @@ Item {
             objectName: "pillMaterialInnerGlow"
             anchors.fill: parent
             glowColor: root.materialAccent
+            // Resting pills and the static status capsule draw nothing new: no frames while idle.
+            drifting: root.materialAwake || (root.mode !== "rest" && root.mode !== "status")
             focusX: root.mode === "status" ? 0.76 : root.mode === "rest" || root.mode === "hover" ? 0.5 : 0.26
             opacity: root.mode === "lateral" || root.width >= 300 * root.s || root.height > 80 * root.s ? 0
                 : root.materialAwake ? 0.48 : root.mode === "rest" ? 0.34 : root.mode === "status" ? 0.38 : 0

@@ -9,8 +9,6 @@ PillSurface {
     mLeft: Theme.marginXl
     mRight: Theme.marginXl
     mBottom: Theme.marginXs
-    focusActive: view.focusActive
-    focusPoint: view.focusPoint
     readonly property color previewAccent: view.previewAccent
     readonly property var sel: view.sel
     readonly property string selName: view.selName

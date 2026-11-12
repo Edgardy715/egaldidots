@@ -19,7 +19,14 @@ Item {
     property bool showNetwork: true
     property bool showBattery: true
     property bool animateChanges: true
+    property bool micActive: false
+    property bool camActive: false
+    property string micApp: ""
+    property string camApp: ""
+    // Indicador de privacidad: sólo ocupa sitio mientras algo captura.
+    readonly property real privacyWidth: privacy.visible ? privacy.width + 7 * s : 0
     signal requestSurface(string name)
+    signal requestPrivacy()
 
     readonly property var monitor: Hyprland.monitors.values.find(m => m.name === screenName) || null
     readonly property var workspace: monitor ? monitor.activeWorkspace : null
@@ -39,7 +46,7 @@ Item {
     readonly property bool nameShown: appStrip && appStrip.nameShown
     readonly property real nameWidth: appStrip ? appStrip.nameWidth : 0
     readonly property int controlCount: Number(audioModule.active) + Number(networkModule.active) + Number(batteryModule.active)
-    readonly property real controlsWidth: ((audioModule.active ? 19 : 0) + (networkModule.active ? 19 : 0)
+    readonly property real controlsWidth: privacyWidth + ((audioModule.active ? 19 : 0) + (networkModule.active ? 19 : 0)
         + (batteryModule.active ? 27 : 0) + Math.max(0, controlCount - 1) * 7) * s
     readonly property real statusWidth: controlCount > 0 ? controlsWidth + 22 * s : 18 * s
     readonly property real appsWidth: appModule.active && apps.length
@@ -60,10 +67,10 @@ Item {
     readonly property bool batteryCharging: hasBattery && (battery.state === UPowerDeviceState.Charging
         || battery.state === UPowerDeviceState.FullyCharged && !UPower.onBattery)
     readonly property bool batteryPaused: hasBattery && battery.state === UPowerDeviceState.PendingCharge
-    readonly property string batteryStateText: batteryCharging ? qsTr("Cargando")
-        : batteryPaused ? qsTr("Carga en espera")
-        : batteryLevel <= 0.2 ? qsTr("Batería baja") : qsTr("En uso")
-    readonly property real minimumWidth: (22 + (showAudio ? 19 : 0) + (showNetwork ? 19 : 0)
+    readonly property string batteryStateText: batteryCharging ? I18n.tr("Cargando")
+        : batteryPaused ? I18n.tr("Carga en espera")
+        : batteryLevel <= 0.2 ? I18n.tr("Batería baja") : I18n.tr("En uso")
+    readonly property real minimumWidth: privacyWidth + (22 + (showAudio ? 19 : 0) + (showNetwork ? 19 : 0)
         + (showBattery && hasBattery ? 27 : 0)
         + Math.max(0, (Number(showAudio) + Number(showNetwork) + Number(showBattery && hasBattery) - 1)) * 7
         + (showApps && apps.length ? 43 : 0)) * s
@@ -90,6 +97,19 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 7 * root.s
 
+        PrivacyDots {
+            id: privacy
+            s: root.s
+            plain: true
+            gap: 0
+            anchors.verticalCenter: undefined
+            width: implicitWidth
+            micActive: root.micActive
+            camActive: root.camActive
+            micApp: root.micApp
+            camApp: root.camApp
+            onActivated: kind => root.requestPrivacy()
+        }
         OptionalModule {
             s: root.s
             id: audioModule

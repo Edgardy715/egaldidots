@@ -36,16 +36,6 @@ ColumnLayout {
     readonly property int lineIndex: synced ? LyricsData.indexAt(lines, position) : -1
     signal retryRequested()
     signal closeRequested()
-    // Attention for Iris: the current synced line, in this view's coordinates.
-    // Unsynced text has no "current" line, so Iris keeps its own gaze there.
-    readonly property bool focusActive: open && visible && following && status === "ready" && synced && lineIndex >= 0
-    readonly property point focusPoint: {
-        if (!focusActive) return Qt.point(0, 0)
-        void lyrics.contentY; void lyrics.count; void lyrics.x; void lyrics.y
-        const row = lyrics.itemAtIndex(lineIndex)
-        const y = row ? Math.max(0, Math.min(lyrics.height, row.y + row.height / 2 - lyrics.contentY)) : lyrics.height / 2
-        return Qt.point(lyrics.x + lyrics.width / 2, lyrics.y + y)
-    }
     spacing: 8 * s
     onLinesChanged: { following = true; Qt.callLater(lyrics.reset) }
     onStatusChanged: if (status === "ready") Qt.callLater(lyrics.follow, false)
@@ -78,14 +68,14 @@ ColumnLayout {
                 textFormat: Text.PlainText
                 elide: Text.ElideRight
                 font.family: Theme.fontMedia
-                font.pixelSize: 16 * Flags.fontScale * root.s
+                font.pixelSize: 15 * Flags.fontScale * root.s
                 font.weight: Font.DemiBold
                 color: Theme.foreground
             }
             Text {
                 Layout.fillWidth: true
                 objectName: "mediaLyricsStatus"
-                text: root.status === "ready" && root.synced ? qsTr("Letra sincronizada · LRCLIB") : qsTr("Letras · LRCLIB")
+                text: root.status === "ready" && root.synced ? I18n.tr("Letra sincronizada · LRCLIB") : I18n.tr("Letras · LRCLIB")
                 color: Theme.iconSecondary
                 font.family: Theme.fontMedia
                 font.pixelSize: Theme.fontSizeSmall * root.s
@@ -95,12 +85,12 @@ ColumnLayout {
         MediaTransportButton {
             visible: root.synced && root.status === "ready"
             iconName: "my_location"
-            accessibleName: qsTr("Seguir la reproducción")
+            accessibleName: I18n.tr("Seguir la reproducción")
             active: root.following
             size: 32; s: root.s
             onClicked: { root.following = true; lyrics.follow(true) }
         }
-        MediaTransportButton { iconName: "close"; accessibleName: qsTr("Volver a la portada"); size: 32; s: root.s; onClicked: root.closeRequested() }
+        MediaTransportButton { iconName: "close"; accessibleName: I18n.tr("Volver a la portada"); size: 32; s: root.s; onClicked: root.closeRequested() }
     }
     // List and status share one slot so the crossfade does not split the height between them.
     Item {
@@ -226,7 +216,7 @@ ColumnLayout {
                 textFormat: Text.PlainText
                 wrapMode: Text.Wrap
                 font.family: Theme.fontMedia
-                font.pixelSize: 22 * Flags.fontScale * root.s
+                font.pixelSize: 20 * Flags.fontScale * root.s
                 font.weight: Font.DemiBold
                 color: line.current || !root.synced ? Theme.foreground : Theme.iconSecondary
                 Behavior on color { enabled: root.motionAllowed; ColorAnimation { duration: Motion.standard } }
@@ -254,11 +244,11 @@ ColumnLayout {
         Text {
             Layout.fillWidth: true
             text: statusColumn.shownText
-            readonly property string statusMessage: root.status === "loading" ? qsTr("Buscando letras…")
-                : root.status === "instrumental" ? qsTr("Esta pista es instrumental.")
-                : root.status === "error" ? qsTr("No se pudieron cargar las letras. Vuelve a intentarlo en un momento.")
-                : root.status === "metadata" ? qsTr("Falta el título o el artista de la canción.")
-                : qsTr("No hay letras disponibles para esta canción.")
+            readonly property string statusMessage: root.status === "loading" ? I18n.tr("Buscando letras…")
+                : root.status === "instrumental" ? I18n.tr("Esta pista es instrumental.")
+                : root.status === "error" ? I18n.tr("No se pudieron cargar las letras. Vuelve a intentarlo en un momento.")
+                : root.status === "metadata" ? I18n.tr("Falta el título o el artista de la canción.")
+                : I18n.tr("No hay letras disponibles para esta canción.")
             onStatusMessageChanged: if (statusColumn.shown) statusColumn.shownText = statusMessage
             Component.onCompleted: statusColumn.shownText = statusMessage
             font.family: Theme.fontMedia
@@ -267,7 +257,7 @@ ColumnLayout {
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.Wrap
         }
-        MediaTransportButton { Layout.alignment: Qt.AlignHCenter; visible: root.status === "error" || root.status === "empty"; iconName: "refresh"; accessibleName: qsTr("Reintentar letras"); s: root.s; onClicked: root.retryRequested() }
+        MediaTransportButton { Layout.alignment: Qt.AlignHCenter; visible: root.status === "error" || root.status === "empty"; iconName: "refresh"; accessibleName: I18n.tr("Reintentar letras"); s: root.s; onClicked: root.retryRequested() }
         Item { Layout.fillHeight: true }
     }
     }

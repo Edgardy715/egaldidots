@@ -56,6 +56,14 @@ var fields = {
         region: { type: "string", default: "system", options: ["system", "es_DO", "es_ES", "es_MX", "es_AR", "en_US", "en_GB"], optionLabels: ["Del sistema", "República Dominicana", "España", "México", "Argentina", "Estados Unidos", "Reino Unido"], label: "Región", control: "choice", description: "Días, meses y primer día de la semana." },
         timeZone: { type: "string", default: "system", options: ["system", "America/Santo_Domingo", "America/Mexico_City", "America/Bogota", "America/Lima", "America/Argentina/Buenos_Aires", "America/Santiago", "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "Europe/Madrid", "Europe/London", "Europe/Paris", "Europe/Berlin", "Asia/Tokyo", "Asia/Shanghai", "Asia/Kolkata", "Australia/Sydney", "UTC"], optionLabels: ["Del sistema", "Santo Domingo", "Ciudad de México", "Bogotá", "Lima", "Buenos Aires", "Santiago", "Nueva York", "Chicago", "Denver", "Los Ángeles", "Madrid", "Londres", "París", "Berlín", "Tokio", "Shanghái", "Calcuta", "Sídney", "UTC"], label: "Zona horaria", control: "choice", description: "Hora del reloj, el calendario y el bloqueo. No cambia la del sistema." }
     },
+    files: {
+        view: { type: "string", default: "grid", options: ["grid", "list"], optionLabels: ["Cuadrícula", "Lista"], label: "Vista", control: "choice", description: "Cómo se muestran los elementos de la carpeta." },
+        showHidden: { type: "boolean", default: false, label: "Mostrar ocultos", control: "toggle", options: [false, true], description: "Incluye archivos y carpetas que empiezan por punto." },
+        iconSize: { type: "number", integer: true, step: 8, unit: "px", default: 96, minimum: 48, maximum: 160, label: "Tamaño de iconos", control: "number", description: "Tamaño de los iconos en la vista de cuadrícula." },
+        sortField: { type: "string", default: "name", options: ["name", "modified", "size", "type"], optionLabels: ["Nombre", "Modificado", "Tamaño", "Tipo"], label: "Ordenar por", control: "choice", description: "Criterio de orden de los elementos." },
+        sortReversed: { type: "boolean", default: false, label: "Orden inverso", control: "toggle", options: [false, true], description: "Invierte el orden elegido." },
+        dirsFirst: { type: "boolean", default: true, label: "Carpetas primero", control: "toggle", options: [false, true], description: "Muestra las carpetas antes que los archivos." }
+    },
     companion: {
         sleepAfterSeconds: { type: "number", integer: true, step: 10, unit: "s", default: 180, minimum: 60, maximum: 1800, label: "Dormir tras la ausencia", control: "number", description: "Segundos de ausencia que informa el compositor antes de dormir el cuerpo." },
         reactToCode: { type: "boolean", default: true, label: "Reaccionar al código", control: "toggle", options: [false, true], description: "Se concentra cuando trabajas con código." },
@@ -137,6 +145,7 @@ var sectionCatalog = [
     { id: "motion", label: "Movimiento", description: "Coreografías de la isla con el compositor." },
     { id: "devices", label: "Dispositivos", description: "Conectar y desconectar dispositivos, avisos de carga y privacidad." },
     { id: "regional", label: "Idioma y región", description: "Idioma, zona horaria y formato regional." },
+    { id: "files", label: "Archivos", description: "Vista, orden y elementos ocultos del explorador de archivos." },
     { id: "companion", label: "Amalgam", description: "Reacciones del cuerpo de vidrio líquido. Se activa con Amalgam en Apariencia." },
     { id: "modules", label: "Módulos de la barra", description: "Entradas laterales opcionales y sus controles." },
     { id: "profile", label: "Perfil", description: "Datos de presentación de la sesión." },
@@ -185,6 +194,7 @@ var surfaces = [
     { id: "recording", label: "Grabación de pantalla", availability: "routed", dependsOn: [], optionalDependsOn: ["gpu-screen-recorder"] },
     { id: "session", label: "Sesión y energía", availability: "routed", dependsOn: ["island.session"], optionalDependsOn: ["island.lockscreen", "hyprctl", "systemctl"] },
     { id: "settings", label: "Ajustes Crucible", availability: "routed", dependsOn: ["settings.config"], optionalDependsOn: [] },
+    { id: "shortcuts", label: "Atajos", availability: "routed", dependsOn: ["hyprctl"], optionalDependsOn: [] },
     { id: "utils", label: "Controles rápidos", availability: "routed", dependsOn: [], optionalDependsOn: ["systemd-inhibit", "sysfs.backlight", "powerprofilesctl"] },
     { id: "wallpaper", label: "Wallpapers", availability: "routed", dependsOn: ["wallpaper.directory"], optionalDependsOn: ["wallpaper.apply-script", "magick", "mpris.players"] }
 ]
@@ -304,6 +314,21 @@ function validate(document, context) {
         })
     })
     return { ok: errors.length === 0, errors: errors, effective: effective }
+}
+
+// Strict patch check for external callers (IPC): validate() tolerates unknown
+// keys so files written by other tools round-trip (extension keys inside known
+// sections are intentional), but an unknown section is almost certainly a typo
+// and must not report ok. Extension sections must be prefixed "x-". Known keys are still range-checked by validate().
+function unknownPatchKeys(patch) {
+    var errors = []
+    if (!isObject(patch)) return ["Patch must be an object"]
+    Object.keys(patch).forEach(function(section) {
+        if (section === "version" || section.indexOf("x-") === 0) return  // x-* = extension namespace
+        if (!fields[section]) { errors.push("Unknown section: " + section); return }
+        if (!isObject(patch[section])) errors.push(section + " must be an object")
+    })
+    return errors
 }
 
 // A patch merges one section at a time; it never replaces another section or

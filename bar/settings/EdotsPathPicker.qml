@@ -107,28 +107,31 @@ Popup {
                 Text { visible: root.height >= 600; Layout.fillWidth: true; wrapMode: Text.WordWrap; text: root.folderMode ? I18n.tr("Abre una carpeta y confirma tu elección.") : I18n.tr("Explora, revisa y elige tu archivo."); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody }
             }
             Item { Layout.fillWidth: true }
-            EdotsButton { text: ""; symbol: "close"; implicitWidth: 44; Accessible.name: qsTr("Cancelar selección"); onClicked: root.close() }
+            EdotsButton { text: ""; symbol: "close"; implicitWidth: 44; Accessible.name: I18n.tr("Cancelar selección"); onClicked: root.close() }
         }
         RowLayout {
             Layout.fillWidth: true; spacing: 8
-            EdotsButton { text: ""; symbol: "arrow_upward"; implicitWidth: 44; enabled: String(root.folder) !== "file:///"; Accessible.name: qsTr("Carpeta superior"); onClicked: root.navigate(files.parentFolder) }
+            EdotsButton { text: ""; symbol: "arrow_upward"; implicitWidth: 44; enabled: String(root.folder) !== "file:///"; Accessible.name: I18n.tr("Carpeta superior"); onClicked: root.navigate(files.parentFolder) }
             EdotsTextField {
                 id: location
                 objectName: "pickerLocation"
                 Layout.fillWidth: true
-                Accessible.name: qsTr("Carpeta actual")
+                Accessible.name: I18n.tr("Carpeta actual")
                 onAccepted: {
                     const path = text.trim().replace(/^~(?=\/|$)/, Config.home)
                     if (path.startsWith("/")) { invalid = false; root.navigate(root.toUrl(path)) }
                     else invalid = true
                 }
             }
-            EdotsButton { text: ""; symbol: "visibility"; implicitWidth: 44; checkable: true; checked: files.showHidden; Accessible.name: qsTr("Mostrar archivos ocultos"); onClicked: files.showHidden = checked }
+            EdotsButton { text: ""; symbol: "visibility"; implicitWidth: 44; checkable: true; checked: files.showHidden; Accessible.name: I18n.tr("Mostrar archivos ocultos"); onClicked: files.showHidden = checked }
         }
         Text {
             Layout.fillWidth: true
-            visible: location.invalid
-            text: qsTr("Usa una ruta absoluta o que empiece por ~/.")
+            opacity: location.invalid ? 1 : 0
+            visible: opacity > 0.01
+            transform: Translate { y: Flags.reduceMotion ? 0 : 4 * (1 - opacity) }
+            Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+            text: I18n.tr("Usa una ruta absoluta o que empiece por ~/.")
             color: Theme.error; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody
         }
         RowLayout {
@@ -137,7 +140,7 @@ Popup {
                 visible: root.width >= 700
                 Layout.minimumWidth: Math.max(136, Theme.fontSizeBodyLg * 10); Layout.maximumWidth: Layout.minimumWidth; Layout.preferredWidth: Layout.minimumWidth; Layout.alignment: Qt.AlignTop; spacing: 8
                 Repeater {
-                    model: [{label: qsTr("Inicio"), path: Config.home, icon: "home"}, {label: qsTr("Imágenes"), path: Config.home + "/Imágenes", icon: "image"}, {label: qsTr("Descargas"), path: Config.home + "/Descargas", icon: "download"}, {label: qsTr("Wallpapers"), path: Config.wallpaperDir, icon: "wallpaper"}]
+                    model: [{label: I18n.tr("Inicio"), path: Config.home, icon: "home"}, {label: I18n.tr("Imágenes"), path: Config.home + "/Imágenes", icon: "image"}, {label: I18n.tr("Descargas"), path: Config.home + "/Descargas", icon: "download"}, {label: I18n.tr("Wallpapers"), path: Config.wallpaperDir, icon: "wallpaper"}]
                     EdotsButton {
                         required property var modelData
                         Layout.fillWidth: true
@@ -195,9 +198,12 @@ Popup {
                 }
                 Text {
                     anchors.centerIn: parent; width: parent.width - 32
-                    visible: files.count === 0
-                    text: files.status === FolderListModel.Loading ? qsTr("Cargando…") : qsTr("Carpeta vacía o no disponible.\nElige otra ubicación.")
-                    color: Qt.alpha(Theme.foreground, 0.72); font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg; horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
+                    opacity: files.count === 0 ? 1 : 0
+                    visible: opacity > 0.01
+                    transform: Translate { y: Flags.reduceMotion ? 0 : 4 * (1 - opacity) }
+                    Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
+                    text: files.status === FolderListModel.Loading ? I18n.tr("Cargando…") : I18n.tr("Carpeta vacía o no disponible.\nElige otra ubicación.")
+                    color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg; horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
                 }
             }
             ColumnLayout {
@@ -222,21 +228,24 @@ Popup {
                     }
                     Column {
                         anchors.centerIn: parent; spacing: 12; width: parent.width - 32
-                        visible: preview.status !== Image.Ready
+                        opacity: preview.status !== Image.Ready ? 1 : 0
+                        visible: opacity > 0.01
+                        transform: Translate { y: Flags.reduceMotion ? 0 : 4 * (1 - opacity) }
+                        Behavior on opacity { NumberAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                         EdotsIcon { anchors.horizontalCenter: parent.horizontalCenter; iconName: root.folderMode ? "folder" : root.selectedIsDirectory ? "folder" : root.selectedIsImage ? "image" : "description"; color: Theme.accent; font.pixelSize: 44 }
                         Text { width: parent.width; text: root.selectedIsImage ? (preview.status === Image.Error ? I18n.tr("No se puede mostrar esta imagen") : I18n.tr("Cargando imagen…")) : root.selectedName || I18n.tr("Vista previa"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody; horizontalAlignment: Text.AlignHCenter; wrapMode: Text.Wrap }
                     }
                 }
-                Text { Layout.fillWidth: true; text: root.selectedName || (root.folderMode ? root.pathText(root.folder).split("/").pop() || "/" : (root.filterKind === "image" ? qsTr("Selecciona una imagen") : qsTr("Selecciona un archivo"))); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg; wrapMode: Text.Wrap }
-                Text { Layout.fillWidth: true; visible: preview.status === Image.Ready; text: qsTr("Vista previa de la imagen"); color: Qt.alpha(Theme.foreground, 0.72); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody }
+                Text { Layout.fillWidth: true; text: root.selectedName || (root.folderMode ? root.pathText(root.folder).split("/").pop() || "/" : (root.filterKind === "image" ? I18n.tr("Selecciona una imagen") : I18n.tr("Selecciona un archivo"))); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg; wrapMode: Text.Wrap }
+                Text { Layout.fillWidth: true; visible: preview.status === Image.Ready; text: I18n.tr("Vista previa de la imagen"); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody }
             }
         }
         RowLayout {
             Layout.fillWidth: true; spacing: 10
             Text { visible: root.width >= 720; text: I18n.tr("%1 elementos").arg(files.count); color: Qt.alpha(Theme.foreground, Theme.alphaIconSec); font.family: Theme.font; font.pixelSize: Theme.fontSizeBody }
             Item { Layout.fillWidth: true }
-            EdotsButton { text: qsTr("Cancelar"); onClicked: root.close() }
-            EdotsButton { objectName: "confirmPath"; text: root.folderMode ? qsTr("Elegir carpeta") : qsTr("Usar archivo"); symbol: "check"; accent: true; enabled: root.folderMode ? files.status === FolderListModel.Ready : String(root.selectedUrl).length > 0 && !root.selectedIsDirectory; onClicked: root.confirm() }
+            EdotsButton { text: I18n.tr("Cancelar"); onClicked: root.close() }
+            EdotsButton { objectName: "confirmPath"; text: root.folderMode ? I18n.tr("Elegir carpeta") : I18n.tr("Usar archivo"); symbol: "check"; accent: true; enabled: root.folderMode ? files.status === FolderListModel.Ready : String(root.selectedUrl).length > 0 && !root.selectedIsDirectory; onClicked: root.confirm() }
         }
     }
 }

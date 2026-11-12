@@ -32,15 +32,15 @@ PillSurface {
     readonly property string response: password.text
     readonly property var identities: !sudoMode && flow ? flow.identities : []
     readonly property string prompt: sudoMode && authState.sudoPrompt ? authState.sudoPrompt : !sudoMode && flow && flow.inputPrompt ? flow.inputPrompt
-        : qsTr("Contraseña")
-    readonly property string requestMessage: sudoMode ? qsTr("Autorización de sudo")
-        : flow && flow.message ? flow.message : qsTr("Autorización del sistema")
-    readonly property string detail: successState ? qsTr("Acceso concedido")
-        : sendRejected ? qsTr("No se pudo enviar la respuesta. Revisa el campo.")
-        : hasError ? (sudoMode ? (authState.sudoCanRespond ? qsTr("Contraseña incorrecta. Inténtalo de nuevo.") : qsTr("No se pudo autorizar"))
-            : authState.polkitMessage || qsTr("No se pudo autenticar. Inténtalo de nuevo."))
-        : verifying ? qsTr("Verificando…")
-        : capsLockOn && !responseVisible ? qsTr("Bloq Mayús activado")
+        : I18n.tr("Contraseña")
+    readonly property string requestMessage: sudoMode ? I18n.tr("Autorización de sudo")
+        : flow && flow.message ? flow.message : I18n.tr("Autorización del sistema")
+    readonly property string detail: successState ? I18n.tr("Acceso concedido")
+        : sendRejected ? I18n.tr("No se pudo enviar la respuesta. Revisa el campo.")
+        : hasError ? (sudoMode ? (authState.sudoCanRespond ? I18n.tr("Contraseña incorrecta. Inténtalo de nuevo.") : I18n.tr("No se pudo autorizar"))
+            : authState.polkitMessage || I18n.tr("No se pudo autenticar. Inténtalo de nuevo."))
+        : verifying ? I18n.tr("Verificando…")
+        : capsLockOn && !responseVisible ? I18n.tr("Bloq Mayús activado")
         : !sudoMode && flow && flow.supplementaryMessage && !flow.supplementaryIsError
             ? flow.supplementaryMessage : requestMessage
     readonly property bool lightMaterial: Theme.background.r * 0.2126 + Theme.background.g * 0.7152 + Theme.background.b * 0.0722 > 0.5
@@ -166,7 +166,7 @@ PillSurface {
                 leftPadding: 0; rightPadding: 0; topPadding: 0; bottomPadding: 0
                 echoMode: root.responseVisible ? TextInput.Normal : TextInput.Password
                 passwordCharacter: "•"; passwordMaskDelay: 0
-                placeholderText: root.successState ? qsTr("Autorizado") : root.verifying ? qsTr("Verificando…") : root.prompt
+                placeholderText: root.successState ? I18n.tr("Autorizado") : root.verifying ? I18n.tr("Verificando…") : root.prompt
                 placeholderTextColor: "transparent"
                 InputPlaceholder { input: password; color: root.successState ? root.stateColor : Theme.iconSecondary; motionActive: root.active && root.exposure > 0 }
                 color: Theme.foreground; font.family: Theme.font; font.pixelSize: (Theme.fontSizeBodyLg + Flags.fontScale) * root.s
@@ -195,9 +195,9 @@ PillSurface {
                 x: parent.width - width - 5 * root.s; y: (parent.height - height) / 2
                 width: 34 * root.s; height: width
                 enabled: root.canRespond && root.response.length > 0
-                Accessible.name: qsTr("Autorizar")
+                Accessible.name: I18n.tr("Autorizar")
                 ToolTip.visible: hovered
-                ToolTip.text: root.verifying ? qsTr("Verificando…") : qsTr("Autorizar · Enter")
+                ToolTip.text: root.verifying ? I18n.tr("Verificando…") : I18n.tr("Autorizar · Enter")
                 background: Rectangle {
                     radius: 12 * root.s
                     color: root.successState ? Qt.alpha(root.stateColor, 0.13) : submit.enabled ? Qt.alpha(Theme.accent, 0.22 + 0.12 * submit.interaction.presence) : "transparent"
@@ -229,7 +229,7 @@ PillSurface {
             x: parent.width - width; y: (root.fieldHeight - height) / 2
             width: 30 * root.s; height: width
             enabled: root.active
-            Accessible.name: qsTr("Cancelar autorización")
+            Accessible.name: I18n.tr("Cancelar autorización")
             background: Rectangle { radius: 12 * root.s; color: Qt.alpha(Theme.foreground, 0.09 * dismiss.interaction.presence) }
             contentItem: MaterialIcon { iconName: "close"; interaction: dismiss.interaction; color: Theme.iconSecondary; font.pixelSize: 17 * root.s }
             onClicked: root.cancel()
@@ -254,7 +254,7 @@ PillSurface {
                 palette.highlight: Qt.alpha(Theme.foreground, 0.14)
                 palette.highlightedText: Theme.foreground
                 model: root.identities; textRole: "displayName"; currentIndex: root.identityIndex
-                Accessible.name: qsTr("Cuenta para autorizar")
+                Accessible.name: I18n.tr("Cuenta para autorizar")
                 contentItem: Text { text: accounts.displayText; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; elide: Text.ElideRight; rightPadding: 15 * root.s }
                 background: Item {}
                 indicator: MaterialIcon { x: accounts.width - width; anchors.verticalCenter: parent.verticalCenter; iconName: "expand_more"; font.pixelSize: 13 * root.s; color: Theme.iconSecondary }

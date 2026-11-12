@@ -23,7 +23,7 @@ Item {
         id: wifiHit
         anchors.fill: parent
         feedbackEnabled: false
-        accessibleName: qsTr("Abrir conectividad")
+        accessibleName: I18n.tr("Abrir conectividad")
         onClicked: root.activated()
     }
 }

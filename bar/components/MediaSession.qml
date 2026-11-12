@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Services.Mpris
+import "../Singletons"
 
 // Per-view playback session. Inject an MPRIS-compatible player and track key;
 // owns capabilities, seeking and the visible position clock, never selection.
@@ -11,15 +12,18 @@ QtObject {
     property string trackKey: ""
     readonly property bool hasPlayer: !!player
     readonly property bool isPlaying: !!player && player.isPlaying
-    readonly property string title: player ? (player.trackTitle || qsTr("Sin título")) : qsTr("Sin contenido")
-    readonly property string artist: player ? (player.trackArtist || qsTr("Artista desconocido")) : ""
+    readonly property string title: player ? (player.trackTitle || I18n.tr("Sin título")) : I18n.tr("Sin contenido")
+    readonly property string artist: player ? (player.trackArtist || I18n.tr("Artista desconocido")) : ""
     readonly property string album: player ? (player.trackAlbum || "") : ""
     readonly property bool albumDistinct: album.length > 0
         && album.toLowerCase() !== title.toLowerCase()
         && album.toLowerCase() !== artist.toLowerCase()
+    // MPRIS lengths outside (0, 24 h] are garbage: the timeline is hidden.
+    readonly property real saneLength: player && isFinite(player.length)
+        && player.length > 0 && player.length <= 86400 ? player.length : 0
     readonly property bool canSeek: !!player && !!player.canControl && !!player.canSeek
         && !!player.positionSupported && !!player.lengthSupported
-        && isFinite(player.length) && player.length > 0
+        && saneLength > 0
     readonly property bool canShuffle: !!player && !!player.canControl && !!player.shuffleSupported
     readonly property bool canRepeat: !!player && !!player.canControl && !!player.loopSupported
     readonly property bool canPrevious: !!player && !!player.canControl && !!player.canGoPrevious
@@ -32,16 +36,16 @@ QtObject {
     property bool dragging: false
     property real dragFraction: 0
     readonly property real progress: player && canSeek
-        ? Math.max(0, Math.min(1, (dragging ? dragFraction * player.length : position) / player.length))
+        ? Math.max(0, Math.min(1, (dragging ? dragFraction * saneLength : position) / saneLength))
         : 0
 
     readonly property var loopNone: MprisLoopState.None
     readonly property var loopTrack: MprisLoopState.Track
     readonly property bool repeatOne: !!player && canRepeat && player.loopState === loopTrack
 
-    readonly property real displayPosition: dragging && player ? dragFraction * player.length : position
-    readonly property real remaining: player ? Math.max(0, player.length - displayPosition) : 0
-    readonly property real length: player ? player.length : 0
+    readonly property real displayPosition: dragging && player ? dragFraction * saneLength : position
+    readonly property real remaining: Math.max(0, saneLength - displayPosition)
+    readonly property real length: saneLength
     readonly property string displayTime: formatTime(displayPosition)
     readonly property string remainingTime: formatTime(remaining)
     readonly property bool shuffleEnabled: !!player && canShuffle && player.shuffle
@@ -60,7 +64,7 @@ QtObject {
 
     function seekTo(value) {
         if (!canSeek || !isFinite(value)) return
-        const next = Math.max(0, Math.min(player.length, value))
+        const next = Math.max(0, Math.min(saneLength, value))
         position = next
         lastPositionAt = Date.now()
         player.position = next
@@ -91,7 +95,7 @@ QtObject {
     function commitDrag(fraction) {
         if (!dragging) return
         dragging = false
-        if (canSeek) seekTo(fraction * player.length)
+        if (canSeek) seekTo(fraction * saneLength)
     }
 
     Component.onCompleted: syncPosition()
@@ -119,7 +123,7 @@ QtObject {
             root.lastPositionAt = now
             const rate = isFinite(root.player.rate) && root.player.rate > 0 ? root.player.rate : 1
             if (elapsed > 0 && elapsed < 2)
-                root.position = Math.min(root.player.length, root.position + elapsed * rate)
+                root.position = Math.min(root.saneLength, root.position + elapsed * rate)
         }
     }
 

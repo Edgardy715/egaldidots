@@ -74,7 +74,7 @@ Item {
                 MaterialIcon { anchors.centerIn: parent; iconName: "arrow_back"; color: Theme.foreground; font.pixelSize: 20 * root.s }
                 MotionArea {
                     anchors.fill: parent
-                    accessibleName: qsTr("Volver a las redes")
+                    accessibleName: I18n.tr("Volver a las redes")
                     enabled: !root.busy
                     hoverWash: false
                     onClicked: root.cancelled()
@@ -82,7 +82,7 @@ Item {
             }
             Text {
                 Layout.fillWidth: true
-                text: qsTr("Conectar a una red")
+                text: I18n.tr("Conectar a una red")
                 color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
@@ -134,7 +134,7 @@ Item {
         CrossfadeLabel {
             Layout.fillWidth: true
             Layout.preferredHeight: implicitHeight
-            value: root.succeeded ? qsTr("Conectado") : root.busy ? qsTr("Estableciendo conexión…") : qsTr("Introduce la contraseña de la red")
+            value: root.succeeded ? I18n.tr("Conectado") : root.busy ? I18n.tr("Estableciendo conexión…") : I18n.tr("Introduce la contraseña de la red")
             horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideRight
             color: root.succeeded ? root.successColor : Theme.iconSecondary
@@ -165,7 +165,7 @@ Item {
             Text {
                 x: 16 * root.s
                 y: 9 * root.s
-                text: qsTr("CONTRASEÑA WI-FI")
+                text: I18n.tr("CONTRASEÑA WI-FI")
                 color: root.errorText.length ? root.errorColor : Theme.iconSecondary
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeSmall * root.s
@@ -186,7 +186,7 @@ Item {
                 padding: 0
                 background: null
                 color: Theme.foreground
-                placeholderText: qsTr("Escribe para conectar")
+                placeholderText: I18n.tr("Escribe para conectar")
                 placeholderTextColor: "transparent"
                 InputPlaceholder { input: password; color: Theme.iconSecondary; motionActive: root.active && !root.succeeded }
                 font.family: Theme.font
@@ -195,7 +195,7 @@ Item {
                 passwordMaskDelay: 0
                 enabled: root.active && !root.busy
                 selectByMouse: true
-                Accessible.name: qsTr("Contraseña para %1").arg(root.ssid)
+                Accessible.name: I18n.tr("Contraseña para %1").arg(root.ssid)
                 onAccepted: root.submit()
                 onTextEdited: root.edited()
                 Keys.onEscapePressed: root.cancelled()
@@ -214,7 +214,7 @@ Item {
                 }
                 MotionArea {
                     anchors.fill: parent
-                    accessibleName: root.reveal ? qsTr("Ocultar contraseña") : qsTr("Mostrar contraseña")
+                    accessibleName: root.reveal ? I18n.tr("Ocultar contraseña") : I18n.tr("Mostrar contraseña")
                     enabled: !root.busy
                     hoverWash: false
                     onClicked: { root.reveal = !root.reveal; root.focusInput() }
@@ -225,9 +225,9 @@ Item {
         CrossfadeLabel {
             Layout.fillWidth: true
             Layout.preferredHeight: 34 * root.s
-            value: root.errorText || (root.busy ? qsTr("Verificando credenciales…")
-                : password.text.length > 0 && password.text.length < 8 ? qsTr("Faltan %1 caracteres").arg(8 - password.text.length)
-                : password.text.length >= 8 ? qsTr("Pulsa Enter para conectar") : qsTr("Mínimo 8 caracteres"))
+            value: root.errorText || (root.busy ? I18n.tr("Verificando credenciales…")
+                : password.text.length > 0 && password.text.length < 8 ? I18n.tr("Faltan %1 caracteres").arg(8 - password.text.length)
+                : password.text.length >= 8 ? I18n.tr("Pulsa Enter para conectar") : I18n.tr("Mínimo 8 caracteres"))
             // The countdown changes on every keystroke: swap it in place instead of
             // queueing one crossfade per character.
             animated: root.errorText.length > 0 || root.busy || password.text.length === 0 || password.text.length >= 8
@@ -248,7 +248,7 @@ Item {
             opacity: root.succeeded ? 0 : 1
             enabled: root.active && !root.busy && password.text.length >= 8
             Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast } }
-            text: root.errorText.length ? qsTr("Reintentar") : qsTr("Conectar")
+            text: root.errorText.length ? I18n.tr("Reintentar") : I18n.tr("Conectar")
             onClicked: root.submit()
             background: Rectangle {
                 radius: Theme.radiusLg * root.s

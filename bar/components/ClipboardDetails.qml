@@ -23,7 +23,7 @@ FocusScope {
     property var previewFailures: ({})
     property string resultStatus: ""
     property string resultText: ""
-    readonly property var destinations: collections.concat([{id: "", name: qsTr("Sin colección")}])
+    readonly property var destinations: collections.concat([{id: "", name: I18n.tr("Sin colección")}])
     readonly property bool savedHere: destinationChosen && !!entry && !!entry.saved && (entry.collectionId || "") === chosenCollectionId
     signal previewRequested(string entryId, bool full)
     signal copyRequested(var entry)
@@ -99,13 +99,13 @@ FocusScope {
             id: header
             Layout.fillWidth: true
             Layout.preferredHeight: 42 * root.s
-            ClipboardChip { s: root.s; text: qsTr("Volver"); visible: true; implicitHeight: 36 * root.s; onClicked: { if (root.choosingCollection) { root.choosingCollection = false; focusDestination() } else root.backRequested() } }
+            ClipboardChip { s: root.s; text: I18n.tr("Volver"); visible: true; implicitHeight: 36 * root.s; onClicked: { if (root.choosingCollection) { root.choosingCollection = false; focusDestination() } else root.backRequested() } }
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 0
                 AnimatedLabel {
                     Layout.fillWidth: true
-                    value: root.organizerPage && root.resultStatus === "success" ? qsTr("Entrada guardada") : root.choosingCollection ? qsTr("Elegir colección") : root.organizerPage ? (root.entry && root.entry.saved ? qsTr("Mover a una colección") : qsTr("Guardar entrada")) : root.entry && root.entry.isImage ? qsTr("Imagen") : qsTr("Texto")
+                    value: root.organizerPage && root.resultStatus === "success" ? I18n.tr("Entrada guardada") : root.choosingCollection ? I18n.tr("Elegir colección") : root.organizerPage ? (root.entry && root.entry.saved ? I18n.tr("Mover a una colección") : I18n.tr("Guardar entrada")) : root.entry && root.entry.isImage ? I18n.tr("Imagen") : I18n.tr("Texto")
                     color: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeTitle * root.s
@@ -115,7 +115,7 @@ FocusScope {
                 Text {
                     Layout.fillWidth: true
                     visible: !!root.entry && !root.choosingCollection && !root.organizerPage
-                    text: root.entry && root.entry.isImage ? qsTr("Imagen del portapapeles") : root.entry ? String(root.entry.text || "").replace(/\s+/g, " ") : ""
+                    text: root.entry && root.entry.isImage ? I18n.tr("Imagen del portapapeles") : root.entry ? String(root.entry.text || "").replace(/\s+/g, " ").replace(/[\u202A-\u202E\u2066-\u2069]/g, "") : ""
                     color: Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeSmall * root.s
@@ -124,7 +124,7 @@ FocusScope {
             }
             ClipboardChip {
                 s: root.s
-                text: qsTr("Copiar")
+                text: I18n.tr("Copiar")
                 objectName: "clipboardDetailCopy"
                 visible: !root.organizerPage && !root.choosingCollection
                 enabled: visible && !!root.entry && !root.busy
@@ -164,7 +164,7 @@ FocusScope {
                 spacing: 4 * root.s
                 Text {
                     Layout.fillWidth: true
-                    text: !root.entry ? "" : root.entry.isImage ? qsTr("Imagen copiada") : root.entry.preview
+                    text: !root.entry ? "" : root.entry.isImage ? I18n.tr("Imagen copiada") : root.entry.preview.replace(/[\u202A-\u202E\u2066-\u2069]/g, "")
                     textFormat: Text.PlainText
                     elide: Text.ElideRight
                     color: Theme.foreground; font.family: Theme.font
@@ -172,7 +172,7 @@ FocusScope {
                     font.weight: Font.Medium
                 }
                 Text {
-                    text: qsTr("Elige dónde quieres conservarla")
+                    text: I18n.tr("Elige dónde quieres conservarla")
                     color: Theme.iconSecondary; font.family: Theme.font
                     font.pixelSize: Theme.fontSizeBody * root.s
                 }
@@ -225,7 +225,7 @@ FocusScope {
                     objectName: "clipboardFullText"
                     width: parent.width - 12 * root.s
                     visible: !!root.entry && !root.entry.isImage
-                    text: root.textLoading ? qsTr("Cargando texto…") : root.fullText
+                    text: root.textLoading ? I18n.tr("Cargando texto…") : root.fullText
                     textFormat: TextEdit.PlainText
                     opacity: previewMotion.progress
                     transform: Translate { y: Flags.reduceMotion ? 0 : 6 * root.s * (1 - previewMotion.progress) }
@@ -237,7 +237,7 @@ FocusScope {
                     selectedTextColor: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeBodyLg * root.s
-                    Accessible.name: qsTr("Contenido completo de la entrada")
+                    Accessible.name: I18n.tr("Contenido completo de la entrada")
                 }
                 Text {
                     anchors.centerIn: parent
@@ -245,7 +245,7 @@ FocusScope {
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.WordWrap
                     visible: !!root.entry && root.entry.isImage && (!!root.previewFailures[root.entry.id + "|full"] || imagePreview.status === Image.Error)
-                    text: qsTr("No se pudo cargar la imagen. Puedes copiarla o volver a la lista.")
+                    text: I18n.tr("No se pudo cargar la imagen. Puedes copiarla o volver a la lista.")
                     color: Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeBody * root.s
@@ -268,7 +268,7 @@ FocusScope {
             }
             AnimatedLabel {
                 Layout.fillWidth: true
-                value: root.busy ? qsTr("Guardando…") : root.resultText.length ? root.resultText : root.textFailed ? qsTr("No se pudo leer todo el texto. Vuelve a abrir esta entrada.") : ""
+                value: root.busy ? I18n.tr("Guardando…") : root.resultText.length ? root.resultText : root.textFailed ? I18n.tr("No se pudo leer todo el texto. Vuelve a abrir esta entrada.") : ""
                 color: root.resultStatus === "error" || root.textFailed ? Theme.error : Theme.iconSecondary
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeSmall * root.s
@@ -288,7 +288,7 @@ FocusScope {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 42 * root.s
                 enabled: !root.busy && !root.choosingCollection
-                Accessible.name: qsTr("Colección de destino")
+                Accessible.name: I18n.tr("Colección de destino")
                 onClicked: root.showCollections()
                 Keys.onDownPressed: root.showCollections()
                 background: Rectangle {
@@ -302,7 +302,7 @@ FocusScope {
                     spacing: 8 * root.s
                     Text {
                         Layout.leftMargin: 12 * root.s
-                        text: qsTr("En")
+                        text: I18n.tr("En")
                         color: Theme.iconSecondary
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSizeSmall * root.s
@@ -310,7 +310,7 @@ FocusScope {
                     Text {
                         Layout.fillWidth: true
                         objectName: "clipboardDestinationLabel"
-                        text: root.destinationChosen ? (root.destinations.find(c => c.id === root.chosenCollectionId) || root.destinations[0]).name : qsTr("Elegir colección")
+                        text: root.destinationChosen ? (root.destinations.find(c => c.id === root.chosenCollectionId) || root.destinations[0]).name : I18n.tr("Elegir colección")
                         color: Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSizeBody * root.s
@@ -329,7 +329,7 @@ FocusScope {
             }
             ClipboardChip {
                 s: root.s
-                text: qsTr("Nueva colección")
+                text: I18n.tr("Nueva colección")
                 objectName: "clipboardDetailNewCollection"
                 visible: !root.choosingCollection
                 enabled: visible && !root.busy
@@ -344,7 +344,7 @@ FocusScope {
             spacing: 8 * root.s
             ClipboardChip {
                 s: root.s
-                text: qsTr("Quitar de guardados")
+                text: I18n.tr("Quitar de guardados")
                 visible: !root.organizerPage && !!root.entry && !!root.entry.saved
                 enabled: visible && !root.busy && !root.choosingCollection
                 onClicked: root.removeRequested(root.entry)
@@ -352,7 +352,7 @@ FocusScope {
             ClipboardChip {
                 objectName: "clipboardOrganizerNewCollection"
                 s: root.s
-                text: qsTr("Nueva colección")
+                text: I18n.tr("Nueva colección")
                 iconName: "add"
                 visible: root.organizerPage
                 enabled: !root.busy
@@ -361,7 +361,7 @@ FocusScope {
             Item { Layout.fillWidth: true }
             ClipboardChip {
                 s: root.s
-                text: qsTr("Cancelar")
+                text: I18n.tr("Cancelar")
                 visible: root.organizerPage
                 implicitHeight: 38 * root.s
                 onClicked: root.backRequested()
@@ -369,7 +369,7 @@ FocusScope {
             ClipboardChip {
                 objectName: "clipboardSaveButton"
                 s: root.s
-                text: root.savedHere ? qsTr("Guardado aquí") : !root.destinationChosen ? qsTr("Elige un destino") : root.chosenCollectionId.length ? qsTr("%1 en %2").arg(root.entry && root.entry.saved ? qsTr("Mover") : qsTr("Guardar")).arg((root.destinations.find(c => c.id === root.chosenCollectionId) || {}).name || "") : qsTr("Guardar sin colección")
+                text: root.savedHere ? I18n.tr("Guardado aquí") : !root.destinationChosen ? I18n.tr("Elige un destino") : root.chosenCollectionId.length ? I18n.tr("%1 en %2").arg(root.entry && root.entry.saved ? I18n.tr("Mover") : I18n.tr("Guardar")).arg((root.destinations.find(c => c.id === root.chosenCollectionId) || {}).name || "") : I18n.tr("Guardar sin colección")
                 prominent: true
                 Layout.maximumWidth: root.width * 0.58
                 implicitHeight: 38 * root.s

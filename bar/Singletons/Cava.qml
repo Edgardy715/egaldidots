@@ -44,7 +44,11 @@ Singleton {
     onPlayerKeyChanged: sourceRestart.restart()
     Timer { id: sourceRestart; interval: 150 }
 
+    /** banda baja (barras 0-3 de 24, RMS) del último cuadro; 0 sin datos. */
+    property real bass: 0
+
     function reset() {
+        root.bass = 0
         root.hasFrame = false
         root.envelopeActive = false
         root.targets = []
@@ -89,6 +93,7 @@ Singleton {
         var frame = Spectrum.parse(line, root.bars)
         if (!frame) return
         root.targets = frame
+        root.bass = Spectrum.band(frame, 0, 6)
         root.lastFrameAt = Date.now()
         root.hasFrame = true
         if (frame.some(value => value > 0) || root.values.some(value => value > 0))
@@ -99,6 +104,7 @@ Singleton {
         running: root.wanted && root.hasFrame && root.envelopeActive && !Flags.reduceMotion
         onTriggered: dt => {
             var fresh = Date.now() - root.lastFrameAt < 250
+            if (!fresh && root.bass !== 0) root.bass = 0
             root.values = Spectrum.advance(root.values, fresh ? root.targets : [], dt)
             if (root.values.every(value => value === 0)) root.envelopeActive = false
         }

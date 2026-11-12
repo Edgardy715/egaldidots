@@ -8,8 +8,6 @@ PillSurface {
     mTop: Theme.marginMd + 78
     mLeft: Theme.marginMd; mRight: Theme.marginMd; mBottom: 20
     property alias query: view.query
-    focusActive: view.focusActive
-    focusPoint: view.focusPoint
     readonly property var searchResults: controller.searchResults
     readonly property int resultsCount: view.resultsCount
     readonly property bool searching: controller.searching
@@ -25,8 +23,11 @@ PillSurface {
         closing: root.closing
         query: view.query
     }
+    // Origen del icono elegido en coordenadas de la ventana de la isla (null si no hay).
+    property var launchHint: null
     LauncherView {
         id: view
+        objectName: "launcherView"
         anchors.fill: parent
         s: root.s
         open: root.open
@@ -36,7 +37,17 @@ PillSurface {
         showCalculator: controller.showCalculator
         searching: controller.searching
         onRequestClose: root.requestClose()
-        onLaunchRequested: app => { controller.launch(app); root.approved() }
+        onLaunchOrigin: (x, y, size) => {
+            const p = view.mapToItem(null, x, y)
+            root.launchHint = { x: p.x, y: p.y, size: size }
+        }
+        // El comando se lanza primero y sin esperas; el vuelo sólo lo anuncia.
+        onLaunchRequested: app => {
+            controller.launch(app)
+            Apps.announceLaunch(app, root.launchHint)
+            root.launchHint = null
+            root.approved()
+        }
         onCopyResultRequested: value => controller.copyResult(value)
     }
 }

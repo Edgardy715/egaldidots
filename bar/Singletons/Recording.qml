@@ -27,7 +27,7 @@ Singleton {
     readonly property bool pauseSupported: snapshot.pauseSupported !== false
     readonly property int elapsedSeconds: Math.max(0, Math.floor(snapshot.elapsedSeconds || 0))
     readonly property string outputPath: snapshot.outputPath || lastOutputPath
-    readonly property string error: localError || (uncertain ? qsTr("Se perdió el control del grabador. Comprueba el archivo antes de volver a grabar.") : snapshot.error || "")
+    readonly property string error: localError || (uncertain ? I18n.tr("Se perdió el control del grabador. Comprueba el archivo antes de volver a grabar.") : snapshot.error || "")
     readonly property bool setupRequired: snapshot.setupRequired === true
     readonly property string timeText: Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")
         + ":" + String(elapsedSeconds % 60).padStart(2, "0")
@@ -89,7 +89,7 @@ Singleton {
                 lastOutputPath = message.outputPath
                 saved(message.outputPath)
             }
-        } catch (error) { root.localError = qsTr("No se pudo leer el estado del grabador.") }
+        } catch (error) { root.localError = I18n.tr("No se pudo leer el estado del grabador.") }
     }
     onObserveChanged: if (!observe) {
         cancelCountdown()

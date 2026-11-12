@@ -11,6 +11,13 @@ Singleton {
 
     readonly property real mult: (Flags.reduceMotion ? 0.28 : 1) * Flags.motionScale
 
+    readonly property real pullThreshold: 6
+    readonly property real pullFling: 0.35 // px/ms at scale 1
+    readonly property int pullSampleWindow: 80
+    readonly property int pullScrollTimeout: 120
+    readonly property real pullOverdrag: 40
+    readonly property real pullUnderdrag: 10
+
     // durations (ms)
     readonly property int fast:       Math.round(140 * mult)
     readonly property int standard:   Math.round(250 * mult)
@@ -140,6 +147,23 @@ Singleton {
     readonly property real surfaceSettleDistance: 0.3
     readonly property real surfaceSettleSpeed: 8
 
+    // ---- Las apps nacen de la isla (docs/apps-nacen-2026-11-06) ----
+    // Un único muelle 2D lleva la gota del icono desde la isla hasta la ventana; un
+    // retarget (destino provisional -> rectángulo real) conserva posición y velocidad.
+    readonly property var launchFlight: ({ "omega": Flags.reduceMotion ? 28 : 12, "zeta": 0.9 })
+    // Llegada: la gota se ensancha al rectángulo de la ventana y se desvanece. Tope duro
+    // de 200 ms (< 220 ms de cobertura máxima) aunque motionScale sea grande.
+    readonly property int launchFade: Math.min(200, Math.round(180 * mult))
+    readonly property int launchCoverMax: 220
+    // Tiempo real (no escalado) que espera una ventana antes de volver a la isla.
+    readonly property int launchWait: 6000
+    // Tras el openwindow que casa, la geometría debe resolverse en este plazo.
+    readonly property int launchGeometryWait: 1500
+    // Absorción al volver a la isla o al indicador de workspace.
+    readonly property int launchAbsorb: Math.round(140 * mult)
+    // Microgota que deja el cuello al romper (regla 4).
+    readonly property int launchResidue: Math.round(200 * mult)
+
     // Duraciones clave del ciclo notif (para timers/hold, NO para la anim del spring)
     // P1-5 (QA 10-30): colapso 350->160 y expansión 350->260 ms; el título se lee hacia ~420 ms.
     readonly property int notifCollapse:  Math.round(160 * mult)   // pill -> circle
@@ -179,6 +203,26 @@ Singleton {
         "morph": { "omega": 20, "zeta": 0.80 },   // más <-> check, rayo, ondas de radio
         "radio": { "omega": 17, "zeta": 0.65 }    // wifi / bluetooth: ondas y barra de apagado
     })
+    // Caja de selección del explorador de archivos: sigue al puntero con un retraso elástico corto.
+    // Vista rápida del explorador: crece desde el elemento (zeta 0.78: rebase ~2-3 %, asentada ~600 ms,
+    // sin la banda de surfaceSpring.open) y vuelve sin rebasar.
+    readonly property var quickLookSpring: ({
+        "open": { "omega": 9.0, "zeta": 0.78 },
+        "close": { "omega": 14, "zeta": 1.0 }
+    })
+    readonly property var rubberBandSpring: ({ "omega": 30, "zeta": 0.8 })
+    // Explorador: al navegar el contenido nuevo entra desplazado como mucho `filesNavTravel` px con
+    // fundido (muelles críticos: se mueve, no rebota). Si el listado aún carga, la entrada espera
+    // como mucho `filesNavHold` ms (tiempo real) en su pose inicial. El resaltado de selección
+    // desliza entre elementos y las migas se reacomodan con muelles sin rebase visible.
+    readonly property real filesNavTravel: 24
+    readonly property int filesNavHold: 200
+    readonly property var filesNavSpring: ({
+        "offset": { "omega": 20, "zeta": 1.0 },
+        "fade": { "omega": 24, "zeta": 1.0 }
+    })
+    readonly property var filesHighlightSpring: ({ "omega": 26, "zeta": 0.9 })
+    readonly property var filesCrumbSpring: ({ "omega": 22, "zeta": 1.0 })
     // Velocidad inicial (unidades del muelle/s) de los empujones con `kick`.
     readonly property var strokeKick: ({
         "cone": 9,     // el cono del volumen se comprime al encender una onda

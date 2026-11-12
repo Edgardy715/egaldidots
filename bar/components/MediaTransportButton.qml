@@ -1,6 +1,5 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Shapes
 import QtQuick.Controls.Basic
 import "../Singletons"
 import "../kit"
@@ -15,11 +14,13 @@ AbstractButton {
     property bool primary: false
     property color primaryColor: Theme.accent
     readonly property color effectivePrimaryColor: hovered ? Qt.lighter(primaryColor, 1.08) : primaryColor
-    // Quicksilver: el botón principal es una gota de mercurio teñida con el
-    // color de la portada (saturado para que el pastel no se pierda en la plata).
+    // El botón principal es una gota sólida del color de la portada (saturado
+    // para que el pastel de la paleta no se lave).
     readonly property color primaryTint: Qt.hsla(effectivePrimaryColor.hslHue < 0 ? 0 : effectivePrimaryColor.hslHue,
         Math.max(0.5, effectivePrimaryColor.hslSaturation), 0.6, 1)
-    readonly property color primaryBody: Qt.tint("#c9cbd2", Qt.alpha(primaryTint, 0.78))
+    readonly property color primaryBody: primaryTint
+    readonly property color primaryAlt: Qt.hsla(((effectivePrimaryColor.hslHue < 0 ? 0 : effectivePrimaryColor.hslHue) + 0.09) % 1,
+        Math.max(0.55, effectivePrimaryColor.hslSaturation), 0.66, 1)
     readonly property real primaryLuminance: {
         const channels = [displayedPrimary.r, displayedPrimary.g, displayedPrimary.b].map(v => v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4))
         return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
@@ -33,6 +34,23 @@ AbstractButton {
     property bool motionEnabled: true
     readonly property bool moving: enabled && visible && opacity > 0 && motionEnabled && !Flags.reduceMotion && Flags.mediaTransitions
     property real morph: playing ? 1 : 0
+    // División de la gota: sólo al sonar y sin puntero encima (al apuntar se funde y enseña la pausa).
+    // Asomar la pausa: al entrar el puntero con la música sonando la gota se funde
+    // y enseña la pausa. Un clic lo anula, para que al darle a play se vea dividirse
+    // aunque el puntero siga encima; hay que salir y volver a entrar para asomarla.
+    property bool peek: false
+    onHoveredChanged: peek = hovered && playing
+    onPressedChanged: if (pressed) peek = false
+    readonly property real splitTarget: primary && playing && !peek && !visualFocus ? 1 : 0
+    property real split: splitTarget
+    // Dividirse tarda más que fundirse: la gota se abre con calma y se recoge con decisión.
+    Behavior on split {
+        enabled: root.moving
+        NumberAnimation {
+            duration: root.splitTarget > 0.5 ? 760 : 560
+            easing.type: root.splitTarget > 0.5 ? Easing.OutCubic : Easing.InOutCubic
+        }
+    }
     property real angle: 0
     property real symbolScale: 1
     property bool ready: false
@@ -63,7 +81,7 @@ AbstractButton {
     // desfasadas (tensión superficial), no gira. En pausa es una esfera quieta.
     AmbientSubscription {
         running: root.primary && root.playing && root.moving
-        onTriggered: dt => root.angle = (root.angle + dt * 40) % 360
+        onTriggered: dt => root.angle = root.angle + dt * 120
     }
     InteractionMotion {
         id: response
@@ -95,47 +113,66 @@ AbstractButton {
             Behavior on width { enabled: !Flags.reduceMotion; SpringAnimation { spring: Motion.controlSpring; damping: Motion.controlDamping } }
             tint: root.primaryColor
             tintAmount: 1
-            glint: 0.6
             border.width: 0
             opacity: root.active ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: Motion.hover } }
         }
-        Shape {
+        // Gota de play: una esfera en pausa. Al sonar se divide en cuatro
+        // columnas líquidas que laten como un ecualizador; al apuntar vuelve a
+        // fundirse y deja ver la pausa. `split` dirige la división, `angle` el latido.
+        ShaderEffect {
             id: drop
             objectName: "mediaMercuryDrop"
             anchors.fill: parent
-            visible: root.primary
-            preferredRendererType: Shape.CurveRenderer
-            readonly property real phase: root.angle * Math.PI / 180
-            readonly property var outline: {
-                const points = []
-                for (let i = 0; i <= 96; ++i) {
-                    const t = i * Math.PI * 2 / 96
-                    const wave = root.morph * (0.026 * Math.cos(2 * t + phase) + 0.018 * Math.cos(3 * t - 1.6 * phase))
-                    const r = 0.46 * (1 + wave)
-                    points.push(Qt.point(width * (0.5 + r * Math.cos(t)), height * (0.5 + r * Math.sin(t))))
+            visible: root.primary && status !== ShaderEffect.Error
+            readonly property real beat: root.angle * Math.PI / 180 * 3
+            readonly property real amount: Math.max(0, Math.min(1, root.split))
+            readonly property var bars: {
+                const m = Math.min(width, height), count = 4
+                const big = 0.44 * m, small = 0.068 * m, spacing = 0.2 * m
+                const list = []
+                for (let i = 0; i < count; ++i) {
+                    // Las columnas salen en cascada desde el centro hacia fuera.
+                    const k = Math.max(0, Math.min(1, root.split * 1.3 - 0.2 * (Math.abs(i - 1.5) - 0.5)))
+                    // Primero adelgaza y se alarga (sigue siendo una gota), luego se abre en columnas.
+                    const er = Math.min(1, k / 0.55), shrink = er * er * (3 - 2 * er)
+                    const eo = Math.max(0, (k - 0.12) / 0.88), e = eo * eo * (3 - 2 * eo)
+                    // Latido de cada columna: dos senos desfasados, como un nivel de audio.
+                    const level = 0.65 * Math.abs(Math.sin(beat * (1 + 0.21 * i) + i * 1.7))
+                        + 0.35 * (0.5 + 0.5 * Math.sin(beat * (1.9 - 0.27 * i) + i * 2.9))
+                    const r = big + (small - big) * shrink
+                    // Nunca se sale del botón: la media altura cabe con el radio actual.
+                    const half = Math.min(0.46 * m - r, (0.1 * Math.sin(Math.PI * Math.min(1, k)) * (1 - e) + (0.03 + 0.15 * (root.moving ? level : 0.5)) * e) * m)
+                    list.push(Qt.vector4d(width / 2 + (i - 1.5) * spacing * e, Math.max(0, half), r, 0))
                 }
-                return points
+                return list
             }
-            ShapePath {
-                strokeColor: root.activeFocus ? Theme.foreground : Qt.alpha("#000000", 0.3)
-                strokeWidth: (root.activeFocus ? 1.5 : 1) * root.s
-                fillGradient: LinearGradient {
-                    x1: 0; y1: 0; x2: 0; y2: drop.height
-                    GradientStop { position: 0; color: Qt.lighter(root.displayedPrimary, 1.2) }
-                    GradientStop { position: 0.5; color: root.displayedPrimary }
-                    GradientStop { position: 1; color: Qt.darker(root.displayedPrimary, 1.5) }
-                }
-                PathPolyline { path: drop.outline }
-            }
+            property size itemSize: Qt.size(width, height)
+            property vector4d b0: bars[0]
+            property vector4d b1: bars[1]
+            property vector4d b2: bars[2]
+            property vector4d b3: bars[3]
+            // La unión es pegajosa a media división (cuellos) y casi nula al asentarse.
+            property real goo: Math.min(width, height) * (0.02 + 0.16 * Math.sin(Math.PI * Math.min(1, amount)))
+            property color colorA: root.primaryAlt
+            property color colorB: root.displayedPrimary
+            fragmentShader: Qt.resolvedUrl("shaders/playdrops.frag.qsb")
         }
-        // Reflejo cenital de la gota.
+        // Sin shader (GPU sin soporte): la esfera plana de siempre.
         Rectangle {
-            visible: root.primary
-            x: parent.width * 0.26; y: parent.height * 0.1
-            width: parent.width * 0.48; height: parent.height * 0.26
-            radius: height / 2
-            color: Qt.alpha("#ffffff", root.hovered ? 0.6 : 0.5)
+            anchors.fill: parent
+            anchors.margins: parent.width * 0.04
+            radius: width / 2
+            visible: root.primary && drop.status === ShaderEffect.Error
+            color: root.displayedPrimary
+        }
+        Rectangle {
+            anchors.fill: parent
+            radius: width / 2
+            visible: root.primary && root.visualFocus
+            color: "transparent"
+            border.width: 1.5 * root.s
+            border.color: Theme.foreground
         }
     }
     // Play/pausa del botón primario: la gota de Tidemark en lugar del glifo de fuente.
@@ -158,6 +195,9 @@ AbstractButton {
             playing: root.playing
             animate: root.moving
             size: root.iconSize * root.s
+            // Dividida en columnas, la gota ya dice "sonando": el glifo se aparta.
+            opacity: Math.max(0, 1 - 2.2 * root.split)
+            scale: 1 - 0.3 * Math.min(1, root.split)
             color: root.primaryInk
             Behavior on color { ColorAnimation { duration: Motion.hover; easing.type: Motion.easeStandard } }
         }

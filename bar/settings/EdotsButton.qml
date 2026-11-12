@@ -11,6 +11,8 @@ MotionButton {
     // Sobre un relleno de estado (barra de guardado llena): el acento se invierte
     // y los botones neutros se tiñen con la tinta del relleno.
     property bool onFill: false
+    // Button.flat: sin relleno en reposo para acciones secundarias (cerrar,
+    // restablecer) que no deben competir con la acción principal de la vista.
     function contrastInk(color) {
         const linear = channel => channel <= 0.04045 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4)
         const luminance = 0.2126 * linear(color.r) + 0.7152 * linear(color.g) + 0.0722 * linear(color.b)
@@ -32,13 +34,14 @@ MotionButton {
             : root.accent ? root.down ? Theme.accentStrong : Theme.accent
             : root.down ? Qt.alpha(wash, Theme.alphaWashStrong)
             : root.hovered ? Qt.alpha(wash, Theme.alphaWash)
+            : root.flat ? "transparent"
             : Qt.alpha(wash, Theme.alphaFaint)
         gradient: Theme.liquid && root.accent && root.enabled && !root.onFill ? accentVolume : null
         property Gradient accentVolume: Gradient {
             GradientStop { position: 0; color: Qt.lighter(root.background.color, 1.12) }
             GradientStop { position: 1; color: root.background.color }
         }
-        border.width: Theme.liquid ? 0 : 1
+        border.width: Theme.liquid || root.flat ? 0 : 1
         border.color: Qt.alpha(Theme.foreground, root.accent ? Theme.alphaHairline : Theme.alphaGhost)
         Rectangle {
             anchors.fill: parent; anchors.margins: -3; radius: parent.radius + 3

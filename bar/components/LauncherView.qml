@@ -35,6 +35,9 @@ Item {
     property bool closing: false
     readonly property bool active: open && !closing
     property string query: ""
+    readonly property int maxQueryLength: 256
+    // El campo recorta a maxQueryLength; llegar al tope es «consulta demasiado larga».
+    readonly property bool queryTooLong: query.length >= maxQueryLength
     property var searchResults: []
     property var calcResult: null
     property bool showCalculator: false
@@ -46,17 +49,10 @@ Item {
     readonly property int maxVisibleResults: 6
     signal requestClose()
     signal launchRequested(var app)
+    // Origen del icono de la fila elegida (coordenadas de esta vista), emitido justo
+    // antes de launchRequested; el vuelo de la app nace ahí.
+    signal launchOrigin(real x, real y, real size)
     signal copyResultRequested(string value)
-
-    // Attention for Iris: the text caret, in this view's coordinates. Only
-    // bound while the field has focus, so a hidden launcher costs nothing.
-    readonly property bool focusActive: active && searchInput.activeFocus
-    readonly property point focusPoint: {
-        if (!focusActive) return Qt.point(0, 0)
-        const r = searchInput.cursorRectangle
-        void searchInput.x; void searchInput.y
-        return searchInput.mapToItem(root, r.x, r.y + r.height / 2)
-    }
 
     onOpenChanged: {
         if (open) {
@@ -122,12 +118,21 @@ Item {
                 anchors.leftMargin: 42 * root.s
                 anchors.rightMargin: 38 * root.s
                 font.pixelSize: Theme.fontSizeBodyLg * root.s
-                placeholderText: qsTr("Buscar aplicaciones…")
+                placeholderText: I18n.tr("Buscar aplicaciones…")
                 motionActive: root.active && root.visible
                 floating: false
                 chrome: false
-                Accessible.name: qsTr("Buscar aplicaciones")
+                Accessible.name: I18n.tr("Buscar aplicaciones")
+                maximumLength: root.maxQueryLength
                 onTextChanged: {
+                    // Controles bidi (U+202A-202E, U+2066-2069) reordenan el campo: fuera.
+                    const clean = text.replace(/[\u202A-\u202E\u2066-\u2069]/g, "")
+                    if (clean !== text) {
+                        const caret = cursorPosition - (text.length - clean.length)
+                        text = clean
+                        cursorPosition = Math.max(0, caret)
+                        return
+                    }
                     root.query = text
                     listView.currentIndex = 0
                 }
@@ -176,7 +181,7 @@ Item {
                 MotionArea {
                     id: clearHit
                     anchors.fill: parent
-                    accessibleName: qsTr("Limpiar búsqueda")
+                    accessibleName: I18n.tr("Limpiar búsqueda")
                     onClicked: { searchInput.text = ""; searchInput.forceActiveFocus() }
                 }
             }
@@ -197,7 +202,8 @@ Item {
                 enabled: !Flags.reduceMotion
                 Anim { type: Anim.DefaultEffects }
             }
-            text: qsTr("Sin resultados. Prueba con otro nombre.")
+            text: root.queryTooLong ? I18n.tr("Consulta demasiado larga. Acórtala para buscar.")
+                                    : I18n.tr("Sin resultados. Prueba con otro nombre.")
             color: Theme.iconSecondary
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeBodyLg * root.s
@@ -346,6 +352,7 @@ Item {
                 s: root.s
                 revealDelay: Math.min(220, ListView.index * 28) * Motion.mult
                 onLaunched: {
+                    root.reportOrigin(index)
                     root.launchRequested(modelData)
                     root.requestClose()
                 }
@@ -448,11 +455,24 @@ Item {
             root.requestClose()
             return
         }
+        // Sin consulta no hay elección del usuario: Enter no lanza la primera app.
+        if (root.query.trim().length === 0) return
         if (root.searching) return
         // Results can arrive before ListView creates the selected delegate.
         const app = root.searchResults[Math.max(0, listView.currentIndex)]
         if (!app) return
+        root.reportOrigin(listView.currentIndex)
         root.launchRequested(app)
         root.requestClose()
+    }
+
+    // Centro y tamaño del icono de una fila (mismo cálculo que AppItem: margen de 14 y
+    // 7 · s, icono al 85 % del alto interior). Sólo informa; no cambia el lanzamiento.
+    function reportOrigin(index) {
+        const row = listView.itemAtIndex(Math.max(0, index))
+        if (!row) return
+        const size = (row.height - 14 * root.s) * 0.85
+        const p = row.mapToItem(root, 14 * root.s + size / 2, row.height / 2)
+        root.launchOrigin(p.x, p.y, size)
     }
 }

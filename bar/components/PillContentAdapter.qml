@@ -9,7 +9,7 @@ Item {
     property string screenName: ""
     property bool workspaceReady: false
     property var notification: null
-    property date now: new Date()
+    property date now: Regional.now()
     readonly property string activeWsName: {
         const monitor = Hyprland.monitors.values.find(m => m.name === root.screenName)
         return monitor && monitor.activeWorkspace ? monitor.activeWorkspace.name : "1"
@@ -30,7 +30,7 @@ Item {
     Timer {
         interval: 1000; repeat: true; running: true
         onTriggered: {
-            const date = new Date()
+            const date = Regional.now()
             if (Flags.clockSeconds || date.getMinutes() !== root.now.getMinutes() || date.getHours() !== root.now.getHours())
                 root.now = date
         }

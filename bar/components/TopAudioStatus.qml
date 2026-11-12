@@ -23,7 +23,7 @@ Item {
         id: volumeHit
         anchors.fill: parent
         feedbackEnabled: false
-        accessibleName: qsTr("Abrir mezclador de volumen")
+        accessibleName: I18n.tr("Abrir mezclador de volumen")
         onClicked: root.activated()
     }
 }

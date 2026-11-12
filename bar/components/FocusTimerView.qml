@@ -16,7 +16,7 @@ FocusScope {
     signal feedbackRequested(string kind)
     readonly property bool completed: !choosingNext && !session.active && session.durationSeconds > 0 && session.remainingSeconds === 0
     readonly property int displaySeconds: session.active || completed ? session.remainingSeconds : selectedMinutes * 60
-    readonly property string statusText: session.paused ? qsTr("En pausa") : session.running ? qsTr("Un momento para concentrarte") : completed ? qsTr("Sesión completada") : qsTr("Elige tu tiempo")
+    readonly property string statusText: session.paused ? I18n.tr("En pausa") : session.running ? I18n.tr("Un momento para concentrarte") : completed ? I18n.tr("Sesión completada") : I18n.tr("Elige tu tiempo")
     readonly property string timeText: String(Math.floor(displaySeconds / 60)).padStart(2, "0") + ":" + String(displaySeconds % 60).padStart(2, "0")
     implicitHeight: content.implicitHeight
     onSelectedMinutesChanged: if (!session.active) choosingNext = true
@@ -50,8 +50,8 @@ FocusScope {
         background: Rectangle {
             radius: height / 2
             color: chip.selected ? Theme.accent : Qt.alpha(Theme.foreground, chip.hovered ? Theme.alphaWash : Theme.alphaFaint)
-            border.width: chip.visualFocus ? 2 : Theme.borderHairline
-            border.color: chip.visualFocus ? Theme.accent : chip.selected ? "transparent" : Qt.alpha(Theme.foreground, Theme.alphaHair)
+            border.width: chip.visualFocus ? 2 : 0
+            border.color: Theme.accent
             Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
         }
     }
@@ -65,11 +65,11 @@ FocusScope {
             visible: root.showHeader
             SurfaceHeader {
                 Layout.fillWidth: true
-                title: qsTr("Enfoque")
+                title: I18n.tr("Enfoque")
                 subtitle: root.statusText
                 s: root.s
             }
-            CtrlBtn { iconName: "close"; size: 30; s: root.s; accessibleName: qsTr("Cerrar enfoque"); onClicked: root.closeRequested() }
+            CtrlBtn { iconName: "close"; size: 30; s: root.s; accessibleName: I18n.tr("Cerrar enfoque"); onClicked: root.closeRequested() }
         }
 
         // Cifra y estado centrados en el espacio libre, igual que Grabación.
@@ -90,7 +90,7 @@ FocusScope {
                     font.pixelSize: Theme.fontSizeCover * root.s
                     font.weight: Font.Medium
                     font.features: Theme.fontNumeric
-                    Accessible.name: qsTr("Tiempo restante: %1").arg(root.timeText)
+                    Accessible.name: I18n.tr("Tiempo restante: %1").arg(root.timeText)
                     Behavior on color { ColorAnimation { duration: Motion.standardSmall; easing.type: Motion.easeStandard } }
                 }
                 AnimatedLabel {
@@ -124,7 +124,7 @@ FocusScope {
                 model: [15, 25, 45]
                 DurationChip {
                     required property int modelData
-                    text: qsTr("%1 min").arg(modelData)
+                    text: I18n.tr("%1 min").arg(modelData)
                     selected: root.selectedMinutes === modelData && minutesInput.text === String(modelData)
                     onClicked: { root.choosingNext = true; root.selectedMinutes = modelData; minutesInput.text = String(modelData) }
                 }
@@ -139,8 +139,9 @@ FocusScope {
                 Layout.preferredHeight: 36 * root.s
                 radius: height / 2
                 color: custom && minutesInput.acceptableInput ? Qt.alpha(Theme.accent, Theme.alphaChip) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                border.width: minutesInput.activeFocus ? 2 : Theme.borderHairline
-                border.color: minutesInput.activeFocus || !minutesInput.acceptableInput ? Theme.accent : Qt.alpha(Theme.foreground, Theme.alphaHair)
+                // Sin contorno en reposo: sólo el foco o una cifra inválida lo dibujan.
+                border.width: minutesInput.activeFocus ? 2 : !minutesInput.acceptableInput ? Theme.borderHairline : 0
+                border.color: Theme.accent
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                 RowLayout {
                     anchors.fill: parent
@@ -163,12 +164,12 @@ FocusScope {
                         onActiveFocusChanged: if (activeFocus && !customField.custom) selectAll()
                         inputMethodHints: Qt.ImhDigitsOnly
                         validator: IntValidator { bottom: 1; top: 180 }
-                        Accessible.name: qsTr("Duración en minutos, entre 1 y 180")
+                        Accessible.name: I18n.tr("Duración en minutos, entre 1 y 180")
                         onTextEdited: { root.choosingNext = true; if (acceptableInput) root.selectedMinutes = Number(text) }
                         onAccepted: if (acceptableInput && root.session.start(Number(text))) root.feedbackRequested("received")
                     }
                     Text {
-                        text: qsTr("min")
+                        text: I18n.tr("min")
                         visible: !customField.idle
                         color: Theme.iconSecondary
                         font.family: Theme.font
@@ -187,7 +188,7 @@ FocusScope {
                     }
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: qsTr("Otro")
+                        text: I18n.tr("Otro")
                         color: Theme.iconSecondary
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSizeBody * root.s
@@ -206,7 +207,7 @@ FocusScope {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 52 * root.s
                 enabled: root.session.active || minutesInput.acceptableInput
-                text: root.session.running ? qsTr("Pausar") : root.session.paused ? qsTr("Continuar") : qsTr("Iniciar")
+                text: root.session.running ? I18n.tr("Pausar") : root.session.paused ? I18n.tr("Continuar") : I18n.tr("Iniciar")
                 Accessible.name: text
                 onClicked: {
                     const kind = root.session.running ? "paused" : "received"
@@ -248,7 +249,7 @@ FocusScope {
                 visible: root.session.active
                 Layout.preferredWidth: 52 * root.s
                 Layout.preferredHeight: 52 * root.s
-                text: qsTr("Cancelar")
+                text: I18n.tr("Cancelar")
                 Accessible.name: text
                 onClicked: root.session.cancel()
                 contentItem: MaterialIcon {
@@ -268,7 +269,7 @@ FocusScope {
         Text {
             objectName: "focusFootnote"
             Layout.fillWidth: true
-            text: !root.session.active && !minutesInput.acceptableInput ? qsTr("Elige entre 1 y 180 minutos") : qsTr("Sesión temporal · se descarta al reiniciar Isla")
+            text: !root.session.active && !minutesInput.acceptableInput ? I18n.tr("Elige entre 1 y 180 minutos") : ""
             color: !root.session.active && !minutesInput.acceptableInput ? Theme.accent : Theme.iconSecondary
             font.family: Theme.font
             font.pixelSize: Theme.fontSizeSmall * root.s

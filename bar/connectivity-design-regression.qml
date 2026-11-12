@@ -156,7 +156,7 @@ ShellRoot {
                 credentials.input.text="fixture-password"
                 credentials.submit(); last("password")
                 compare(credentials.input.text,"")
-                view.passwordError=qsTr("Contraseña incorrecta. Inténtalo de nuevo.")
+                view.passwordError=I18n.tr("Contraseña incorrecta. Inténtalo de nuevo.")
                 wait(500); capture("09-password-error")
                 view.passwordError=""; view.passwordConnecting=true
                 wait(250); capture("10-password-busy")

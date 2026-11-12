@@ -6,6 +6,7 @@ import "Singletons"
 ShellRoot {
     id: test
     property int step: 0
+    property int waits: 0
     property bool narrow: false
     function check(ok, message) {
         if (!ok) { console.error("FAIL: " + message); Qt.exit(1) }
@@ -61,6 +62,8 @@ ShellRoot {
     Timer {
         interval: 100; repeat: true; running: true
         onTriggered: {
+            // La entrada dura 2*Motion.morph: espera a que termine antes de la comprobación.
+            if (test.step === 8 && surface.entrance < 1 && test.waits++ < 120) return
             switch (test.step++) {
             case 0:
                 test.check(surface.entrance === 0, "entrance waits for compositor security")
@@ -73,11 +76,12 @@ ShellRoot {
                 test.capture("01-entering")
                 break
             case 8:
-                test.check(surface.entrance === 1 && surface.restingMedia === 1, "clock and playing media settle")
-                if (Quickshell.env("ISLA_LOCK_WIDE") === "1") {
+                test.check(surface.entrance === 1 && surface.restingMedia === 1, "clock and playing media settle ")
+                {
                     const clock = test.find(surface, "lockRestClock")
-                    const media = test.find(surface, "lockRestingPlayer")
-                    test.check(surface.wideRest && clock.x + clock.width < media.x, "wide clock and media remain separate")
+                    const media = test.find(surface, "lockMedia")
+                    test.check(media.visible && clock.y + clock.height < media.y, "clock and media capsule remain separate")
+                    test.check(Math.abs(media.x + media.width / 2 - surface.width / 2) < 1, "media capsule is centred")
                 }
                 test.capture("02-clock-player")
                 player.togglePlaying()
@@ -100,7 +104,7 @@ ShellRoot {
                 surface.player = null
                 break
             case 31:
-                test.check(test.find(surface, "lockRestingPlayer").item !== null, "vanished player card retained during withdrawal")
+                test.check(test.find(surface, "lockMedia").player !== null && surface.mediaShow > 0, "vanished player capsule retained during withdrawal")
                 break
             case 35:
                 test.check(surface.restingMedia === 0, "player disappearance settles")
@@ -118,8 +122,8 @@ ShellRoot {
                 surface.activateInput("")
                 break
             case 40:
-                test.check(test.find(surface, "lockAccessPlayer").hasPlayer && test.find(surface, "lockAccessPlayer").visible, "narrow auth media uses injected player")
-                const seek = test.find(test.find(surface, "lockAccessPlayer"), "lockMediaSeek")
+                test.check(test.find(surface, "lockMedia").hasPlayer && test.find(surface, "lockMedia").visible, "narrow auth media uses injected player")
+                const seek = test.find(test.find(surface, "lockMedia"), "lockMediaSeek")
                 seek.value = 0.5
                 seek.moved()
                 test.check(Math.abs(player.position - 120) < 0.1, "seek control forwards supported position")
@@ -135,14 +139,14 @@ ShellRoot {
                 surface.errorText = "Contraseña incorrecta. Revisa los caracteres e inténtalo de nuevo."
                 break
             case 44: {
-                const media = test.find(surface, "lockAccessPlayer")
+                const media = test.find(surface, "lockMedia")
                 const text = test.find(media, "lockMediaMetadata")
                 const controls = test.find(media, "lockMediaControls")
-                test.check(text.y + text.height <= controls.y, "long metadata stays above controls")
-                test.check(controls.y + controls.height <= media.height, "controls fit enlarged card")
+                test.check(text.x + text.width <= controls.x, "long metadata stays beside controls")
+                test.check(text.y >= 0 && text.y + text.height <= media.height, "metadata fits enlarged capsule")
+                test.check(controls.y >= 0 && controls.y + controls.height <= media.height, "controls fit enlarged capsule")
                 const feedback = test.find(surface, "lockFeedback")
-                const body = test.find(surface, "lockBody")
-                test.check(feedback.y + feedback.implicitHeight <= body.height - 12 * surface.unit, "long error fits auth card")
+                test.check(feedback.y + feedback.implicitHeight <= media.y, "long error stays above the media capsule")
                 test.capture("05-large-text-player")
                 break
             }

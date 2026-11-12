@@ -11,10 +11,10 @@ MotionButton {
     width: 38 * s
     height: 38 * s
     padding: 0
-    Accessible.name: qsTr("Cambiar foto de perfil")
+    Accessible.name: I18n.tr("Cambiar foto de perfil")
     ToolTip {
         visible: root.hovered
-        text: qsTr("Cambiar foto de perfil")
+        text: I18n.tr("Cambiar foto de perfil")
         delay: 250
         x: root.width - width
         y: root.height + 8
@@ -22,7 +22,7 @@ MotionButton {
         enter: Transition { NumberAnimation { property: "opacity"; from: 0; to: 1; duration: Motion.fast; easing.type: Motion.easeStandard } }
         exit: Transition { NumberAnimation { property: "opacity"; from: 1; to: 0; duration: Motion.hover; easing.type: Motion.easeStandard } }
         contentItem: Text {
-            text: qsTr("Cambiar foto de perfil")
+            text: I18n.tr("Cambiar foto de perfil")
             font.family: Theme.font
             font.pixelSize: 12
             color: Theme.foreground
@@ -35,16 +35,16 @@ MotionButton {
     }
     background: Rectangle {
         radius: width / 2
-        color: Qt.alpha(Theme.accent, 0.08 + 0.12 * root.interaction.presence)
-        border.color: Qt.alpha(Theme.accent, 0.65 + 0.25 * root.interaction.presence)
-        border.width: (root.activeFocus ? 1.4 : 0.9) * root.s
-        layer.enabled: root.visible
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowColor: Qt.alpha(Theme.accent, 0.28 + 0.14 * root.interaction.presence)
-            shadowBlur: 0.45
-            blurMax: 8
+        // Neutral hairline at rest (one accent in the bar); the accent answers hover/focus.
+        color: Qt.alpha(Theme.foreground, 0.05)
+        Rectangle {
+            anchors.fill: parent
+            radius: parent.radius
+            color: Qt.alpha(Theme.accent, 0.14)
+            opacity: root.interaction.presence
         }
+        border.color: Qt.tint(Qt.alpha(Theme.foreground, 0.24), Qt.alpha(Theme.accent, 0.75 * root.interaction.presence))
+        border.width: Math.round((root.activeFocus ? 2 : 1) * root.s)
     }
     contentItem: UserAvatar {
         name: root.userName || "•"

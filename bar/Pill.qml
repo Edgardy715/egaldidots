@@ -2,6 +2,8 @@ import QtQuick
 import Quickshell.Wayland
 import "Singletons"
 import "components"
+import "components/audio"
+import "components/RubberBand.js" as RubberBand
 import "body"
 
 /** Pill principal: expone estado al shell y coordina geometría, surfaces y morphs de notificación.
@@ -11,11 +13,174 @@ Item {
     id: pill
 
     // ---- API pública (host svg) ----
-    // Cuerpo replaces the face; retain legacy wiring for the later cleanup.
-    readonly property bool legacyCompanionEnabled: false
     readonly property alias bodyPresentation: body
     property real s: 1
     property bool layoutChanging: false
+    property bool pullIntent: false
+    readonly property alias pullMotion: morph
+    readonly property alias pullGesture: pull
+    property bool pullEnabled: true
+    property string pullTarget: "utils"
+    signal pullPrepare(string name)
+    signal pullSettled(string name, bool opened)
+    PillPullGesture {
+        id: pull
+        motion: morph
+        s: pill.s
+        enabled: pill.pullEnabled && !pill.layoutChanging
+        reduceMotion: Flags.reduceMotion
+        mode: pill.notifMorphing && pill.activeNotif ? "notification" : "surface"
+        target: pill.pullTarget
+        plannedW: pill.surfaceOpen && pill.surface === pull.surface ? pill.targetW
+            : (IslandGeometry.surfaceSizes[pull.surface || target] || IslandGeometry.fallbackSurface).width * pill.s
+        plannedH: pill.surfaceOpen && pill.surface === pull.surface ? pill.targetH
+            : (IslandGeometry.surfaceSizes[pull.surface || target] || IslandGeometry.fallbackSurface).height * pill.s
+        plannedRadius: Math.min(Math.max(18 * pill.s, plannedW * 0.055), plannedH / 2 - 2 * pill.s)
+        rubberBand: (value, limit) => RubberBand.rubberBand(value, limit, 0.55)
+        onNotificationStarted: pill.pauseNotification()
+        onNotificationFinished: action => pill.finishNotification(action)
+        onPrepare: name => pill.pullPrepare(name)
+        onSettled: (name, opened) => pill.pullSettled(name, opened)
+    }
+    // Observe before descendant MouseAreas, without accepting their presses.
+    Item {
+        anchors.fill: parent
+        z: 100
+        PointHandler {
+            id: pullPoint
+            acceptedButtons: Qt.LeftButton
+            enabled: pill.pullEnabled
+            onPointChanged: if (active && pill.pullGesture.candidate)
+                pill.pullIntent = pill.pullGesture.wantsMove(point.scenePosition.x, point.scenePosition.y)
+            onActiveChanged: {
+                if (active) pill.pullIntent = false
+                if (active && pill.pullCanStart(point.position)) {
+                    pill.pullGesture.press(point.scenePosition.x, point.scenePosition.y,
+                        Date.now(), pill.surfaceOpen, pill.surface)
+                } else if (!active && !pullDrag.active && !pill.pullGesture.scrolling) {
+                    pill.pullGesture.release(Date.now())
+                }
+            }
+        }
+        DragHandler {
+            id: pullDrag
+            target: null
+            acceptedButtons: Qt.LeftButton
+            enabled: pill.pullEnabled && !pill.pullGesture.scrolling
+            xAxis.enabled: pill.pullGesture.kind === "notification"
+            dragThreshold: pill.pullIntent ? Math.max(Motion.pullThreshold * pill.s, 1) : 32766
+            grabPermissions: PointerHandler.CanTakeOverFromItems
+                | PointerHandler.CanTakeOverFromHandlersOfDifferentType
+                | PointerHandler.ApprovesTakeOverByAnything
+            onActiveChanged: {
+                if (active) pill.pullGesture.move(centroid.scenePosition.x, centroid.scenePosition.y, Date.now())
+                else if (!pullPoint.active) pill.pullGesture.release(Date.now())
+            }
+            onCentroidChanged: if (active)
+                pill.pullGesture.move(centroid.scenePosition.x, centroid.scenePosition.y, Date.now())
+            onCanceled: pill.pullGesture.cancel()
+        }
+        WheelHandler {
+            id: pullWheel
+            target: null
+            enabled: pill.pullEnabled
+            acceptedDevices: PointerDevice.TouchPad  // la rueda del ratón nunca abre ni cierra surfaces
+            blocking: false
+            activeTimeout: Motion.pullScrollTimeout / 1000
+            onWheel: event => { event.accepted = pill.pullWheelDelta(event.x, event.y,
+                event.pixelDelta.x, event.pixelDelta.y, event.inverted) }
+            // Qt's QML WheelEvent omits phase; WheelHandler.active handles
+            // native ScrollEnd. The state also has a 120 ms fallback.
+            onActiveChanged: if (!active && !pullWheelCatch.active) pill.pullWheelIdle()
+        }
+        // The shrinking card moves away from a fixed pointer. While a wheel
+        // gesture lives, this catcher (parented to the window, so it covers
+        // the whole overlay) keeps receiving the steps the pill no longer gets.
+        Item {
+            id: wheelCatcher
+            parent: pill.Window.contentItem || pill
+            anchors.fill: parent
+            z: -1
+            enabled: pill.pullGesture.scrolling
+            WheelHandler {
+                id: pullWheelCatch
+                target: null
+                enabled: wheelCatcher.enabled
+                acceptedDevices: PointerDevice.TouchPad  // la rueda del ratón nunca abre ni cierra surfaces
+                blocking: false
+                activeTimeout: Motion.pullScrollTimeout / 1000
+                onWheel: event => { event.accepted = pill.pullWheelDelta(event.x, event.y,
+                    event.pixelDelta.x, event.pixelDelta.y, event.inverted) }
+                onActiveChanged: if (!active && !pullWheel.active) pill.pullWheelIdle()
+            }
+        }
+    }
+
+    function pullWheelDelta(x, y, dx, dy, inverted) {
+        // Angle-only mouse wheels always retain their existing path.
+        if (!pullGesture.scrolling && !pullCanWheel(Qt.point(x, y))) return false
+        const atTop = pullScrollAtTop(surfaceItem)
+        const wanted = pullGesture.wheelWanted(dx, dy, surfaceOpen, atTop, inverted)
+        // Never open/close surfaces inside Qt's wheel delivery.
+        if (wanted) pullGesture.queueWheel(dx, dy, Date.now(), surfaceOpen, surface, atTop, inverted)
+        return wanted
+    }
+    // Deactivating well before the timeout is a native ScrollEnd (real lift-off
+    // time); otherwise it is the timeout, measured at the last step.
+    function pullWheelIdle() {
+        const now = Date.now(), last = pullGesture.lastWheelTime
+        pullGesture.queueWheelRelease(now - last < Motion.pullScrollTimeout - 20 ? now : last)
+    }
+
+    function pullScrollAtTop(item) {
+        if (!item || !item.visible || !item.enabled) return true
+        if (item.contentY !== undefined && item.originY !== undefined
+                && item.contentY > item.originY + 0.5) return false
+        for (const child of item.children || []) if (!pullScrollAtTop(child)) return false
+        return true
+    }
+    function pullHit(item, point) {
+        if (!item || !item.visible || !item.enabled) return false
+        const p = item.mapFromItem(pill, point.x, point.y)
+        return p.x >= 0 && p.y >= 0 && p.x <= item.width && p.y <= item.height
+    }
+    function pullWheelControlAt(item, point) {
+        if (!pullHit(item, point)) return false
+        // Campos de texto no usan la rueda: el scroll sobre ellos cierra la
+        // superficie como en cualquier otro punto. Sliders/faders sí la consumen.
+        if (item instanceof Slider || item instanceof AudioFader) return true
+        for (const child of item.children || []) if (pullWheelControlAt(child, point)) return true
+        return false
+    }
+    function pullCanWheel(point) {
+        if (!pull.enabled || surface === "auth" || surface === "wallpaper") return false
+        if (notifMorphing && activeNotif) return true
+        if (!surfaceOpen) return true
+        // Anywhere on an open surface except wheel controls: wheel() still
+        // requires every list to sit at its top before a scroll closes it.
+        return !pullWheelControlAt(surfaceHost.loadedItem, point)
+    }
+    function pullHeaderAt(item, point) {
+        if (!item || !item.visible || !item.enabled) return false
+        const p = item.mapFromItem(pill, point.x, point.y)
+        if (p.x < 0 || p.y < 0 || p.x > item.width || p.y > item.height) return false
+        if (item.pullGrabZone === true) return true
+        for (const child of item.children || []) if (pullHeaderAt(child, point)) return true
+        return false
+    }
+    function pullCanStart(point) {
+        if (!pull.enabled || surface === "auth" || surface === "wallpaper") return false
+        if (notifMorphing && activeNotif) return true
+        if (!surfaceOpen) return true
+        // The launcher's separate top strip contains the clock/media controls.
+        // Its outer rim remains a grip; its controls keep their existing input.
+        if (surface === "launcher" && point.y < launcherHeaderH)
+            return point.y < 8 * s || point.x < 12 * s || point.x > width - 12 * s
+        const item = surfaceHost.loadedItem
+        if (!item) return false
+        const p = item.mapFromItem(pill, point.x, point.y)
+        return p.x < 0 || p.y < 0 || p.x > item.width || p.y > item.height || pullHeaderAt(item, point)
+    }
     property bool recordingDetached: false
     readonly property real restHeaderOpacity: header.restOpacity
     property real restLeftWidth: 0
@@ -27,28 +192,30 @@ Item {
     property string surface: ""            // nombre de surface activa
     property bool launcherClosing: false
     property int launcherClosePhase: 0
+    // Vuelo del launcher: la pill entera se recoge en una gota (LauncherDropMotion).
+    property bool dropMode: false
+    readonly property real dropSize: geometry.coreH
+    // El contenido se retira antes de que la forma se recoja y vuelve con ella.
+    property real dropVeil: dropMode ? 0 : 1
+    Behavior on dropVeil {
+        enabled: !Flags.reduceMotion
+        NumberAnimation { duration: pill.dropMode ? 110 : 160; easing.type: Easing.OutCubic }
+    }
     property bool forcePinned: false
-    property real companionWorkspaceLook: 0
     property bool companionCodeFocused: false
-    property bool companionMusicVisible: false
-    property real companionSeek: 0.5
-    property real companionBeat: 0
     property bool companionBlocked: false
     property bool hovered: false
     property bool interactionOpen: surfaceOpen
     readonly property bool receiving: body.waterActive ? body.receiving : material.receiving
     property real pointerX: width / 2
     property real pointerY: height / 2
-    property string responseMood: "rest"
     property string activityNotice: ""
     property string lastBatteryStatus: ""
     readonly property string focusTime: Math.floor(FocusSession.remainingSeconds / 60)
         + ":" + String(FocusSession.remainingSeconds % 60).padStart(2, "0")
     function respond(kind) {
         if (!visible || surface === "auth" || layoutChanging) return
-        responseMood = kind
         bodyEvents.react(kind)
-        expressionHold.restart()
         if (kind !== "paused" && kind !== "cancel") {
             if (body.waterActive) body.receive(0.55)
             else material.receive(0.55)
@@ -60,11 +227,10 @@ Item {
         noticeHold.restart()
         respond(kind)
     }
-    Timer { id: expressionHold; interval: 1600; onTriggered: pill.responseMood = "rest" }
     Timer { id: noticeHold; interval: 3200; onTriggered: pill.activityNotice = "" }
     onVisibleChanged: if (!visible) {
-        expressionHold.stop(); noticeHold.stop()
-        responseMood = "rest"; activityNotice = ""
+        noticeHold.stop()
+        activityNotice = ""
         material.settleReception()
         body.settleReception()
     }
@@ -90,6 +256,7 @@ Item {
         surface: pill.surface
         launcherClosing: pill.launcherClosing
         launcherClosePhase: pill.launcherClosePhase
+        dropMode: pill.dropMode
         restContentWidth: header.restContentWidth
         restLeftWidth: pill.restLeftWidth
         restRightWidth: pill.restRightWidth
@@ -169,6 +336,8 @@ Item {
 
     function awakenMaterial() { materialMotion.awaken() }
     onSurfaceChanged: {
+        // Escape, outside click or another route wins over an ongoing pull.
+        if (pull.active && !pull.resolving && surface !== pull.surface) pull.cancel(false)
         if (surface !== "focus" && surface !== "recording") Recording.cancelCountdown()
         if (surface.length > 0) awakenMaterial()
     }
@@ -218,13 +387,66 @@ Item {
     readonly property real surfaceGrowth: morph.surfaceGrowth
     readonly property real surfaceContentProgress: morph.contentProgress
 
+    property var heldNotification: null
+    property bool notificationResolving: false
+    property var notificationClocks: []
+    function pauseNotification() {
+        heldNotification = activeNotif
+        if (!heldNotification) return
+        heldNotification.lock(pill)
+        Notifs.pauseExpiration(heldNotification)
+        for (const clock of notificationClocks) {
+            clock.resume = clock.timer.running
+            clock.remaining = Math.max(1, clock.timer.interval - (Date.now() - clock.started))
+            clock.timer.stop()
+        }
+    }
+    function finishNotification(action) {
+        const notif = heldNotification
+        if (!notif) return
+        if (action !== "return") {
+            notificationResolving = true
+            if (action === "open") { Notifs.promote(notif); notif.popup = false }
+            else Notifs.dismissGesture(notif)
+        }
+        for (const clock of notificationClocks) {
+            if (action === "return" && clock.resume) {
+                clock.timer.interval = clock.remaining
+                clock.timer.start()
+            } else clock.timer.interval = clock.interval
+            clock.resume = false
+        }
+        Notifs.resumeExpiration(notif)
+        notif.unlock(pill)
+        heldNotification = null
+        if (action !== "return") Qt.callLater(settleNotificationGesture)
+    }
+    property bool notificationExternalSettling: false
+    function settleNotificationGesture() {
+        if (!morph.integrating && !morph.grabbed && !notificationExternalSettling) notificationResolving = false
+    }
+    onNotificationExternalSettlingChanged: settleNotificationGesture()
+    Connections {
+        target: morph
+        function onIntegratingChanged() { if (!morph.integrating) Qt.callLater(pill.settleNotificationGesture) }
+    }
+    function setupNotificationClocks() {
+        const timers = [notificationMotion.notifHoldInObject, notificationMotion.notifExpandTimerObject,
+            notificationMotion.notifHoldTimerObject, notificationMotion.notifCollapseOutTimerObject,
+            notificationMotion.notifReturnTimerObject, notificationMotion.surfaceRestoreTimerObject]
+        notificationClocks = timers.map(timer => ({timer: timer, started: Date.now(), interval: timer.interval, resume: false, remaining: 0}))
+        for (const clock of notificationClocks) {
+            clock.timer.runningChanged.connect(() => { if (clock.timer.running) clock.started = Date.now() })
+            clock.timer.triggered.connect(() => { clock.timer.interval = clock.interval })
+        }
+    }
     NotificationChoreography {
         id: notificationMotion
         objectName: "pillNotificationMotion"
-        blocked: pill.surface === "auth"
+        blocked: pill.surface === "auth" || pill.notificationResolving
         deferInformational: true
         suspendSurface: !pill.notifDrop
-        popup: pill.notificationsEnabled ? Notifs.activePopup : null
+        popup: pill.heldNotification || (pill.notificationsEnabled ? Notifs.activePopup : null)
         surfaceOpen: pill.interactionOpen
         collapseDuration: Motion.notifCollapse + 50
         expandDuration: Motion.notifExpand + 80
@@ -301,6 +523,11 @@ Item {
         mood: bodyEvents.mood
         music: Config.companion.reactToMusic && Players.playing && Cava.hasFrame && !Flags.reduceMotion
         beatEnvelope: Cava.hasFrame && Cava.values.length ? Math.max.apply(null, Cava.values.slice(0, 8)) : 0
+        tintColor: MediaPalette.extracted ? MediaPalette.extracted : "transparent"
+        tintOn: Players.playing && Players.isMusicSource
+        bassLive: Config.appearance.waterReactsToMusic !== false && Config.companion.reactToMusic
+            && Players.playing && Cava.hasFrame && !Flags.reduceMotion
+        bassTarget: body.bassLive ? (Cava.bass || 0) : 0
         pointerInside: pill.hovered && Config.companion.followPointer
         pointer: Qt.point(pill.pointerX, pill.pointerY)
         resting: Config.appearance.personality && Flags.liquidSurfaces && !Flags.reduceTransparency
@@ -361,11 +588,15 @@ Item {
         id: content
         anchors.fill: parent
         z: 1
+        opacity: pill.dropVeil
+        visible: opacity > 0.001
 
         PillHeaderView {
             id: header
             anchors.fill: parent
             z: 3
+            // Mientras dura el momento de corriente cede el reposo al rayo y al porcentaje.
+            opacity: 1 - powerMoment.exposure
             s: pill.s
             coreH: pill.coreH
             layoutChanging: pill.layoutChanging
@@ -385,24 +616,16 @@ Item {
             notifAnimating: pill.notifMorphing
             capsLockOn: statusAdapter.capsLockOn
             now: pill.now
-            companionContext: companionBehavior
-            companionEnabled: pill.legacyCompanionEnabled
-            companionAsleep: presence.isIdle
-            companionSleepy: Config.companion.reactAtNight && companionBehavior.night
-            companionListening: Config.companion.reactToMusic && Players.playing
             recordingPhase: !pill.recordingDetached && Recording.engaged ? (Recording.uncertain ? "unknown" : Recording.phase) : ""
             recordingCountdown: Recording.countdown
-            activityText: !pill.recordingDetached && Recording.engaged ? Recording.uncertain ? qsTr("Grabador sin conexión")
-                : Recording.phase === "countdown" ? qsTr("Preparando…")
-                : Recording.phase === "starting" ? qsTr("Iniciando…")
-                : Recording.phase === "stopping" ? qsTr("Finalizando…")
-                : Recording.paused ? qsTr("Pausa · %1").arg(Recording.timeText) : qsTr("REC · %1").arg(Recording.timeText)
+            activityText: !pill.recordingDetached && Recording.engaged ? Recording.uncertain ? I18n.tr("Grabador sin conexión")
+                : Recording.phase === "countdown" ? I18n.tr("Preparando…")
+                : Recording.phase === "starting" ? I18n.tr("Iniciando…")
+                : Recording.phase === "stopping" ? I18n.tr("Finalizando…")
+                : Recording.paused ? I18n.tr("Pausa · %1").arg(Recording.timeText) : I18n.tr("REC · %1").arg(Recording.timeText)
                 : pill.activityNotice || (FocusSession.active
-                ? (FocusSession.paused ? qsTr("Pausa · %1").arg(pill.focusTime) : pill.focusTime)
-                : FocusSession.durationSeconds > 0 && FocusSession.remainingSeconds === 0 ? qsTr("Sesión completada") : "")
-            activityMood: pill.faceMood
-            lookX: pill.faceLookX
-            lookY: pill.faceLookY
+                ? (FocusSession.paused ? I18n.tr("Pausa · %1").arg(pill.focusTime) : pill.focusTime)
+                : FocusSession.durationSeconds > 0 && FocusSession.remainingSeconds === 0 ? I18n.tr("Sesión completada") : "")
             hasMedia: contentAdapter.hasMedia
             artUrl: contentAdapter.artUrl
             hasProgress: contentAdapter.hasProgress
@@ -412,7 +635,19 @@ Item {
             onRequestCalendar: pill.requestSurface("calendar")
         }
 
+        DevicePowerMoment {
+            id: powerMoment
+            z: 4
+            s: pill.s
+            coreH: pill.coreH
+            shown: DeviceMoments.powerShown && !pill.surfaceOpen && !pill.activeNotif
+            charging: DeviceMoments.powerPlugged
+            percent: DeviceMoments.powerPercent
+        }
+
         IslandNotification {
+            contentOffset: pull.kind === "notification" ? pull.contentOffset : 0
+            gestureActive: pull.candidate && pull.kind === "notification"
             anchors.centerIn: parent
             notification: pill.activeNotif
             s: pill.s
@@ -453,6 +688,7 @@ Item {
     PillSurfaceHost {
         id: surfaceHost
         artworkTransition: sharedArtwork
+        gestureDriven: pull.active || morph.pullRevealing
         open: pill.surfaceOpen
         surface: pill.surface
         scaleFactor: pill.s
@@ -468,31 +704,13 @@ Item {
         reveal: pill.surfaceReveal
         returning: pill.launcherReturning
         largeSurface: pill.lastSurfaceW * pill.lastSurfaceH > Motion.materializeLargeArea * pill.s * pill.s
+        // Lay the content out at the surface's own size; a notification target is not one.
+        layoutTargetWidth: pill.surfaceOpen && !pill.surfaceNotifSuspended ? geometry.surfaceTargetW : 0
+        layoutTargetHeight: pill.surfaceOpen && !pill.surfaceNotifSuspended ? geometry.surfaceTargetH : 0
         onRequestClose: pill.requestClose()
         onRequestPage: (name) => pill.requestSurface(name)
         onFeedbackRequested: kind => pill.respond(kind)
     }
-
-        // Iris travels to the corner of an open surface and back. It is the same
-        // face (same behaviour context) as the one in the header; the header face
-        // fades as this one takes over, so there is never a second personality.
-        IslandCompanion {
-            id: perch
-            objectName: "irisPerch"
-            z: 6
-            s: pill.s
-            context: companionBehavior
-            mood: pill.faceMood
-            asleep: presence.isIdle
-            sleepy: Config.companion.reactAtNight && companionBehavior.night
-            listening: Config.companion.reactToMusic && Players.playing
-            lookX: pill.faceLookX
-            lookY: pill.faceLookY
-            opacity: pill.perchTravel
-            visible: pill.perchShown
-            x: pill.perchOrigin.x + (pill.perchTarget.x - pill.perchOrigin.x) * pill.perchTravel - width / 2
-            y: pill.perchOrigin.y + (pill.perchTarget.y - pill.perchOrigin.y) * pill.perchTravel - height / 2
-        }
     }
 
     /** item de la surface activa (para que el host enrute teclado hacia él). */
@@ -502,15 +720,17 @@ Item {
         id: statusAdapter
         s: pill.s
         fallbackVisible: pill.surfaceOpen || (pill.activeNotif && pill.notifMorphing)
-        onShowVolume: (progress, muted) => header.showVolume(progress, muted)
+        objectName: "pillStatusAdapter"
+        onShowVolume: (progress, muted) => { header.showVolume(progress, muted); body.adjust("volume", progress, muted) }
         onShowMic: (progress, muted) => header.showMic(progress, muted)
-        onShowBrightness: (progress) => header.showBrightness(progress)
+        onShowBrightness: (progress) => { header.showBrightness(progress); body.adjust("brightness", progress, false) }
         onShowBattery: (percent, status) => {
             header.showBattery(percent, status)
-            if (status === "charging" && pill.lastBatteryStatus.length && pill.lastBatteryStatus !== status)
-                pill.notice(qsTr("Cargando · %1%").arg(percent), "connected")
+            // El momento de corriente de DeviceMoments sustituye al aviso de enchufar.
+            if (status === "charging" && pill.lastBatteryStatus.length && pill.lastBatteryStatus !== status
+                && !DeviceMoments.ownsPowerTransition())
+                pill.notice(I18n.tr("Cargando · %1%").arg(percent), "connected")
             pill.lastBatteryStatus = status
-            companionBehavior.noteBattery(percent, status)
         }
         onFallbackVolumeRequested: (scaleFactor) => osd.showVolume(scaleFactor)
         onFallbackBrightnessRequested: (scaleFactor) => osd.showBrightness(scaleFactor)
@@ -519,121 +739,29 @@ Item {
     // Public API used by external hosts.
     function showVolumeOSD() { statusAdapter.showVolumeOSD() }
 
-    // ---- Iris: shared face state, perch and attention ----
-    readonly property string faceMood: responseMood !== "rest" ? responseMood
-        : FocusSession.paused ? "paused" : FocusSession.running ? "working" : "rest"
-    readonly property real faceLookX: companionBehavior.lookX
-    readonly property real faceLookY: responseMood === "attention" ? 0.8 : companionBehavior.lookY
 
-    // The perch: the face leaves the header for the corner of surfaces that hide
-    // the header. The launcher and the auth prompt keep it in their own header.
-    // With reduced motion it does not travel (the header face simply fades).
-    readonly property bool perchWanted: pill.legacyCompanionEnabled && surfaceOpen && !launcherReturning
-        && surface !== "launcher" && surface !== "auth" && !layoutChanging && !Flags.reduceMotion
-        && !surfaceNotifSuspended && !(activeNotif && notifMorphing)
-    property real perchTravel: perchWanted ? 1 : 0
-    // SmoothedAnimation keeps the velocity when the target flips mid-way, as the pill's own geometry does.
-    Behavior on perchTravel {
-        enabled: !Flags.reduceMotion
-        SmoothedAnimation { duration: Motion.standardLarge; velocity: -1 }
-    }
-    readonly property bool perchShown: perchTravel > 0.01
-    readonly property bool faceVisible: header.restOpacity > 0.01 || perchShown
-    // Origin: where the header face is now (it follows the header, so the way back
-    // ends exactly on it, whatever the scale). Target: top right, on the inset the
-    // launcher divider uses, at the middle of the scaled rest strip (coreH).
-    readonly property point perchOrigin: header.faceSlot
-    readonly property point perchTarget: Qt.point(width - 22 * s - 15 * s, coreH / 2)
-    // Where the face looks from: the perch while it is out, the header otherwise.
-    readonly property point faceCenter: perchShown ? Qt.point(perch.x + perch.width / 2, perch.y + perch.height / 2) : header.faceSlot
-
-    // Attention: a surface with one point that matters publishes it and Iris
-    // looks there. Nothing is evaluated unless the surface declares it active.
-    // The surface open in the pill, or else the one the host injects (the media card
-    // of the split layout lives outside the pill).
-    property var attentionItem: null
-    readonly property var attentionSource: surfaceItem ? surfaceItem : attentionItem
-    readonly property bool attentionActive: !!attentionSource && attentionSource.focusActive === true && faceVisible
-    readonly property point attentionVector: {
-        if (!attentionActive) return Qt.point(0, 0)
-        const p = attentionSource.mapToItem(pill, attentionSource.focusPoint.x, attentionSource.focusPoint.y)
-        const range = 120 * s
-        return Qt.point(Math.max(-1, Math.min(1, (p.x - faceCenter.x) / range)),
-                        Math.max(-1, Math.min(1, (p.y - faceCenter.y) / range)))
-    }
-
-    CompanionBehavior {
-        id: companionBehavior
-        objectName: "companionBehavior"
-        active: pill.legacyCompanionEnabled && pill.visible && pill.faceVisible && !pill.layoutChanging
-        reduced: Flags.reduceMotion
-        asleep: presence.isIdle
-        options: Config.companion
-        blocked: pill.companionBlocked || pill.surface === "launcher" || pill.surface === "auth" || Recording.engaged || !!pill.activeNotif
-        night: pill.now.getHours() >= 23 || pill.now.getHours() < 6
-        codeFocused: pill.companionCodeFocused
-        workspaceLook: pill.companionWorkspaceLook
-        musicVisible: pill.companionMusicVisible
-        playing: Players.playing
-        seek: pill.companionSeek
-        beat: pill.companionBeat
-        memoryPlayfulness: IrisMemory.playfulness
-        recording: Recording.engaged
-        greetingPending: IrisMemory.greetingKind !== ""
-        onInteracted: IrisMemory.noteInteraction()
-        onVisited: kind => IrisMemory.noteSighting(kind)
-        onGreetingRequested: greet(IrisMemory.consumeGreeting())
-        focusActive: pill.attentionActive
-        focusX: pill.attentionVector.x
-        focusY: pill.attentionVector.y
-        pointerInside: pill.hovered
-        pointerX: (pill.pointerX / Math.max(1, pill.width) - 0.5) * 2
-        pointerY: (pill.pointerY / Math.max(1, pill.height) - 0.5) * 2
-    }
     onActiveNotifChanged: {
+        if (activeNotif && !heldNotification) pull.resetNotificationContent()
         if (activeNotif && activeNotif.urgency >= 2) {
-            companionBehavior.gestureRequested("curious")
-            companionBehavior.react("surprised", "defer")
             respond("attention")
         }
     }
 
-    // The companion's sense of presence: it falls asleep when the user leaves
-    // and greets them on return. The compositor reports idleness; nothing polls.
+    // Presence: the compositor reports idleness and the body quietens; nothing polls.
     IdleMonitor {
         id: presence
         enabled: Config.appearance.personality && pill.visible
         timeout: Config.companion.sleepAfterSeconds
         respectInhibitors: true
     }
-    // The first activity of the day is noted once the user is present, at startup
-    // or on waking; IrisMemory ignores every later call that day.
-    readonly property bool irisPresent: Config.loaded && pill.legacyCompanionEnabled && !presence.isIdle
-    onIrisPresentChanged: if (irisPresent) IrisMemory.noteActivity()
-
     Connections {
         target: FocusSession
-        function onFinished() { pill.notice(qsTr("Sesión completada"), "finished") }
+        function onFinished() { pill.notice(I18n.tr("Sesión completada"), "finished") }
     }
     Connections {
         target: Recording
         function onFeedbackRequested(kind) { pill.respond(kind) }
-        function onActiveChanged() { if (!Recording.active && !Recording.uncertain) Qt.callLater(() => companionBehavior.react("relief")) }
-        function onSaved(path) { pill.notice(qsTr("Grabación guardada"), "finished") }
-    }
-    // The prompt's own verdict on the password; the face sits beside it on this surface.
-    Connections {
-        target: pill.surfaceItem
-        ignoreUnknownSignals: true
-        function onHasErrorChanged() { if (pill.surface === "auth" && pill.surfaceItem.hasError) companionBehavior.react("no", "surface") }
-        function onSuccessStateChanged() { if (pill.surface === "auth" && pill.surfaceItem.successState) companionBehavior.react("wink", "surface") }
-    }
-    // A discrete success on the open surface (an app launched, a wallpaper applied).
-    // Wink is the existing approval gesture; it bypasses `blocked` like auth's.
-    Connections {
-        target: pill.surfaceItem
-        ignoreUnknownSignals: true
-        function onApproved() { if (pill.surface !== "auth") companionBehavior.react("wink", "surface") }
+        function onSaved(path) { pill.notice(I18n.tr("Grabación guardada"), "finished") }
     }
     Connections {
         target: Config
@@ -641,8 +769,8 @@ Item {
     }
 
     Component.onCompleted: {
+        setupNotificationClocks()
         lastBatteryStatus = statusAdapter.batteryStatus
-        if (irisPresent) IrisMemory.noteActivity()
         // The initial load is complete; the next workspace change is real.
         wsReady = true
     }

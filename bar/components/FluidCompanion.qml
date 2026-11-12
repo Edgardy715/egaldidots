@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell.Widgets
 import "../fluid" as Fluid
 import "../Singletons"
+import "RubberBand.js" as RubberBand
 
 /** Shared droplet engine. Motion is integrated in right-facing coordinates;
  * leftSide reflects geometry only, never text or controls. */
@@ -18,9 +19,106 @@ Item {
     readonly property vector4d fieldBox: waterActive && active && visible && opacity > 0.005
         ? Qt.vector4d(visualX - bodyX + wPos / 2, yPos - bodyY + hPos / 2, wPos / 2, hPos / 2)
         : Qt.vector4d(0, 0, 0, 0)
-    readonly property vector2d fieldShape: Qt.vector2d(cardRadius, Math.max(0, neckSpring.value))
+    // Sinking home, the smooth union shrinks with depth: a drop inside the pill
+    // adds no bulge, so hiding it at concealment changes no pixel.
+    readonly property real sinkFade: {
+        const t = Math.max(0, Math.min(1, (stretch - 0.15) / 0.5))
+        return t * t * (3 - 2 * t)
+    }
+    // A side drop instead stays fused while it sits in the pill's end: the shared
+    // radius swells that end like a received drop, and it relaxes before hiding.
+    readonly property vector2d fieldShape: Qt.vector2d(cardRadius,
+        Math.max(0, neckSpring.value) * (centered ? sinkFade : 1))
     readonly property alias fieldSpring: neckSpring
     readonly property alias motionRunning: motionFrames.running
+    property bool gesturesEnabled: Config._effective.gestures.enabled
+    property bool gestureDismissable: false
+    property bool gestureDismissed: false
+    property bool gestureCandidate: false
+    property bool gestureActive: false
+    property bool gestureIntent: false
+    property bool gestureHandoff: false
+    property bool gestureOpening: false
+    property bool gestureResolving: false
+    property real gestureStartX: 0
+    property real gestureStartY: 0
+    property real gestureX: 0
+    property real gestureY: 0
+    property real gestureDX: 0
+    property real gestureDY: 0
+    property string gestureDirection: ""
+    signal requestOpen(string name)
+    PillPullGesture { id: gestureSamples; motion: null; enabled: false }
+    function gesturePress(x, y, time) {
+        if (!gesturesEnabled || expanded || centered || !active || gestureDismissed || gestureCandidate) return false
+        gestureStartX = x; gestureStartY = y; gestureX = xPos; gestureY = yPos
+        gestureDX = 0; gestureDY = 0; gestureDirection = ""
+        gestureSamples.beginSampling(time, xPos, yPos)
+        gestureCandidate = true; gestureHandoff = false
+        birthTimer.stop()
+        return true
+    }
+    function gestureWantsMove(x, y) {
+        return gestureCandidate && Math.max(Math.abs(x - gestureStartX), Math.abs(y - gestureStartY)) > Motion.pullThreshold * s
+    }
+    function gestureMove(x, y, time) {
+        if (!gestureCandidate) return false
+        gestureDX = (x - gestureStartX) * (leftSide ? -1 : 1)
+        gestureDY = y - gestureStartY
+        if (!gestureActive) {
+            if (!gestureWantsMove(x, y)) return false
+            gestureDirection = Math.abs(gestureDX) > Math.abs(gestureDY) ? "horizontal" : "down"
+            gestureActive = true
+        }
+        let dx = gestureDX, dy = gestureDY
+        if (gestureDirection === "horizontal") {
+            if (!gestureDismissable || dx < 0) dx = RubberBand.rubberBand(dx, 14 * s, 0.55)
+            dy = 0
+        } else { dx = 0; dy = RubberBand.rubberBand(dy, 40 * s, 0.55) }
+        gestureSamples.sample(time, gestureX + dx, gestureY + dy)
+        if (!Flags.reduceMotion) { xPos = gestureX + dx; yPos = gestureY + dy; updateBond() }
+        return true
+    }
+    function gestureRelease(time, cancelled) {
+        if (!gestureCandidate || gestureResolving) return false
+        gestureResolving = true
+        gestureSamples.finishSampling(time)
+        const moving = gestureActive
+        // Navigation and visibility resolve while capture is still held. The
+        // overlay freezes both layer focus and mask until candidate is cleared.
+        let opened = !cancelled && moving && gestureDirection === "down" && gestureDY > 24 * s
+        const rawStretch = Math.hypot(gestureX + Math.max(0, gestureDX) + wPos / 2 - capX,
+            gestureY + hPos / 2 - capY) / Math.max(1, capRadius + dropRadius)
+        const dismissed = !cancelled && moving && gestureDismissable && gestureDirection === "horizontal"
+            && gestureDX > 0 && (Flags.reduceMotion ? rawStretch : stretch) >= 1.30
+        gestureActive = false
+        if (opened) {
+            gestureOpening = true
+            requestOpen(surfaceName)
+            if (!expanded) {
+                opened = false; gestureOpening = false
+                retarget("companion", bodyX + bodyW + gap, compactY, hovered ? moduleW : compactWidth, moduleH)
+            } else if (!Flags.reduceMotion) retarget("brotando", budX, budY, budSize, budSize)
+            else bloom()
+        } else if (dismissed) {
+            gestureDismissed = true
+            if (Flags.reduceMotion) { phase = "idle"; concealed = true; bond = false }
+            else {
+                retarget("residual", capX + bodyRadius - 3 * s, capY - 3 * s, 6 * s, 6 * s)
+                bond = false
+            }
+        } else if (moving) retarget("companion", bodyX + bodyW + gap, compactY, hovered ? moduleW : compactWidth, moduleH)
+        if (!Flags.reduceMotion && moving) {
+            vx = cancelled ? 0 : gestureSamples.velocityW
+            vy = cancelled ? 0 : gestureSamples.velocityH
+            gestureHandoff = true
+        }
+        if (!moving && phase === "nacimiento") birthTimer.restart()
+        gestureCandidate = false
+        gestureResolving = false
+        return opened || dismissed
+    }
+    onGesturesEnabledChanged: if (!gesturesEnabled) gestureRelease(Date.now(), true)
     property bool manualStep: false
     property bool open: false
     property bool expanded: false
@@ -43,11 +141,16 @@ Item {
     property Component compactContent
     property Component expandedContent
     property bool retainExpandedContent: false
+    // Share of cardContentProgress already spent before expanded content shows;
+    // dense content (text) leaves the shrinking card early instead of ghosting.
+    property real expandedContentDelay: 0
+    readonly property real expandedContentOpacity: Math.max(0, Math.min(1,
+        (cardContentProgress - expandedContentDelay) / Math.max(0.01, 1 - expandedContentDelay)))
     property bool asynchronousExpandedContent: false
     property real compactWidth: collapsedW
     property real hoverWidth: 218 * s
     property real compactY: bodyY
-    property string compactAccessibleName: qsTr("Abrir panel multimedia")
+    property string compactAccessibleName: I18n.tr("Abrir panel multimedia")
     readonly property var surfaceItem: expandedContent
         ? (expandedLoader.status === Loader.Ready ? expandedLoader.item : null) : surfaceHost.loadedItem
     readonly property real visualX: leftSide ? 2 * bodyX + bodyW - xPos - wPos : xPos
@@ -72,11 +175,15 @@ Item {
     readonly property real bodyY: body ? body.y : 0
     readonly property real bodyW: body ? body.width : 0
     readonly property real bodyH: body ? body.height : IslandGeometry.restHeight * s
-    readonly property real bodyRadius: bodyH / 2
+    // A tall surface keeps its own corner radius: the drop is swallowed by the
+    // top corner of the end, never by a disc as tall as the whole body.
+    readonly property real bodyRadius: body && body.morphRadius !== undefined
+        ? Math.max(1, Math.min(bodyH / 2, body.morphRadius)) : bodyH / 2
     readonly property real moduleW: hoverWidth
     readonly property real moduleH: IslandGeometry.restHeight * s
     readonly property real collapsedW: 42 * s
-    readonly property real returnH: centered ? Math.min(moduleH, bodyH) : moduleH
+    // A side drop settles a little inside the pill's height, so the fused end swells.
+    readonly property real returnH: centered ? Math.min(moduleH, bodyH) : Math.max(12 * s, Math.min(bodyH, moduleH) - 6 * s)
     // Every droplet sinks home round: a pill-wide capsule joined below the pill
     // reads as a flat-bottomed trapezoid through the neck hull.
     readonly property real returnW: returnH
@@ -112,6 +219,8 @@ Item {
     property real captureV: 0
     property bool concealed: false
     property bool bond: false
+    // A side drop held in the pill's end while its swell relaxes.
+    property bool draining: false
     property bool hovered: false
 
     readonly property bool active: phase !== "idle" && !concealed
@@ -183,8 +292,11 @@ Item {
         : bodyY + (bodyH - budSize) / 2
     // Start the trailing contraction while the return still has velocity.
     readonly property bool coveredByBody: {
-        if (wPos > returnW + 3 * s
-                || hPos > returnH + 3 * s || contentExposure >= 0.01) return false
+        // A side drop already sunk in the pill is hidden while it still contracts;
+        // waiting for the last pixels of contraction leaves it visibly lingering.
+        const slack = (centered ? 3 : 10) * s
+        if (wPos > returnW + slack
+                || hPos > returnH + slack || contentExposure >= 0.01) return false
         const left = bodyX + capRadius
         const right = bodyX + bodyW + captureExtra - capRadius
         const cy = yPos + hPos / 2
@@ -202,6 +314,7 @@ Item {
     function retarget(nextPhase: string, x: real, y: real, w: real, h: real): void {
         phase = nextPhase
         concealed = false
+        draining = false
         targetX = x; targetY = y; targetW = w; targetH = h
         if (nextPhase !== "retornando" && nextPhase !== "absorbiendo") captureTarget = 0
         if (Flags.reduceMotion) {
@@ -217,6 +330,7 @@ Item {
     }
 
     function start(): void {
+        if (gestureDismissed) return
         captureExtra = expanded || Flags.reduceMotion ? 0 : 6 * s
         captureTarget = 0; captureV = 0
         lastBodyEdge = bodyX + bodyW
@@ -239,6 +353,7 @@ Item {
     }
 
     function close(): void {
+        if (gestureDismissed) return
         if (phase === "idle" || phase === "retornando" || phase === "absorbiendo"
                 || phase === "recogiendo") return
         captureTarget = 0
@@ -249,25 +364,47 @@ Item {
         returnHome()
     }
 
+    // A card drawn into the pill below it narrows first (width and x share the
+    // faster rate so the centre holds): height and y keep the shared spring, so it
+    // arrives as a drop, never a wide slab. A side drop returning home is pulled
+    // in faster along x, so it is swallowed instead of crawling to the rim.
+    readonly property real gatherRate: phase === "retornando" ? 1.7
+        : phase === "recogiendo" ? (centered ? 1.8 : 1.6) : 1
+    // A side card gathers as a whole, and rises to the pill's centre line as it
+    // returns, so the swell at its end stays level instead of hanging below.
+    readonly property real gatherRateY: !centered && (phase === "recogiendo" || phase === "retornando") ? 1.6 : 1
     // Below this the gathering card is a blob well inside the pill width.
     readonly property real gatherSize: 66 * s
+    // A side drop is drawn into the pill's end, centred on its cap: it reaches the
+    // rim still moving, fuses, and the end swells instead of a disc sliding across.
+    readonly property real returnX: centered ? bodyX + (bodyW - returnW) / 2
+        : capX - (draining ? drainSize : returnW) / 2
+    readonly property real drainSize: returnW * 0.6
+    // On the cap line: the pill's centre line at rest, the top corner of a tall body.
+    readonly property real returnY: below || bodyH > moduleH * 1.2 ? capY - returnH / 2
+        : bodyY + (bodyH - returnH) / 2
+    // Fusion radius while a side drop is drawn in; a pill-wide radius over-swells.
+    readonly property real drainBlend: 14 * s
     function returnHome(): void {
-        retarget("retornando", centered ? bodyX + (bodyW - returnW) / 2
-                 : bodyX + bodyW - 20 * s,
-                 below ? capY - returnH / 2 : bodyY + (bodyH - returnH) / 2, returnW, returnH)
+        const wasReturning = phase === "retornando"
+        retarget("retornando", returnX,
+                 returnY, returnW, returnH)
+        // Pulled in: the drop leaves with inward speed, so it is swallowed rather
+        // than easing to a stop at the rim.
+        if (!centered && !wasReturning && !Flags.reduceMotion) vx -= 650 * s
     }
 
     // A card blooms only clear of the pill; reopening while joined or inside
     // it buds off again with the current velocity instead of growing in the neck.
     function bloom(): void {
         birthTimer.stop()
-        if (!Flags.reduceMotion && phase !== "media" && (bond || overlapsBody || concealed))
+        if (!Flags.reduceMotion && phase !== "media" && (gestureOpening || bond || overlapsBody || concealed))
             retarget("brotando", budX, budY, budSize, budSize)
         else
             retarget("media", cardX, cardY, cardW, cardH)
     }
     function syncHoverSize(): void {
-        if (phase === "idle") return
+        if (gestureCandidate || gestureDismissed || phase === "idle") return
         if (phase === "brotando" && expanded) return
         if (expanded) {
             bloom()
@@ -278,7 +415,7 @@ Item {
         retarget("companion", bodyX + bodyW + gap, compactY, compactW, moduleH)
     }
 
-    function spring(value: real, velocity: real, target: real, dt: real): var {
+    function spring(value: real, velocity: real, target: real, dt: real, rate: real): var {
         let omega = 16
         let damping = 0.92
         if (phase === "separando") { omega = 11; damping = 0.84 }
@@ -286,7 +423,7 @@ Item {
         else if (phase === "recogiendo") { omega = 19; damping = 0.98 }
         else if (phase === "retornando" || phase === "absorbiendo") { omega = 15.5; damping = 0.98 }
         if (Flags.reduceMotion) { omega = 28; damping = 1.15 }
-        else omega *= springRate
+        else omega *= springRate * (rate || 1)
         // Exact damped motion keeps the same trajectory at every refresh rate.
         const offset = value - target
         const decay = Math.exp(-damping * omega * dt)
@@ -305,7 +442,12 @@ Item {
         // Returning grows the neck from zero at the same threshold where it breaks.
         // A wide droplet can pass the stretch limit while its edge is still
         // inside the pill; the neck holds until it is clear, so no loose drop overlaps.
+        const was = bond
         bond = stretch < (bond || phase === "retornando" ? 1.30 : 1.02) || (bond && overlapsBody)
+        // Touching water bridges at once: a side drop's neck opens with speed
+        // rather than growing from nothing while the drop is already half inside.
+        if (bond && !was && !centered && phase === "retornando" && waterActive)
+            neckSpring.kick(drainBlend * 18)
     }
 
     onOpenChanged: {
@@ -347,12 +489,14 @@ Item {
             targetX = bodyX + bodyW + gap
             targetY = compactY
         } else if (phase === "retornando") {
-            targetX = centered ? bodyX + (bodyW - returnW) / 2
-                : bodyX + bodyW - 20 * s
-            targetY = below ? capY - returnH / 2 : bodyY + (bodyH - returnH) / 2
-            targetW = returnW
-            targetH = returnH
-        } else if (phase === "brotando" || phase === "recogiendo") {
+            const size = draining ? drainSize : returnW
+            targetX = returnX
+            targetY = below || bodyH > moduleH * 1.2 ? capY - size / 2 : bodyY + (bodyH - size) / 2
+            targetW = size
+            targetH = size
+        } else if (phase === "brotando") {
+            targetX = budX; targetY = budY
+        } else if (phase === "recogiendo") {
             targetX = budX; targetY = budY
         } else if (phase === "companion" || phase === "media") syncHoverSize()
     }
@@ -363,6 +507,9 @@ Item {
     onBodyHChanged: followBody()
     onReturnWChanged: if (phase === "retornando") followBody()
     onReturnHChanged: if (phase === "retornando") followBody()
+    // While draining, the rim withdraws: the drop keeps to the moving cap, or it
+    // settles outside the end, is never covered and the dock waits forever.
+    onCaptureExtraChanged: if (phase === "retornando" && draining) followBody()
     onBodyBusyChanged: updateBond()
     onHoveredChanged: syncHoverSize()
     onCompactWidthChanged: syncHoverSize()
@@ -402,7 +549,8 @@ Item {
     SpringValue {
         id: neckSpring
         objectName: "waterNeckSpring"
-        target: root.joined ? root.neckBlend : 0
+        target: !root.joined || root.draining ? 0
+            : root.centered ? root.neckBlend : Math.min(root.neckBlend, root.drainBlend)
         spring: Motion.strokeSpring.lift
         active: root.waterActive && root.phase !== "idle"
         manualStep: true
@@ -410,38 +558,64 @@ Item {
 
     FrameAnimation {
         id: motionFrames
-        running: !root.manualStep && !Flags.reduceMotion && root.phase !== "idle"
+        running: !root.manualStep && !root.gestureCandidate && !Flags.reduceMotion && root.phase !== "idle"
             && (!root.settled || root.waterActive && neckSpring.integrating || root.phase === "separando" || root.phase === "brotando"
                 || root.phase === "recogiendo"
-                || root.phase === "retornando" || root.phase === "absorbiendo")
+                || root.phase === "retornando" || root.phase === "absorbiendo" || root.phase === "residual")
         onTriggered: root.advanceMotion(frameTime)
     }
 
     function advanceMotion(dt: real): void {
-        let next = root.spring(root.xPos, root.vx, root.targetX, dt); root.xPos = next[0]; root.vx = next[1]
-        next = root.spring(root.yPos, root.vy, root.targetY, dt); root.yPos = next[0]; root.vy = next[1]
-        next = root.spring(root.wPos, root.vw, root.targetW, dt); root.wPos = next[0]; root.vw = next[1]
-        next = root.spring(root.hPos, root.vh, root.targetH, dt); root.hPos = next[0]; root.vh = next[1]
+        if (gestureCandidate) return
+        if (gestureHandoff) {
+            gestureHandoff = false
+            xPos += vx * dt; yPos += vy * dt
+            return
+        }
+        let next = root.spring(root.xPos, root.vx, root.targetX, dt, root.gatherRate); root.xPos = next[0]; root.vx = next[1]
+        next = root.spring(root.yPos, root.vy, root.targetY, dt, root.gatherRateY); root.yPos = next[0]; root.vy = next[1]
+        next = root.spring(root.wPos, root.vw, root.targetW, dt, root.gatherRate); root.wPos = next[0]; root.vw = next[1]
+        next = root.spring(root.hPos, root.vh, root.targetH, dt, root.gatherRateY); root.hPos = next[0]; root.vh = next[1]
         root.updateBond()
-        if (!root.centered && root.phase === "retornando" && root.stretch < 1.10)
-            root.captureTarget = 20 * root.s
-        next = root.spring(root.captureExtra, root.captureV, root.captureTarget, dt)
+        // The pill's end reaches for an incoming side drop before contact.
+        if (!root.centered && root.phase === "retornando" && !root.draining && root.stretch < 1.6)
+            root.captureTarget = 12 * root.s
+        // The rim reaches for a side drop quickly enough to meet it at contact.
+        next = root.spring(root.captureExtra, root.captureV, root.captureTarget, dt,
+                           !root.centered && root.phase === "retornando" ? 2.2 : 1)
         root.captureExtra = next[0]; root.captureV = next[1]
         if (root.waterActive && neckSpring.integrating) neckSpring.step(dt)
         if (root.phase === "brotando" && ((!root.bond && root.stretch >= 1.30) || root.settled)) {
+            root.gestureOpening = false
             root.retarget("media", root.cardX, root.cardY, root.cardW, root.cardH)
         } else if (root.phase === "recogiendo"
                 && (Math.min(root.wPos, root.hPos) < root.gatherSize || root.settled)) {
+            // A card gathered where it stands rises only once it is a drop, never a slab.
             root.returnHome()
         } else if (root.phase === "separando" && root.settled) {
             root.phase = "companion"
-        } else if (root.phase === "retornando" && root.coveredByBody) {
+        } else if (root.phase === "retornando" && !root.draining && !root.centered
+                && root.waterActive && root.coveredByBody) {
+            // Held fused in the pill's end: the rim withdraws, the drop shrinks
+            // and the swell relaxes before it is hidden, so no pixel pops.
+            root.draining = true
+            root.captureTarget = 0
+            root.followBody()
+        } else if (root.phase === "retornando" && root.coveredByBody
+                && (!root.draining || root.fieldShape.y < 0.35 * root.s)) {
             root.concealed = true
             root.captureTarget = 0
             root.phase = "absorbiendo"
         } else if (root.phase === "absorbiendo" && root.settled) {
             root.phase = "idle"
             root.bond = false
+        } else if (root.phase === "residual" && root.settled) {
+            // A dismissed drop is a 6 px residue sunk in the pill's end; left active it
+            // re-bonds (stretch < 1.02) and the pill keeps a pointed neck until the track changes.
+            root.phase = "idle"
+            root.concealed = true
+            root.bond = false
+            root.captureExtra = 0; root.captureTarget = 0; root.captureV = 0
         }
     }
 
@@ -525,6 +699,7 @@ Item {
 
         Loader {
             anchors.fill: parent
+            opacity: root.gestureDismissed ? 0 : 1
             sourceComponent: root.compactContent
         }
 
@@ -548,9 +723,9 @@ Item {
             z: 2
             radius: root.cardRadius
             color: "transparent"
-            visible: root.expandedContent && root.active && root.cardContentProgress > 0.01
-            enabled: visible && root.expanded && root.cardContentProgress > 0.9
-            opacity: root.cardContentProgress
+            visible: root.expandedContent && root.active && (root.gestureCandidate || root.expandedContentOpacity > 0.01)
+            enabled: visible && root.expanded && (root.gestureCandidate || root.cardContentProgress > 0.9)
+            opacity: root.expandedContentOpacity
             Loader {
                 id: expandedLoader
                 asynchronous: root.asynchronousExpandedContent
@@ -573,12 +748,45 @@ Item {
             }
         }
 
+        // Observe above the click area, as in Pill: keep the click passive
+        // until directional intent takes the exclusive pointer grab.
+        Item {
+            anchors.fill: parent
+            z: 100
+            PointHandler {
+                id: gesturePoint
+                enabled: root.gesturesEnabled && !root.gestureDismissed && !root.expanded && !root.centered && root.cardFraction < 0.05
+                acceptedButtons: Qt.LeftButton
+                onActiveChanged: {
+                    if (active) { root.gestureIntent = false; root.gesturePress(point.scenePosition.x, point.scenePosition.y, Date.now()) }
+                    else if (!gestureDrag.active) root.gestureRelease(Date.now(), false)
+                }
+                onPointChanged: if (active && root.gestureCandidate)
+                    root.gestureIntent = root.gestureWantsMove(point.scenePosition.x, point.scenePosition.y)
+            }
+            DragHandler {
+                id: gestureDrag
+                target: null
+                enabled: gesturePoint.enabled
+                acceptedButtons: Qt.LeftButton
+                dragThreshold: root.gestureIntent ? Math.max(Motion.pullThreshold * root.s, 1) : 32766
+                grabPermissions: PointerHandler.CanTakeOverFromItems
+                    | PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
+                onActiveChanged: {
+                    if (active) root.gestureMove(centroid.scenePosition.x, centroid.scenePosition.y, Date.now())
+                    else if (!gesturePoint.active) root.gestureRelease(Date.now(), false)
+                }
+                onCentroidChanged: if (active) root.gestureMove(centroid.scenePosition.x, centroid.scenePosition.y, Date.now())
+                onCanceled: root.gestureRelease(Date.now(), true)
+            }
+        }
+
         MotionArea {
             id: compactHit
             accessibleName: root.compactAccessibleName
             feedbackEnabled: false
             anchors.fill: parent
-            enabled: !root.expanded && root.cardFraction < 0.05
+            enabled: !root.gestureDismissed && !root.expanded && root.cardFraction < 0.05
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onEntered: root.hovered = true

@@ -7,6 +7,16 @@ QtObject {
     property var monitors: []
     property string surface: ""
     property bool launcherClosing: false
+    property bool pointerPull: false
+    property bool heldPullFocus: false
+    // Scroll-close on an open surface: the card shrinks under a fixed pointer, so the
+    // mask must hold while the wheel gesture lives (focus is untouched).
+    property bool wheelHold: false
+    property string heldPullMask: "pill"
+    onPointerPullChanged: if (pointerPull) {
+        heldPullFocus = requestedFocus
+        heldPullMask = requestedMask
+    }
 
     property real pillX: 0
     property real pillY: 0
@@ -47,13 +57,16 @@ QtObject {
         }
         return false
     }
-    readonly property bool kbFocusWanted: surfaceOpen && !monFullscreen && !launcherClosing
+    readonly property bool requestedFocus: surfaceOpen && !monFullscreen && !launcherClosing
+    readonly property string requestedMask: monFullscreen ? "hidden" : requestedFocus ? "full" : "pill"
+    // Changing layer focus or mask mode during a press cancels Hyprland's pointer grab.
+    readonly property bool kbFocusWanted: !monFullscreen && (pointerPull ? heldPullFocus : requestedFocus)
     readonly property bool sideModulesPresented: (!surfaceOpen || surface === "settings") && !monFullscreen
     readonly property bool modal: kbFocusWanted
     readonly property bool exclusiveFocus: kbFocusWanted
     readonly property bool authFocusGrab: surface === "auth" && kbFocusWanted
     readonly property bool escapeShortcutEnabled: kbFocusWanted && surface !== "session" && surface !== "auth"
-    readonly property string maskMode: monFullscreen ? "hidden" : modal ? "full" : "pill"
+    readonly property string maskMode: monFullscreen ? "hidden" : pointerPull ? heldPullMask : wheelHold ? "full" : requestedMask
 
     readonly property real baseW: Math.max(pillWidth, pillTargetW)
     readonly property real baseH: Math.max(pillHeight, pillTargetH)

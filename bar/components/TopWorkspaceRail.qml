@@ -32,7 +32,7 @@ Item {
     signal requestWorkspaces()
     signal workspaceRequested(int id)
     onActiveIdChanged: hoverId = 0
-    readonly property real navWidth: (integrated ? 40 : 68) * s
+    readonly property real navWidth: (integrated ? 40 : 60) * s
     readonly property real slot: Math.min((style === "numbers" ? (integrated ? 28 : 38) : (integrated ? 22 : 24)) * s, Math.max(19 * s, (availableWidth - navWidth - 8 * s) / count))
     readonly property real inset: 4 * s
     readonly property real targetWidth: navWidth + count * slot + inset * 2
@@ -59,12 +59,14 @@ Item {
         id: navButton
         x: 0
         anchors.verticalCenter: parent.verticalCenter
-        width: (root.integrated ? 36 : 44) * root.s
+        width: (root.integrated ? 36 : 38) * root.s
         height: width
         PillMaterial { visible: !root.integrated; s: root.s; morphRadius: parent.height / 2; mode: "lateral" }
+        // Same lateral glass as the rail at rest; the accent wash only answers hover/focus.
         Rectangle {
             anchors.fill: parent
-            visible: !root.integrated || navHit.containsMouse
+            visible: opacity > 0.005
+            opacity: navHit.motion.presence
             radius: height / 2
             gradient: Gradient {
                 GradientStop { position: 0; color: Qt.alpha(Theme.accent, 0.05) }
@@ -76,7 +78,8 @@ Item {
         MaterialIcon {
             anchors.centerIn: parent
             iconName: "apps"
-            color: navHit.containsMouse ? Theme.foreground : Theme.iconSecondary
+            // Follows the same presence as the wash, so hover and keyboard focus read alike.
+            color: Qt.tint(Theme.iconSecondary, Qt.alpha(Theme.foreground, navHit.motion.presence))
             font.pixelSize: Theme.fontSizeBodyLg * 1.1 * root.s
             interaction: navHit.motion
         }
@@ -85,7 +88,7 @@ Item {
             objectName: "workspaceNavigationHit"
             anchors.fill: parent
             feedbackEnabled: false
-            accessibleName: qsTr("Abrir espacios de trabajo")
+            accessibleName: I18n.tr("Abrir espacios de trabajo")
             onClicked: root.requestWorkspaces()
         }
     }
@@ -194,7 +197,7 @@ Item {
         layer.enabled: visible
         layer.effect: MultiEffect {
             shadowEnabled: true
-            shadowColor: Qt.alpha(Theme.accent, 0.90)
+            shadowColor: Qt.alpha(Theme.accent, 0.50)
             shadowBlur: 0.8
             blurMax: 16
         }
@@ -294,7 +297,7 @@ Item {
                     id: hit
                     anchors.fill: parent
                     feedbackEnabled: false
-                    accessibleName: qsTr("Ir al escritorio %1").arg(cell.wsId)
+                    accessibleName: I18n.tr("Ir al escritorio %1").arg(cell.wsId)
                     onActiveFocusChanged: { if (activeFocus) root.hoverId = cell.wsId; else if (root.hoverId === cell.wsId) root.hoverId = 0 }
                     onEntered: root.hoverId = cell.wsId
                     onExited: if (root.hoverId === cell.wsId) root.hoverId = 0

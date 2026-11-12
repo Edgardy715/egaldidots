@@ -192,7 +192,8 @@ ShellRoot {
                     const shadow = findChild(pill, "pillMaterialShadow")
                     const cache = findChild(pill, "pillBodyCache")
                     verify(body && material && cache)
-                    compare(!!shadow, !body.waterActive)
+                    // The unloaded Loader item is deleted on the next event loop turn.
+                    tryVerify(() => !!findChild(pill, "pillMaterialShadow") === !body.waterActive, 1000)
                     wait(700)
                     roundOne()
                     compare(body.shader.outsideOpacity, 0)
@@ -290,7 +291,8 @@ ShellRoot {
                     wait(20)
                     fuzzyCompare(pill.width, pill.targetW, .01)
                     fuzzyCompare(pill.height, pill.targetH, .01)
-                    compare(body.exposure, 1)
+                    // Water mode hands reduceMotion to the legacy material (W4), so the body steps aside.
+                    compare(body.exposure, body.waterBody ? 0 : 1)
                     pill.fluidJoined = true
                     compare(body.shader.edgeExposure, 0)
                     pill.fluidCaptureExtra = 18; pill.fluidCaptureLeftExtra = 12
@@ -301,7 +303,7 @@ ShellRoot {
                     Config.update({appearance: {reduceTransparency: true}})
                     compare(body.exposure, 0)
                     verify(!material.shaderActive)
-                    Config.update({appearance: {reduceTransparency: false}})
+                    Config.update({appearance: {reduceTransparency: false, reduceMotion: false}})
                     compare(body.exposure, 1)
                     pill.visible = false
                     compare(body.exposure, 0)
@@ -322,7 +324,7 @@ ShellRoot {
                     // (reduceTransparency) restores the complete original material and its shadow.
                     Config.update({appearance: {reduceTransparency: true}})
                     verify(!material.shaderActive && material.opacity === 1)
-                    tryVerify(() => shadow.layer.enabled, 1000, "inactive water restores the complete original material")
+                    tryVerify(() => { const s = findChild(pill, "pillMaterialShadow"); return !!s && s.layer.enabled }, 1000, "inactive water restores the complete original material")
                     Config.update({appearance: {reduceTransparency: false}})
                     console.info("PASS: WaterBody no handoff, routes, cache, shadow FBO, fallback, reduced motion and interruption")
                     passed = true

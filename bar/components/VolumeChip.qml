@@ -105,9 +105,12 @@ Item {
                 iconName: root.glyph()
             }
 
-            Text {
+            // Cada paso de volumen gira sólo los dígitos que cambian (odómetro).
+            RollingNumber {
                 anchors.verticalCenter: parent.verticalCenter
-                text: Math.round(Math.max(0, Math.min(1, dial.level)) * 100) + "%"
+                value: Math.round(Math.max(0, Math.min(1, dial.level)) * 100)
+                suffix: "%"
+                alignment: Qt.AlignLeft
                 color: Theme.accent
                 font.family: Theme.font
                 font.features: Theme.fontNumeric

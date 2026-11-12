@@ -95,7 +95,7 @@ ShellRoot {
                 verify(Config.profile.displayName !== "Borrador conservado", "hidden Ctrl+S cannot commit draft")
                 if (mode.layout === "split" && !reduced) capture("launcher-focused")
                 compare(page.drafts["profile.displayName"], "Borrador conservado")
-                for (const surface of ["calendar", "mixer", "connectivity", "notifs", "appearance", "wallpaper", "overview", "media", "session", "utils", "workspaces", "clipboard"]) {
+                for (const surface of ["calendar", "mixer", "connectivity", "notifs", "wallpaper", "overview", "media", "session", "utils", "clipboard"]) {
                     open(surface)
                     compare(editor.contentReady, false)
                     verify(!page.pickerOpen)
@@ -128,7 +128,7 @@ ShellRoot {
                 tryCompare(navigation, "openSurface", "")
                 tryVerify(() => !editor.contentReady)
             }
-            console.log("PASS: settings picker, hidden focus/shortcuts, destination typing, retained drafts, rapid retarget and 13 destinations in split/compact with normal/reduced motion")
+            console.log("PASS: settings picker, hidden focus/shortcuts, destination typing, retained drafts, rapid retarget and 10 destinations in split/compact with normal/reduced motion")
             finished = true
             } catch (error) {
                 console.error("FAIL: settings switch", error.message)

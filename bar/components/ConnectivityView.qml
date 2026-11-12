@@ -183,7 +183,8 @@ Item {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
-        onWheel: wheel => { wheel.accepted = true }
+        // Deja pasar la rueda a la pill (cerrar por scroll desde la cabecera).
+        onWheel: wheel => { wheel.accepted = false }
     }
     ColumnLayout {
         id: page
@@ -194,21 +195,10 @@ Item {
         opacity: root.showPasswordDialog ? 0 : 1
         Behavior on opacity { enabled: root.motionActive; NumberAnimation { duration: Motion.fast } }
 
-        RowLayout {
+        SurfaceHeader {
             Layout.fillWidth: true
-            Layout.preferredHeight: 36 * root.s
-            Label {
-                Layout.fillWidth: true
-                text: qsTr("Conectividad")
-                font.family: Theme.fontMedia
-                font.pixelSize: Theme.fontSizeHero * root.s
-                font.weight: Font.Medium
-            }
-            MaterialIcon {
-                iconName: "settings_input_antenna"
-                color: Theme.iconSecondary
-                font.pixelSize: Theme.fontSizeDisplayLg * root.s
-            }
+            title: I18n.tr("Conectividad")
+            s: root.s
         }
         Rectangle {
             Layout.fillWidth: true
@@ -250,15 +240,15 @@ Item {
                             Column {
                                 spacing: Theme.spacingXs * root.s
                                 Label {
-                                    text: modeButton.wifi ? qsTr("Wi-Fi") : qsTr("Bluetooth")
+                                    text: modeButton.wifi ? I18n.tr("Wi-Fi") : I18n.tr("Bluetooth")
                                     font.weight: Font.Medium
                                     color: root.mode === modeButton.modelData ? Theme.foreground : Theme.iconSecondary
                                     Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                                 }
                                 Label {
-                                    text: !modeButton.radioOn ? qsTr("Desactivado")
-                                        : modeButton.wifi ? (root.activeSsid || root.connectedNetwork ? qsTr("Conectado") : qsTr("Activado"))
-                                        : root.connectedDevices ? qsTr("%1 conectado(s)").arg(root.connectedDevices) : qsTr("Activado")
+                                    text: !modeButton.radioOn ? I18n.tr("Desactivado")
+                                        : modeButton.wifi ? (root.activeSsid || root.connectedNetwork ? I18n.tr("Conectado") : I18n.tr("Activado"))
+                                        : root.connectedDevices ? I18n.tr("%1 conectado(s)").arg(root.connectedDevices) : I18n.tr("Activado")
                                     color: Theme.iconSecondary
                                     font.pixelSize: Theme.fontSizeSmall * root.s
                                 }
@@ -267,7 +257,7 @@ Item {
                         MotionArea {
                             objectName: "mode-" + modeButton.modelData
                             anchors.fill: parent
-                            accessibleName: modeButton.wifi ? qsTr("Mostrar Wi-Fi") : qsTr("Mostrar Bluetooth")
+                            accessibleName: modeButton.wifi ? I18n.tr("Mostrar Wi-Fi") : I18n.tr("Mostrar Bluetooth")
                             hoverWash: false
                             onClicked: root.mode = modeButton.modelData
                         }
@@ -307,13 +297,13 @@ Item {
                         Layout.fillWidth: true
                         spacing: Theme.spacingXs * root.s
                         Label {
-                            text: root.radioEnabled ? qsTr("Activado") : qsTr("Desactivado")
+                            text: root.radioEnabled ? I18n.tr("Activado") : I18n.tr("Desactivado")
                             font.pixelSize: Theme.fontSizeTitle * root.s
                             font.weight: Font.DemiBold
                         }
                         Label {
                             Layout.fillWidth: true
-                            text: root.wifiPage ? qsTr("Conexión inalámbrica") : qsTr("Audio y dispositivos cercanos")
+                            text: root.wifiPage ? I18n.tr("Conexión inalámbrica") : I18n.tr("Audio y dispositivos cercanos")
                             color: Theme.iconSecondary
                             font.pixelSize: Theme.fontSizeSmall * root.s
                         }
@@ -321,7 +311,7 @@ Item {
                     Toggle {
                         objectName: root.wifiPage ? "wifiToggle" : "bluetoothToggle"
                         s: root.s
-                        accessibleName: root.wifiPage ? qsTr("Wi-Fi") : qsTr("Bluetooth")
+                        accessibleName: root.wifiPage ? I18n.tr("Wi-Fi") : I18n.tr("Bluetooth")
                         checked: root.radioEnabled
                         onToggled: root.wifiPage ? root.wifiToggleRequested() : root.bluetoothToggleRequested()
                     }
@@ -343,7 +333,7 @@ Item {
                         objectName: "network-" + (root.connectedNetwork ? root.connectedNetwork.ssid : root.activeSsid)
                         anchors.fill: parent
                         enabled: root.connectedNetwork !== null
-                        accessibleName: qsTr("Desconectar de %1").arg(root.activeSsid)
+                        accessibleName: I18n.tr("Desconectar de %1").arg(root.activeSsid)
                         hoverWash: false
                         onClicked: root.networkRequested(root.connectedNetwork)
                     }
@@ -365,15 +355,15 @@ Item {
                             }
                             Label {
                                 Layout.fillWidth: true
-                                text: !root.connectedNetwork ? qsTr("Conectado")
-                                    : root.connectedNetwork.isSecure ? qsTr("Conectado · Red protegida") : qsTr("Conectado · Red abierta")
+                                text: !root.connectedNetwork ? I18n.tr("Conectado")
+                                    : root.connectedNetwork.isSecure ? I18n.tr("Conectado · Red protegida") : I18n.tr("Conectado · Red abierta")
                                 color: Theme.iconSecondary
                                 font.pixelSize: Theme.fontSizeSmall * root.s
                             }
                         }
                         Action {
                             objectName: "wifiDisconnect"
-                            text: qsTr("Desconectar")
+                            text: I18n.tr("Desconectar")
                             onClicked: root.wifiDisconnectRequested()
                         }
                     }
@@ -383,14 +373,14 @@ Item {
                     Layout.fillWidth: true
                     Label {
                         Layout.fillWidth: true
-                        text: root.wifiPage ? qsTr("Redes disponibles") : qsTr("Mis dispositivos y cercanos")
+                        text: root.wifiPage ? I18n.tr("Redes disponibles") : I18n.tr("Mis dispositivos y cercanos")
                         color: Theme.iconSecondary
                         font.pixelSize: Theme.fontSizeBody * root.s
                         font.weight: Font.Medium
                     }
                     Action {
                         objectName: root.wifiPage ? "wifiScan" : "bluetoothScan"
-                        text: root.scanning ? (root.wifiPage ? qsTr("Buscando…") : qsTr("Detener")) : qsTr("Buscar")
+                        text: root.scanning ? (root.wifiPage ? I18n.tr("Buscando…") : I18n.tr("Detener")) : I18n.tr("Buscar")
                         accented: root.scanning
                         enabled: root.radioEnabled && (!root.wifiPage || !root.wifiScanning)
                         onClicked: root.wifiPage ? root.wifiScanRequested() : root.bluetoothDiscoveryToggleRequested()
@@ -435,9 +425,9 @@ Item {
                                     }
                                     Label {
                                         Layout.fillWidth: true
-                                        text: networkRow.busy ? qsTr("Conectando…")
-                                            : (networkRow.modelData.isSecure ? qsTr("Protegida") : qsTr("Abierta"))
-                                            + " · " + qsTr("Señal %1%").arg(networkRow.modelData.strength)
+                                        text: networkRow.busy ? I18n.tr("Conectando…")
+                                            : (networkRow.modelData.isSecure ? I18n.tr("Protegida") : I18n.tr("Abierta"))
+                                            + " · " + I18n.tr("Señal %1%").arg(networkRow.modelData.strength)
                                         color: Theme.iconSecondary
                                         font.pixelSize: Theme.fontSizeSmall * root.s
                                     }
@@ -452,7 +442,7 @@ Item {
                                 id: networkArea
                                 objectName: "network-" + networkRow.modelData.ssid
                                 anchors.fill: parent
-                                accessibleName: qsTr("Conectar a %1").arg(networkRow.modelData.ssid)
+                                accessibleName: I18n.tr("Conectar a %1").arg(networkRow.modelData.ssid)
                                 enabled: !networkRow.busy
                                 hoverWash: false
                                 onClicked: root.networkRequested(networkRow.modelData)
@@ -480,7 +470,7 @@ Item {
                             readonly property string displayName: modelData.deviceName ||
                                 (modelData.name && modelData.name !== modelData.address
                                     && modelData.name !== (modelData.address || "").replace(/:/g, "-").toUpperCase()
-                                    ? modelData.name : qsTr("Dispositivo desconocido"))
+                                    ? modelData.name : I18n.tr("Dispositivo desconocido"))
                             width: body.width
                             height: deviceContent.implicitHeight + Theme.spacingXl * 2 * root.s
                             radius: Theme.radiusXxl * root.s
@@ -512,12 +502,12 @@ Item {
                                             Layout.fillWidth: true
                                             text: {
                                                 const d = deviceRow.modelData
-                                                if (d.pairing) return qsTr("Vinculando…")
-                                                if (d.state === root.connectingState) return qsTr("Conectando…")
-                                                if (d.state === root.disconnectingState) return qsTr("Desconectando…")
+                                                if (d.pairing) return I18n.tr("Vinculando…")
+                                                if (d.state === root.connectingState) return I18n.tr("Conectando…")
+                                                if (d.state === root.disconnectingState) return I18n.tr("Desconectando…")
                                                 if (d.connected) return d.batteryAvailable
-                                                    ? qsTr("Conectado · %1%").arg(Math.round(d.battery * 100)) : qsTr("Conectado")
-                                                const status = d.paired ? qsTr("Vinculado") : qsTr("Disponible")
+                                                    ? I18n.tr("Conectado · %1%").arg(Math.round(d.battery * 100)) : I18n.tr("Conectado")
+                                                const status = d.paired ? I18n.tr("Vinculado") : I18n.tr("Disponible")
                                                 return !d.deviceName ? status + " · " + (d.address || "") : status
                                             }
                                             color: deviceRow.modelData.connected ? Theme.accent : Theme.iconSecondary
@@ -531,12 +521,12 @@ Item {
                                     spacing: Theme.spacingMd * root.s
                                     Action {
                                         objectName: "bluetooth-action-" + deviceRow.displayName
-                                        text: deviceRow.busy ? qsTr("Espera…") : deviceRow.modelData.connected ? qsTr("Desconectar")
-                                            : deviceRow.modelData.paired ? qsTr("Conectar") : qsTr("Vincular")
+                                        text: deviceRow.busy ? I18n.tr("Espera…") : deviceRow.modelData.connected ? I18n.tr("Desconectar")
+                                            : deviceRow.modelData.paired ? I18n.tr("Conectar") : I18n.tr("Vincular")
                                         enabled: !deviceRow.busy
-                                        Accessible.name: deviceRow.modelData.connected ? qsTr("Desconectar %1").arg(deviceRow.displayName)
-                                            : deviceRow.modelData.paired ? qsTr("Conectar %1").arg(deviceRow.displayName)
-                                            : qsTr("Vincular %1").arg(deviceRow.displayName)
+                                        Accessible.name: deviceRow.modelData.connected ? I18n.tr("Desconectar %1").arg(deviceRow.displayName)
+                                            : deviceRow.modelData.paired ? I18n.tr("Conectar %1").arg(deviceRow.displayName)
+                                            : I18n.tr("Vincular %1").arg(deviceRow.displayName)
                                         accented: !deviceRow.modelData.connected
                                         onClicked: root.bluetoothActionRequested(deviceRow.modelData,
                                             deviceRow.modelData.connected ? "disconnect" : deviceRow.modelData.paired ? "connect" : "pair")
@@ -544,9 +534,9 @@ Item {
                                     Action {
                                         objectName: "bluetooth-forget-" + deviceRow.displayName
                                         visible: deviceRow.modelData.paired
-                                        text: qsTr("Olvidar")
+                                        text: I18n.tr("Olvidar")
                                         enabled: !deviceRow.busy
-                                        Accessible.name: qsTr("Olvidar %1").arg(deviceRow.displayName)
+                                        Accessible.name: I18n.tr("Olvidar %1").arg(deviceRow.displayName)
                                         onClicked: root.bluetoothActionRequested(deviceRow.modelData, "forget")
                                     }
                                     Item { Layout.fillWidth: true }
@@ -571,9 +561,9 @@ Item {
                     Label {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
-                        text: !root.radioEnabled ? (root.wifiPage ? qsTr("Wi-Fi desactivado") : qsTr("Bluetooth desactivado"))
-                            : root.scanning ? qsTr("Buscando cerca de ti…")
-                            : root.wifiPage ? qsTr("No hay más redes disponibles") : qsTr("Sin dispositivos disponibles")
+                        text: !root.radioEnabled ? (root.wifiPage ? I18n.tr("Wi-Fi desactivado") : I18n.tr("Bluetooth desactivado"))
+                            : root.scanning ? I18n.tr("Buscando cerca de ti…")
+                            : root.wifiPage ? I18n.tr("No hay más redes disponibles") : I18n.tr("Sin dispositivos disponibles")
                         font.pixelSize: Theme.fontSizeTitle * root.s
                         font.weight: Font.Medium
                     }
@@ -581,9 +571,9 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
-                        text: !root.radioEnabled ? qsTr("Activa la conexión con el interruptor superior.")
-                            : root.wifiPage ? qsTr("Las redes cercanas aparecerán aquí.")
-                            : qsTr("Pon el dispositivo en modo de vinculación y pulsa Buscar.")
+                        text: !root.radioEnabled ? ""
+                            : root.wifiPage ? I18n.tr("Las redes cercanas aparecerán aquí.")
+                            : I18n.tr("Pon el dispositivo en modo de vinculación y pulsa Buscar.")
                         color: Theme.iconSecondary
                         font.pixelSize: Theme.fontSizeBody * root.s
                     }

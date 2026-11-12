@@ -22,6 +22,8 @@ node bar/tests/media-source.cjs
 node bar/tests/lyrics.cjs
 python bar/tests/settings-integration.py
 python bar/tests/hyprland-settings.py
+python3 bar/scripts/test-hypr-plugins.py
+python3 bar/scripts/test-hypr-binds.py
 python bar/tests/nmcli-service.py
 python bar/tests/brightness-service.py
 python starship/.config/starship/test_matugen.py
@@ -53,6 +55,10 @@ QT_QPA_PLATFORM=wayland python bar/tests/qml-performance.py --output /tmp/isla-q
 python bar/tests/wallpaper-scanner-async.py --build /tmp/isla-wpscan-test
 ISLA_WPSCAN_BUILD=/tmp/isla-wpscan-test python bar/tests/wallpaper-scanner.py
 ```
+
+`rolling-elastic-regression.qml` covers RollingNumber (direction follows the value,
+queued rolls burst, `immediate` is 1:1, reduced motion is static) and the rubber band
+of `Slider` and `AudioFader` (value clamps, stretch is bounded, spring returns).
 
 The Cava envelope and discovery tests use synthetic data and fake producers;
 they never capture personal audio. `nmcli-lifetime.py` checks graceful quit,
@@ -177,6 +183,17 @@ transitions in a regular preview window and checks that each settles. With
 intervals; these are not display presentation FPS. Use a temporary `ISLA_CONFIG`
 and Wayland. The fixture never acquires the session lock or authenticates.
 
+`bar/lockscreen-filmstrip.qml` is visual QA for the whole lock choreography
+(secure → rest → access → typing → error → retype → success → return to the
+desktop). Its verify steps call `attemptUnlock()`, so they show the liquid beads
+gathering into the submit drop, the drain on error and the swell on success. It saves half-size frames every `ISLA_LOCK_FRAME_MS` (40 ms) to
+`ISLA_LOCK_CAPTURE_DIR` and logs when `exitFinished` fires. Pass a desktop
+capture as `ISLA_LOCK_SNAPSHOT` (for example `grim -t ppm /tmp/desk.ppm`) to see
+the snapshot blur and the return to the desktop; `ISLA_LOCK_WIDE=1` opens it
+fullscreen. It never acquires the lock or starts PAM. Frames come from the scene
+graph, so judge continuity, not FPS. The same snapshot works in the regular
+preview: `QS_LOCK_PREVIEW=1 QS_LOCK_PREVIEW_SNAPSHOT=/tmp/desk.ppm quickshell -p bar/lockscreen.qml`.
+
 Use Wayland for fixtures involving layer surfaces, focus or native keyboard
 input. Some fixtures need a driver script or simulated service; check their
 setup before running them directly.
@@ -186,6 +203,7 @@ python bar/tests/settings-surface-switch.py
 python bar/tests/settings-media-routing.py
 python bar/tests/settings-ux.py
 python bar/tests/hyprland-settings-ui.py
+python bar/tests/shortcut-explorer-ui.py
 python bar/tests/overlay-native-input.py
 python bar/tests/desktop-integration.py
 ```
@@ -235,40 +253,6 @@ session/settings and narrow-space fallback. `overlay-input-policy-regression.qml
 checks reflected recording bounds without grabbing desktop-wide idle input.
 Real capture additionally needs the ScreenCast picker and a working GPU encoder.
 
-`personality-regression.qml` covers finite material reception, surface result routing,
-charging presentation, pet clicks/keyboard without surface navigation, separate recording
-indicator, companion opt-out, reduced motion and hiding. It also checks all new
-prototype moments finish, blink interruption, cursor stroking distinct from click,
-260 ms pointer sampling, context options, bounded night/mischief cadence, blockers,
-and no delayed joy transition from new events under reduced motion. Run on Wayland
-with a temporary `ISLA_CONFIG`; `ISLA_TEST_OUTPUT` stores mock-only captures.
-`companion-delight-regression.qml` checks touch deformation at scales 1/1.5/3,
-fixed layout and unclipped plate bounds, the four-click held-sneeze story,
-its visible anticipation after the previous smile, the fifth-click firefly story,
-light/eye tracking at scales 1/1.5/3, finite departure and unchanged mischief cadence,
-interruptions in three phases,
-pointer approach, reduced/hidden/suspended/blocked/sleep cancellation and tracking
-opt-out. Run with a temporary `ISLA_CONFIG`. `ISLA_TEST_OUTPUT=1` emits capture
-markers; `docs/companion-delight-2026-10-25/capture.py` captures Wayland on the
-documented desktop layout. `docs/companion-firefly-2026-10-25/capture.py` also captures
-the firefly crossing. These captures do not certify physical mouse input.
-`iris-memory-regression.qml` checks Iris' memory and greetings: lazy read of an absent
-`ISLA_IRIS` file, hour-histogram classification (habitual, adjacent, unusual, return,
-neutral under five days), a single consumed greeting, hostile files (`null`, broken JSON never
-overwritten by loading, `warmth: null`), the greeting waiting for dust and yawn to finish, warmth ageing and caps, the
-`companion.remember` opt-out (no read, no write), the `interacted`/greeting signals of
-`CompanionBehavior`, mood-scaled mischief, and that `welcome`/`surprised` end in stillness
-and are cancelled by reduced/hidden/suspended/blocked/asleep. Run with temporary
-`ISLA_CONFIG` and `ISLA_IRIS`: `ISLA_CONFIG=$T/shell.json ISLA_IRIS=$T/sub/iris.json
-QT_QPA_PLATFORM=offscreen quickshell -p bar/iris-memory-regression.qml` (about 17 s).
-`iris-system-regression.qml` checks Iris' system reactions through the composition hooks
-(`CompanionBehavior.react/noteBattery`, `recording`; no real battery, recorder, notification
-or authorization service is touched): deferred surprise for a critical notification, tired
-lids at 15 % or less, `content` on charging, `stretch` on full, red glint and `relief` around a
-capture, `no`/`wink` on the auth surface, stillness after each, cancellation by
-reduced/hidden/suspended/blocked/asleep and the `companion.reactToSystem` opt-out. Run with
-temporary `ISLA_CONFIG` and `ISLA_IRIS`: `ISLA_CONFIG=$T/shell.json ISLA_IRIS=$T/sub/iris.json
-QT_QPA_PLATFORM=offscreen timeout 90s quickshell -p bar/iris-system-regression.qml` (about 40 s).
 `surface-materialize-regression.qml` covers the surface spring and materialization: open
 overshoot 2.5-4 % and settling, resize <= 0.5 %, close <= 1.2 %, retarget with position and
 velocity equality, notification and workspace paths unchanged, reduced motion direct, and the
@@ -277,31 +261,6 @@ host's scale/blur layer (retired at p=1, A to B at 0.97, blur limit on large sur
 `ISLA_CONFIG`: `QT_QPA_PLATFORM=offscreen quickshell -p bar/surface-materialize-regression.qml`.
 Visual capture: `docs/surface-materialize-2026-10-25/capture.py <before|after> <dir>` (Wayland,
 grim) and `sheets.py`.
-`iris-continuity-regression.qml` checks Iris' continuity across surfaces: the attention
-mechanism of `CompanionBehavior` (`focusActive/focusX/focusY`: focus beats the pointer, the pointer
-leads without focus, saturation to -1..1, off with `reduced`, `asleep`, hidden and
-`companion.followFocus=false`, never blocked by `blocked`), the perch in `Pill`
-(`perchTravel` 0 at rest, monotonic 0 -> 1 on opening, retarget from the current value when
-closing mid-way, comes back and hides on close, absent in launcher/auth, with reduced motion and
-with personality off; corner inside the pill and no origin jump at scales 1, 1.33 and 2, mixer to
-launcher ending on the real header face) and the producers with fixtures (launcher caret, synced lyric line,
-wallpaper thumbnail under the pointer). The overview producer and the approval wink need a
-compositor and are not covered. Run with temporary `ISLA_CONFIG` and `ISLA_IRIS`:
-`ISLA_CONFIG=$T/shell.json ISLA_IRIS=$T/sub/iris.json QT_QPA_PLATFORM=offscreen timeout 120s
-quickshell -p bar/iris-continuity-regression.qml` (about 20 s). `ISLA_CONTINUITY_SHOTS=<dir>`
-saves a grab; offscreen is not visual QA.
-`iris-delight-regression.qml` checks Iris' small visitors (`bar/Singletons/Visitors.js`: firefly,
-moth, raindrop, bubble, snowflake): every path fits the 30x26 slot at scales 1, 1.5 and 3, the eyes
-follow raindrop (down) and bubble (up), each scene ends in stillness and counts one sighting only
-when seen to the end, reduced/hidden/suspended/blocked/asleep/touch cancel without residue, the
-choice by clock with explicit dates (moth 23:00-05:59, snowflake in December), unchanged mischief
-budget over a roll sweep, the fifth click still being the firefly, sightings in `IrisMemory`
-(cap 99, validated on load, inert with `remember=false`), the dust shake after 30 minutes asleep
-(smaller than the refusal, then yawn, then stillness) and the eye tint and pupil in dark and light
-palettes (contrast >= 4.5). Run with temporary `ISLA_CONFIG` and `ISLA_IRIS`:
-`ISLA_CONFIG=$T/shell.json ISLA_IRIS=$T/sub/iris.json QT_QPA_PLATFORM=offscreen timeout 120s
-quickshell -p bar/iris-delight-regression.qml` (about 65 s). `ISLA_TEST_OUTPUT=1` logs
-`DELIGHT_CAPTURE` markers for `docs/iris-delight-2026-10-25/capture.py`; offscreen is not visual QA.
 `focus-session-regression.qml` checks deadlines, suspend, pause/resume milliseconds,
 single completion, choosing the next duration, custom minutes and keyboard input.
 `notification-attention-regression.qml` and `notification-priority-regression.qml`
@@ -556,7 +515,7 @@ consistency and bounded settling; it does not measure compositor FPS.
 `bar/launcher-focus-regression.qml` uses the production Pill in a Wayland Window:
 focus within 120 ms after field load, typing without clicking, closing without
 reclaiming focus, cancelled close, unload and reduced motion. Run serially with
-other native focus fixtures and temporary ISLA_CONFIG/ISLA_IRIS. Its Window does
+other native focus fixtures and temporary ISLA_CONFIG. Its Window does
 not certify layer-shell keyboard policy.
 
 `bar/calendar-design-regression.qml` checks translated Spanish source dates,
@@ -569,7 +528,7 @@ and no FAIL in every log, not just exit 0.
 
 `bar/material-accessibility-regression.qml` checks reduced transparency, stored
 glass alpha preservation/restoration, discard, split/compact and a 175% editor.
-Use temporary ISLA_CONFIG/ISLA_IRIS; Wayland is required for native inspection.
+Use temporary ISLA_CONFIG; Wayland is required for native inspection.
 ISLA_PALETTE_FIXTURES accepts `docs/design-accessibility-2026-10-26/palettes.json`,
 ISLA_PALETTE_INDEX selects its palette and ISLA_CAPTURE_HOLD_MS keeps the native
 window available after PASS for grim. Offscreen is not visual QA.
@@ -763,3 +722,306 @@ gota, conservación del arte al cerrar/invertir, continuidad de muelles y reposo
 La rama RHI añade píxeles de arte y error real de shader. Offscreen software no
 prueba el shader ni costuras; RHI sin contexto tampoco equivale a PASS visual.
 Resultados y fallos reproducidos sobre W3: `docs/agua-w4-2026-10-31/REPORT.md`.
+
+
+## Gestos F1 · abrir y cerrar tirando de la pill (2026-11-06)
+
+Desde la raíz, con configuración inicialmente inexistente y directorios aislados:
+
+```bash
+gesture_test_dir=$(mktemp -d /tmp/isla-gestos-f1.XXXXXX)
+mkdir -m 700 "$gesture_test_dir/runtime"
+QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME= \
+  ISLA_CONFIG="$gesture_test_dir/shell.json" \
+  XDG_RUNTIME_DIR="$gesture_test_dir/runtime" \
+  XDG_CACHE_HOME="$gesture_test_dir/cache" \
+  XDG_STATE_HOME="$gesture_test_dir/state" \
+  timeout 90 quickshell -p bar/pull-gesture-regression.qml
+```
+
+La prueba usa press/move/release reales de QtTest sobre Pill y `manualStep` sobre
+el mismo PillMorphMotion de producción. Comprueba umbral y dirección, seguimiento
+1:1, ancho/radio y banda elástica compartida con Slider, regresión de velocidad de
+80 ms, fling, retorno corto, primer cuadro extrapolado, cierre y captura de un
+muelle que abre o cierra. También comprueba cierre externo durante el gesto,
+scroll de lista fuera del tope, fin por 120 ms de silencio, reduceMotion,
+desactivación, tamaño final del contenido y reposo sin integrador, temporizador
+del gesto ni capa del contenido. Guarda los ajustes en el ISLA_CONFIG temporal,
+comprueba el JSON y discard, y carga Edots > Movimiento en español e inglés,
+incluida su búsqueda. No usar el archivo de configuración habitual para este test.
+
+`gestures.enabled` activa los gestos; `gestures.pullTarget` admite auto, utils,
+media, notifs y calendar. Auto elige media sólo si hay reproductor disponible
+mostrado; en otro caso elige utils. Una surface abierta se agarra desde sus
+márgenes libres o el texto de SurfaceHeader; los controles conservan su entrada.
+La rueda por pasos no inicia gestos. Un touchpad puede cerrar desde una lista
+cuando está arriba del todo; los campos de texto y faders conservan su entrada.
+WheelHandler.active termina las fases nativas y un Timer de una sola ejecución
+cubre dispositivos sin fin de fase. El IPC opcional de tres dedos queda fuera
+de esta implementación; no se ha modificado Hyprland.
+
+Ejecutar además surface-materialize, content-hold, frame-time, compact-island,
+overlay-native-input, notification-breath y todos los archivos devueltos por:
+
+```bash
+rg -l 'PillMorphMotion|SurfaceRouter|IslandOverlay' bar/*regression*.qml
+```
+
+Usar un directorio temporal nuevo por prueba. Comparación previa y final, límites
+del backend offscreen y archivos concretos: `docs/gestos-f1-2026-11-06/REPORT.md`.
+
+QA Wayland pendiente para Claude (offscreen no la sustituye): en compact/split,
+auto/utils/media/notifs/calendar y escalas de monitor distintas, arrastrar más
+allá de la región inicial de la pill, invertir y volver a atraparla. Comprobar
+que el movimiento continúa fuera de la máscara de reposo por el agarre implícito
+y que al soltar se restablece la entrada normal. La máscara/política de entrada
+en reposo conserva el código previo; no se amplía a pantalla completa al pulsar.
+Probar scroll con fases nativas y pausa de 120 ms; las listas desplazadas deben
+conservar su scroll. Probar cabeceras, sliders, botones, texto, fondos, hover,
+peek, Escape, clic fuera, BodyMessenger y DnD de archivos. Revisar la continuidad
+de radio, materialización y velocidad con captura visual. Esta fase no reinicia
+ni manipula la shell real.
+
+## Gestos F1 · corrección 1 (2026-11-06)
+
+Esta sección sustituye la omisión anterior del IPC y precisa la política de
+entrada. Mientras candidate/active de puntero está en curso y no es scrolling,
+se conservan el foco y el modo de máscara anteriores al press. La región pill
+usa la geometría real y objetivo, incluido el sobreestiramiento. Soltar abierto
+activa Exclusive/full y Escape inmediatamente; soltar cerrado restaura pill.
+El scroll conserva su política normal. El contenido mantiene su layout final,
+queda oculto hasta progreso/espacio 0.6 y se revela hacia 0.95; al cerrar se
+retira primero. WheelEvent.inverted normaliza los deltas físicos del touchpad.
+
+Con el mismo aislamiento descrito arriba y un directorio nuevo por fixture,
+ejecutar también:
+
+```bash
+timeout 90 quickshell -p bar/overlay-input-policy-regression.qml
+timeout 90 quickshell -p bar/rolling-elastic-regression.qml
+```
+
+La primera prueba conserva foco/máscara al abrir y cerrar durante el press,
+comprueba la región sobreestirada y la recuperación de teclado/Escape al soltar.
+La segunda comprueba la función JS compartida (asíntota, pendiente inicial y
+simetría), además del clamp, estiramiento y retorno de Slider y AudioFader.
+pull-gesture-regression comprueba esos cambios sobre Pill con eventos QtTest,
+contenido ya cargado, deltas invertidos y no invertidos, y rutas IPC.
+
+IPC disponible en el target island: `pull(auto|utils|media|notifs|calendar)`
+alterna la surface en el monitor enfocado con el muelle normal. Auto usa media
+si está disponible y mostrada; en otro caso utils. Ejemplos para la QA de Claude
+(no se han ejecutado contra la shell real):
+
+```bash
+qs -c bar ipc call island pull auto
+qs -c bar ipc call island pull calendar
+```
+
+Ejemplo para Hyprland con configuración hyprlang, según la
+[wiki versionada](https://wiki.hypr.land/0.52.0/Configuring/Gestures/):
+
+```ini
+gesture = 3, down, dispatcher, exec, qs -c bar ipc call island pull auto
+```
+
+Equivalente para configuración Lua, según la
+[wiki actual](https://wiki.hypr.land/configuring/core/binds/gestures/):
+
+```lua
+hl.gesture({ fingers = 3, direction = "down", action = function()
+    hl.exec_cmd("qs -c bar ipc call island pull auto")
+end })
+```
+
+Son ejemplos de documentación: no se ha editado la configuración del usuario.
+Este gesto del compositor dispara el toggle al terminar, no envía deltas 1:1.
+La QA Wayland de Claude debe repetir el arrastre lento fuera de la región
+inicial, sobreestiramiento, cierre sin captura residual, Escape/teclado tras
+soltar, contenido en ambos sentidos, touchpad con/sin natural scrolling e IPC
+con el monitor enfocado. La prueba Python nativa usa ahora focus en lugar de
+Appearance eliminada. Offscreen no verifica el agarre de una layer surface.
+
+## Gestos F2 · gotas y notificaciones (2026-11-06)
+
+`drop-gesture-regression.qml` prueba los motores reales con press/move/release,
+pasos manuales y eventos de ratón de QtTest: notificación arriba/horizontal/abajo,
+velocidad, salida del texto antes del recipiente, pausa y reanudación de la
+expiración real, prioridad de la notificación tocada, seguimiento y rotura de
+media, microgota y restauración al cambiar pista/reproductor, gotas protegidas,
+brote de las cuatro rutas y reposo sin reloj activo. Incluye movimiento reducido,
+gestos desactivados, cambios de ajuste durante un descarte y rechazo del router.
+
+Desde la raíz, usar un entorno nuevo por fixture; el archivo de configuración
+debe ser inexistente al empezar:
+
+```bash
+gesture_check() {
+    local gesture_dir
+    gesture_dir="$(mktemp -d /tmp/isla-gestos-f2.XXXXXX)"
+    mkdir -p "$gesture_dir/runtime" "$gesture_dir/cache" "$gesture_dir/state"
+    chmod 700 "$gesture_dir/runtime"
+    QT_QPA_PLATFORM=offscreen QT_QPA_PLATFORMTHEME= \
+      ISLA_CONFIG="$gesture_dir/config.json" \
+      XDG_RUNTIME_DIR="$gesture_dir/runtime" \
+      XDG_CACHE_HOME="$gesture_dir/cache" \
+      XDG_STATE_HOME="$gesture_dir/state" \
+      timeout 90 quickshell -p "$1"
+}
+gesture_check bar/drop-gesture-regression.qml
+for fixture in $(rg -l 'FluidCompanion|IslandNotification|Notifs' bar/*regression*.qml); do
+    if [ "$fixture" != bar/drop-gesture-regression.qml ]; then
+        gesture_check "$fixture"
+    fi
+done
+gesture_check bar/pull-gesture-regression.qml
+```
+
+Comprobar tanto el código de salida como los marcadores PASS/FAIL. La línea base
+de F2 ya falla en `interaction-surfaces` (Workspaces eliminado), `updates-service`
+(marcador FAIL aunque exit=0) y `settings-async` (sin backend PanelWindow en
+offscreen); sus resultados se conservan tras F2. Detalle y evidencia en
+`docs/gestos-f2-2026-11-06/REPORT.md`.
+
+La QA Wayland corresponde a Claude: comprobar captura fuera de la región
+inicial, foco/máscara estables mientras se arrastra, clic/hover y continuidad
+visual de cuello, brote y microgota. `bar/tests/vpointer.py` queda reservado a
+esa QA; este fixture no lo ejecuta ni reinicia la shell ni modifica Hyprland.
+
+
+## Actividades · 2026-11-06
+
+Desde la raíz, el runner crea HOME, configuración inexistente, runtime, caché y
+estado temporales por fixture. Quita WAYLAND_DISPLAY, HYPRLAND_INSTANCE_SIGNATURE
+y DBUS_SESSION_BUS_ADDRESS; nunca consulta la shell real. Comprueba los marcadores
+FAIL además del exit code (algunos fixtures antiguos terminan con 0 tras fallar).
+
+```bash
+python -I bar/tests/activity-qml.py
+python -I bar/tests/activity-cli.py
+python -I bar/tests/activity-fish-button.py
+fish -n bar/scripts/fish/isla.fish
+/usr/lib/qt6/bin/qmllint bar/Singletons/Activities.qml \
+  bar/components/ActivityDropContent.qml bar/components/FluidRecordingCompanion.qml \
+  bar/components/ActivityView.qml bar/components/PillPullGesture.qml \
+  bar/Singletons/Notifs.qml bar/Singletons/SystemUpdates.qml \
+  bar/windows/IslandOverlay.qml bar/shell.qml bar/settings/EdotsWindow.qml \
+  bar/settings/SettingsPage.qml bar/settings/FishIntegration.qml \
+  bar/activities-regression.qml bar/tests/activity-fish-button.qml
+```
+
+`activity-qml.py` acepta rutas adicionales de fixtures. Para repetir la comparación
+de gotas, notificaciones, pull/drop y ajustes:
+
+```bash
+python -I bar/tests/activity-qml.py \
+  bar/centered-companion-regression.qml bar/companion-continuity-regression.qml \
+  bar/drop-gesture-regression.qml bar/interaction-surfaces-regression.qml \
+  bar/notification-attention-regression.qml bar/notification-drop-regression.qml \
+  bar/notification-priority-regression.qml bar/notification-routing-regression.qml \
+  bar/notifs-surface-regression.qml bar/pull-gesture-regression.qml \
+  bar/session-companion-regression.qml bar/settings-async-regression.qml \
+  bar/settings-companion-regression.qml bar/updates-notice-regression.qml \
+  bar/updates-service-regression.qml bar/water-decor-regression.qml \
+  bar/water-drop-regression.qml
+```
+
+La línea base previa y posterior a actividades coincide: 14 PASS; fallan ya
+`interaction-surfaces` (Workspaces), `settings-async` (PanelWindow offscreen) y
+`updates-service` (compare). No asumir PASS por exit=0.
+
+La prueba nueva cubre validación, ráfagas, prioridad, ocho entradas, métodos IPC,
+expiración controlada, notificaciones QObject, SystemUpdates, lista compartida,
+gesto de gota, destino auto, swell/ErrorShake, movimiento reducido, Edots bilingüe
+y reposo. El runner intenta además el SocketServer sólo en su runtime temporal;
+si no puede escuchar, muestra BLOCKED. El CLI usa un socket simulado y también
+intenta AF_UNIX real: EPERM produce SKIP explícito. En este sandbox ambos binds
+están bloqueados; los métodos IPC se prueban directamente, sin llamar `qs ipc`
+contra una instancia real. Los botones fish sí ejecutan su componente y procesos
+reales, y verifican crear/quitar el enlace en HOME temporal.
+
+Reposo: el publicador de 34 ms y la única expiración son one-shot; no corren sin
+entradas. El listener espera eventos del sistema, sin polling. El contenido sin
+actividad oculta ConfirmationIndicator (sin arco ni layer), y los muelles y el
+motor de gota se detienen al asentarse. Con una actividad indeterminada estable,
+sólo anima el arco existente; la lista oculta no anima indicadores. Duración en
+la lista usa un reloj de 1 s sólo mientras esa página está abierta y hay procesos
+en curso; se detiene al cerrar, cambiar de página o terminar el último proceso.
+Offscreen no prueba píxeles, materiales ni captura de una layer surface: Claude
+hace la QA Wayland, incluida convivencia con grabación/foco y reabsorción.
+La API, evidencias y relevo están en `docs/actividades-2026-11-06/REPORT.md`.
+
+## Momentos de dispositivo (dispositivos-2026-11-06)
+
+`device-moments-regression.qml` (~25 s, tiempos reales de los Timers de un disparo)
+cubre con datos simulados: ajustes `devices.*`, Bluetooth (conexión, hover que
+pausa 3,5 s, baterías, desconexión, batería baja una vez por conexión), corriente
+(2 s, enchufar/desenchufar), USB (líneas del monitor, abrir, expulsar con
+`runner` simulado y errores), privacidad (histéresis de 400 ms, nombres, enlace
+breve) y cola/prioridad (surface abierta, pantalla completa, DND, gesto,
+notificación, caducidad). Ejecutar con ISLA_CONFIG inexistente y XDG_* temporales:
+`python /tmp/gestos-f1-validate.py <fase> bar/device-moments-regression.qml`.
+No se prueba offscreen: cableado de IslandOverlay (no hay backend PanelWindow),
+fuentes vivas de Bluetooth/UPower/Pipewire/udisks, hover/clic reales, píxeles.
+Reposo: sólo Timers de un disparo mientras hay momento o transición de
+privacidad; el único proceso nuevo es `scripts/isla-device-storage`
+(`udisksctl monitor`, sólo con `devices.storage`). Autocomprobación del monitor:
+`python3 bar/scripts/isla-device-storage --self-test`. Detalle en
+`docs/dispositivos-2026-11-06/REPORT.md`.
+
+## Las apps nacen de la isla (launch-flight-regression)
+
+`bar/launch-flight-regression.qml` prueba el motor de vuelo (`components/LaunchFlight.qml`
++ `LaunchFlight.js`) con `manualStep`, eventos `openwindow` / `activewindowv2` simulados y un
+proveedor de geometría inyectado: no toca Hyprland ni lanza apps. Cubre casado de clase,
+cero retraso (orden `controller.launch` -> `Apps.announceLaunch` por texto), secuencia
+brote -> rotura con residuo -> vuelo -> retarget (posición ±1·s, velocidad ±10 %) -> llegada,
+cobertura <= 220 ms, 6 s sin ventana, ventana existente, workspace oculto, otro monitor,
+reduceMotion / ajuste apagado / pantalla completa y reposo sin escena. El cableado de
+`IslandOverlay` no es instanciable offscreen: sólo se comprueba por texto y `qmllint`.
+Ejecutar: `python /tmp/gestos-f1-validate.py <fase> bar/launch-flight-regression.qml`
+(ISLA_CONFIG inexistente). La QA Wayland real (cuello, vidrio, `decoration:rounding`) sigue pendiente.
+
+## water-reactive-regression (material vivo)
+Reglas numéricas (tinte <= 12 % y contraste con portadas extremas en temas oscuro/claro/real, onda
+proporcional/acotada/sin apilar, envolvente de graves 40/220 ms y +-8 %) más PillBody en vivo: onda ~450 ms,
+0 cuadros en reposo/pausa/tinte asentado, cruce con muelle sin rebasar, relajación ~1,2 s, fallbacks
+(reduceMotion, waterBody=false, shader roto, software) y cableado de OSD en `Pill`.
+Ejecutar: `python /tmp/gestos-f1-validate.py <fase> bar/water-reactive-regression.qml` (y con
+`QT_QUICK_BACKEND=rhi QSG_RHI_BACKEND=opengl` para la rama en vivo; en software sólo corren las reglas
+puras y los fallbacks). Offscreen no es QA visual; falta QA Wayland del brillo, tinte y anillo.
+
+Vuelo de app (escenario aislado, sin lanzar apps): `ISLA_CONFIG=$T/shell.json ISLA_STAGE_OUT=$T QT_QPA_PLATFORM=offscreen quickshell -p bar/launch-flight-stage.qml`
+guarda fotogramas `stage-<ms>-<fase>.png`. Offscreen sirve para revisar forma y trayectoria; no es QA Wayland.
+
+## files-integration-regression + files-ipc (explorador de archivos, composición)
+`ISLA_CONFIG=$(mktemp -u).json QT_QPA_PLATFORM=offscreen qs -p bar/files-integration-regression.qml` monta `FilesView`
+sobre un fixture en mktemp (papelera aislada con `XDG_DATA_HOME`, abridor stub): historial (Alt+←/→, Backspace),
+abrir un archivo con espacios y `#` (un solo argv al abridor), diálogo de conflicto (Omitir/Mantener ambos/Reemplazar/Esc),
+papelera + Ctrl+Z, menú contextual, carpeta nueva/renombrar, enlace a `Config.files` (Ctrl+H, vista lista/cuadrícula),
+carpeta borrada bajo la vista (fallback + aviso), aviso de elementos no mostrables y Ctrl+W. Se niega a correr si
+`ISLA_CONFIG` no está en /tmp (guarda ajustes). `python bar/tests/files-ipc.py` arranca `bar/files-test-host.qml` aislado
+y comprueba `ipc call files open|toggle|close` (relativa/inexistente = false, archivo abre su carpeta, toggle x2 sin ventanas).
+Offscreen es lógica, no QA visual: ventana flotante, cristal, tamaño/centrado (windowrule) y `xdg-open` quedan para QA Wayland.
+
+## Explorador de archivos: suite completa (2026-11-07)
+Todas las QML se lanzan con `ISLA_CONFIG=$(mktemp -u).json QT_QPA_PLATFORM=offscreen timeout 300 qs -p bar/<nombre>.qml`
+(nunca con el HOME real) y terminan con `PASS:` en el log. Las de Python no necesitan shell.
+
+| Prueba | Cubre |
+| --- | --- |
+| `file-ops-regression.qml` | cola de `FileOps` (FIFO, copiar/mover/papelera/renombrar, deshacer, cancelar, conflictos, miniaturas fuera de cola); 13 escenarios. Puede dar falso rojo con la máquina muy cargada (timeout fijo) |
+| `files-model-regression.qml` | `PathUtil` y `FilesModel`: carpeta vacía, 20000 archivos, symlink roto, filtro, ocultos, nombres raros, `pathLost` |
+| `files-views-regression.qml` | selección por ruta (clic/Ctrl/Shift/teclado/banda), lista y cuadrícula, reordenación, miniaturas con `thumbResolver`, 20k = 41 delegados |
+| `files-nav-regression.qml` | migas, edición/validación de ruta, lugares XDG, unidades `lsblk`, JSON malformado, barra lateral |
+| `files-integration-regression.qml` | composición de `FilesView` (ver sección anterior) |
+| `files-interaction-regression.qml` | QuickLook (origen/retorno/contenido/reduceMotion), búsqueda al teclear, carga útil y umbral de arrastre, drops internos/ajenos, banda; 10 pruebas |
+| `files-motion-regression.qml` | apertura monótona, entrada direccional, navegación interrumpida, resalte deslizante, fundido de migas/miniaturas, ventana oculta, reduceMotion, interrupción hacia 20k; 10 pruebas |
+| `python3 bar/tests/files-helper.py` | `services/files_helper.py` (NDJSON): listado, copiar/mover/papelera/restaurar, conflictos, miniaturas; 35 pruebas unittest |
+| `python3 bar/tests/files-settings.py` | defaults, validación y ida y vuelta de la sección `files` |
+| `python3 bar/tests/files-ipc.py` | IPC `files open|toggle|close` con `bar/files-test-host.qml` aislado |
+| `python3 bar/tests/files-performance.py` | 20000 archivos offscreen: apertura en frío, scroll (p50/p95), navegación, RSS, perfil por tipo; escribe JSON en /tmp. Medida, no QA visual |
+
+Offscreen no es QA visual ni de Wayland: arrastre real, DnD saliente, multimonitor, apertura en frío vía `FilesWindow`
+y windowrules de Hyprland quedan para QA manual.
+

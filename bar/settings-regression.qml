@@ -67,7 +67,7 @@ ShellRoot {
                 check(page.entries.length === 1 && page.entries[0].key === "fontScale", "accent insensitive AND search")
                 page.query = ""; page.fieldKeys = ["appearance.motionScale", "modules.animateChanges"]
                 check(page.entries.length === 2, "cross-section curated group")
-                page.fieldKeys = ["appearance.pillBlur"]
+                page.fieldKeys = ["companion.mischief"]
                 check(page.entries.length === 0, "inactive hidden")
                 page.showUnavailable = true
                 check(page.entries.length === 1, "inactive discoverable")

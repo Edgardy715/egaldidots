@@ -9,27 +9,18 @@ Row {
     property real s: 1
     property real coreH: 38
     property bool capsLockOn: false
-    property date now: new Date()
+    property date now: Regional.now()
     signal requestCalendar()
-    property var companionContext: null
-    property bool companionEnabled: true
     property string activityText: ""
-    property string activityMood: "rest"
     property string recordingPhase: ""
     property int recordingCountdown: 0
-    property real lookX: 0
-    property real lookY: 0
-    property bool companionAsleep: false
-    property bool companionSleepy: false
-    property bool companionListening: false
 
-    // Centre of the face in this row's coordinates; follows the chips before it.
-    readonly property point faceCenter: Qt.point(activityChip.x + activityChip.faceCenter.x, activityChip.y + activityChip.faceCenter.y)
     readonly property bool workspaceAnimating: workspaceFlash.shown || workspaceFlash.width > 0.01
 
     spacing: 0
 
     function flashWorkspace(number) {
+        workspaceFlash.direction = number < workspaceFlash.number ? -1 : 1
         workspaceFlash.number = number
         workspaceFlash.shown = true
         workspaceFlashHold.restart()
@@ -43,7 +34,7 @@ Row {
         id: workspaceFlash
         property bool shown: false
         property int number: 1
-        width: shown ? 44 * root.s : 0
+        width: shown ? 24 * root.s : 0
         height: root.coreH
         clip: true
         Behavior on width {
@@ -55,40 +46,33 @@ Row {
             interval: 1600
             onTriggered: workspaceFlash.shown = false
         }
-        Rectangle {
-            x: 0
-            anchors.verticalCenter: parent.verticalCenter
-            width: 30 * root.s
-            height: 26 * root.s
-            radius: 9 * root.s
-            color: Qt.alpha(Theme.accent, Theme.alphaWash)
-            opacity: Math.max(0, Math.min(1, (parent.width / (44 * root.s) - 0.3) / 0.7))
-            ListView {
-                id: workspaceReel
-                anchors.fill: parent
-                clip: true
-                interactive: false
-                highlight: Item {}
-                model: Math.max(11, workspaceFlash.number + 2)
-                currentIndex: workspaceFlash.number
-                preferredHighlightBegin: 0
-                preferredHighlightEnd: height
-                highlightRangeMode: ListView.StrictlyEnforceRange
-                highlightMoveDuration: Flags.reduceMotion ? 0 : Motion.emphasizedLarge
-                highlightMoveVelocity: -1
-                delegate: Text {
-                    required property int index
-                    width: workspaceReel.width
-                    height: workspaceReel.height
-                    text: index
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    font.family: Theme.fontDisplay
-                    font.pixelSize: 17 * root.s
-                    font.weight: Font.DemiBold
-                    color: Theme.foreground
-                }
-                Accessible.name: qsTr("Escritorio %1").arg(workspaceFlash.number)
+        // The badge leaves before the slot closes: it fades and shrinks in the
+        // middle of the narrowing gap, so the clock never slides over a digit.
+        readonly property real reveal: {
+            const t = Math.max(0, Math.min(1, (width / (24 * root.s) - 0.55) / 0.45))
+            return t * t * (3 - 2 * t)
+        }
+        property int direction: 1
+        // Just the number: no capsule inside the capsule, so nothing collides with the rim.
+        Item {
+            anchors.fill: parent
+            opacity: workspaceFlash.reveal
+            scale: 0.8 + 0.2 * workspaceFlash.reveal
+            visible: opacity > 0.001
+            Accessible.role: Accessible.StaticText
+            Accessible.name: I18n.tr("Escritorio %1").arg(workspaceFlash.number)
+            // Only the old and the new number roll, never every desktop between them;
+            // the first number of a flash appears without a roll.
+            ClockReel {
+                anchors.centerIn: parent
+                text: String(workspaceFlash.number)
+                widthSample: "0"
+                direction: workspaceFlash.direction
+                motionEnabled: !Flags.reduceMotion && workspaceFlash.reveal > 0.01
+                font.family: Theme.fontDisplay
+                font.pixelSize: 15 * root.s
+                font.weight: Font.DemiBold
+                color: Theme.accent
             }
         }
     }
@@ -114,13 +98,9 @@ Row {
     IslandActivityChip {
         id: activityChip
         s: root.s; coreH: root.coreH
-        companionContext: root.companionContext
-        companionEnabled: root.companionEnabled
-        label: root.activityText; mood: root.activityMood
+        label: root.activityText
         recordingPhase: root.recordingPhase
         recordingCountdown: root.recordingCountdown
-        lookX: root.lookX; lookY: root.lookY
-        asleep: root.companionAsleep; sleepy: root.companionSleepy; listening: root.companionListening
     }
 
     Item {
@@ -174,7 +154,7 @@ Row {
             id: clockHit
             objectName: "clockCalendarHit"
             feedbackEnabled: false
-            accessibleName: qsTr("Abrir calendario")
+            accessibleName: I18n.tr("Abrir calendario")
             anchors.fill: parent
             anchors.margins: -6 * root.s
             cursorShape: Qt.PointingHandCursor

@@ -68,13 +68,6 @@ PillSurface {
     // usuario hace con el teclado (bug: mouse sobre el tile activo → Enter iba al ws 2).
     // keyNav=true tras usar teclado; un movimiento REAL del mouse lo desactiva.
     property bool selectionTouched: false
-    // Attention for Iris: the previewed workspace under the pointer or the keys.
-    focusActive: active && selectionTouched && selectionRing.slot >= 0 && selectionRing.visible
-    focusPoint: {
-        if (!focusActive) return Qt.point(0, 0)
-        void selectionRing.x; void selectionRing.y
-        return selectionRing.mapToItem(root, selectionRing.width / 2, selectionRing.height / 2)
-    }
     property bool _keyNav: false
     function _keyMove() { root._keyNav = true; root.selectionTouched = true }
     function _mouseMove() { root._keyNav = false; root.selectionTouched = true }
@@ -196,14 +189,14 @@ PillSurface {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 4 * root.s
                 Text {
-                    text: qsTr("Tus escritorios")
+                    text: I18n.tr("Tus escritorios")
                     font.family: Theme.fontDisplay
-                    font.pixelSize: 19 * root.s
+                    font.pixelSize: 20 * root.s
                     font.weight: Font.DemiBold
                     color: Theme.foreground
                 }
                 AnimatedLabel {
-                    value: qsTr("Espacios %1–%2").arg(root.groupBase).arg(root.groupBase + root.groupSize - 1)
+                    value: I18n.tr("Espacios %1–%2").arg(root.groupBase).arg(root.groupBase + root.groupSize - 1)
                     font.family: Theme.font
                     font.pixelSize: 11 * root.s
                     color: Theme.iconSecondary
@@ -220,7 +213,7 @@ PillSurface {
                     textWidth: 220 * root.s
                     spacing: 10 * root.s
                     metadataSpacing: 3 * root.s
-                    titlePixelSize: 12.5 * root.s
+                    titlePixelSize: 13 * root.s
                     artistPixelSize: 11 * root.s
                     artUrl: root.mediaArtUrl
                     hasProgress: root.mediaHasProgress
@@ -306,7 +299,7 @@ PillSurface {
                                     width: parent.width - 6 * root.s
                                     text: windowPreview.modelData.class || ""
                                     font.family: Theme.font
-                                    font.pixelSize: 10 * root.s
+                                    font.pixelSize: 11 * root.s
                                     color: Theme.foreground
                                     elide: Text.ElideRight
                                     horizontalAlignment: Text.AlignHCenter
@@ -316,7 +309,7 @@ PillSurface {
                         }
                         MotionArea {
                             anchors.fill: parent
-                            accessibleName: qsTr("Ir al escritorio %1").arg(tile.wsId)
+                            accessibleName: I18n.tr("Ir al escritorio %1").arg(tile.wsId)
                             focusOnTab: false
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
@@ -329,7 +322,7 @@ PillSurface {
                         anchors.rightMargin: 3 * root.s
                         anchors.top: desktop.bottom
                         anchors.topMargin: 11 * root.s
-                        value: tile.windows.length ? String(tile.windows.length) : qsTr("Vacío")
+                        value: tile.windows.length ? String(tile.windows.length) : ""
                         font.family: Theme.font
                         font.pixelSize: 11 * root.s
                         color: Theme.iconSecondary
@@ -349,9 +342,9 @@ PillSurface {
                             Behavior on opacity { NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                         }
                         Text {
-                            text: qsTr("Escritorio %1").arg(tile.wsId)
+                            text: I18n.tr("Escritorio %1").arg(tile.wsId)
                             font.family: Theme.font
-                            font.pixelSize: 12 * root.s
+                            font.pixelSize: 11 * root.s
                             font.weight: Font.Medium
                             color: tile.selected ? Theme.foreground : Theme.iconSecondary
                             Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
@@ -383,14 +376,6 @@ PillSurface {
         Item {
             width: parent.width
             height: 30 * root.s
-            Text {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("← →  elegir     ↵  abrir     esc  cerrar")
-                color: Theme.iconSecondary
-                font.family: Theme.font
-                font.pixelSize: 11 * root.s
-            }
             Row {
                 anchors.right: parent.right
                 spacing: 6 * root.s
@@ -407,7 +392,7 @@ PillSurface {
 
                         MotionArea {
                             id: buttonMouse
-                            accessibleName: groupAction.index === 2 ? qsTr("Cerrar") : groupAction.index === 0 ? qsTr("Grupo anterior") : qsTr("Grupo siguiente")
+                            accessibleName: groupAction.index === 2 ? I18n.tr("Cerrar") : groupAction.index === 0 ? I18n.tr("Grupo anterior") : I18n.tr("Grupo siguiente")
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor

@@ -4,26 +4,39 @@ import Quickshell.Widgets
 import "../components"
 import "../Singletons"
 
+// Marea media capsule: one floating strip for rest and access. A round cover
+// that turns like a disc while playing, the track on one line, a hairline
+// timeline and the transport on the right.
 Item {
     id: root
     property real unit: 1
     property var player: null
     property string artUrl: ""
     property string trackKey: ""
-    property bool embedded: false
-    readonly property bool landscape: !embedded && width >= 480 * unit
-    readonly property bool showTimeline: !embedded && session.canSeek
     readonly property bool hasPlayer: session.hasPlayer
-    implicitHeight: Math.max(cover.y + cover.height, controls.y + controls.height)
-    MediaSession { id: session; player: root.player; positionOffset: Players.offsetFor(player); trackKey: root.trackKey; active: root.visible && !root.embedded }
+    readonly property real fontScale: Math.max(1, Flags.fontScale * 0.85)
+    implicitHeight: Math.round(64 * unit * fontScale)
+    MediaSession { id: session; player: root.player; positionOffset: Players.offsetFor(player); trackKey: root.trackKey; active: root.visible }
+    LockGlass { anchors.fill: parent; radius: height / 2; unit: root.unit }
+    // A new track slides its text in from the cover side.
+    property real swap: 1
+    onTrackKeyChanged: if (!Flags.reduceMotion && visible) swapAnim.restart()
+    NumberAnimation { id: swapAnim; target: root; property: "swap"; from: 0; to: 1; duration: Motion.standardLarge; easing.type: Motion.easeStandard }
     ClippingRectangle {
         id: cover
         objectName: "lockMediaCover"
-        x: root.landscape ? 0 : (parent.width - width) / 2
-        y: 0
-        width: Math.min(parent.width - 48 * root.unit, (root.embedded ? 80 : root.landscape ? 160 : 112) * root.unit); height: width
-        radius: 16 * root.unit
+        x: Math.round(8 * root.unit); anchors.verticalCenter: parent.verticalCenter
+        width: root.height - 16 * root.unit; height: width
+        radius: width / 2
         color: Qt.alpha(Theme.foreground, Theme.alphaSoft)
+        // Turning the clipped cover as a whole keeps its clip texture static.
+        NumberAnimation on rotation {
+            from: 0; to: 360
+            duration: 24000
+            loops: Animation.Infinite
+            running: root.visible && !Flags.reduceMotion && artwork.status === Image.Ready
+            paused: running && !session.isPlaying
+        }
         Image {
             id: artwork
             anchors.fill: parent
@@ -36,7 +49,7 @@ Item {
             anchors.centerIn: parent
             visible: artwork.status !== Image.Ready
             iconName: "music_note"
-            font.pixelSize: cover.width * 0.38
+            font.pixelSize: cover.width * 0.42
             color: Theme.iconSecondary
             Accessible.ignored: true
         }
@@ -44,41 +57,36 @@ Item {
     Column {
         id: metadata
         objectName: "lockMediaMetadata"
-        x: root.landscape ? cover.width + 24 * root.unit : 0
-        y: root.landscape ? 8 * root.unit : cover.height + 16 * root.unit
-        width: parent.width - x
-        spacing: 5 * root.unit
+        x: cover.x + cover.width + 12 * root.unit
+        anchors.verticalCenter: parent.verticalCenter
+        width: controls.x - x - 10 * root.unit
+        spacing: 2 * root.unit
+        opacity: root.swap
+        transform: Translate { x: -10 * root.unit * (1 - root.swap) }
         Text {
             objectName: "lockMediaTitle"
             width: parent.width; text: session.title
-            maximumLineCount: 2; wrapMode: Text.Wrap; elide: Text.ElideRight
-            horizontalAlignment: root.landscape ? Text.AlignLeft : Text.AlignHCenter
+            elide: Text.ElideRight
             color: Theme.foreground; font.family: Theme.fontMedia
-            font.pixelSize: (root.embedded ? 15 : 24) * root.unit * Flags.fontScale; font.weight: Font.Medium
+            font.pixelSize: 13 * root.unit * Flags.fontScale; font.weight: Font.Medium
         }
         Text {
             width: parent.width; text: session.artist; elide: Text.ElideRight
-            horizontalAlignment: root.landscape ? Text.AlignLeft : Text.AlignHCenter
-            color: Qt.alpha(Theme.foreground, 0.9); font.family: Theme.fontMedia
-            font.pixelSize: (root.embedded ? 13 : 16) * root.unit * Flags.fontScale
+            visible: text.length > 0
+            color: Theme.iconSecondary; font.family: Theme.fontMedia
+            font.pixelSize: 11 * root.unit * Flags.fontScale
         }
-    }
-    Column {
-        id: timeline
-        x: metadata.x
-        y: metadata.y + metadata.height + 16 * root.unit
-        width: metadata.width
-        visible: root.showTimeline
-        spacing: 0
         Controls.Slider {
             id: seek
             objectName: "lockMediaSeek"
             width: parent.width
-            height: 28 * root.unit
+            height: 12 * root.unit
+            padding: 0
+            visible: session.canSeek
             from: 0; to: 1
             value: session.progress
             enabled: session.canSeek
-            Accessible.name: qsTr("Posición de reproducción")
+            Accessible.name: I18n.tr("Posición de reproducción")
             onPressedChanged: {
                 if (pressed) session.beginDrag(value)
                 else session.commitDrag(value)
@@ -88,33 +96,31 @@ Item {
                 else if (root.player) session.seekTo(value * root.player.length)
             }
             background: Rectangle {
-                x: seek.leftPadding; y: (seek.height - height) / 2
-                width: seek.availableWidth; height: 3 * root.unit
+                y: (seek.height - height) / 2
+                width: seek.availableWidth
+                height: (seek.hovered || seek.pressed ? 4 : 2) * root.unit
                 radius: height / 2; color: Qt.alpha(Theme.foreground, Theme.alphaSubtle)
-                Rectangle { width: parent.width * seek.visualPosition; height: parent.height; radius: parent.radius; color: Theme.accent }
+                Behavior on height { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.hover; easing.type: Motion.easeStandard } }
+                Rectangle { width: parent.width * seek.visualPosition; height: parent.height; radius: parent.radius; color: Theme.foreground }
             }
             handle: Rectangle {
-                x: seek.leftPadding + seek.visualPosition * (seek.availableWidth - width)
+                x: seek.visualPosition * (seek.availableWidth - width)
                 y: (seek.height - height) / 2
                 width: 10 * root.unit; height: width; radius: width / 2
-                color: Theme.accent
-                opacity: seek.hovered || seek.pressed || seek.activeFocus ? 1 : 0
+                color: Theme.foreground
+                scale: seek.hovered || seek.pressed || seek.activeFocus ? 1 : 0
+                Behavior on scale { NumberAnimation { duration: Flags.reduceMotion ? 0 : Motion.fast; easing.type: Easing.OutBack } }
             }
-        }
-        Item {
-            width: parent.width; height: 18 * root.unit * Flags.fontScale
-            Text { text: session.formatTime(session.displayPosition); color: Theme.foreground; font.family: Theme.fontMedia; font.pixelSize: 11 * root.unit * Flags.fontScale }
-            Text { anchors.right: parent.right; text: session.formatTime(root.player?.length || 0); color: Theme.foreground; font.family: Theme.fontMedia; font.pixelSize: 11 * root.unit * Flags.fontScale }
         }
     }
     Row {
         id: controls
         objectName: "lockMediaControls"
-        x: metadata.x + (metadata.width - width) / 2
-        y: (root.showTimeline ? timeline.y + timeline.height : metadata.y + metadata.height) + 12 * root.unit
-        spacing: 24 * root.unit
-        LockButton { unit: root.unit; flatStyle: true; iconName: "skip_previous"; text: qsTr("Anterior"); enabled: session.canPrevious; onClicked: session.previous() }
-        LockButton { unit: root.unit; flatStyle: true; iconName: session.isPlaying ? "pause" : "play_arrow"; text: session.isPlaying ? qsTr("Pausar") : qsTr("Reproducir"); enabled: session.canToggle; onClicked: session.togglePlaying() }
-        LockButton { unit: root.unit; flatStyle: true; iconName: "skip_next"; text: qsTr("Siguiente"); enabled: session.canNext; onClicked: session.next() }
+        x: parent.width - width - 10 * root.unit
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 2 * root.unit
+        LockButton { anchors.verticalCenter: parent.verticalCenter; unit: root.unit; width: 36 * root.unit; height: width; iconSize: 20 * root.unit; flatStyle: true; iconName: "skip_previous"; text: I18n.tr("Anterior"); enabled: session.canPrevious; onClicked: session.previous() }
+        LockButton { anchors.verticalCenter: parent.verticalCenter; unit: root.unit; width: 42 * root.unit; height: width; iconSize: 22 * root.unit; solid: true; iconName: session.isPlaying ? "pause" : "play_arrow"; text: session.isPlaying ? I18n.tr("Pausar") : I18n.tr("Reproducir"); enabled: session.canToggle; onClicked: session.togglePlaying() }
+        LockButton { anchors.verticalCenter: parent.verticalCenter; unit: root.unit; width: 36 * root.unit; height: width; iconSize: 20 * root.unit; flatStyle: true; iconName: "skip_next"; text: I18n.tr("Siguiente"); enabled: session.canNext; onClicked: session.next() }
     }
 }

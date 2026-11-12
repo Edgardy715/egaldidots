@@ -16,7 +16,7 @@ ShellRoot {
             started = true
             check(Config.error === "", "load defaults")
             check(Config.update({ appearance: { fontScale: 1.25, fontMediaFamily: "Inter" }, extension: { keep: 7 } }).ok, "update")
-            check(Flags.fontScale === 1.25 && Theme.fontSizeBody === 15, "reactive consumers")
+            check(Flags.fontScale === 1.25 && Math.abs(Theme.fontSizeBody - 13 * 1.25) < 0.001, "reactive consumers")
             check(!Config.update({ appearance: { fontScale: -2, time12h: false } }).ok, "reject invalid batch")
             check(Flags.fontScale === 1.25 && Flags.time12h, "no partial apply")
             Config.discard()

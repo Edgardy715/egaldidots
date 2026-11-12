@@ -105,7 +105,7 @@ ShellRoot {
         process = subprocess.Popen(["qs", "-p", str(fixture)], env=env, stdout=overlay_log, stderr=subprocess.STDOUT)
         surface("")
         typed("initial")
-        for name in ["calendar", "mixer", "connectivity", "workspaces", "notifs", "utils", "appearance",
+        for name in ["calendar", "mixer", "connectivity", "notifs", "utils",
                      "launcher", "media", "wallpaper", "clipboard", "overview", "session", "settings"]:
             call("open", name)
             surface(name)
@@ -127,7 +127,7 @@ ShellRoot {
         typed("nested")
         print("PASS native settings Escape clears search before closing panel", flush=True)
         call("open", "workspaces")
-        surface("workspaces")
+        surface("overview")
         time.sleep(.25)
         call("selectWorkspace")
         surface("")

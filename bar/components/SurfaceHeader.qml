@@ -44,6 +44,7 @@ Item {
 
         ColumnLayout {
             id: labels
+            readonly property bool pullGrabZone: true
             Layout.fillWidth: true
             Layout.minimumWidth: 0
             spacing: Theme.spacingXxs * root.s

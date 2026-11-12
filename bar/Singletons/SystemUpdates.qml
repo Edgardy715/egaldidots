@@ -64,6 +64,7 @@ Singleton {
         installer.running = true
     }
     function begin(source, initial) {
+        Activities.dispatch({op: "start", id: "updates:" + source, title: I18n.tr("Actualizando %1").arg(source), icon: "system_update", source: "SystemUpdates"})
         operation = "install"
         installSource = source
         progress = initial
@@ -84,29 +85,34 @@ Singleton {
     }
     function handle(event) {
         if (!event || event.source !== installSource) return
-        if (event.event === "phase") progress = event
+        if (event.event === "phase") {
+            progress = event
+            Activities.dispatch({op: "update", id: "updates:" + event.source,
+                progress: event.total > 0 ? event.done / event.total : -1, subtitle: event.phase || ""})
+        }
         else if (event.event === "result") finish(event)
     }
     function finish(event) {
+        Activities.dispatch({op: "end", id: "updates:" + event.source, state: event.result === "success" ? "done" : "failed", subtitle: UpdateText.outcome(event, event.source)})
         gotResult = true
         outcomes = Object.assign({}, outcomes, {[event.source]: event})
         if (event.result === "cancelled" || !Config.updates.notifications) return
         const ok = event.result === "success"
-        Notifs.postLocal(ok ? qsTr("Actualización completada") : qsTr("La actualización no se completó"),
+        Notifs.postLocal(ok ? I18n.tr("Actualización completada") : I18n.tr("La actualización no se completó"),
             UpdateText.outcome(event, event.source),
-            [{identifier: "updates", text: qsTr("Ver actualizaciones"), invoke: function() { root.open() }}], "isla:updates")
+            [{identifier: "updates", text: I18n.tr("Ver actualizaciones"), invoke: function() { root.open() }}], "isla:updates")
     }
     function accept(data) {
-        if (!data || !data.system || !data.shell) throw new Error(qsTr("Respuesta de actualizaciones inválida"))
+        if (!data || !data.system || !data.shell) throw new Error(I18n.tr("Respuesta de actualizaciones inválida"))
         result = data
         const fingerprint = JSON.stringify(sources.map(key => [key, data[key]?.count || 0, data[key]?.packages || []]))
         if (!count || !Config.updates.notifications) return
         if (fingerprint === lastNotice && Date.now() - lastNoticeAt < 86400000) return
         lastNotice = fingerprint
         lastNoticeAt = Date.now()
-        Notifs.postLocal(qsTr("Hay actualizaciones disponibles"),
-            qsTr("%1 actualizaciones para tu equipo. Abre Actualizaciones en Edots para revisarlas.").arg(count),
-            [{identifier: "updates", text: qsTr("Ver actualizaciones"), invoke: function() { root.open() }}], "isla:updates")
+        Notifs.postLocal(I18n.tr("Hay actualizaciones disponibles"),
+            I18n.tr("%1 actualizaciones para tu equipo. Abre Actualizaciones en Edots para revisarlas.").arg(count),
+            [{identifier: "updates", text: I18n.tr("Ver actualizaciones"), invoke: function() { root.open() }}], "isla:updates")
         if (noticeState.loaded) noticeState.setText(JSON.stringify({fingerprint: lastNotice, time: lastNoticeAt}))
     }
     Timer { id: startup; interval: 45000; onTriggered: if (Config.updates.enabled) root.refresh() }
@@ -186,8 +192,8 @@ Singleton {
             let reason = ""
             try { reason = JSON.parse(cancelOutput.text).reason } catch (e) {}
             if (root.installing) root.feedback = reason === "committed"
-                ? qsTr("Ya no se puede cancelar: los cambios se están aplicando. Espera a que termine.")
-                : qsTr("No se pudo cancelar la actualización.")
+                ? I18n.tr("Ya no se puede cancelar: los cambios se están aplicando. Espera a que termine.")
+                : I18n.tr("No se pudo cancelar la actualización.")
         })
     }
     IpcHandler {

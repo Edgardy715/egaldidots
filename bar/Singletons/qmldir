@@ -2,8 +2,9 @@ singleton Motion Motion.qml
 singleton IslandGeometry IslandGeometry.qml
 singleton Config Config.qml
 singleton SystemUpdates SystemUpdates.qml
-singleton IrisMemory IrisMemory.qml
 singleton HyprlandSettings HyprlandSettings.qml
+singleton HyprlandPlugins HyprlandPlugins.qml
+singleton HyprlandBinds HyprlandBinds.qml
 singleton IslaPalette IslaPalette.qml
 singleton Theme Theme.qml
 singleton Flags Flags.qml
@@ -30,3 +31,9 @@ singleton Recording Recording.qml
 
 singleton AmbientClock AmbientClock.qml
 singleton GlowClock GlowClock.qml
+singleton I18n I18n.qml
+singleton Regional Regional.qml
+
+singleton Activities 1.0 Activities.qml
+singleton DeviceMoments 1.0 DeviceMoments.qml
+singleton FileOps FileOps.qml

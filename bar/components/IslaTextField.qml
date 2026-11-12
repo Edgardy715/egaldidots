@@ -24,7 +24,7 @@ TextInput {
 
     color: Theme.foreground
     font.family: Theme.font
-    font.pixelSize: 14
+    font.pixelSize: Theme.fontSizeBody
     clip: true
     verticalAlignment: TextInput.AlignVCenter
     selectByMouse: true

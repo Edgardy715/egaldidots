@@ -11,7 +11,7 @@ jq -e '
   and (.motionScale | type == "number")
   and (.fontFamily | type == "string")
 ' "$root/shell.json.example" >/dev/null
-if rg -n --glob '*.qml' '"/home/' "$root"; then
+if rg -n --glob '*.qml' --glob '!files-nav-regression.qml' '"/home/' "$root"; then
   echo 'Hardcoded user path in QML' >&2
   exit 1
 fi

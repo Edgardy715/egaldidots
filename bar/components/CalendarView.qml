@@ -22,14 +22,14 @@ PillSurface {
     mTop: Theme.marginLg; mLeft: Theme.marginLg; mRight: Theme.marginLg; mBottom: Theme.marginMd
 
     // Fechas y controles comparten el idioma traducible de la interfaz.
-    readonly property var dayNames: [qsTr("domingo"), qsTr("lunes"), qsTr("martes"),
-        qsTr("miércoles"), qsTr("jueves"), qsTr("viernes"), qsTr("sábado")]
-    readonly property var monthNames: [qsTr("enero"), qsTr("febrero"), qsTr("marzo"),
-        qsTr("abril"), qsTr("mayo"), qsTr("junio"), qsTr("julio"), qsTr("agosto"),
-        qsTr("septiembre"), qsTr("octubre"), qsTr("noviembre"), qsTr("diciembre")]
+    readonly property var dayNames: [I18n.tr("domingo"), I18n.tr("lunes"), I18n.tr("martes"),
+        I18n.tr("miércoles"), I18n.tr("jueves"), I18n.tr("viernes"), I18n.tr("sábado")]
+    readonly property var monthNames: [I18n.tr("enero"), I18n.tr("febrero"), I18n.tr("marzo"),
+        I18n.tr("abril"), I18n.tr("mayo"), I18n.tr("junio"), I18n.tr("julio"), I18n.tr("agosto"),
+        I18n.tr("septiembre"), I18n.tr("octubre"), I18n.tr("noviembre"), I18n.tr("diciembre")]
     property int viewYear: today.getFullYear()
     property int viewMonth: today.getMonth()   // 0-based
-    property date today: new Date()
+    property date today: Regional.now()
     property int selectedDay: today.getDate()
 
     // re-trigger del stagger de grilla al cambiar de mes
@@ -86,7 +86,8 @@ PillSurface {
     onClosingChanged: if (closing) { weatherSwap.stop(); weatherTarget = weatherView; weatherHeroOpacity = 1 }
 
     function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate() }
-    function firstOffset(y, m) { return new Date(y, m, 1).getDay() }  // 0=domingo
+    // Leading blank cells before day 1, for the region's first day of the week.
+    function firstOffset(y, m) { return (new Date(y, m, 1).getDay() - Regional.weekStart + 7) % 7 }
 
     readonly property int offset: root.firstOffset(root.viewYear, root.viewMonth)
     readonly property int length: root.daysInMonth(root.viewYear, root.viewMonth)
@@ -212,7 +213,7 @@ PillSurface {
                 transformOrigin: Item.Center
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
-                MotionArea { id: prevMa; objectName: "calendarPreviousMonth"; accessibleName: qsTr("Mes anterior"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(-1) }
+                MotionArea { id: prevMa; objectName: "calendarPreviousMonth"; accessibleName: I18n.tr("Mes anterior"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(-1) }
 
                 MaterialIcon {
                     compressWithControl: true
@@ -252,7 +253,7 @@ PillSurface {
                 transformOrigin: Item.Center
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
-                MotionArea { id: nextMa; objectName: "calendarNextMonth"; accessibleName: qsTr("Mes siguiente"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(1) }
+                MotionArea { id: nextMa; objectName: "calendarNextMonth"; accessibleName: I18n.tr("Mes siguiente"); anchors.fill: parent; hoverWash: false; onClicked: root.shiftMonth(1) }
 
                 MaterialIcon {
                     compressWithControl: true
@@ -283,7 +284,7 @@ PillSurface {
                 model: {
                     var out = []
                     for (var i = 0; i < 7; i++)
-                        out.push(root.dayNames[i].slice(0, 2).toUpperCase())
+                        out.push(root.dayNames[(i + Regional.weekStart) % 7].slice(0, 2).toUpperCase())
                     return out
                 }
                 delegate: Text {
@@ -453,7 +454,7 @@ PillSurface {
 
                         MotionArea {
                             id: cellMa
-                            accessibleName: qsTr("Seleccionar día %1").arg(cell.dayNum)
+                            accessibleName: I18n.tr("Seleccionar día %1").arg(cell.dayNum)
                             focusOnTab: false
                             anchors.fill: parent
                             enabled: cell.inMonth
@@ -497,7 +498,7 @@ PillSurface {
                     Layout.fillWidth: true
                     Text {
                         Layout.fillWidth: true
-                        text: qsTr("Clima")
+                        text: I18n.tr("Clima")
                         color: Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSizeBodyLg * root.s
@@ -508,8 +509,8 @@ PillSurface {
                         Layout.preferredWidth: 48 * root.s; Layout.preferredHeight: 28 * root.s
                         radius: height / 2
                         color: Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                        Text { anchors.centerIn: parent; text: qsTr("Ahora"); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; font.weight: Font.Medium }
-                        MotionArea { objectName: "weatherCurrent"; anchors.fill: parent; accessibleName: qsTr("Volver al clima actual"); onClicked: root.selectForecast(-1) }
+                        Text { anchors.centerIn: parent; text: I18n.tr("Ahora"); color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; font.weight: Font.Medium }
+                        MotionArea { objectName: "weatherCurrent"; anchors.fill: parent; accessibleName: I18n.tr("Volver al clima actual"); onClicked: root.selectForecast(-1) }
                     }
                     Rectangle {
                         Layout.preferredWidth: 28 * root.s; Layout.preferredHeight: 28 * root.s
@@ -521,7 +522,7 @@ PillSurface {
                             Behavior on opacity { NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                         }
                         ConfirmationIndicator { anchors.centerIn: parent; width: 20 * root.s; height: width; s: root.s; status: root.weatherLoading ? "busy" : "" }
-                        MotionArea { objectName: "weatherRefresh"; anchors.fill: parent; enabled: !root.weatherLoading; accessibleName: qsTr("Actualizar clima"); onClicked: root.refreshWeatherRequested() }
+                        MotionArea { objectName: "weatherRefresh"; anchors.fill: parent; enabled: !root.weatherLoading; accessibleName: I18n.tr("Actualizar clima"); onClicked: root.refreshWeatherRequested() }
                     }
                 }
                 // Lugar y frescura en una sola línea de metadatos.
@@ -529,8 +530,8 @@ PillSurface {
                     objectName: "weatherStatus"
                     Layout.fillWidth: true
                     Layout.topMargin: -6 * root.s
-                    text: (root.weatherLocation || qsTr("Ubicación aproximada")) + " · "
-                        + (root.weatherLoading ? qsTr("Actualizando…") : root.weatherError ? (root.weatherTemp ? qsTr("Sin actualizar · datos anteriores") : root.weatherError) : (root.weatherUpdated ? qsTr("Actualizado %1").arg(root.weatherUpdated) : "wttr.in"))
+                    text: (root.weatherLocation || I18n.tr("Ubicación aproximada")) + " · "
+                        + (root.weatherLoading ? I18n.tr("Actualizando…") : root.weatherError ? (root.weatherTemp ? I18n.tr("Sin actualizar · datos anteriores") : root.weatherError) : (root.weatherUpdated ? I18n.tr("Actualizado %1").arg(root.weatherUpdated) : "wttr.in"))
                     color: root.weatherError ? Theme.accent : Theme.iconSecondary
                     font.family: Theme.font; font.features: Theme.fontNumeric
                     font.pixelSize: Theme.fontSizeLabel * root.s; wrapMode: Text.WordWrap
@@ -542,10 +543,10 @@ PillSurface {
                     spacing: 4 * root.s
                     opacity: root.weatherHeroOpacity
                     Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                    Text {
+                    AnimatedLabel {
                         Layout.fillWidth: true
                         objectName: "calendarForecastWeekday"
-                        text: root.selectedForecast ? root.dayNames[new Date(root.selectedForecast.date + "T12:00:00").getDay()] : qsTr("Ahora mismo")
+                        value: root.selectedForecast ? root.dayNames[new Date(root.selectedForecast.date + "T12:00:00").getDay()] : I18n.tr("Ahora mismo")
                         color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; elide: Text.ElideRight
                     }
                     RowLayout {
@@ -558,18 +559,18 @@ PillSurface {
                             color: Theme.foreground; font.family: Theme.fontDisplay
                             font.pixelSize: 46 * root.s * Math.min(Flags.fontScale, 1.2); font.weight: Font.Medium
                             Accessible.role: Accessible.StaticText
-                            Accessible.name: root.selectedForecast ? qsTr("Máxima %1 Celsius").arg(text) : qsTr("Temperatura %1 Celsius").arg(text)
+                            Accessible.name: root.selectedForecast ? I18n.tr("Máxima %1 Celsius").arg(text) : I18n.tr("Temperatura %1 Celsius").arg(text)
                         }
                         MaterialIcon { iconName: root.selectedForecast ? root.selectedForecast.icon : root.weatherIcon; color: Theme.accent; font.pixelSize: 40 * root.s; opacity: root.weatherTemp ? 1 : 0.4 }
                     }
-                    Text {
+                    AnimatedLabel {
                         Layout.fillWidth: true
-                        text: root.selectedForecast ? root.selectedForecast.label : (root.weatherDesc || (root.weatherLoading ? qsTr("Consultando clima…") : qsTr("Clima no disponible")))
+                        value: root.selectedForecast ? root.selectedForecast.label : (root.weatherDesc || (root.weatherLoading ? I18n.tr("Consultando clima…") : I18n.tr("Clima no disponible")))
                         color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBodyLg * root.s; wrapMode: Text.WordWrap
                     }
-                    Text {
+                    AnimatedLabel {
                         Layout.fillWidth: true
-                        text: root.selectedForecast ? qsTr("Máx. %1 · Mín. %2").arg(root.selectedForecast.high).arg(root.selectedForecast.low) : (root.weatherFeels ? qsTr("Sensación %1").arg(root.weatherFeels) : "")
+                        value: root.selectedForecast ? I18n.tr("Máx. %1 · Mín. %2").arg(root.selectedForecast.high).arg(root.selectedForecast.low) : (root.weatherFeels ? I18n.tr("Sensación %1").arg(root.weatherFeels) : "")
                         visible: text.length > 0
                         color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; wrapMode: Text.WordWrap
                     }
@@ -580,16 +581,16 @@ PillSurface {
                     spacing: 12 * root.s
                     ColumnLayout {
                         Layout.fillWidth: true
-                        Text { text: qsTr("Humedad"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s }
+                        Text { text: I18n.tr("Humedad"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s }
                         Text { objectName: "weatherHumidityValue"; text: (root.selectedForecast ? root.selectedForecast.humidity : root.weatherHumidity) || "—"; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s }
                     }
                     ColumnLayout {
                         Layout.fillWidth: true
-                        Text { text: qsTr("Viento"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s }
+                        Text { text: I18n.tr("Viento"); color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s }
                         Text { objectName: "weatherWindValue"; text: (root.selectedForecast ? root.selectedForecast.wind : root.weatherWind) || "—"; color: Theme.foreground; font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s }
                     }
                 }
-                Text { text: qsTr("Pronóstico"); visible: root.forecast.length > 0; color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; font.weight: Font.DemiBold }
+                Text { text: I18n.tr("Pronóstico"); visible: root.forecast.length > 0; color: Theme.iconSecondary; font.family: Theme.font; font.pixelSize: Theme.fontSizeLabel * root.s; font.weight: Font.DemiBold }
                 Repeater {
                     model: root.forecast
                     delegate: Rectangle {
@@ -633,7 +634,7 @@ PillSurface {
                         }
                         MotionArea {
                             anchors.fill: parent; feedbackRadius: forecastRow.radius; hoverWash: false
-                            accessibleName: qsTr("%1: %2, máxima %3, mínima %4").arg(forecastRow.modelData.date).arg(forecastRow.modelData.label).arg(forecastRow.modelData.high).arg(forecastRow.modelData.low)
+                            accessibleName: I18n.tr("%1: %2, máxima %3, mínima %4").arg(forecastRow.modelData.date).arg(forecastRow.modelData.label).arg(forecastRow.modelData.high).arg(forecastRow.modelData.low)
                             onClicked: root.selectForecast(root.weatherView === forecastRow.index ? -1 : forecastRow.index)
                         }
                     }
@@ -675,7 +676,7 @@ PillSurface {
                 MotionArea {
                     objectName: "calendarMediaOpen"
                     anchors.fill: parent
-                    accessibleName: qsTr("Abrir música: %1 · %2").arg(root.mediaTitle).arg(root.mediaArtist)
+                    accessibleName: I18n.tr("Abrir música: %1 · %2").arg(root.mediaTitle).arg(root.mediaArtist)
                     onClicked: root.mediaRequested()
                 }
             }

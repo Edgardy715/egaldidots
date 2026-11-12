@@ -1,11 +1,14 @@
 import QtQuick
+import "../Singletons"
 
 Item {
     id: root
     property real s: 1
     property bool active: false
     readonly property bool popupOpen: view.popupOpen
-    signal requestClose()
+    // El punto de privacidad abre Sonido en la página de entrada.
+    onActiveChanged: if (active && DeviceMoments.consumeIntent("mixer") === "input") view.page = 1
+    Component.onCompleted: if (active && DeviceMoments.consumeIntent("mixer") === "input") view.page = 1
     AudioController {
         id: audio
         active: root.active
@@ -29,6 +32,5 @@ Item {
         levels: audio.levels
         onRequested: (action, args) => audio.request(action, args)
         onRefreshRequested: audio.refresh()
-        onRequestClose: root.requestClose()
     }
 }

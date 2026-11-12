@@ -13,7 +13,6 @@ Singleton {
     readonly property bool mediaTransitions: Config.appearance.mediaTransitions
     readonly property bool notificationDrop: Config.appearance.notificationDrop
     readonly property bool menuSelectionAnchor: Config.appearance.menuSelectionAnchor
-    readonly property bool pillBlur: Config.appearance.pillBlur
     readonly property real topGap: Config.appearance.topGap
     readonly property real appGap: Config.appearance.appGap
     readonly property real uiScale: Config.appearance.uiScale
@@ -27,6 +26,5 @@ Singleton {
     readonly property bool reduceMotion: Config.appearance.reduceMotion
     readonly property bool time12h: Config.appearance.time12h
     readonly property bool clockSeconds: Config.appearance.clockSeconds
-    readonly property bool showGlyphs: Config.appearance.showGlyphs
     readonly property string fontMediaFamily: Config.appearance.fontMediaFamily
 }

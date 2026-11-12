@@ -38,12 +38,6 @@ Item {
     property color bgColor: "transparent"
     property alias bgRect: _surfaceBg
 
-    // Attention: while the surface has one point that matters (a caret, a hovered
-    // card, the current lyric) it publishes it here, in its own coordinates, and
-    // Iris looks at it. `approved` is a discrete success (launch, apply).
-    property bool focusActive: false
-    property point focusPoint: Qt.point(0, 0)
-
     signal requestClose()
     signal feedbackRequested(string kind)
     signal approved()

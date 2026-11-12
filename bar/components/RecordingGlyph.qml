@@ -36,9 +36,12 @@ Item {
         Behavior on height { enabled: !root.reduced; SmoothedAnimation { duration: Motion.standardSmall; velocity: -1 } }
         Behavior on radius { enabled: !root.reduced; SmoothedAnimation { duration: Motion.standardSmall; velocity: -1 } }
     }
-    Text {
+    // Cuenta atrás: cada segundo el número cae de arriba como en un odómetro.
+    RollingNumber {
         anchors.centerIn: parent
-        text: root.countdown
+        value: Number(root.countdown) || 0
+        widthSample: "0"
+        alignment: Qt.AlignHCenter
         visible: root.phase === "countdown"
         color: Theme.foreground
         font.family: Theme.fontMedia

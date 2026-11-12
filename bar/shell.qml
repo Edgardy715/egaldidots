@@ -8,6 +8,7 @@ import Quickshell.Io
 import "Singletons"
 import "components"
 import "windows"
+import "components/files"
 
 /**
  * Isla · shell. Puerto de Ricelin `pill/shell.qml`: dos `PanelWindow` por
@@ -31,16 +32,36 @@ import "windows"
 ShellRoot {
     id: root
 
+    // Rachas de `island reload` se funden en una sola recarga (QA-10).
+    Timer {
+        id: reloadDebounce
+        interval: 400
+        onTriggered: Quickshell.reload(false)
+    }
+
     settings.watchFiles: true
+    Component.onCompleted: Activities.initialize()
 
     SurfaceRouter {
         id: navigation
+        mediaAvailable: Players.has
     }
 
     ShellRuntime { router: navigation }
 
+    /** Explorador de archivos: qs -c bar ipc call files open <ruta absoluta>. */
+    FilesIpc {}
+
     IpcHandler {
         target: "island"
+        function pull(target: string): bool {
+            for (let i = 0; i < monitorWindows.instances.length; i++) {
+                const monitor = monitorWindows.instances[i]
+                if (monitor.modelData.name === navigation.focusedMonitorName)
+                    return monitor.overlay.togglePull(target)
+            }
+            return false
+        }
         function bodyOpen(): bool {
             const monitor = navigation.focusedMonitorName || (Quickshell.screens.length ? Quickshell.screens[0].name : "")
             navigation.fileActivationRequested(monitor)
@@ -65,6 +86,7 @@ ShellRoot {
         function launcher(mon: string): bool { navigation.toggleSurface(mon, "launcher"); return true; }
         /** Clipboard history (cliphist). Super+V por defecto. */
         function clipboard(mon: string): bool { navigation.toggleSurface(mon, "clipboard"); return true; }
+        function shortcuts(mon: string): bool { navigation.toggleSurface(mon, "shortcuts"); return true; }
         /** Utilities (KeepAwake + Brillo + QuickToggles). Super+U por defecto. */
         function utils(mon: string): bool { navigation.toggleSurface(mon, "utils"); return true; }
         /** Connectivity panel: Wi-Fi + Bluetooth completo. */
@@ -74,7 +96,16 @@ ShellRoot {
         function peek(mon: string): bool       { navigation.peek(mon); return true; }
         function hide(): bool                  { navigation.close(); return true; }
         /** Abre cualquier surface por nombre — puerta para scripting. */
-        function page(mon: string, name: string): bool { navigation.toggleSurface(mon, name); return true; }
+        function page(mon: string, name: string): bool {
+            // "audio" es el nombre público del mezclador; "files" no tiene surface.
+            const surface = name === "audio" ? "mixer" : name
+            const known = ["calendar", "clipboard", "connectivity", "focus", "launcher", "media",
+                           "mixer", "notifs", "overview", "recording", "session", "settings", "shortcuts",
+                           "utils", "wallpaper", "workspaces", "appearance"]
+            if (known.indexOf(surface) < 0) return false
+            navigation.toggleSurface(mon, surface)
+            return true
+        }
         /** Overview (alt+tab estilo windows): surface de la pill con mini-ventanas
          *  vivas + navegación por teclado. Toggle con `qs -c bar ipc call island
          *  overview ""` (Super+Shift+Tab). Mientras está abierto el overlay toma foco de
@@ -91,15 +122,17 @@ ShellRoot {
         }
         /** Recarga de quickshell conservando el traspaso de recursos nativos.
          *  qs -c bar ipc call island reload */
-        function reload(): bool { Quickshell.reload(false); return true; }
+        function reload(): bool { reloadDebounce.restart(); return true; }
     }
 
     // Reserve follows the layout committed by this monitor's overlay.
     Variants {
+        id: monitorWindows
         model: Quickshell.screens
         Scope {
             id: monitor
             required property var modelData
+            readonly property alias overlay: monitorOverlay
             IslandReserve { modelData: monitor.modelData; compact: monitorOverlay.compact }
             IslandOverlay { id: monitorOverlay; modelData: monitor.modelData; router: navigation }
         }

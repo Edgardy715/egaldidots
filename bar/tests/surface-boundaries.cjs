@@ -9,10 +9,10 @@ for (const module of ['workspaceModule', 'userModule', 'statusModule', 'mediaMod
     `${module} must receive pointer input while interactive and release it when hidden`);
 }
 const views = {
-  Appearance: 'AppearanceView', Auth: 'AuthPromptView', Calendar: 'CalendarView',
+  Auth: 'AuthPromptView', Calendar: 'CalendarView',
   Clipboard: 'ClipboardView', Connectivity: 'ConnectivityView', Focus: 'ActivityView', Launcher: 'LauncherView',
   Media: 'MediaView', Mixer: 'MixerView', Notifs: 'NotifsView', Overview: 'OverviewView', Recording: 'ActivityView',
-  Session: 'SessionView', Utils: 'QuickControlsView', Wallpaper: 'WallpaperView', Workspaces: 'WorkspacesView'
+  Session: 'SessionView', Shortcuts: 'ShortcutExplorer', Utils: 'QuickControlsView', Wallpaper: 'WallpaperView'
 };
 const surfaces = fs.readdirSync(path.join(root, 'surfaces')).filter(n => n.endsWith('Surface.qml')).map(n => n.slice(0, -11)).sort();
 assert.deepEqual(surfaces, [...Object.keys(views), 'Settings'].sort(), 'Every surface must have an audited presentation boundary');

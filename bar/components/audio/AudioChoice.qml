@@ -28,7 +28,7 @@ ComboBox {
     onVisibleChanged: if (!visible) popup.close()
     onEnabledChanged: if (!enabled) popup.close()
     contentItem: Text {
-        text: root.displayText || qsTr("No disponible")
+        text: root.displayText || I18n.tr("No disponible")
         font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s
         color: root.enabled ? Theme.foreground : Theme.iconSecondary
         verticalAlignment: Text.AlignVCenter
@@ -62,7 +62,7 @@ ComboBox {
         hoverEnabled: true
         contentItem: Text {
             id: caption
-            text: option.modelData.description + (option.enabled ? "" : qsTr(" · No disponible"))
+            text: option.modelData.description + (option.enabled ? "" : I18n.tr(" · No disponible"))
             font.family: Theme.font; font.pixelSize: Theme.fontSizeBody * root.s
             color: option.enabled ? Theme.foreground : Theme.iconSecondary
             elide: Text.ElideRight

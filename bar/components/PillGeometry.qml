@@ -7,6 +7,8 @@ QtObject {
     property string surface: ""
     property bool launcherClosing: false
     property int launcherClosePhase: 0
+    // La pill viaja como gota (launcher): círculo del alto de reposo.
+    property bool dropMode: false
     property real restContentWidth: 0
     property real restLeftWidth: 0
     property real restRightWidth: 0
@@ -109,14 +111,23 @@ QtObject {
         return NaN
     }
 
-    readonly property real targetW: hasNotification && notifAnimating && !isNaN(_notifTargetW) ? _notifTargetW
-        : launcherReturning ? restW
+    readonly property real dropD: coreH
+    readonly property real targetW: dropMode ? dropD
+        : hasNotification && notifAnimating && !isNaN(_notifTargetW) ? _notifTargetW
+        : surfaceTargetW
+    // The surface's own size, without a notification borrowing the glass.
+    // The launcher card only ever opens at its landing and leaves as a drop
+    // (LauncherDropMotion); once the drop is back at the top — or never left it,
+    // when the launcher is closed mid-gather — every closing phase targets rest.
+    // The old in-place search bar here flashed a 660 px slab under the screen edge.
+    readonly property real surfaceTargetW: launcherLeaving ? restW
         : surface === "auth" ? restContentWidth + authInputW + 56 * s
         : surfaceOpen ? sizeFor.width * s : restW
-    readonly property real targetH: {
-        if (hasNotification && notifAnimating && !isNaN(_notifTargetH)) return _notifTargetH
-        if (launcherReturning) return coreH
-        if (launcherLeaving) return launcherSearchH
+    readonly property real targetH: dropMode ? dropD
+        : hasNotification && notifAnimating && !isNaN(_notifTargetH) ? _notifTargetH
+        : surfaceTargetH
+    readonly property real surfaceTargetH: {
+        if (launcherLeaving) return coreH
         if (!surfaceOpen) return coreH
         if (surface === "auth") return Math.max(82, Math.max(44, fontSizeBodyLg + fontScale + 20)
             + 3 + Math.max(18, fontSizeLabel + 6) + 16) * s
@@ -128,8 +139,9 @@ QtObject {
     }
     readonly property real radiusRest: coreH / 2
     readonly property real radiusOpen: Math.min(Math.max(18 * s, targetW * 0.055), Math.max(2, targetH / 2 - 2 * s))
-    readonly property real targetRadius: hasNotification && notifAnimating && !isNaN(_notifTargetRadius) ? _notifTargetRadius
-        : launcherReturning ? radiusRest
+    readonly property real targetRadius: dropMode ? dropD / 2
+        : hasNotification && notifAnimating && !isNaN(_notifTargetRadius) ? _notifTargetRadius
+        : launcherLeaving ? radiusRest
         : surface === "launcher" && targetH <= launcherSearchH ? targetH / 2
         : surface === "auth" ? targetH / 2 : surfaceOpen ? radiusOpen : radiusRest
 }

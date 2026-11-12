@@ -49,7 +49,7 @@ ShellRoot {
                 mediaReady()
                 router.close()
                 wait(1000)
-                for (const name of ["calendar", "mixer", "connectivity", "workspaces", "notifs", "clipboard", "launcher", "wallpaper", "overview", "settings", "session"]) {
+                for (const name of ["calendar", "mixer", "connectivity", "notifs", "clipboard", "launcher", "wallpaper", "overview", "settings", "session"]) {
                     router.toggleSurface("", name)
                     tryVerify(() => overlay.surface === name && !overlay.mediaDocking, 6000)
                     wait(600)
@@ -83,7 +83,8 @@ ShellRoot {
             wait(80)
             router.toggleSurface("", "calendar")
             layout("compact")
-            compare(overlay.surface, "calendar")
+            // El calendario cubre la fila superior: la gota de media se funde antes de abrir.
+            tryVerify(() => overlay.surface === "calendar", 3000)
             router.close()
             console.log("PASS: animated layouts both directions, all non-destructive surfaces, media transfer, interruptions and reduced motion")
         }

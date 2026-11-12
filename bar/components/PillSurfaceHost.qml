@@ -18,6 +18,7 @@ ClippingRectangle {
     property bool capsLockOn: false
     property real authContextWidth: 170 * scaleFactor
     property bool closing: false
+    property bool gestureDriven: false
     property bool suspended: false
     property real reveal: 1
     // Fase 2 del cierre del launcher: la surface se retira (fundido, escala, desenfoque).
@@ -33,11 +34,42 @@ ClippingRectangle {
         NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard }
     }
     // p: cuánto está presente el contenido entrante; q: cuánto el saliente (swap A->B).
-    readonly property real matP: Math.max(0, Math.min(1, root.morphCloseness)) * root.loadReveal * root.returnFade
+    // The layout stays at its destination; expose it only once both axes have room.
+    readonly property real gestureExposure: gestureDriven ? Math.max(0, Math.min(1,
+        (Math.min(morphCloseness, width / Math.max(1, layoutWidth), height / Math.max(1, layoutHeight)) - 0.6) / 0.35)) : 1
+    readonly property real matP: (gestureDriven ? gestureExposure : Math.max(0, Math.min(1, root.morphCloseness))) * root.loadReveal * root.returnFade
     readonly property real matQ: root.swapOpacity
     readonly property real contentScale: surfaceLoader.scale
     readonly property bool contentLayerActive: surfaceLoader.layer.enabled
     readonly property bool materializing: !Flags.reduceMotion && (matP < 0.999 || matQ < 0.999)
+
+    // Layout hold: content is laid out once, at the size the glass is heading to, and the
+    // glass reveals or clips it. Growing never reflows (the target is already the final size);
+    // closing and swapping keep the last open layout. Shrinking while open (launcher results,
+    // launcher close phases) still follows the glass, as designed. 0 = fill the glass.
+    property real layoutTargetWidth: 0
+    property real layoutTargetHeight: 0
+    readonly property bool layoutTracking: open && displayedSurface === surface
+    // A target below the glass is a shrink: follow the glass down until it arrives. The
+    // spring's overshoot past a target never reflows the content (a full relayout per frame).
+    property bool followGlassW: false
+    property bool followGlassH: false
+    onLayoutTargetWidthChanged: followGlassW = layoutTargetWidth > 0 && width > layoutTargetWidth + 0.5
+    onLayoutTargetHeightChanged: followGlassH = layoutTargetHeight > 0 && height > layoutTargetHeight + 0.5
+    onWidthChanged: if (followGlassW && width <= layoutTargetWidth + 0.5) followGlassW = false
+    onHeightChanged: if (followGlassH && height <= layoutTargetHeight + 0.5) followGlassH = false
+    readonly property real liveLayoutWidth: layoutTargetWidth <= 0 || !gestureDriven && followGlassW ? width : layoutTargetWidth
+    readonly property real liveLayoutHeight: layoutTargetHeight <= 0 || !gestureDriven && followGlassH ? height : layoutTargetHeight
+    property real heldLayoutWidth: 0
+    property real heldLayoutHeight: 0
+    onLiveLayoutWidthChanged: if (layoutTracking) heldLayoutWidth = liveLayoutWidth
+    onLiveLayoutHeightChanged: if (layoutTracking) heldLayoutHeight = liveLayoutHeight
+    onLayoutTrackingChanged: if (layoutTracking) {
+        heldLayoutWidth = liveLayoutWidth
+        heldLayoutHeight = liveLayoutHeight
+    }
+    readonly property real layoutWidth: layoutTracking || heldLayoutWidth <= 0 ? liveLayoutWidth : heldLayoutWidth
+    readonly property real layoutHeight: layoutTracking || heldLayoutHeight <= 0 ? liveLayoutHeight : heldLayoutHeight
 
     signal requestClose()
     signal requestPage(string name)
@@ -50,10 +82,10 @@ ClippingRectangle {
     radius: root.surfaceRadius
     color: "transparent"
     enabled: root.open && !root.suspended
-    opacity: root.suspended ? 0 : root.reveal * root.returnFade * root.swapOpacity * root.loadReveal
+    opacity: root.suspended ? 0 : root.reveal * root.returnFade * root.swapOpacity * root.loadReveal * root.gestureExposure
 
     Behavior on loadReveal {
-        enabled: surfaceLoader.status === Loader.Ready && !Flags.reduceMotion
+        enabled: !root.gestureDriven && surfaceLoader.status === Loader.Ready && !Flags.reduceMotion
         NumberAnimation { id: loadAnimation; duration: Motion.standardSmall; easing.type: Motion.easeStandard }
     }
 
@@ -118,7 +150,10 @@ ClippingRectangle {
 
     Loader {
         id: surfaceLoader
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: root.layoutWidth
+        height: root.layoutHeight
         asynchronous: true
         transformOrigin: Item.Top
         scale: Flags.reduceMotion ? 1

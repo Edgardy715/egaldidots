@@ -48,7 +48,7 @@ with tempfile.TemporaryDirectory(prefix='isla-settings-') as directory:
             assert schema['sections']['appearance']['fontScale']['label'] == 'Tamaño de texto'
             catalog = call('catalog')
             assert schema['sections']['companion']['sleepAfterSeconds']['integer'] is True
-            assert any(section['id'] == 'companion' and section['label'] == 'Iris'
+            assert any(section['id'] == 'companion' and section['label'] == 'Amalgam'
                        for section in catalog['sectionOrder'])
             assert call('get')['effective']['companion'] == {
                 'sleepAfterSeconds': 180, 'reactToCode': True, 'reactToMusic': True,
@@ -69,10 +69,10 @@ with tempfile.TemporaryDirectory(prefix='isla-settings-') as directory:
             assert call('discard')
             assert call('get')['effective']['updates']['enabled'] is False
             assert catalog['availabilityIsLive'] is False
-            assert catalog['sections']['appearance']['pillBlur']['availability'] == 'inactive'
+            assert catalog['sections']['companion']['mischief']['availability'] == 'inactive'
             assert catalog['sections']['appearance']['clockSeconds']['availability'] == 'partial'
             assert catalog['requiredModules'][0]['id'] == 'pill'
-            assert len(catalog['surfaces']) == 17
+            assert len(catalog['surfaces']) == 16
             assert any(surface['id'] == 'settings' for surface in catalog['surfaces'])
             assert catalog['optionalModules'][1]['dependencyMode'] == 'any'
             assert 'pets' not in call('get')['effective']
@@ -103,11 +103,15 @@ with tempfile.TemporaryDirectory(prefix='isla-settings-') as directory:
             assert call('discard')
             assert call('get')['effective']['appearance']['barLayout'] == 'split'
             assert call('update', '{"appearance":{"barLayout":"compact"}}')['ok']
-            assert call('update', '{"appearance":{"fontScale":1.2},"custom":{"keep":7}}')['ok']
+            assert call('update', '{"appearance":{"fontScale":1.2},"x-custom":{"keep":7}}')['ok']
+            bad = call('update', '{"island":{"x":1},"theme":{"y":2}}')
+            assert bad['ok'] is False and any('Unknown section' in e for e in bad['errors'])
+            assert call('update', '{"appearance":{"fontScale":1e308}}')['ok'] is False
+            assert call('update', '{"appearance":{"fontScale":-1}}')['ok'] is False
             assert call('get')['dirty']
             assert call('save')
             wait(lambda x: not x['saving'] and not x['dirty'] and not x['error'])
-            assert json.loads(config.read_text())['custom']['keep'] == 7
+            assert json.loads(config.read_text())['x-custom']['keep'] == 7
             assert json.loads(config.read_text())['appearance']['barLayout'] == 'compact'
             replace('{"appearance":{"fontScale":1.4},"custom":{"keep":9}}')
             wait(lambda x: x['effective']['appearance']['fontScale'] == 1.4)
@@ -241,17 +245,16 @@ ShellRoot {
                 if (stage === 0) {
                     check(Config.update({appearance: {reduceMotion: true}}).ok, "reduce motion")
                     const index = editor.sections.indexOf("companion")
-                    check(index >= 0 && editor.titles[index] === "Iris", "navigation section")
-                    check(editor.subtitles[index].includes("Prototipo"), "prototype help")
+                    check(index >= 0 && editor.titles[index] === "Amalgam", "navigation section")
                     editor.page = index
                 } else if (stage === 1) {
                     page = find(editor, item => item.entries !== undefined && item.drafts !== undefined)
-                    check(page !== null && page.entries.length === 9, "companion field visibility")
+                    check(page !== null && page.entries.length === 12, "companion field visibility")
                     const row = find(page, item => item.fieldKey === "sleepAfterSeconds")
                     check(row !== null, "sleep row")
-                    check(find(row, item => item.text === "180") !== null, "integer value presentation")
+                    check(find(row, item => item.text === "180 s") !== null, "integer value presentation")
                     slider = find(row, item => item.objectName === "settingSlider")
-                    check(slider !== null && slider.stepSize === 1, "integer slider step")
+                    check(slider !== null && slider.stepSize === 10, "integer slider step")
                     slider.value = 333.5
                     slider.moved()
                     check(Config.companion.sleepAfterSeconds === 334, "integer slider update")

@@ -9,7 +9,7 @@ Item {
     id: root
     property real s: 1
     property bool open: false
-    property string userName: qsTr("Usuario")
+    property string userName: I18n.tr("Usuario")
     property string avatarSource: ""
     signal actionRequested(string action)
     signal closeRequested()
@@ -19,16 +19,16 @@ Item {
     property int displayedPending: -1
     onPendingChanged: if (pending >= 0) displayedPending = pending
     readonly property var choices: [
-        { icon: "lock", label: qsTr("Bloquear"), detail: qsTr("Tu sesión seguirá abierta."), action: "lock" },
-        { icon: "logout", label: qsTr("Cerrar sesión"), detail: qsTr("Se cerrarán tus aplicaciones."), action: "logout" },
-        { icon: "restart_alt", label: qsTr("Reiniciar"), detail: qsTr("El equipo volverá a iniciarse."), action: "reboot" },
-        { icon: "power_settings_new", label: qsTr("Apagar"), detail: qsTr("El equipo se apagará."), action: "shutdown" },
-        { icon: "dark_mode", label: qsTr("Suspender"), detail: qsTr("Tu sesión seguirá abierta."), action: "suspend" }
+        { icon: "lock", label: I18n.tr("Bloquear"), detail: I18n.tr("Tu sesión seguirá abierta."), action: "lock" },
+        { icon: "logout", label: I18n.tr("Cerrar sesión"), detail: I18n.tr("Se cerrarán tus aplicaciones."), action: "logout" },
+        { icon: "restart_alt", label: I18n.tr("Reiniciar"), detail: I18n.tr("El equipo volverá a iniciarse."), action: "reboot" },
+        { icon: "power_settings_new", label: I18n.tr("Apagar"), detail: I18n.tr("El equipo se apagará."), action: "shutdown" },
+        { icon: "dark_mode", label: I18n.tr("Suspender"), detail: I18n.tr("Tu sesión seguirá abierta."), action: "suspend" }
     ]
     readonly property var primaryOrder: [4, 2, 3, 1]
     readonly property var navigationOrder: [4, 2, 3, 1, 0]
-    property date now: new Date()
-    readonly property string greeting: now.getHours() < 12 ? qsTr("Buenos días") : now.getHours() < 19 ? qsTr("Buenas tardes") : qsTr("Buenas noches")
+    property date now: Regional.now()
+    readonly property string greeting: now.getHours() < 12 ? I18n.tr("Buenos días") : now.getHours() < 19 ? I18n.tr("Buenas tardes") : I18n.tr("Buenas noches")
     focus: root.open
     onOpenChanged: {
         pending = -1
@@ -77,19 +77,18 @@ Item {
         event.accepted = true
     }
 
-    Timer { interval: 60000; repeat: true; running: root.open; onTriggered: root.now = new Date() }
+    Timer { interval: 60000; repeat: true; running: root.open; onTriggered: root.now = Regional.now() }
     ColumnLayout {
         anchors.fill: parent
         spacing: 16 * root.s
         RowLayout {
             Layout.fillWidth: true
-            Text {
+            SurfaceHeader {
                 Layout.fillWidth: true
-                text: qsTr("Sesión y energía")
-                font.family: Theme.fontMedia; font.pixelSize: 22 * Flags.fontScale * root.s
-                font.weight: Font.Medium; color: Theme.foreground
+                title: I18n.tr("Sesión y energía")
+                s: root.s
             }
-            CtrlBtn { iconName: "close"; size: 30; s: root.s; accessibleName: qsTr("Cerrar panel"); onClicked: root.closeRequested() }
+            CtrlBtn { iconName: "close"; size: 30; s: root.s; accessibleName: I18n.tr("Cerrar panel"); onClicked: root.closeRequested() }
         }
         ColumnLayout {
             Layout.fillWidth: true
@@ -102,7 +101,7 @@ Item {
             Text {
                 Layout.fillWidth: true
                 text: root.userName; horizontalAlignment: Text.AlignHCenter; elide: Text.ElideRight
-                font.family: Theme.fontMedia; font.pixelSize: 21 * Flags.fontScale * root.s
+                font.family: Theme.fontMedia; font.pixelSize: 20 * Flags.fontScale * root.s
                 font.weight: Font.DemiBold; color: Theme.foreground
             }
             Text {
@@ -159,7 +158,7 @@ Item {
                             transform: Translate { y: -Motion.labelTravel * tile.interaction.presence }
                             text: tile.choice.label
                             horizontalAlignment: Text.AlignHCenter; wrapMode: Text.WordWrap
-                            font.family: Theme.fontMedia; font.pixelSize: 12 * Flags.fontScale * root.s
+                            font.family: Theme.fontMedia; font.pixelSize: 11 * Flags.fontScale * root.s
                             font.weight: Font.Medium; color: Theme.foreground
                         }
                     }
@@ -180,13 +179,8 @@ Item {
                     Behavior on y { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                 }
                 Behavior on opacity { enabled: !Flags.reduceMotion; NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                FooterButton { text: qsTr("Bloquear"); onClicked: root.activate(0) }
+                FooterButton { text: I18n.tr("Bloquear"); onClicked: root.activate(0) }
                 Item { Layout.fillWidth: true }
-                Text {
-                    text: qsTr("← → Elegir · Esc Cerrar")
-                    font.family: Theme.fontMedia; font.pixelSize: 10 * Flags.fontScale * root.s
-                    color: Theme.iconSecondary
-                }
             }
             RowLayout {
                 anchors.fill: parent
@@ -204,7 +198,7 @@ Item {
                     spacing: 4 * root.s
                     AnimatedLabel {
                         Layout.fillWidth: true
-                        value: root.displayedPending >= 0 ? qsTr("¿%1?").arg(root.choices[root.displayedPending].label) : ""
+                        value: root.displayedPending >= 0 ? I18n.tr("¿%1?").arg(root.choices[root.displayedPending].label) : ""
                         font.family: Theme.fontMedia; font.pixelSize: 13 * Flags.fontScale * root.s
                         font.weight: Font.Medium; color: Theme.foreground
                     }
@@ -212,12 +206,12 @@ Item {
                         Layout.fillWidth: true
                         value: root.displayedPending >= 0 ? root.choices[root.displayedPending].detail : ""
                         wrapMode: Text.WordWrap
-                        font.family: Theme.fontMedia; font.pixelSize: 10 * Flags.fontScale * root.s
+                        font.family: Theme.fontMedia; font.pixelSize: 11 * Flags.fontScale * root.s
                         color: Theme.iconSecondary
                     }
                 }
-                FooterButton { text: qsTr("Cancelar"); onClicked: root.cancel() }
-                FooterButton { text: qsTr("Confirmar"); prominent: true; onClicked: root.confirm() }
+                FooterButton { text: I18n.tr("Cancelar"); onClicked: root.cancel() }
+                FooterButton { text: I18n.tr("Confirmar"); prominent: true; onClicked: root.confirm() }
             }
         }
     }

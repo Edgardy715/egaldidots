@@ -204,7 +204,7 @@ ShellRoot {
                         checkBounds()
                     }
                 }
-                for (const name of ["mixer", "workspaces", "calendar", "launcher"]) {
+                for (const name of ["mixer", "overview", "calendar", "launcher"]) {
                     pill.surface = name
                     settle()
                     check(pill.surfaceItem && pill.surfaceContentProgress > 0.99, name + " content reveals")

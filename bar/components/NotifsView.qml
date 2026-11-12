@@ -41,7 +41,7 @@ Item {
         // ---- header ----
         SurfaceHeader {
             Layout.fillWidth: true
-            title: qsTr("Notificaciones")
+            title: I18n.tr("Notificaciones")
             s: root.s
             trailing: Component {
                 Rectangle {
@@ -52,8 +52,6 @@ Item {
                     height: 20 * root.s
                     radius: height / 2
                     color: Qt.alpha(Theme.accent, Theme.alphaSubtle)
-                    border.color: Qt.alpha(Theme.accent, Theme.alphaStrong)
-                    border.width: Theme.borderHairline
                     Behavior on width { SmoothedAnimation { velocity: -1; duration: Motion.fast } }
                     AnimatedLabel {
                         id: countTxt
@@ -73,14 +71,14 @@ Item {
             Layout.fillWidth: true
             spacing: Theme.spacingMd * root.s
             Text {
-                text: qsTr("No molestar")
+                text: I18n.tr("No molestar")
                 color: Theme.iconSecondary
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSizeLabel * root.s
             }
             Toggle {
                 objectName: "dndToggle"
-                accessibleName: qsTr("No molestar")
+                accessibleName: I18n.tr("No molestar")
                 checked: root.dnd
                 onToggled: root.toggleDndRequested()
             }
@@ -94,16 +92,13 @@ Item {
                 opacity: root.count > 0 ? 1 : 0.42
                 Behavior on opacity { NumberAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
                 color: clr.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaChip) : Qt.alpha(Theme.foreground, Theme.alphaFaint)
-                border.color: clr.containsMouse ? Qt.alpha(Theme.accent, Theme.alphaStrong) : Qt.alpha(Theme.foreground, Theme.alphaSoft)
-                border.width: Theme.borderHairline
                 Behavior on color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
-                Behavior on border.color { ColorAnimation { duration: Motion.fast; easing.type: Motion.easeStandard } }
 
                 MotionArea {
                     id: clr
                     anchors.fill: parent
                     enabled: root.count > 0 && historyMotion.shown
-                    accessibleName: qsTr("Limpiar todas las notificaciones")
+                    accessibleName: I18n.tr("Limpiar todas las notificaciones")
                     hoverWash: false
                     onClicked: historyMotion.shown = false
                 }
@@ -125,7 +120,7 @@ Item {
                         scale: clr.motion.visualScale
                         transform: Translate { y: -Motion.labelTravel * clr.motion.presence }
                         anchors.verticalCenter: parent.verticalCenter
-                        text: qsTr("Limpiar todo")
+                        text: I18n.tr("Limpiar todo")
                         color: clr.containsMouse ? Theme.accent : Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSizeLabel * root.s
@@ -194,7 +189,6 @@ Item {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.preferredWidth: 40 * root.s; Layout.preferredHeight: 40 * root.s; radius: width / 2
                     color: Qt.alpha(Theme.accent, Theme.alphaSoft)
-                    border.color: Qt.alpha(Theme.accent, Theme.alphaEmphasis); border.width: Theme.borderHairlineSoft * root.s
                     MaterialIcon {
                         anchors.centerIn: parent
                                     color: Theme.accent
@@ -204,7 +198,7 @@ Item {
                 }
                 Text {
                     Layout.alignment: Qt.AlignHCenter
-                    text: qsTr("Todo al día")
+                    text: I18n.tr("Todo al día")
                     color: Theme.iconSecondary
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSizeBodyLg * root.s

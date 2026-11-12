@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import "../services/fzf.js" as Fzf
 import "../services/fuzzysort.js" as Fuzzy
+import "../components/LaunchFlight.js" as Flight
 
 /**
  * Isla · Apps service. Reemplaza el AppDb (C++) de caelestia por JS puro:
@@ -145,6 +146,25 @@ Singleton {
         root._bumpFreq(entry.id)
         // Run after the launcher releases its layer keyboard focus, even if it unloads.
         Qt.callLater(root.executeEntry, entry)
+    }
+
+    /**
+     * Un lanzamiento visible (no cambia el comando ni su momento). `hint` trae el
+     * origen del icono en coordenadas de la ventana de la isla: {x, y, size}.
+     * IslandOverlay escucha esta señal; sólo el monitor con el launcher abierto
+     * reacciona. `candidates` es la regla de casado de ventanas (LaunchFlight.js).
+     */
+    signal launchAnnounced(var info)
+    function announceLaunch(entry, hint) {
+        if (!entry || !hint) return
+        root.launchAnnounced({
+            id: entry.id || "",
+            name: entry.name || "",
+            icon: Quickshell.iconPath(entry.icon || "", "app-no-icon"),
+            candidates: Flight.candidates(entry),
+            originX: hint.x, originY: hint.y, size: hint.size,
+            pid: 0
+        })
     }
 
     function executeEntry(entry) {

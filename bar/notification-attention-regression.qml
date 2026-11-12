@@ -47,7 +47,28 @@ ShellRoot {
         Notifs.list = []
         Notifs._maybePromote()
         check(Notifs.activePopup === null, "empty queue clears active")
-        console.log("PASS: informational deferral, critical priority, auth, expiry and queue promotion")
+        // A burst arrives newest-first in list; toasts still play in arrival order.
+        const first = Qt.createQmlObject('import QtQml; QtObject { property bool popup: true; property bool closed: false; property bool isCritical: false }', root)
+        const second = Qt.createQmlObject('import QtQml; QtObject { property bool popup: true; property bool closed: false; property bool isCritical: false }', root)
+        const third = Qt.createQmlObject('import QtQml; QtObject { property bool popup: true; property bool closed: false; property bool isCritical: false }', root)
+        Notifs.list = [third, second, first]
+        Notifs._maybePromote()
+        check(Notifs.activePopup === first, "burst starts with the oldest")
+        Notifs.advancePopup(first)
+        check(Notifs.activePopup === second, "burst continues in arrival order")
+        // Two criticals in one burst: the older one goes first.
+        const crit1 = Qt.createQmlObject('import QtQml; QtObject { property bool popup: true; property bool closed: false; property bool isCritical: true }', root)
+        const crit2 = Qt.createQmlObject('import QtQml; QtObject { property bool popup: true; property bool closed: false; property bool isCritical: true }', root)
+        const normalBefore = Qt.createQmlObject('import QtQml; QtObject { property bool popup: true; property bool closed: false; property bool isCritical: false }', root)
+        Notifs.list = [crit2, crit1, normalBefore]
+        Notifs.activePopup = normalBefore
+        Notifs._maybePromote()
+        check(Notifs.activePopup === crit1, "older critical wins over newer critical")
+        Notifs.advancePopup(crit1)
+        check(Notifs.activePopup === crit2, "second critical follows")
+        Notifs.list = []
+        Notifs._maybePromote()
+        console.log("PASS: informational deferral, critical priority, auth, expiry, queue promotion and burst order")
         Qt.quit()
     } }
 }
