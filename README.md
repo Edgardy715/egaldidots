@@ -64,7 +64,7 @@ Useful options:
 | `--keep-shell` | Keep the current login shell |
 
 The default hardware profile uses the preferred mode of connected monitors.
-Put your own monitor and GPU overrides in `~/.config/hypr/local.hardware.conf`.
+Put your own monitor and GPU overrides in `~/.config/hypr/local.hardware.lua` (Hyprland Lua).
 See [recovery](docs/RECOVERY.md) for backup behavior and troubleshooting.
 
 ## Use

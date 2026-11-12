@@ -120,12 +120,12 @@ install_config() {
         mkdir -p -- "$(dirname -- "$bar")"
         ln -s -- "$REPO/bar" "$bar"
     fi
-    local hardware="$HOME/.config/hypr/local.hardware.conf"
+    local hardware="$HOME/.config/hypr/local.hardware.lua"
     if [[ ! -e "$hardware" || "$PROFILE_SET" == 1 ]]; then
         if [[ "$PROFILE" == original ]]; then
-            write_generated "$hardware" < "$REPO/profiles/original.hardware.conf"
+            write_generated "$hardware" < "$REPO/profiles/original.hardware.lua"
         else
-            printf '# Portable defaults. Add machine-specific monitor/GPU settings here.\n' | write_generated "$hardware"
+            printf '%s\n' '-- Portable defaults. Add machine-specific monitor/GPU settings here (Hyprland Lua).' | write_generated "$hardware"
         fi
     fi
     bash "$REPO/bar/lockscreen/install.sh"

@@ -25,7 +25,7 @@ def prepare(repo, home, backup, packages):
     # Include generated destinations in the same ancestor safety check.
     data = Path(os.environ.get('XDG_DATA_HOME', home / '.local/share'))
     state = Path(os.environ.get('XDG_STATE_HOME', home / '.local/state'))
-    generated = [Path('.config/quickshell/bar'), Path('.config/hypr/local.hardware.conf'),
+    generated = [Path('.config/quickshell/bar'), Path('.config/hypr/local.hardware.lua'),
                  Path('.cache/matugen/palette.json'), (data / 'isla/qml/Wpscan').relative_to(home),
                  (data / 'quickshell-lockscreen/lock.sh').relative_to(home),
                  (data / 'nvim/lazy/lazy.nvim/.check').relative_to(home),

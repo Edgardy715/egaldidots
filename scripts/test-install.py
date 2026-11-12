@@ -109,11 +109,11 @@ class Recovery(unittest.TestCase):
         self.assertFalse((self.home/'.config/gtk-3.0/settings.ini').is_symlink())
         self.assertEqual((self.repo/'gtk/.config/gtk-3.0/settings.ini').read_text(), '[Settings]\ngtk-theme-name=Adwaita\n')
         self.assertEqual(manifest.read_text(), manifest_text, 'Fisher changed source manifest')
-        self.assertIn('monitor=,preferred,auto,auto', (self.home/'.config/hypr/modules/monitors.conf').read_text())
-        hardware = self.home/'.config/hypr/local.hardware.conf'
-        hardware.write_text('# personal override\n')
+        self.assertIn('hl.monitor(', (self.home/'.config/hypr/modules/monitors.lua').read_text())
+        hardware = self.home/'.config/hypr/local.hardware.lua'
+        hardware.write_text('-- personal override\n')
         self.run_install('--stow-only', '--keep-shell')
-        self.assertEqual(hardware.read_text(), '# personal override\n')
+        self.assertEqual(hardware.read_text(), '-- personal override\n')
         self.run_install('--check')
         calls = self.commands()
         retired = {'rofi', 'waybar', 'swaync', 'wlogout', 'python-pywal16', 'wpgtk'}
@@ -196,7 +196,7 @@ class Recovery(unittest.TestCase):
 
     def test_original_hardware_profile(self):
         self.run_install('--stow-only','--hardware-profile','original')
-        self.assertIn('monitor=eDP-1, disable', (self.home/'.config/hypr/local.hardware.conf').read_text())
+        self.assertIn('GBM_BACKEND', (self.home/'.config/hypr/local.hardware.lua').read_text())
 
     def test_palette_failure_cannot_report_success(self):
         self.env['FAIL_COMMAND'] = 'matugen'
