@@ -84,8 +84,23 @@ fi
 
 command -v python3 >/dev/null || die "python3 is required"
 [[ -f "$src/Main.qml" ]] || die "theme source not found at $src"
-mkdir "$stage/isla"
+mkdir -p "$stage/isla/components" "$stage/isla/shaders" "$stage/isla/Singletons"
 cp "$src/Main.qml" "$src/metadata.desktop" "$stage/isla/"
+
+# The greeter uses the lockscreen's own components, so the login screen moves
+# like the lock. They only need Theme/Flags/Motion, which Singletons/ provides;
+# Motion is Isla's own file without the Quickshell import.
+repo="$(dirname -- "$src")/.."
+for f in InteractionMotion SpringValue MaterialIcon AnimatedSymbol ConfirmationIndicator \
+         InputPlaceholder InputCaret LockGlyph ErrorShake MotionButton; do
+    cp "$repo/bar/components/$f.qml" "$stage/isla/components/"
+done
+cp "$repo/bar/components/AnimatedIconData.js" "$repo/bar/lockscreen/LockButton.qml" "$stage/isla/components/"
+cp "$repo/bar/lockscreen/shaders/drops.frag.qsb" "$stage/isla/shaders/"
+cp "$src/Singletons/qmldir" "$src/Singletons/Flags.qml" "$src/Singletons/Theme.qml" "$stage/isla/Singletons/"
+sed -e '/^import Quickshell$/d' -e 's/^Singleton {/QtObject {/' \
+    "$repo/bar/Singletons/Motion.qml" > "$stage/isla/Singletons/Motion.qml"
+grep -q '^QtObject {' "$stage/isla/Singletons/Motion.qml" || die "unexpected Motion.qml layout"
 
 palette="${XDG_CACHE_HOME:-$HOME/.cache}/matugen/palette.json"
 # Only colours, a locale and file names reach theme.conf; nothing from the user's
@@ -101,7 +116,7 @@ except Exception:
 colors = data.get("colors", {}) if isinstance(data, dict) else {}
 keys = {"bgColor": "background", "foreground": "on_surface", "secondary": "on_surface_variant",
         "accent": "primary", "error": "error", "cardTop": "surface_container_high",
-        "cardBot": "surface_container_low"}
+        "cardBot": "surface_container_low", "outline": "outline_variant"}
 print("[General]")
 for k, v in keys.items():
     c = colors.get(v)
@@ -120,6 +135,13 @@ if [[ -f "$font" && "$(fc-query -f '%{family[0]}\n' "$font" 2>/dev/null | head -
     cp "$font" "$stage/isla/Inter.ttf"
     echo "font=Inter.ttf" >> "$stage/isla/theme.conf"
 fi
+icons="$(fc-match -f '%{file}' 'Material Symbols Rounded' 2>/dev/null || true)"
+if [[ -f "$icons" && "$(fc-query -f '%{family[0]}\n' "$icons" 2>/dev/null | head -1)" == "Material Symbols Rounded" ]]; then
+    cp "$icons" "$stage/isla/MaterialSymbols.ttf"
+    echo "iconFont=MaterialSymbols.ttf" >> "$stage/isla/theme.conf"
+else
+    printf 'isla sddm: Material Symbols Rounded not found; some icons will show as text\n' >&2
+fi
 locale="${LANG%%.*}"
 [[ $locale =~ ^[a-z]{2}(_[A-Z]{2})?$ ]] || locale=es_ES
 printf 'locale=%s\nclock12h=false\n' "$locale" >> "$stage/isla/theme.conf"
@@ -133,8 +155,11 @@ set_current "$conf" isla > "$stage/sddm.conf"
 # Replace the theme as a whole so stale files (an old wallpaper) do not linger.
 "${as_root[@]}" rm -rf -- "$theme_dir"
 "${as_root[@]}" install -d -m755 "$theme_dir"
-for f in "$stage"/isla/*; do
-    "${as_root[@]}" install -m644 "$f" "$theme_dir/"
+(cd "$stage/isla" && find . -mindepth 1 -type d) | while read -r d; do
+    "${as_root[@]}" install -d -m755 "$theme_dir/$d"
+done
+(cd "$stage/isla" && find . -type f) | while read -r f; do
+    "${as_root[@]}" install -m644 "$stage/isla/$f" "$theme_dir/$f"
 done
 "${as_root[@]}" install -d -m755 "$(dirname -- "$conf")"
 "${as_root[@]}" install -m644 "$stage/sddm.conf" "$conf"

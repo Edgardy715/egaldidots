@@ -28,7 +28,11 @@ repository. Never use preview mode as a real lockscreen.
 ## Login screen (SDDM)
 
 After a reboot SDDM handles login, not the lockscreen. `sddm/isla` is an SDDM
-theme with the lockscreen's layout. Install it as your normal user; the script
+theme that ports the lockscreen: the island grows into the rest pill, the
+capsule with liquid beads, the rejection slosh, the lock glyph and the power
+menu. It has no media, weather or battery. The installer bundles the
+lockscreen's own components, shader and Material Symbols font into the theme,
+so rerun it after changing those. Install it as your normal user; the script
 asks for sudo only to copy files:
 
 ```sh
@@ -37,7 +41,11 @@ sddm/install.sh --uninstall   # restore the previous theme
 sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/isla   # preview
 ```
 
-The script copies the current wallpaper, the Inter font and the Matugen colours
+Preview the installed theme, not `sddm/isla` from the checkout: the checkout
+lacks the bundled components. Test mode has no SDDM daemon, so the power menu
+is hidden and a submitted password stays on "Verificando…".
+
+The script copies the current wallpaper, fonts, components and Matugen colours
 into `/usr/share/sddm/themes/isla` (root-owned, mode 644), so the greeter never
 reads your home directory. Colours must be `#rrggbb`; anything else is dropped.
 It changes only `[Theme] Current=` in `/etc/sddm.conf` and records the previous

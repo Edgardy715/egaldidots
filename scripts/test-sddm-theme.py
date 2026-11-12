@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """sddm/install.sh: themed copy, sddm.conf edit that keeps other lines, uninstall."""
 import os
+import re
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -21,6 +23,14 @@ MaximumUid=60513
 """
 
 
+def tiny_png():
+    import struct, zlib
+    def chunk(kind, data):
+        return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 1, 1, 8, 2, 0, 0, 0))
+            + chunk(b"IDAT", zlib.compress(b"\x00\x40\x60\x80")) + chunk(b"IEND", b""))
+
+
 class SddmTheme(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -32,7 +42,7 @@ class SddmTheme(unittest.TestCase):
         self.cache = t / "cache"
         (self.cache / "matugen").mkdir(parents=True)
         self.wall = t / "wall.png"
-        self.wall.write_bytes(b"\x89PNG\r\n\x1a\nfake")
+        self.wall.write_bytes(tiny_png())
         self.palette(background="#14140c", on_surface="#e6e3d5", primary="#cbcb76")
         self.theme = self.root / "usr/share/sddm/themes/isla"
 
@@ -66,6 +76,32 @@ class SddmTheme(unittest.TestCase):
         for line in ("Session=hyprland", "CursorTheme=Bibata", "[Users]", "MaximumUid=60513"):
             self.assertIn(line, text)
         self.assertEqual((self.theme / "previous-theme").read_text().strip(), "material-you")
+
+    def test_lockscreen_components_are_bundled(self):
+        self.run_install()
+        for f in ("components/LockGlyph.qml", "components/LockButton.qml", "components/MaterialIcon.qml",
+                  "components/AnimatedIconData.js", "shaders/drops.frag.qsb", "Singletons/qmldir",
+                  "Singletons/Theme.qml", "Singletons/Flags.qml", "Singletons/Motion.qml"):
+            self.assertEqual((self.theme / f).stat().st_mode & 0o777, 0o644, f)
+        self.assertEqual((self.theme / "components").stat().st_mode & 0o777, 0o755)
+        motion = (self.theme / "Singletons/Motion.qml").read_text()
+        self.assertNotIn("import Quickshell", motion)
+        self.assertIn("QtObject {", motion)
+
+    @unittest.skipUnless(shutil.which("sddm-greeter-qt6"), "sddm-greeter-qt6 not installed")
+    def test_greeter_loads_theme_without_qml_errors(self):
+        self.run_install()
+        env = dict(os.environ, QT_QPA_PLATFORM="offscreen", QT_FORCE_STDERR_LOGGING="1")
+        try:
+            out = subprocess.run(["sddm-greeter-qt6", "--test-mode", "--theme", str(self.theme)],
+                                 env=env, capture_output=True, text=True, timeout=6)
+            text = out.stdout + out.stderr
+        except subprocess.TimeoutExpired as e:
+            text = (e.stdout or b"").decode() + (e.stderr or b"").decode()
+        self.assertIn("Adding view", text)
+        # QML warnings carry "file.qml:LINE"; a load failure says "Fallback".
+        bad = [l for l in text.splitlines() if re.search(r"\.(qml|js):\d+", l) or "Fallback" in l]
+        self.assertEqual(bad, [], text)
 
     def test_reinstall_keeps_original_previous_theme(self):
         self.run_install()
